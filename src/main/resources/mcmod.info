@@ -1,0 +1,16 @@
+[
+{
+  "modid": "drudgemod",
+  "name": "DrudgeMod",
+  "description": "A collection of useful agents.",
+  "version": "0.1.0",
+  "mcversion": "1.8.0",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["Andrew Mellinger"],
+  "credits": "For Virginia and Natalie",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]

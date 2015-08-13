@@ -1,0 +1,7 @@
+tile.drudgemod_taskerFurnace.name=Tasker Furnace (tile)
+item.drudgemod_taskerFurnace.name=Tasker Furnace (item)
+container.taskerFurnace=TaskerFurnace
+tile.drudgemod_taskerLumberjack.name=Tasker Lumberjack (tile)
+item.drudgemod_taskerLumberjack.name=Tasker Lumberjack (item)
+container.taskerLumberjack=TaskerLumberjack
+

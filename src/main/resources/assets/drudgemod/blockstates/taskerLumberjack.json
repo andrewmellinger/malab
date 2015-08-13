@@ -1,0 +1,11 @@
+{
+  "variants":
+  {
+    "normal": { "model": "drudgemod:taskerLumberjack" },
+    "facing=up": { "model": "drudgemod:taskerLumberjack" },
+    "facing=east": { "model": "drudgemod:taskerLumberjack" },
+    "facing=south": { "model": "drudgemod:taskerLumberjack", "y": 90 },
+    "facing=west": { "model": "drudgemod:taskerLumberjack", "y": 180 },
+    "facing=north": { "model": "drudgemod:taskerLumberjack", "y": 270 }
+  }
+}

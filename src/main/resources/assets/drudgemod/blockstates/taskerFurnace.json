@@ -1,0 +1,11 @@
+{
+  "variants":
+  {
+    "normal": { "model": "drudgemod:taskerFurnace" },
+    "facing=up": { "model": "drudgemod:taskerFurnace" },
+    "facing=east": { "model": "drudgemod:taskerFurnace" },
+    "facing=south": { "model": "drudgemod:taskerFurnace", "y": 90 },
+    "facing=west": { "model": "drudgemod:taskerFurnace", "y": 180 },
+    "facing=north": { "model": "drudgemod:taskerFurnace", "y": 270 }
+  }
+}
