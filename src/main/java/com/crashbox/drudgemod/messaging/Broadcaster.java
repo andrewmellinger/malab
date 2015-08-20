@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Copyright 2015 Andrew o. Mellinger
+ * Copyright 2015 Andrew O. Mellinger
  */
 public class Broadcaster
 {
@@ -25,7 +25,7 @@ public class Broadcaster
 
     public static void postMessage(Message message, Channel channel)
     {
-        getInstance().broadcast(message, channel);
+        getInstance().broadcastSync(message, channel);
     }
 
     // Numbers
@@ -74,7 +74,7 @@ public class Broadcaster
      * @param message The message to send.
      * @param channel The channel on which to send.
      */
-    public void broadcast(Message message, Channel channel)
+    public void broadcastSync(Message message, Channel channel)
     {
         List<IListener> listenerList = null;
         synchronized (_lock)

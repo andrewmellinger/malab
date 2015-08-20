@@ -97,12 +97,5 @@ public class AIUtils
         return null;
     }
 
-    public static void scheduleTimerTask(TimerTask task, int delayMillis)
-    {
-        TIMER.schedule(task, delayMillis);
-    }
-
-    private static final Timer TIMER = new Timer("DrudgeTimer", true);
-
     private static final Logger LOGGER = LogManager.getLogger();
 }

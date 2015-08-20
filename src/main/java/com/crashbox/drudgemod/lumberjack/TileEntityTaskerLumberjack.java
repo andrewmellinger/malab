@@ -1,6 +1,8 @@
 package com.crashbox.drudgemod.lumberjack;
 
 import com.crashbox.drudgemod.ai.*;
+import com.crashbox.drudgemod.messaging.Message;
+import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
@@ -18,7 +20,7 @@ public class TileEntityTaskerLumberjack  extends TileEntity
     @Override
     public void setWorldObj(World worldIn)
     {
-        LOGGER.debug("setWorldObk: " + worldIn);
+        LOGGER.debug("setWorldObj: " + worldIn);
         super.setWorldObj(worldIn);
         if (worldIn != null && !worldIn.isRemote)
         {
@@ -41,25 +43,29 @@ public class TileEntityTaskerLumberjack  extends TileEntity
         }
 
         @Override
-        protected void checkWork(MessageWorkerAvailability msg)
+        protected void handleMessage(Message msg)
         {
-            LOGGER.debug("Lumberjack " + this + " is asked for work. In progress work: " + getInProgress().size());
-
-            // Look around for work
-            BlockPos target = AIUtils.findBlock(msg.getWorld(), getPos(), 10, Blocks.log, getInProgress());
-
-            if (target != null)
+            if (msg instanceof MessageItemRequest)
             {
-                LOGGER.debug("********* Found log at: " + target);
+                MessageItemRequest itemReq = (MessageItemRequest)msg;
+                LOGGER.debug("Lumberjack " + this + " is asked for work. In progress work: " + getInProgress().size());
 
-                // Offer a task
-                TaskBase newOffer = new TaskHarvest(this, target);
+                // Look around for work
+                BlockPos target = AIUtils.findBlock(getWorld(), getPos(), 10, Blocks.log, getInProgress());
 
-                // Stash off the offers so we can track what we have already offered
-                addTask(newOffer);
+                if (target != null)
+                {
+                    LOGGER.debug("********* Found log at: " + target);
 
-                // Add the offer to the AI
-                msg.getPayload().offer(newOffer);
+                    // Offer a task
+                    TaskBase newOffer = new TaskHarvest(this, target, 0);
+
+                    // Stash off the offers so we can track what we have already offered
+                    addTask(newOffer);
+
+                    // Add the offer to the AI
+                    itemReq.getAIDrudge().offer(newOffer);
+                }
             }
         }
     }

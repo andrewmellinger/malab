@@ -2,21 +2,19 @@ package com.crashbox.drudgemod.ai;
 
 import com.crashbox.drudgemod.EntityDrudge;
 import com.crashbox.drudgemod.messaging.Broadcaster;
-import com.crashbox.drudgemod.messaging.IListener;
 import com.crashbox.drudgemod.messaging.IMessageSender;
 import com.crashbox.drudgemod.messaging.Message;
-import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.concurrent.LinkedTransferQueue;
 
 /**
- * Copyright 2015 Andrew o. Mellinger
+ * Copyright 2015 Andrew O. Mellinger
  */
 public class EntityAIDrudge extends EntityAIBase implements IMessageSender
 {
@@ -87,6 +85,115 @@ public class EntityAIDrudge extends EntityAIBase implements IMessageSender
         return 0;
     }
 
+    private TaskBase elicit(Message msg)
+    {
+        LOGGER.debug("Eliciting: " + msg);
+        Queue<TaskBase> previous = new LinkedList<TaskBase>(_offers);
+        _offers.clear();
+
+        // Post message
+        Broadcaster.postMessage(msg, _channel);
+
+        // If we didn't get any new offers we are done
+        if (_offers.size() == 0)
+        {
+            LOGGER.debug("No offers made.");
+            _offers.addAll(previous);
+            return null;
+        }
+
+        // Find highest offer, and see if we can do it.
+        TaskBase highest;
+        while ((highest = findHighest(_offers)) != null)
+        {
+            LOGGER.debug("Processing highest: " + highest);
+            if (!canPerform(highest))
+            {
+                LOGGER.debug("Can't perform task, rejecting: " + highest);
+                highest.reject();
+                continue;
+            }
+
+            Message preReq = checkPrerequisite(highest);
+            if (preReq != null)
+            {
+                LOGGER.debug("Has pre-req: " + preReq);
+                TaskBase preReqTask = elicit(preReq);
+                if (preReqTask == null)
+                {
+                    // Couldn't find a task for the pre-req
+                    LOGGER.debug("Couldn't find task for pre-req rejecting.");
+                    highest.reject();
+                }
+                else
+                {
+                    preReqTask.setNextTask(highest);
+                    highest = preReqTask;
+                    rejectOffers();
+                    _offers.addAll(previous);
+                    return highest;
+                }
+            }
+            else
+            {
+                return highest;
+            }
+        }
+
+        // Ran out of offers
+        LOGGER.debug("Ran out of offers.");
+
+        _offers.addAll(previous);
+        return null;
+    }
+
+    private boolean canPerform(TaskBase task)
+    {
+        if (task instanceof TaskCarryTo)
+        {
+            TaskCarryTo deliver = (TaskCarryTo)task;
+            ItemStack held = getEntity().getHeldItem();
+            if (held == null || held.getItem() == deliver.getItemType())
+            {
+                return true;
+            }
+        }
+        if (task instanceof TaskHarvest)
+        {
+            TaskHarvest harvest = (TaskHarvest)task;
+            return true;
+        }
+        return false;
+    }
+
+    private Message checkPrerequisite(TaskBase task)
+    {
+        if (task instanceof TaskCarryTo)
+        {
+            TaskCarryTo deliver = (TaskCarryTo)task;
+            if (getEntity().getHeldItem() == null)
+            {
+                return new MessageItemRequest(this, deliver.getItemType(), deliver.getQuantity());
+            }
+        }
+        return null;
+    }
+
+    private void rejectOffers()
+    {
+        TaskBase task;
+        while ((task = _offers.poll()) != null)
+        {
+            task.reject();
+        }
+    }
+
+    private TaskBase findHighest(Queue<TaskBase> list)
+    {
+        return list.poll();
+    }
+
+
     /**
      * This asks everyone on our communications channel if there is work for us.
      * @return True if we have a new task.
@@ -98,44 +205,20 @@ public class EntityAIDrudge extends EntityAIBase implements IMessageSender
 
         // Send availability message
         // When we return the offers should be full.
-        Broadcaster.postMessage(new MessageWorkerAvailability(_entity.worldObj, this), _channel);
+        TaskBase task = elicit(new MessageWorkerAvailability(_entity.worldObj, this));
 
-        // Process all offers
-        TaskBase highestOffer = null;
-        int highestWeight = 0;
-        TaskBase offer;
-        while ((offer = _offers.poll()) != null)
+        // If we have one, accept all
+        if (task != null)
         {
-            // Keep the highest around, rejecting all others
-            int weight = computeWeight(offer);
-            if (weight > highestWeight)
-            {
-                if (highestOffer != null)
-                    highestOffer.reject();
-
-                highestWeight = weight;
-                highestOffer = offer;
-            }
-            else
-            {
-                LOGGER.debug("Rejecting offer due to weight: " + weight + " <= " + highestWeight);
-                offer.reject();
-            }
+            _currentTask = task;
+            task.accept(this);
+            while ((task = task.getNextTask()) != null)
+                task.accept(this);
+            _offers.clear();
+            return true;
         }
-
-        // If offer then start commuting
-        if (highestOffer != null)
-        {
-            // Accept.
-            highestOffer.accept(this);
-
-            // Put into our pending queue so we get executed
-            _currentTask = highestOffer;
-        }
-
-        // Now that we have processed them all, clear the offers
         _offers.clear();
-        return (_currentTask != null);
+        return false;
     }
 
     // This computes the cost of each task
@@ -146,10 +229,17 @@ public class EntityAIDrudge extends EntityAIBase implements IMessageSender
         return 1;
     }
 
-
-
-
-
+    @Override
+    public String toString()
+    {
+        return "EntityAIDrudge{" +
+//                "_entity=" + _entity +
+//                ", _nextElicit=" + _nextElicit +
+//                ", _channel=" + _channel +
+//                ", _currentTask=" + _currentTask +
+//                ", _offers=" + _offers +
+                '}';
+    }
 
     //========================
     // PRIVATES

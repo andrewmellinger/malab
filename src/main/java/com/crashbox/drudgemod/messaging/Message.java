@@ -3,12 +3,11 @@ package com.crashbox.drudgemod.messaging;
 /**
  * Copyright 2015 Andrew o. Mellinger
  */
-public class Message<T>
+public class Message
 {
-    public Message(IMessageSender sender, T payload)
+    public Message(IMessageSender sender)
     {
         _sender = sender;
-        _payload = payload;
     }
 
     public IMessageSender getSender()
@@ -16,11 +15,5 @@ public class Message<T>
         return _sender;
     }
 
-    public T getPayload()
-    {
-        return _payload;
-    }
-
-    private T _payload;
     private IMessageSender _sender;
 }

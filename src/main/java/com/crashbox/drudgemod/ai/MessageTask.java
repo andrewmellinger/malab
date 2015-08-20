@@ -6,10 +6,13 @@ import com.crashbox.drudgemod.messaging.IMessageSender;
 /**
  * Copyright 2015 Andrew O. Mellinger
  */
-public class MessageTask extends Message<TaskBase>
+public class MessageTask extends Message
 {
-    public MessageTask(IMessageSender sender, TaskBase payload)
+    public MessageTask(IMessageSender sender, TaskBase task)
     {
-        super(sender, payload);
+        super(sender);
+        _task = task;
     }
+
+    private final TaskBase _task;
 }

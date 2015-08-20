@@ -43,14 +43,18 @@ public abstract class TaskMaster
     }
 
     /**
-     * Extension point for taskers to see if they have approprite work.
+     * Extension point for taskers to see if they have appropriate work.
      * They should check to see if they have work.
      * @param msg The message indicating the worker is ready.
      */
-    protected abstract void checkWork(MessageWorkerAvailability msg);
+    protected abstract void handleMessage(Message msg);
 
+    public Broadcaster.Channel getChannel()
+    {
+        return _inChannel;
+    }
 
-    // =================
+    //=============================================================================================
     // Progress track
 
     // Called by the Task when it is rejected
@@ -80,9 +84,8 @@ public abstract class TaskMaster
         _inProgress.add(task);
     }
 
-    // Here we track made offers.
-    private List<TaskBase> _inProgress = new ArrayList<TaskBase>();
 
+    //=============================================================================================
 
     // Listener to deal with all the incoming messages
     private class Listener implements IListener
@@ -90,10 +93,7 @@ public abstract class TaskMaster
         @Override
         public void handleMessage(Message message)
         {
-            if (message instanceof MessageWorkerAvailability)
-            {
-                checkWork((MessageWorkerAvailability)message);
-            }
+            TaskMaster.this.handleMessage(message);
         }
     }
 
@@ -102,10 +102,13 @@ public abstract class TaskMaster
     {
         return "TaskMaster{" +
                 "_inProgress=" + _inProgress.size() +
-                ", _listener=" + _listener +
+                ", _listener=" + Integer.toHexString(_listener.hashCode()) +
                 ", _inChannel=" + _inChannel +
                 '}';
     }
+
+    // Here we track made offers.
+    private List<TaskBase> _inProgress = new ArrayList<TaskBase>();
 
     private Listener _listener;
     private Broadcaster.Channel _inChannel = Broadcaster.Channel.RED;

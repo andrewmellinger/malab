@@ -1,6 +1,7 @@
 package com.crashbox.drudgemod.ai;
 
 import com.crashbox.drudgemod.EntityDrudge;
+import com.crashbox.drudgemod.messaging.Message;
 import net.minecraft.util.BlockPos;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -10,20 +11,35 @@ import org.apache.logging.log4j.Logger;
  */
 public abstract class TaskBase
 {
-    protected TaskBase(TaskMaster tasker)
-    {
-        this(tasker, null);
-    }
-
-    protected TaskBase(TaskMaster tasker, BlockPos focusBlock)
+    /**
+     * Base class for all tasks.
+     * @param tasker This is the TaskMaster who originated the tasks.
+     * @param focusBlock The block we are focused on.
+     * @param priority The priority of the task.
+     */
+    protected TaskBase(TaskMaster tasker, BlockPos focusBlock, int priority)
     {
         _tasker = tasker;
         _focusBlock = focusBlock;
+        _priority = priority;
     }
 
+
+    @Deprecated
     public BlockPos getFocusBlock()
     {
         return _focusBlock;
+    }
+
+    /**
+     * Used to indicate if a task is focused on this block.  If true, other tasks of the same
+     * type should not focus on ths block.
+     * @param pos The position in question
+     * @return True if this task is focused on the pos.
+     */
+    public boolean isFocusBlock(BlockPos pos)
+    {
+        return false;
     }
 
     /**
@@ -53,6 +69,22 @@ public abstract class TaskBase
      * @return True if we are doing work.
      */
     public abstract boolean continueExecution();
+
+    /**
+     * @return The next task for task chaining
+     */
+    public TaskBase getNextTask()
+    {
+        return _nextTask;
+    }
+
+    /**
+     * Sets the next task
+     */
+    public void setNextTask(TaskBase task)
+    {
+        _nextTask = task;
+    }
 
     // =======================
     // Task Acceptance
@@ -94,8 +126,13 @@ public abstract class TaskBase
     // Is the task focused on a particular block such as harvesting?
     protected BlockPos _focusBlock;
 
+    protected final int _priority;
+
     // Who is executing the task?   Can be null.
     protected EntityAIDrudge _entityAI;
+
+    // Use for chaining
+    protected TaskBase _nextTask;
 
     // When was the task accepted?  0 for not accepted.
     private long _accepted = 0;

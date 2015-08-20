@@ -7,11 +7,11 @@ import net.minecraft.util.BlockPos;
 /**
  * Copyright 2015 Andrew O. Mellinger
  */
-public class MessageGoTo extends Message<BlockPos>
+public class MessageGoTo extends Message
 {
     public MessageGoTo(IMessageSender sender, BlockPos pos)
     {
-        super(sender, pos);
+        super(sender);
         _pos = pos;
     }
 

@@ -1,6 +1,13 @@
 package com.crashbox.drudgemod.furnace;
 
-import com.crashbox.drudgemod.furnace.ContainerTaskerFurnace;
+import com.crashbox.drudgemod.ai.MessageItemRequest;
+import com.crashbox.drudgemod.ai.MessageWorkerAvailability;
+import com.crashbox.drudgemod.ai.TaskCarryTo;
+import com.crashbox.drudgemod.ai.TaskMaster;
+import com.crashbox.drudgemod.messaging.Broadcaster;
+import com.crashbox.drudgemod.messaging.Message;
+import com.crashbox.drudgemod.tasker.TileEntityTaskerInventory;
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -14,9 +21,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.server.gui.IUpdatePlayerListBox;
 import net.minecraft.tileentity.TileEntityFurnace;
-import net.minecraft.tileentity.TileEntityLockable;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MathHelper;
@@ -30,8 +35,12 @@ import org.apache.logging.log4j.Logger;
 /**
  * Copyright 2015 Andrew O. Mellinger
  */
-public class TileEntityTaskerFurnace extends TileEntityLockable implements IUpdatePlayerListBox, ISidedInventory
+public class TileEntityTaskerFurnace extends TileEntityTaskerInventory implements ISidedInventory
 {
+    public int INPUT_INDEX = 0;
+    public int FUEL_INDEX = 1;
+    public int OUTPUT_INDEX = 2;
+
     // enumerate the slots
     public enum slotEnum
     {
@@ -338,7 +347,6 @@ public class TileEntityTaskerFurnace extends TileEntityLockable implements IUpda
         return 200;
     }
 
-
     private boolean canSmelt()
     {
         if (_itemStacks[0] == null)
@@ -422,6 +430,19 @@ public class TileEntityTaskerFurnace extends TileEntityLockable implements IUpda
     @Override
     public boolean isItemValidForSlot(int index, ItemStack stack)
     {
+        if ( index == INPUT_INDEX)
+        {
+            if (_itemStacks[INPUT_INDEX] == null)
+            {
+                return FurnaceRecipes.instance().getSmeltingResult(_itemStacks[0]) != null;
+            }
+            if (_itemStacks[FUEL_INDEX].isItemEqual(stack))
+            {
+                return true;
+            }
+        }
+
+
         return index == slotEnum.INPUT_SLOT.ordinal() ? true : false;
     }
 
@@ -530,6 +551,117 @@ public class TileEntityTaskerFurnace extends TileEntityLockable implements IUpda
                 '}';
     }
 
+
+    //---------------------------------------------------------------------------------------------
+
+    private ItemStack getSmeltable()
+    {
+        return _itemStacks[0];
+    }
+
+    private ItemStack getFuel()
+    {
+        return _itemStacks[1];
+    }
+
+    private ItemStack getOutput()
+    {
+        return _itemStacks[2];
+    }
+
+    private int fuelNeedPriority()
+    {
+        return (_itemStacks[1] != null && _itemStacks[1].stackSize < 16 ? 1 : 0);
+    }
+
+    private Block getFuelBlockType()
+    {
+        if (_itemStacks[1] != null)
+        {
+            return Block.getBlockFromItem(_itemStacks[1].getItem());
+        }
+        return null;
+    }
+
+    private int smeltableNeedPriority()
+    {
+        return (_itemStacks[0] != null && _itemStacks[0].stackSize < 32 ? 1 : 0);
+    }
+
+    private Item getSmeltableItemType()
+    {
+        if (_itemStacks[0] != null)
+        {
+            return _itemStacks[0].getItem();
+        }
+        return null;
+    }
+
+
+    public void blockBroken()
+    {
+        _furnace.terminate();
+    }
+
+    //---------------------------------------------------------------------------------------------
+
+    @Override
+    public int distanceTo(BlockPos pos)
+    {
+        return 0;
+    }
+
+    //---------------------------------------------------------------------------------------------
+
+    @Override
+    public void setWorldObj(World worldIn)
+    {
+        LOGGER.debug("setWorldObj: " + worldIn);
+        super.setWorldObj(worldIn);
+        if (worldIn != null && !worldIn.isRemote)
+        {
+            _furnace = new Furnace(worldIn);
+        }
+        else
+        {
+            if (_furnace != null)
+                _furnace.terminate();
+            _furnace = null;
+        }
+    }
+
+    // TaskMaster Furnace
+    private class Furnace extends TaskMaster
+    {
+        Furnace(World world)
+        {
+            super(world);
+        }
+
+        @Override
+        protected void handleMessage(Message msg)
+        {
+            if (msg instanceof MessageWorkerAvailability)
+            {
+                MessageWorkerAvailability availability = (MessageWorkerAvailability)msg;
+                LOGGER.debug("Furnace " + this + " is asked for work. In progress work: " + getInProgress().size());
+
+                int priority = smeltableNeedPriority();
+
+                if ( priority > 0 )
+                {
+                    // Find smeltable
+                    LOGGER.debug("Furnace can use more smeltable: " + getSmeltableItemType().getUnlocalizedName());
+
+                    // Indicate we need some supplies
+                    availability.getAIDrudge().offer(new TaskCarryTo(this, TileEntityTaskerFurnace.this,
+                            getSmeltableItemType(), INPUT_INDEX, 0));
+                }
+            }
+        }
+    }
+
+    private Furnace _furnace;
     private static final Logger LOGGER = LogManager.getLogger();
 }
 

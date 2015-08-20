@@ -66,14 +66,14 @@ public class BlockTaskerFurnace extends BlockContainer
     public void breakBlock(World inWorld, BlockPos inPos, IBlockState inBlockState)
     {
         // TODO:  What does hasTileEntity do?  Do I really need this?
-//        if (hasTileEntity(inBlockState))
-//        {
-//            TileEntity entity = inWorld.getTileEntity(inPos);
-//            if (entity instanceof TileEntityTaskerFurnace)
-//            {
-//                ((TileEntityTaskerFurnace)entity).terminate();
-//            }
-//        }
+        if (hasTileEntity(inBlockState))
+        {
+            TileEntity entity = inWorld.getTileEntity(inPos);
+            if (entity instanceof TileEntityTaskerFurnace)
+            {
+                ((TileEntityTaskerFurnace)entity).blockBroken();
+            }
+        }
 
         // This MUST be last because it removes the TileEntity.
         super.breakBlock(inWorld, inPos, inBlockState);
