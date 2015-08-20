@@ -149,9 +149,9 @@ public class EntityAIDrudge extends EntityAIBase implements IMessageSender
 
     private boolean canPerform(TaskBase task)
     {
-        if (task instanceof TaskCarryTo)
+        if (task instanceof TaskDeliver)
         {
-            TaskCarryTo deliver = (TaskCarryTo)task;
+            TaskDeliver deliver = (TaskDeliver)task;
             ItemStack held = getEntity().getHeldItem();
             if (held == null || held.getItem() == deliver.getItemType())
             {
@@ -168,9 +168,9 @@ public class EntityAIDrudge extends EntityAIBase implements IMessageSender
 
     private Message checkPrerequisite(TaskBase task)
     {
-        if (task instanceof TaskCarryTo)
+        if (task instanceof TaskDeliver)
         {
-            TaskCarryTo deliver = (TaskCarryTo)task;
+            TaskDeliver deliver = (TaskDeliver)task;
             if (getEntity().getHeldItem() == null)
             {
                 return new MessageItemRequest(this, deliver.getItemType(), deliver.getQuantity());

@@ -9,7 +9,7 @@ import net.minecraft.item.ItemStack;
  * <p/>
  * In this task we take the item(s) in our inventory to the target destination.
  */
-public class TaskCarryTo extends TaskBase
+public class TaskDeliver extends TaskBase
 {
     /**
      * Create a new carry task.
@@ -20,7 +20,7 @@ public class TaskCarryTo extends TaskBase
      * @param slot      Where to place the items.
      * @param quantity How much they can handle
      */
-    public TaskCarryTo(TaskMaster tasker, TileEntityTaskerInventory recipient, Item itemType, int slot, int quantity)
+    public TaskDeliver(TaskMaster tasker, TileEntityTaskerInventory recipient, Item itemType, int slot, int quantity)
     {
         super(tasker, recipient.getPos(), 0);
         _recipient = recipient;

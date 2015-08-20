@@ -1,10 +1,8 @@
 package com.crashbox.drudgemod.furnace;
 
-import com.crashbox.drudgemod.ai.MessageItemRequest;
 import com.crashbox.drudgemod.ai.MessageWorkerAvailability;
-import com.crashbox.drudgemod.ai.TaskCarryTo;
+import com.crashbox.drudgemod.ai.TaskDeliver;
 import com.crashbox.drudgemod.ai.TaskMaster;
-import com.crashbox.drudgemod.messaging.Broadcaster;
 import com.crashbox.drudgemod.messaging.Message;
 import com.crashbox.drudgemod.tasker.TileEntityTaskerInventory;
 import net.minecraft.block.Block;
@@ -654,7 +652,7 @@ public class TileEntityTaskerFurnace extends TileEntityTaskerInventory implement
                     LOGGER.debug("Furnace can use more smeltable: " + getSmeltableItemType().getUnlocalizedName());
 
                     // Indicate we need some supplies
-                    availability.getAIDrudge().offer(new TaskCarryTo(this, TileEntityTaskerFurnace.this,
+                    availability.getAIDrudge().offer(new TaskDeliver(this, TileEntityTaskerFurnace.this,
                             getSmeltableItemType(), INPUT_INDEX, 0));
                 }
             }
