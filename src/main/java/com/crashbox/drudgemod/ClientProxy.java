@@ -1,7 +1,7 @@
 package com.crashbox.drudgemod;
 
 import com.crashbox.drudgemod.furnace.BlockTaskerFurnace;
-import com.crashbox.drudgemod.lumberjack.BlockTaskerLumberjack;
+import com.crashbox.drudgemod.forester.BlockTaskerForester;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelZombie;
 import net.minecraft.client.renderer.entity.RenderItem;
@@ -46,9 +46,9 @@ public class ClientProxy extends CommonProxy
                 0,
                 new ModelResourceLocation(DrudgeMain.MODID + ":" + BlockTaskerFurnace.NAME, "inventory"));
         renderItem.getItemModelMesher().register(
-                Item.getItemFromBlock(DrudgeMain.BLOCK_TASKER_LUMBERJACK),
+                Item.getItemFromBlock(DrudgeMain.BLOCK_TASKER_FORESTER),
                 0,
-                new ModelResourceLocation(DrudgeMain.MODID + ":" + BlockTaskerLumberjack.NAME, "inventory"));
+                new ModelResourceLocation(DrudgeMain.MODID + ":" + BlockTaskerForester.NAME, "inventory"));
     }
 
     @Override

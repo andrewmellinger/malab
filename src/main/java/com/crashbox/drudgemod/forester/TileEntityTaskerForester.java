@@ -1,8 +1,7 @@
-package com.crashbox.drudgemod.lumberjack;
+package com.crashbox.drudgemod.forester;
 
 import com.crashbox.drudgemod.ai.*;
 import com.crashbox.drudgemod.messaging.Message;
-import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
@@ -13,9 +12,9 @@ import org.apache.logging.log4j.Logger;
 /**
  * Copyright 2015 Andrew O. Mellinger
  */
-public class TileEntityTaskerLumberjack  extends TileEntity
+public class TileEntityTaskerForester extends TileEntity
 {
-    public static final String NAME = "tileEntityTaskerLumberjack";
+    public static final String NAME = "tileEntityTaskerForester";
 
     @Override
     public void setWorldObj(World worldIn)
@@ -24,19 +23,19 @@ public class TileEntityTaskerLumberjack  extends TileEntity
         super.setWorldObj(worldIn);
         if (worldIn != null && !worldIn.isRemote)
         {
-            _lumberjack = new Lumberjack(worldIn);
+            _forester = new Forester(worldIn);
         }
         else
         {
-            if (_lumberjack != null)
-                _lumberjack.terminate();
-            _lumberjack = null;
+            if (_forester != null)
+                _forester.terminate();
+            _forester = null;
         }
     }
 
-    private class Lumberjack extends TaskMaster
+    private class Forester extends TaskMaster
     {
-        private Lumberjack(World world)
+        private Forester(World world)
         {
             super(world);
             LOGGER.debug("Constructing: " + this);
@@ -48,13 +47,15 @@ public class TileEntityTaskerLumberjack  extends TileEntity
             if (msg instanceof MessageItemRequest)
             {
                 MessageItemRequest itemReq = (MessageItemRequest)msg;
-                LOGGER.debug("Lumberjack " + this + " is asked for work. In progress work: " + getInProgress().size());
+                LOGGER.debug("Forester " + this + " is asked for work. In progress work: " + getInProgress().size());
 
                 // Look around for work
                 BlockPos target = AIUtils.findBlock(getWorld(), getPos(), 10, Blocks.log, getInProgress());
 
                 if (target != null)
                 {
+                    System.out.println(getWorld().getBlockState(target));
+
                     LOGGER.debug("********* Found log at: " + target);
 
                     // Offer a task
@@ -72,18 +73,18 @@ public class TileEntityTaskerLumberjack  extends TileEntity
 
     public void blockBroken()
     {
-        _lumberjack.terminate();
+        _forester.terminate();
     }
 
     @Override
     public String toString()
     {
-        return "TileEntityTaskerLumberjack{" +
-                "_lumberjack=" + _lumberjack +
+        return "TileEntityTaskerForester{" +
+                "_forester=" + _forester +
                 '}';
     }
 
-    private Lumberjack _lumberjack;
+    private Forester _forester;
     private static final Logger LOGGER = LogManager.getLogger();
 
 }

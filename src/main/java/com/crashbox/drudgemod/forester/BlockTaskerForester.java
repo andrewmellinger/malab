@@ -1,7 +1,6 @@
-package com.crashbox.drudgemod.lumberjack;
+package com.crashbox.drudgemod.forester;
 
 import com.crashbox.drudgemod.DrudgeMain;
-import com.crashbox.drudgemod.lumberjack.TileEntityTaskerLumberjack;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -15,11 +14,11 @@ import org.apache.logging.log4j.Logger;
 /**
  * Copyright 2015 Andrew O. Mellinger
  */
-public class BlockTaskerLumberjack extends BlockContainer
+public class BlockTaskerForester extends BlockContainer
 {
-    public static final String NAME = "taskerLumberjack";
+    public static final String NAME = "taskerForester";
 
-    public BlockTaskerLumberjack()
+    public BlockTaskerForester()
     {
         super(Material.iron);
         setUnlocalizedName(DrudgeMain.MODID + "_" + NAME);
@@ -41,7 +40,7 @@ public class BlockTaskerLumberjack extends BlockContainer
     @Override
     public TileEntity createNewTileEntity(World world, int i)
     {
-        return new TileEntityTaskerLumberjack();
+        return new TileEntityTaskerForester();
     }
 
     @Override
@@ -51,9 +50,9 @@ public class BlockTaskerLumberjack extends BlockContainer
         if (hasTileEntity(inBlockState))
         {
             TileEntity entity = inWorld.getTileEntity(inPos);
-            if (entity instanceof TileEntityTaskerLumberjack)
+            if (entity instanceof TileEntityTaskerForester)
             {
-                ((TileEntityTaskerLumberjack)entity).blockBroken();
+                ((TileEntityTaskerForester)entity).blockBroken();
             }
         }
 

@@ -2,8 +2,8 @@ package com.crashbox.drudgemod;
 
 import com.crashbox.drudgemod.furnace.BlockTaskerFurnace;
 import com.crashbox.drudgemod.furnace.TileEntityTaskerFurnace;
-import com.crashbox.drudgemod.lumberjack.BlockTaskerLumberjack;
-import com.crashbox.drudgemod.lumberjack.TileEntityTaskerLumberjack;
+import com.crashbox.drudgemod.forester.BlockTaskerForester;
+import com.crashbox.drudgemod.forester.TileEntityTaskerForester;
 import net.minecraft.block.Block;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -32,7 +32,7 @@ public class DrudgeMain
     public static final String VERSION = "0.1.0";
 
     public static Block BLOCK_TASKER_FURNACE;
-    public static Block BLOCK_TASKER_LUMBERJACK;
+    public static Block BLOCK_TASKER_FORESTER;
 
     // This allows us to us one gui handler for many things
     public enum GUI_ENUM
@@ -106,9 +106,9 @@ public class DrudgeMain
         GameRegistry.registerBlock(BLOCK_TASKER_FURNACE, BlockTaskerFurnace.NAME);
         GameRegistry.registerTileEntity(TileEntityTaskerFurnace.class, TileEntityTaskerFurnace.NAME);
 
-        BLOCK_TASKER_LUMBERJACK = new BlockTaskerLumberjack();
-        GameRegistry.registerBlock(BLOCK_TASKER_LUMBERJACK, BlockTaskerLumberjack.NAME);
-        GameRegistry.registerTileEntity(TileEntityTaskerLumberjack.class, TileEntityTaskerLumberjack.NAME);
+        BLOCK_TASKER_FORESTER = new BlockTaskerForester();
+        GameRegistry.registerBlock(BLOCK_TASKER_FORESTER, BlockTaskerForester.NAME);
+        GameRegistry.registerTileEntity(TileEntityTaskerForester.class, TileEntityTaskerForester.NAME);
     }
 
 
