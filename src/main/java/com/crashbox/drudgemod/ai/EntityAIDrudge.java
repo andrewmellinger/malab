@@ -153,7 +153,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessageSender
         {
             TaskDeliver deliver = (TaskDeliver)task;
             ItemStack held = getEntity().getHeldItem();
-            if (held == null || held.getItem() == deliver.getItemType())
+            if (held == null || held.isItemEqual(deliver.getItemSample()))
             {
                 return true;
             }
@@ -173,7 +173,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessageSender
             TaskDeliver deliver = (TaskDeliver)task;
             if (getEntity().getHeldItem() == null)
             {
-                return new MessageItemRequest(this, deliver.getItemType(), deliver.getQuantity());
+                return new MessageItemRequest(this, deliver.getItemSample(), deliver.getQuantity());
             }
         }
         return null;
@@ -245,7 +245,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessageSender
     // PRIVATES
     private EntityDrudge _entity;
 
-    private static final int CHECK_DELAY_MILLIS = 2000;
+    private static final int CHECK_DELAY_MILLIS = 3000;
     private static final int DEFAULT_RANGE = 10;
     private static final double DEFAULT_SPEED = 0.5;
 

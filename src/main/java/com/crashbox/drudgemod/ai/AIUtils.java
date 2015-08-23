@@ -3,8 +3,6 @@ package com.crashbox.drudgemod.ai;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
@@ -12,9 +10,8 @@ import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.Iterator;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * Copyright 2015 Andrew o. Mellinger
@@ -94,6 +91,43 @@ public class AIUtils
                 }
             }
         }
+        return null;
+    }
+
+    public static interface BlockVisitor
+    {
+        /** @return true to keep visiting */
+        public boolean visit(BlockPos pos);
+    }
+
+    /**
+     * Visits the blocks in a cubic shell surrounding the area.
+     * @param world
+     * @param center
+     * @param start
+     * @param quantity
+     * @param filter
+     * @return
+     */
+    public static BlockPos visitBlock(World world, BlockPos center, BlockPos start, int quantity, BlockVisitor filter)
+    {
+        return null;
+    }
+
+    /**
+     * Finds trees in the area, starting at the specified block at ground level and working outward.
+     * We assume vertical blocks are trees so we work that way.
+     */
+    public static List<BlockPos> findTree(World world, BlockPos center, int radius, int height, int quantity, Block type)
+    {
+        // Search in ring at top, then work down if we find a block
+
+        int x;
+        int y;
+        int z;
+
+
+
         return null;
     }
 

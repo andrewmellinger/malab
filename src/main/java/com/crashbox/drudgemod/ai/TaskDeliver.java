@@ -1,7 +1,6 @@
 package com.crashbox.drudgemod.ai;
 
 import com.crashbox.drudgemod.tasker.TileEntityTaskerInventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 /**
@@ -13,25 +12,24 @@ public class TaskDeliver extends TaskBase
 {
     /**
      * Create a new carry task.
-     *
-     * @param tasker    Who made the task.
+     *  @param tasker    Who made the task.
      * @param recipient Target of the delivery.
-     * @param itemType  Then item to deliver.
+     * @param itemSample  Then item to deliver.
      * @param slot      Where to place the items.
      * @param quantity How much they can handle
      */
-    public TaskDeliver(TaskMaster tasker, TileEntityTaskerInventory recipient, Item itemType, int slot, int quantity)
+    public TaskDeliver(TaskMaster tasker, TileEntityTaskerInventory recipient, ItemStack itemSample, int slot, int quantity)
     {
         super(tasker, recipient.getPos(), 0);
         _recipient = recipient;
-        _itemType = itemType;
+        _itemSample = itemSample;
         _slot = slot;
         _quantity = quantity;
     }
 
-    public Item getItemType()
+    public ItemStack getItemSample()
     {
-        return _itemType;
+        return _itemSample;
     }
 
     public int getQuantity()
@@ -74,14 +72,14 @@ public class TaskDeliver extends TaskBase
     {
         return "TaskCarryTo{" +
                 "_recipient=" + Integer.toHexString(_recipient.hashCode()) +
-                ", _itemType=" + _itemType +
+                ", _itemSample=" + _itemSample +
                 ", _slot=" + _slot +
                 ", _quantity=" + _quantity +
                 '}';
     }
 
     private final TileEntityTaskerInventory _recipient;
-    private final Item _itemType;
+    private final ItemStack _itemSample;
     private final int _slot;
     private final int _quantity;
 }

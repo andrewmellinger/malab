@@ -116,7 +116,6 @@ public class DrudgeMain
     {
 
 //        // Do your mod setup. Build whatever data structures you care about. Register recipes.
-//        //System.out.println(">>> In Mod Init");
 //        int entityID = 0;
 //        EntityRegistry.registerModEntity(EntityTanglerGrenadePlain.class, "Tangler Grenade",
 //                ++entityID, TanglerMod.instance, 80, 10, true);

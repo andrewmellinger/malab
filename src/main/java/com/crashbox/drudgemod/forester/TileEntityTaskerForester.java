@@ -2,9 +2,7 @@ package com.crashbox.drudgemod.forester;
 
 import com.crashbox.drudgemod.ai.*;
 import com.crashbox.drudgemod.messaging.Message;
-import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -50,16 +48,16 @@ public class TileEntityTaskerForester extends TileEntity
                 LOGGER.debug("Forester " + this + " is asked for work. In progress work: " + getInProgress().size());
 
                 // Look around for work
-                BlockPos target = AIUtils.findBlock(getWorld(), getPos(), 10, Blocks.log, getInProgress());
+//                BlockPos target = AIUtils.findBlock(getWorld(), getPos(), 10, Blocks.log, getInProgress());
 
-                if (target != null)
+                boolean hasMats = RingedSearcher.findBlock(getWorld(), getPos(), _searchRadius, 10, itemReq.getItemSample());
+
+//                if (target != null)
+                if (hasMats)
                 {
-                    System.out.println(getWorld().getBlockState(target));
-
-                    LOGGER.debug("********* Found log at: " + target);
-
-                    // Offer a task
-                    TaskBase newOffer = new TaskHarvest(this, target, 0);
+                    // Offer a task, at our area
+//                    TaskBase newOffer = new TaskHarvest(this, target, 0, _searchRadius, 1);
+                    TaskBase newOffer = new TaskHarvest(this, getPos(), 0, _searchRadius, 1, itemReq.getItemSample());
 
                     // Stash off the offers so we can track what we have already offered
                     addTask(newOffer);
@@ -85,6 +83,7 @@ public class TileEntityTaskerForester extends TileEntity
     }
 
     private Forester _forester;
+    private int _searchRadius = 5;
     private static final Logger LOGGER = LogManager.getLogger();
 
 }

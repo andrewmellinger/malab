@@ -586,11 +586,11 @@ public class TileEntityTaskerFurnace extends TileEntityTaskerInventory implement
         return (_itemStacks[0] != null && _itemStacks[0].stackSize < 32 ? 1 : 0);
     }
 
-    private Item getSmeltableItemType()
+    private ItemStack getSmeltableItemSample()
     {
         if (_itemStacks[0] != null)
         {
-            return _itemStacks[0].getItem();
+            return new ItemStack(_itemStacks[0].getItem(), 1, _itemStacks[0].getMetadata());
         }
         return null;
     }
@@ -649,11 +649,11 @@ public class TileEntityTaskerFurnace extends TileEntityTaskerInventory implement
                 if ( priority > 0 )
                 {
                     // Find smeltable
-                    LOGGER.debug("Furnace can use more smeltable: " + getSmeltableItemType().getUnlocalizedName());
+                    LOGGER.debug("Furnace can use more smeltable: " + getSmeltableItemSample().getUnlocalizedName());
 
                     // Indicate we need some supplies
                     availability.getAIDrudge().offer(new TaskDeliver(this, TileEntityTaskerFurnace.this,
-                            getSmeltableItemType(), INPUT_INDEX, 0));
+                            getSmeltableItemSample(), INPUT_INDEX, 0));
                 }
             }
         }

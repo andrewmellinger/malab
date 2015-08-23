@@ -29,7 +29,6 @@ public class ClientProxy extends CommonProxy
     {
         // Add renderers.
         RenderManager renderManager = Minecraft.getMinecraft().getRenderManager();
-        System.out.println("renderManager: " + renderManager);
         RenderingRegistry.registerEntityRenderingHandler(EntityDrudge.class,
                 new RenderDrudge(renderManager, new ModelZombie(), 0.5F));
 //        RenderingRegistry.registerEntityRenderingHandler(EntityDrudge.class,
