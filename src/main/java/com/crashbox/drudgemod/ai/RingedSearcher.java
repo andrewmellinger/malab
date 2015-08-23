@@ -12,7 +12,7 @@ import java.util.*;
  */
 public class RingedSearcher  implements Iterable<BlockPos>
 {
-
+    // UNDERSTANDS LOG METADATA
     public static Queue<BlockPos> findTree(World world, BlockPos center, int radius, int height, ItemStack sample)
     {
         RingedSearcher searcher = new RingedSearcher(center, radius, height);

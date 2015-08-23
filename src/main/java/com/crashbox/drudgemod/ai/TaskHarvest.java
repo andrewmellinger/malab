@@ -3,6 +3,7 @@ package com.crashbox.drudgemod.ai;
 import com.crashbox.drudgemod.DrudgeUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import org.apache.logging.log4j.LogManager;
@@ -110,6 +111,15 @@ public class TaskHarvest extends TaskBase
             Block blockType = blockState.getBlock();
 
             int meta = blockType.getMetaFromState(blockState);
+            if (blockType == Blocks.log || blockType == Blocks.log2)
+            {
+                LOGGER.debug("++++++++++++++ IS LOG: Just getting lower bits: " + meta + " : " + (meta & 3));
+                meta = meta & 3;
+            }
+
+            LOGGER.debug("++++++++++++ block: " + blockState);
+            LOGGER.debug("++++++++++++ meta: " + meta);
+
             ItemStack newStack = new ItemStack(blockType, 1, meta);
 
             getEntity().getEntityWorld().destroyBlock(_harvestBlock, false);

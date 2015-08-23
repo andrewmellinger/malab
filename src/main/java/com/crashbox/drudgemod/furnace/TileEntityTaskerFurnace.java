@@ -1,5 +1,6 @@
 package com.crashbox.drudgemod.furnace;
 
+import com.crashbox.drudgemod.DrudgeUtils;
 import com.crashbox.drudgemod.ai.MessageWorkerAvailability;
 import com.crashbox.drudgemod.ai.TaskDeliver;
 import com.crashbox.drudgemod.ai.TaskMaster;
@@ -378,27 +379,38 @@ public class TileEntityTaskerFurnace extends TileEntityTaskerInventory implement
     {
         if (canSmelt())
         {
-            ItemStack itemstack = FurnaceRecipes.instance().getSmeltingResult(_itemStacks[0]);
-            if (_itemStacks[2] == null)
+            ItemStack itemstack = FurnaceRecipes.instance().getSmeltingResult(_itemStacks[INPUT_INDEX]);
+
+            // Automatically refuel.  Bascially, this is form charcoal
+            if (_itemStacks[FUEL_INDEX] != null &&
+                    _itemStacks[FUEL_INDEX].stackSize < 48 &&
+                    _itemStacks[FUEL_INDEX].isItemEqual(itemstack))
             {
-                _itemStacks[2] = itemstack.copy();
+                // In case we have multiple outputs
+                _itemStacks[FUEL_INDEX].stackSize += itemstack.stackSize;
             }
-            else if (_itemStacks[2].getItem() == itemstack.getItem())
+            else if (_itemStacks[OUTPUT_INDEX] == null)
             {
-                _itemStacks[2].stackSize += itemstack.stackSize;
+                _itemStacks[OUTPUT_INDEX] = itemstack.copy();
+            }
+            else if (_itemStacks[OUTPUT_INDEX].getItem() == itemstack.getItem())
+            {
+                _itemStacks[OUTPUT_INDEX].stackSize += itemstack.stackSize;
             }
 
-            if (_itemStacks[0].getItem() == Item
-                    .getItemFromBlock(Blocks.sponge) && _itemStacks[0]
-                    .getMetadata() == 1 && _itemStacks[1] != null && _itemStacks[1].getItem() == Items.bucket)
+            // TODO:  What does this mean??
+            if (_itemStacks[INPUT_INDEX].getItem() == Item.getItemFromBlock(Blocks.sponge) &&
+                    _itemStacks[INPUT_INDEX].getMetadata() == 1 &&
+                    _itemStacks[FUEL_INDEX] != null &&
+                    _itemStacks[FUEL_INDEX].getItem() == Items.bucket)
             {
-                _itemStacks[1] = new ItemStack(Items.water_bucket);
+                _itemStacks[FUEL_INDEX] = new ItemStack(Items.water_bucket);
             }
 
-            --_itemStacks[0].stackSize;
-            if (_itemStacks[0].stackSize <= 0)
+            --_itemStacks[INPUT_INDEX].stackSize;
+            if (_itemStacks[INPUT_INDEX].stackSize <= 0)
             {
-                _itemStacks[0] = null;
+                _itemStacks[INPUT_INDEX] = null;
             }
         }
 
