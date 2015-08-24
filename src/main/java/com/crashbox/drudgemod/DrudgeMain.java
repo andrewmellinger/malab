@@ -5,6 +5,8 @@ import com.crashbox.drudgemod.furnace.TileEntityTaskerFurnace;
 import com.crashbox.drudgemod.forester.BlockTaskerForester;
 import com.crashbox.drudgemod.forester.TileEntityTaskerForester;
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
@@ -15,8 +17,11 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.oredict.OreDictionary;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.Arrays;
 
 
 /**
@@ -86,6 +91,12 @@ public class DrudgeMain
     @EventHandler
     public void postInit(FMLPostInitializationEvent event)
     {
+//        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+//        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+//        dumpOreDict();
+//        findLogWood();
+//        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+//        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
         // Handle interaction with other mods, complete your setup based on this.
         proxy.postInit(event);
     }
@@ -111,6 +122,39 @@ public class DrudgeMain
         GameRegistry.registerTileEntity(TileEntityTaskerForester.class, TileEntityTaskerForester.NAME);
     }
 
+
+    private void dumpOreDict()
+    {
+        for (String name : OreDictionary.getOreNames())
+        {
+            System.out.println("############# " + name + " -> " + OreDictionary.getOreID(name));
+        }
+    }
+
+    private void findLogWood()
+    {
+        for (int meta = 0; meta < 4; ++meta)
+        {
+            ItemStack wood = new ItemStack(Blocks.log, 1, meta);
+            System.out.println(wood + " -> " + Arrays.toString(OreDictionary.getOreIDs(wood)));
+        }
+
+        for (ItemStack ore : OreDictionary.getOres("logWood"))
+        {
+            System.out.println(ore);
+        }
+
+        ItemStack oak = new ItemStack(Blocks.log, 1, 0);
+        ItemStack spruce = new ItemStack(Blocks.log, 1, 1);
+        System.out.println("Strict match: " + OreDictionary.itemMatches(oak, spruce, true));
+        System.out.println("UnStrict match: " + OreDictionary.itemMatches(oak, spruce, false));
+
+        ItemStack yAxis = new ItemStack(Blocks.log, 1, 0);
+        ItemStack xAxis = new ItemStack(Blocks.log, 1, 4);
+        System.out.println("Strict match: " + OreDictionary.itemMatches(xAxis, yAxis, true));
+        System.out.println("UnStrict match: " + OreDictionary.itemMatches(xAxis, yAxis, false));
+
+    }
 
     private void initModEntities()
     {

@@ -18,7 +18,7 @@ public class RingedSearcher  implements Iterable<BlockPos>
         RingedSearcher searcher = new RingedSearcher(center, radius, height);
         for (BlockPos pos : searcher)
         {
-            if (DrudgeUtils.sameType(world, pos, sample))
+            if (DrudgeUtils.willDrop(world, pos, sample))
             {
                 Queue<BlockPos> result = new LinkedList<BlockPos>();
 
@@ -27,7 +27,7 @@ public class RingedSearcher  implements Iterable<BlockPos>
                 for (int y = pos.getY(); y >= center.getY(); --y)
                 {
                     BlockPos tmp = new BlockPos(pos.getX(), y, pos.getZ());
-                    if (DrudgeUtils.sameType(world, tmp, sample))
+                    if (DrudgeUtils.willDrop(world, tmp, sample))
                     {
                         result.add(tmp);
                     }
@@ -44,7 +44,7 @@ public class RingedSearcher  implements Iterable<BlockPos>
         RingedSearcher searcher = new RingedSearcher(center, radius, height);
         for (BlockPos pos : searcher)
         {
-            if (DrudgeUtils.sameType(world, pos, sample))
+            if (DrudgeUtils.willDrop(world, pos, sample))
             {
                 return true;
             }

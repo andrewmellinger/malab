@@ -1,5 +1,6 @@
 package com.crashbox.drudgemod.ai;
 
+import com.crashbox.drudgemod.DrudgeUtils;
 import com.crashbox.drudgemod.EntityDrudge;
 import com.crashbox.drudgemod.messaging.Broadcaster;
 import com.crashbox.drudgemod.messaging.IMessageSender;
@@ -68,6 +69,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessageSender
     @Override
     public boolean continueExecuting()
     {
+
         if (!_currentTask.continueExecution())
         {
             _currentTask.complete();
@@ -76,6 +78,23 @@ public class EntityAIDrudge extends EntityAIBase implements IMessageSender
         }
         return true;
     }
+
+
+//    @Override
+//    public void resetTask()
+//    {
+//        super.resetTask();
+//
+//    }
+//
+//    @Override
+//    public void updateTask()
+//    {
+//        super.updateTask();
+//        LOGGER.debug("+++++++++++++++++++++++++++++++++++++++++++++++++++++.");
+//        DrudgeUtils.showStack();
+//        LOGGER.debug("+++++++++++++++++++++++++++++++++++++++++++++++++++++.");
+//    }
 
     // ================
     // IMessageSender
@@ -250,6 +269,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessageSender
     private static final double DEFAULT_SPEED = 0.5;
 
     private long _nextElicit = 0;
+
 
     // This is the channel we send and listen on.
     private Broadcaster.Channel _channel = Broadcaster.Channel.RED;

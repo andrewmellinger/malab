@@ -4,6 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
@@ -38,7 +39,7 @@ public class AIUtils
         return null;
     }
 
-    public static BlockPos findFirstEntity(World world, BlockPos startPos, int range, Block blockType, List<TaskBase> exclude )
+    public static void collectEntityIntoStack(World world, BlockPos startPos, int range, ItemStack targetStack )
     {
         int x = startPos.getX();
         int y = startPos.getY();
@@ -51,13 +52,13 @@ public class AIUtils
             if ( obj instanceof EntityItem)
             {
                 EntityItem entityItem = (EntityItem) obj;
-                if ( entityItem.getEntityItem().getItem() == Item.getItemFromBlock(blockType) )
+                if ( entityItem.getEntityItem().isItemEqual(targetStack) )
                 {
-                    return entityItem.getPosition();
+                    targetStack.stackSize += entityItem.getEntityItem().stackSize;
+                    world.removeEntity(entityItem);
                 }
             }
         }
-        return null;
     }
 
     public static BlockPos findBlock(World world, BlockPos startPos, int range, Block blockType, List<TaskBase> exclude )

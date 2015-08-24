@@ -10,7 +10,6 @@ import net.minecraft.world.World;
  * Copyright 2015 Andrew o. Mellinger
  */
 public class EntityDrudge extends EntityCreature
-//public class EntityDrudge extends EntityZombie
 {
     public EntityDrudge(World world)
     {
@@ -22,8 +21,6 @@ public class EntityDrudge extends EntityCreature
     {
         return getEntityAttribute(SharedMonsterAttributes.movementSpeed).getAttributeValue();
     }
-
-
 
     // you don't have to call this as it is called automatically during EntityLiving subclass creation
     @Override
@@ -72,5 +69,11 @@ public class EntityDrudge extends EntityCreature
     {
         tasks.taskEntries.clear();
         targetTasks.taskEntries.clear();
+
+
     }
+
+
+    // How many things we can carry.
+    private int _carryCapacity = 4;
 }

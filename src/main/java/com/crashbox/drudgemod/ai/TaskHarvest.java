@@ -6,9 +6,12 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
+import net.minecraft.world.EnumDifficulty;
+import net.minecraftforge.oredict.OreDictionary;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.List;
 import java.util.Queue;
 
 /**
@@ -48,17 +51,39 @@ public class TaskHarvest extends TaskBase
             return true;
         }
 
+        // If we are in the process of breaking, do that.
+        if (_isBreaking)
+        {
+            _isBreaking = updateBreak();
+            if (!_isBreaking)
+            {
+                LOGGER.debug("Finished breaking, harvesting.");
+                harvestBlock();
+
+                if (getEntity().getHeldItem().stackSize >= 4)
+                {
+                    LOGGER.debug("Reached capacity.  Done");
+                    complete();
+                    return false;
+                }
+                _targetBlock = null;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
         // If we had somewhere to go see if we can harvest
         if (_targetBlock != null)
         {
             if ( getEntity().getPosition().distanceSq(_targetBlock) < 4.2)
             {
-                harvestBlock();
-                if (getEntity().getHeldItem().stackSize >= 4)
-                {
-                    complete();
-                    return false;
-                }
+                LOGGER.debug("Start breaking");
+                _isBreaking = true;
+                _breakingTime = 0;
+                _previousBreakProgress = 0;
+                return true;
             }
             else
             {
@@ -66,75 +91,101 @@ public class TaskHarvest extends TaskBase
                 LOGGER.debug("NOT Breaking at at: " + _focusBlock);
             }
 
-            // Quantity check
+            // TODO: Quantity check
         }
 
+        // Find things to harvest
         if (_harvestList != null)
         {
+            LOGGER.debug("Getting next harvest block");
             _harvestBlock = _harvestList.poll();
         }
 
+        // Get the next block to harvest
         if (_harvestBlock == null)
         {
+            LOGGER.debug("Getting next harvest list");
             // Find blocks in a tree
             _harvestList = RingedSearcher.findTree(getEntity().getEntityWorld(), _focusBlock, _radius, 10, _sample );
             if (_harvestList == null)
             {
                 // Didn't find any blocks anywhere
                 complete();
+                LOGGER.debug("Didn't find any blocks to harvest.  Done.");
                 return false;
             }
 
+            // Now that we have a new list, get the next block
             _harvestBlock = _harvestList.poll();
-            if (_harvestBlock == null)
-            {
-                // Didn't find any blocks anywhere
-                complete();
-                return false;
-            }
         }
 
         // At this point we have a harvest block, set a block to walk to
         _targetBlock = new BlockPos(_harvestBlock.getX(), _focusBlock.getY(), _harvestBlock.getZ());
+        LOGGER.debug("Made new target block.  Moving tio: " + _targetBlock);
 
         getEntity().getNavigator()
                 .tryMoveToXYZ(_targetBlock.getX(), _targetBlock.getY(), _targetBlock.getZ(), getEntity().getSpeed());
+
+        // TODO:  Can't set the path.  Try to find another.
+
+        return true;
+    }
+
+
+    private boolean updateBreak()
+    {
+//        if (getEntity().getRNG().nextInt(20) == 0)
+//        {
+//            getEntity().worldObj.playAuxSFX(1010, this.doorPosition, 0);
+//        }
+
+        ++this._breakingTime;
+        int i = (int)((float)this._breakingTime / 240.0F * 10.0F);
+
+        if (i != this._previousBreakProgress)
+        {
+            getEntity().worldObj.sendBlockBreakProgress(getEntity().getEntityId(), _harvestBlock, i);
+            this._previousBreakProgress = i;
+        }
+
+//        if (this._breakingTime == 240 && getEntity().worldObj.getDifficulty() == EnumDifficulty.HARD)
+        if (this._breakingTime == 240)
+        {
+            return false;
+//            getEntity().worldObj.setBlockToAir(this.doorPosition);
+//            getEntity().worldObj.playAuxSFX(1012, this.doorPosition, 0);
+//            getEntity().worldObj.playAuxSFX(2001, this.doorPosition, Block.getIdFromBlock(this.doorBlock));
+        }
+
         return true;
     }
 
 
     private void harvestBlock()
     {
-        if (getEntity().getHeldItem() == null)
+        ItemStack targetStack = getEntity().getHeldItem();
+        if (targetStack == null)
         {
+            targetStack = _sample.copy();
+            targetStack.stackSize = 0;
+
             IBlockState blockState = getEntity().getEntityWorld().getBlockState(_harvestBlock);
             Block blockType = blockState.getBlock();
 
-            int meta = blockType.getMetaFromState(blockState);
-            if (blockType == Blocks.log || blockType == Blocks.log2)
-            {
-                LOGGER.debug("++++++++++++++ IS LOG: Just getting lower bits: " + meta + " : " + (meta & 3));
-                meta = meta & 3;
-            }
-
-            LOGGER.debug("++++++++++++ block: " + blockState);
-            LOGGER.debug("++++++++++++ meta: " + meta);
-
-            ItemStack newStack = new ItemStack(blockType, 1, meta);
-
-            getEntity().getEntityWorld().destroyBlock(_harvestBlock, false);
-            getEntity().setCurrentItemOrArmor(0, newStack);
+            getEntity().setCurrentItemOrArmor(0, targetStack);
         }
         else
         {
-            ItemStack held = getEntity().getHeldItem();
-            if (!DrudgeUtils.harvestInto(getEntity().getEntityWorld(), _harvestBlock, held))
-            {
-                LOGGER.debug("Failed to harvest block intom inventory");
-            }
-
-
+            // It changed or won't drop the right thing, bail.
+            if (!DrudgeUtils.willDrop(getEntity().getEntityWorld(), _harvestBlock, targetStack))
+                return;
         }
+
+        ///// BREAK
+        getEntity().getEntityWorld().destroyBlock(_harvestBlock, true);
+
+        ///// PICKUP
+        AIUtils.collectEntityIntoStack(getEntity().getEntityWorld(), _harvestBlock, 3, targetStack);
     }
 
     @Override
@@ -149,6 +200,10 @@ public class TaskHarvest extends TaskBase
     private Queue<BlockPos> _harvestList;
     private BlockPos _harvestBlock;
     private BlockPos _targetBlock;
+
+    private int _breakingTime;
+    private int _previousBreakProgress;
+    private boolean _isBreaking;
 
     private static final Logger LOGGER = LogManager.getLogger();
 

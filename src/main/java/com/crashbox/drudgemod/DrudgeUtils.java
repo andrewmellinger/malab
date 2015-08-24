@@ -28,48 +28,24 @@ public class DrudgeUtils
         }
     }
 
-    public static boolean sameType(World world, BlockPos pos, ItemStack stack)
+    public static boolean willDrop(World world, BlockPos pos, ItemStack sample)
     {
         IBlockState state = world.getBlockState(pos);
         Block block = state.getBlock();
 
-        if (Block.getBlockFromItem(stack.getItem()) == block)
+        if (block.isAir(world, pos))
         {
-            // If log, ignore lowest two bits
-            if (stack.getItem() == Item.getItemFromBlock(Blocks.log) ||
-                    stack.getItem() == Item.getItemFromBlock(Blocks.log2))
-            {
+            return false;
+        }
 
-                int meta = block.getMetaFromState(state);
-
-
-                LOGGER.debug("State: " + state);
-                LOGGER.debug("meta: " + meta);
-
-                meta = meta & 0x3;
-
-                if (meta == (stack.getMetadata() & 0x3))
-                {
-                    return true;
-                }
-            }
-
-
-            return block.getMetaFromState(state) == stack.getMetadata();
+        for (ItemStack stack : block.getDrops(world, pos, state, 0))
+        {
+            if (stack.isItemEqual(sample))
+                return true;
         }
 
         return false;
-    }
 
-    public static boolean canHarvestInto(World world, BlockPos pos, ItemStack stack)
-    {
-        if (stack.stackSize >= stack.getMaxStackSize())
-            return false;
-
-        IBlockState state = world.getBlockState(pos);
-        Block block = state.getBlock();
-
-        return Block.getBlockFromItem(stack.getItem()) == block && block.getMetaFromState(state) == stack.getMetadata();
     }
 
     public static boolean harvestInto(World world, BlockPos pos, ItemStack stack)
@@ -82,9 +58,7 @@ public class DrudgeUtils
         IBlockState state = world.getBlockState(pos);
         Block block = state.getBlock();
 
-        // TODO Animate Breaking
-        //block.getHarvestLevel(state);
-        //block.harvestBlock();
+
 
         if (Block.getBlockFromItem(stack.getItem()) == block)
         {
