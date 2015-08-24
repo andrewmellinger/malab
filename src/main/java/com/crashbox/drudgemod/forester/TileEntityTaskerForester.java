@@ -57,7 +57,7 @@ public class TileEntityTaskerForester extends TileEntity
                 {
                     // Offer a task, at our area
 //                    TaskBase newOffer = new TaskHarvest(this, target, 0, _searchRadius, 1);
-                    TaskBase newOffer = new TaskHarvest(this, getPos(), 0, _searchRadius, 1, itemReq.getItemSample());
+                    TaskBase newOffer = new TaskHarvest(this, getPos(), 0, _searchRadius, itemReq.getQuantity(), itemReq.getItemSample());
 
                     // Stash off the offers so we can track what we have already offered
                     addTask(newOffer);

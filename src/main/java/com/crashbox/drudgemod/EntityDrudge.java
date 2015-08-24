@@ -69,11 +69,21 @@ public class EntityDrudge extends EntityCreature
     {
         tasks.taskEntries.clear();
         targetTasks.taskEntries.clear();
-
-
     }
 
+    public int getCarryCapacity()
+    {
+        return _carryCapacity;
+    }
+
+    public float getMiningSpeed()
+    {
+        return _miningSpeed;
+    }
 
     // How many things we can carry.
     private int _carryCapacity = 4;
+
+    // Multiplier on mining speed, a percentage.  Base drudge is 1.0;
+    private float _miningSpeed = 1.0F;
 }

@@ -567,36 +567,23 @@ public class TileEntityTaskerFurnace extends TileEntityTaskerInventory implement
 
     private ItemStack getSmeltable()
     {
-        return _itemStacks[0];
-    }
-
-    private ItemStack getFuel()
-    {
-        return _itemStacks[1];
-    }
-
-    private ItemStack getOutput()
-    {
-        return _itemStacks[2];
-    }
-
-    private int fuelNeedPriority()
-    {
-        return (_itemStacks[1] != null && _itemStacks[1].stackSize < 16 ? 1 : 0);
-    }
-
-    private Block getFuelBlockType()
-    {
-        if (_itemStacks[1] != null)
-        {
-            return Block.getBlockFromItem(_itemStacks[1].getItem());
-        }
-        return null;
+        return _itemStacks[INPUT_INDEX];
     }
 
     private int smeltableNeedPriority()
     {
-        return (_itemStacks[0] != null && _itemStacks[0].stackSize < 32 ? 1 : 0);
+        if (_itemStacks[INPUT_INDEX] == null)
+        {
+            // We don't know what to ask for.
+            return 0;
+        }
+
+        int size = _itemStacks[INPUT_INDEX].stackSize;
+        if ( size < (_itemStacks[INPUT_INDEX].getMaxStackSize() * _smeltableRequestFraction))
+        {
+            return 1;
+        }
+        return 0;
     }
 
     private ItemStack getSmeltableItemSample()
@@ -608,6 +595,28 @@ public class TileEntityTaskerFurnace extends TileEntityTaskerInventory implement
         return null;
     }
 
+    /**
+     * @return How much smeltable material we can consume.
+     */
+    private int getSmeltableQuantityWanted()
+    {
+        // We'll take all the free space.
+        return _itemStacks[INPUT_INDEX].getMaxStackSize() - _itemStacks[INPUT_INDEX].stackSize;
+    }
+
+    //---------------------------
+
+    private ItemStack getFuel()
+    {
+        return _itemStacks[FUEL_INDEX];
+    }
+
+    //---------------------------
+
+    private ItemStack getOutput()
+    {
+        return _itemStacks[OUTPUT_INDEX];
+    }
 
     public void blockBroken()
     {
@@ -666,11 +675,14 @@ public class TileEntityTaskerFurnace extends TileEntityTaskerInventory implement
 
                     // Indicate we need some supplies
                     availability.getAIDrudge().offer(new TaskDeliver(this, TileEntityTaskerFurnace.this,
-                            getSmeltableItemSample(), INPUT_INDEX, 0));
+                            getSmeltableItemSample(), INPUT_INDEX, getSmeltableQuantityWanted()));
                 }
             }
         }
     }
+
+    private float _fuelRequestFraction = 0.5F;
+    private float _smeltableRequestFraction = 0.5F;
 
     private Furnace _furnace;
     private static final Logger LOGGER = LogManager.getLogger();

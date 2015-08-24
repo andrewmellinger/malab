@@ -3,15 +3,11 @@ package com.crashbox.drudgemod.ai;
 import com.crashbox.drudgemod.DrudgeUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
-import net.minecraft.world.EnumDifficulty;
-import net.minecraftforge.oredict.OreDictionary;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.List;
 import java.util.Queue;
 
 /**
@@ -24,7 +20,7 @@ public class TaskHarvest extends TaskBase
      *  @param tasker   Who made the task.
      * @param center  Block to harvest.
      * @param priority Priority of the task.
-     * @param sample
+     * @param sample A sample of the thing we are looking for.
      */
     public TaskHarvest(TaskMaster tasker, BlockPos center, int priority, int radius, int quantity, ItemStack sample)
     {
@@ -60,7 +56,8 @@ public class TaskHarvest extends TaskBase
                 LOGGER.debug("Finished breaking, harvesting.");
                 harvestBlock();
 
-                if (getEntity().getHeldItem().stackSize >= 4)
+                if (getEntity().getHeldItem().stackSize >= getEntity().getCarryCapacity() ||
+                        getEntity().getHeldItem().stackSize >= _quantity)
                 {
                     LOGGER.debug("Reached capacity.  Done");
                     complete();
@@ -79,10 +76,7 @@ public class TaskHarvest extends TaskBase
         {
             if ( getEntity().getPosition().distanceSq(_targetBlock) < 4.2)
             {
-                LOGGER.debug("Start breaking");
-                _isBreaking = true;
-                _breakingTime = 0;
-                _previousBreakProgress = 0;
+                startBreaking();
                 return true;
             }
             else
@@ -90,8 +84,6 @@ public class TaskHarvest extends TaskBase
                 // If we didn't get close enough bail
                 LOGGER.debug("NOT Breaking at at: " + _focusBlock);
             }
-
-            // TODO: Quantity check
         }
 
         // Find things to harvest
@@ -131,6 +123,16 @@ public class TaskHarvest extends TaskBase
         return true;
     }
 
+    private void startBreaking()
+    {
+        IBlockState state = getEntity().getEntityWorld().getBlockState(_harvestBlock);
+        _breakTotalNeeded = (int)(BASE_BREAK_TIME * state.getBlock().getBlockHardness(getEntity().getEntityWorld(), _harvestBlock));
+        _isBreaking = true;
+        _breakingProgress = 0;
+        _previousBreakProgress = 0;
+        LOGGER.debug("Start breaking. Needed " + _breakTotalNeeded);
+    }
+
 
     private boolean updateBreak()
     {
@@ -139,8 +141,9 @@ public class TaskHarvest extends TaskBase
 //            getEntity().worldObj.playAuxSFX(1010, this.doorPosition, 0);
 //        }
 
-        ++this._breakingTime;
-        int i = (int)((float)this._breakingTime / 240.0F * 10.0F);
+        // we have 10 stages
+        ++this._breakingProgress;
+        int i = (int)((float)this._breakingProgress / _breakTotalNeeded * 10.0F);
 
         if (i != this._previousBreakProgress)
         {
@@ -148,8 +151,8 @@ public class TaskHarvest extends TaskBase
             this._previousBreakProgress = i;
         }
 
-//        if (this._breakingTime == 240 && getEntity().worldObj.getDifficulty() == EnumDifficulty.HARD)
-        if (this._breakingTime == 240)
+//        if (this._breakingProgress == 240 && getEntity().worldObj.getDifficulty() == EnumDifficulty.HARD)
+        if (this._breakingProgress == _breakTotalNeeded)
         {
             return false;
 //            getEntity().worldObj.setBlockToAir(this.doorPosition);
@@ -201,9 +204,13 @@ public class TaskHarvest extends TaskBase
     private BlockPos _harvestBlock;
     private BlockPos _targetBlock;
 
-    private int _breakingTime;
+    private int _breakTotalNeeded;
+    private int _breakingProgress;
     private int _previousBreakProgress;
     private boolean _isBreaking;
+
+    // How long to break a 1.0 hardness thing in ticks
+    private final int BASE_BREAK_TIME = 40;
 
     private static final Logger LOGGER = LogManager.getLogger();
 
