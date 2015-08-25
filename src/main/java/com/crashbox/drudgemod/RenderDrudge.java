@@ -9,13 +9,11 @@ import net.minecraft.util.ResourceLocation;
 /**
  * Copyright 2015 Andrew o. Mellinger
  */
-//public class RenderDrudge extends RenderZombie
-//public class RenderDrudge extends RenderLiving
 public class RenderDrudge extends RenderBiped
 {
 
-    private static final ResourceLocation zombieTextures = new ResourceLocation("textures/entity/zombie/zombie.png");
-//    private static final ResourceLocation zombieTextures = new ResourceLocation("mob/zombie.png");
+//    private static final ResourceLocation zombieTextures = new ResourceLocation("textures/entity/zombie/zombie.png");
+    private static final ResourceLocation zombieTextures = new ResourceLocation("drudgemod:textures/entity/drudge.png");
 
 //    public RenderDrudge(RenderManager p_i46127_1_)
 //    {
@@ -32,6 +30,4 @@ public class RenderDrudge extends RenderBiped
     {
         return zombieTextures;
     }
-
-
 }
