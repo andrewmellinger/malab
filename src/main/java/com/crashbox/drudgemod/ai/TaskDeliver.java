@@ -46,12 +46,18 @@ public class TaskDeliver extends TaskBase
     }
 
     @Override
-    public boolean continueExecution()
+    public void resetTask()
+    {
+        execute();
+    }
+
+    @Override
+    public void updateTask()
     {
         // We are continuing as long as we have a path.
         if (!getEntity().getNavigator().noPath())
         {
-            return true;
+            return;
         }
 
         // Now we should be at the end
@@ -64,7 +70,6 @@ public class TaskDeliver extends TaskBase
             getEntity().setCurrentItemOrArmor(0, current);
         }
         complete();
-        return false;
     }
 
     @Override

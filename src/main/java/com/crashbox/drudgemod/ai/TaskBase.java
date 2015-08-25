@@ -68,7 +68,14 @@ public abstract class TaskBase
     /**
      * @return True if we are doing work.
      */
-    public abstract boolean continueExecution();
+    public boolean continueExecution()
+    {
+        return !_complete;
+    }
+
+    public abstract void resetTask();
+
+    public abstract void updateTask();
 
     /**
      * @return The next task for task chaining
@@ -100,6 +107,7 @@ public abstract class TaskBase
     public void complete()
     {
         LOGGER.debug("Task completed.");
+        _complete = true;
         _tasker.taskCompleted(this);
         _entityAI = null;
     }
@@ -109,6 +117,10 @@ public abstract class TaskBase
         return (_accepted != 0);
     }
 
+    public boolean isComplete()
+    {
+        return _complete;
+    }
 
     @Override
     public String toString()
@@ -136,6 +148,7 @@ public abstract class TaskBase
 
     // When was the task accepted?  0 for not accepted.
     private long _accepted = 0;
+    private boolean _complete = false;
 
     private static final Logger LOGGER = LogManager.getLogger();
 }

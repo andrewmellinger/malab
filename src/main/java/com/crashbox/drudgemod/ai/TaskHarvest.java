@@ -39,53 +39,63 @@ public class TaskHarvest extends TaskBase
     }
 
     @Override
-    public boolean continueExecution()
+    public void resetTask()
     {
-        // We are continuing as long as we have a path.
+        if (findNextBlock())
+        {
+            startNavigation();
+        }
+    }
+
+    @Override
+    public void updateTask()
+    {
+        // Wait until we have no path.
         if (!getEntity().getNavigator().noPath())
         {
-            return true;
+            return;
         }
 
         // If we are in the process of breaking, do that.
         if (_isBreaking)
         {
-            _isBreaking = updateBreak();
-            if (!_isBreaking)
+            if (!handleBreaking())
             {
-                LOGGER.debug("Finished breaking, harvesting.");
-                harvestBlock();
-
-                if (getEntity().getHeldItem().stackSize >= getEntity().getCarryCapacity() ||
-                        getEntity().getHeldItem().stackSize >= _quantity)
-                {
-                    LOGGER.debug("Reached capacity.  Done");
-                    complete();
-                    return false;
-                }
-                _targetBlock = null;
+                complete();
             }
-            else
-            {
-                return true;
-            }
+            return;
         }
 
-        // If we had somewhere to go see if we can harvest
+        // If we have a target block, then let's see if we are close enough to start breaking
         if (_targetBlock != null)
         {
             if ( getEntity().getPosition().distanceSq(_targetBlock) < 4.2)
             {
                 startBreaking();
-                return true;
+                return;
             }
             else
             {
-                // If we didn't get close enough bail
+                // If we didn't get close enough, try finding again
                 LOGGER.debug("NOT Breaking at at: " + _focusBlock);
             }
         }
 
+        // Try to identify another block to break.
+        if (!findNextBlock())
+        {
+            complete();
+            return;
+        }
+
+        // Navigate to another block
+        // TODO:  What if we can't navigate there?
+        startNavigation();
+    }
+
+
+    private boolean findNextBlock()
+    {
         // Find things to harvest
         if (_harvestList != null)
         {
@@ -102,7 +112,6 @@ public class TaskHarvest extends TaskBase
             if (_harvestList == null)
             {
                 // Didn't find any blocks anywhere
-                complete();
                 LOGGER.debug("Didn't find any blocks to harvest.  Done.");
                 return false;
             }
@@ -110,15 +119,6 @@ public class TaskHarvest extends TaskBase
             // Now that we have a new list, get the next block
             _harvestBlock = _harvestList.poll();
         }
-
-        // At this point we have a harvest block, set a block to walk to
-        _targetBlock = new BlockPos(_harvestBlock.getX(), _focusBlock.getY(), _harvestBlock.getZ());
-        LOGGER.debug("Made new target block.  Moving tio: " + _targetBlock);
-
-        getEntity().getNavigator()
-                .tryMoveToXYZ(_targetBlock.getX(), _targetBlock.getY(), _targetBlock.getZ(), getEntity().getSpeed());
-
-        // TODO:  Can't set the path.  Try to find another.
 
         return true;
     }
@@ -130,17 +130,33 @@ public class TaskHarvest extends TaskBase
         _isBreaking = true;
         _breakingProgress = 0;
         _previousBreakProgress = 0;
-        LOGGER.debug("Start breaking. Needed " + _breakTotalNeeded);
+        LOGGER.debug("Start breaking. Need: " + _breakTotalNeeded);
+    }
+
+    /** @return True to continue breaking */
+    private boolean handleBreaking()
+    {
+        _isBreaking = updateBreak();
+        if (!_isBreaking)
+        {
+            LOGGER.debug("Finished breaking, harvesting.");
+            harvestBlock();
+
+            if (getEntity().getHeldItem().stackSize >= getEntity().getCarryCapacity() ||
+                    getEntity().getHeldItem().stackSize >= _quantity)
+            {
+                LOGGER.debug("Reached capacity.  Done");
+                return false;
+            }
+            _targetBlock = null;
+        }
+        return true;
     }
 
 
+    /** @return True to keep processing. */
     private boolean updateBreak()
     {
-//        if (getEntity().getRNG().nextInt(20) == 0)
-//        {
-//            getEntity().worldObj.playAuxSFX(1010, this.doorPosition, 0);
-//        }
-
         // we have 10 stages
         ++this._breakingProgress;
         int i = (int)((float)this._breakingProgress / _breakTotalNeeded * 10.0F);
@@ -151,18 +167,8 @@ public class TaskHarvest extends TaskBase
             this._previousBreakProgress = i;
         }
 
-//        if (this._breakingProgress == 240 && getEntity().worldObj.getDifficulty() == EnumDifficulty.HARD)
-        if (this._breakingProgress == _breakTotalNeeded)
-        {
-            return false;
-//            getEntity().worldObj.setBlockToAir(this.doorPosition);
-//            getEntity().worldObj.playAuxSFX(1012, this.doorPosition, 0);
-//            getEntity().worldObj.playAuxSFX(2001, this.doorPosition, Block.getIdFromBlock(this.doorBlock));
-        }
-
-        return true;
+        return (this._breakingProgress != _breakTotalNeeded);
     }
-
 
     private void harvestBlock()
     {
@@ -191,6 +197,18 @@ public class TaskHarvest extends TaskBase
         AIUtils.collectEntityIntoStack(getEntity().getEntityWorld(), _harvestBlock, 3, targetStack);
     }
 
+    private boolean startNavigation()
+    {
+        // At this point we have a harvest block, set a block to walk to
+        _targetBlock = new BlockPos(_harvestBlock.getX(), _focusBlock.getY(), _harvestBlock.getZ());
+        LOGGER.debug("Made new target block.  Moving tio: " + _targetBlock);
+
+        return getEntity().getNavigator()
+                .tryMoveToXYZ(_targetBlock.getX(), _targetBlock.getY(), _targetBlock.getZ(), getEntity().getSpeed());
+    }
+
+
+
     @Override
     public String toString()
     {
@@ -200,6 +218,7 @@ public class TaskHarvest extends TaskBase
     private final int _radius;
     private final int _quantity;
     private final ItemStack _sample;
+
     private Queue<BlockPos> _harvestList;
     private BlockPos _harvestBlock;
     private BlockPos _targetBlock;

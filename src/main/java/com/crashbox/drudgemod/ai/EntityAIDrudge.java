@@ -69,32 +69,30 @@ public class EntityAIDrudge extends EntityAIBase implements IMessageSender
     @Override
     public boolean continueExecuting()
     {
-
-        if (!_currentTask.continueExecution())
-        {
-            _currentTask.complete();
-            _currentTask = null;
-            return false;
-        }
-        return true;
+        return (_currentTask != null);
     }
 
+    @Override
+    public void resetTask()
+    {
+        if (_currentTask != null)
+        {
+            _currentTask.resetTask();
+        }
+    }
 
-//    @Override
-//    public void resetTask()
-//    {
-//        super.resetTask();
-//
-//    }
-//
-//    @Override
-//    public void updateTask()
-//    {
-//        super.updateTask();
-//        LOGGER.debug("+++++++++++++++++++++++++++++++++++++++++++++++++++++.");
-//        DrudgeUtils.showStack();
-//        LOGGER.debug("+++++++++++++++++++++++++++++++++++++++++++++++++++++.");
-//    }
+    @Override
+    public void updateTask()
+    {
+        if (_currentTask != null)
+        {
+            if (_currentTask.isComplete())
+                _currentTask = _currentTask.getNextTask();
+
+            if (_currentTask != null)
+                _currentTask.updateTask();
+        }
+    }
 
     // ================
     // IMessageSender
