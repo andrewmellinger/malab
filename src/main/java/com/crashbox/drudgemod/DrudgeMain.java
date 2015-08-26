@@ -4,6 +4,8 @@ import com.crashbox.drudgemod.furnace.BlockTaskerFurnace;
 import com.crashbox.drudgemod.furnace.TileEntityTaskerFurnace;
 import com.crashbox.drudgemod.forester.BlockTaskerForester;
 import com.crashbox.drudgemod.forester.TileEntityTaskerForester;
+import com.crashbox.drudgemod.workbench.BlockTaskerWorkbench;
+import com.crashbox.drudgemod.workbench.TileEntityTaskerWorkbench;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
@@ -38,14 +40,10 @@ public class DrudgeMain
 
     public static Block BLOCK_TASKER_FURNACE;
     public static Block BLOCK_TASKER_FORESTER;
+    public static Block BLOCK_TASKER_WORKBENCH;
 
     // This allows us to us one gui handler for many things
-    public enum GUI_ENUM
-    {
-        FURNACE
-    }
-
-//    public static Item ITEM_SMART_BLOCK;
+    public enum GUI_ENUM { FURNACE, WORKBENCH }
 
     // These are the blocks and items we load that other parts need to use.
     //public static ItemThrowableTorch ITEM_THROWABLE_TORCH;
@@ -91,12 +89,6 @@ public class DrudgeMain
     @EventHandler
     public void postInit(FMLPostInitializationEvent event)
     {
-//        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-//        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-//        dumpOreDict();
-//        findLogWood();
-//        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-//        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
         // Handle interaction with other mods, complete your setup based on this.
         proxy.postInit(event);
     }
@@ -120,6 +112,10 @@ public class DrudgeMain
         BLOCK_TASKER_FORESTER = new BlockTaskerForester();
         GameRegistry.registerBlock(BLOCK_TASKER_FORESTER, BlockTaskerForester.NAME);
         GameRegistry.registerTileEntity(TileEntityTaskerForester.class, TileEntityTaskerForester.NAME);
+
+        BLOCK_TASKER_WORKBENCH = new BlockTaskerWorkbench();
+        GameRegistry.registerBlock(BLOCK_TASKER_WORKBENCH, BlockTaskerWorkbench.NAME);
+        GameRegistry.registerTileEntity(TileEntityTaskerWorkbench.class, TileEntityTaskerWorkbench.NAME);
     }
 
 
