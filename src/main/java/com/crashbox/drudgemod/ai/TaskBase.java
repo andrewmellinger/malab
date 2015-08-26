@@ -3,6 +3,7 @@ package com.crashbox.drudgemod.ai;
 import com.crashbox.drudgemod.EntityDrudge;
 import com.crashbox.drudgemod.messaging.Message;
 import net.minecraft.util.BlockPos;
+import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -121,6 +122,18 @@ public abstract class TaskBase
     {
         return _complete;
     }
+
+    public World getWorld()
+    {
+        return _entityAI.getEntity().getEntityWorld();
+    }
+
+    // Convenience method
+    public boolean tryMoveTo(BlockPos pos)
+    {
+        return getEntity().getNavigator().tryMoveToXYZ(pos.getX(), pos.getY(), pos.getZ(), getEntity().getSpeed());
+    }
+
 
     @Override
     public String toString()

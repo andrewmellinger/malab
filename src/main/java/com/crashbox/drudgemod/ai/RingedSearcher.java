@@ -114,7 +114,7 @@ public class RingedSearcher  implements Iterable<BlockPos>
                     {
                         // next ring
                         _currentRadius += 1;
-                        if (_currentRadius == _radius)
+                        if (_currentRadius > _radius)
                         {
                             _done = true;
                         }

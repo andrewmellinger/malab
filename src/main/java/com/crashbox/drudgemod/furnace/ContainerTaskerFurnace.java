@@ -118,8 +118,7 @@ public class ContainerTaskerFurnace extends Container
     }
 
     @Override
-    public ItemStack transferStackInSlot(EntityPlayer playerIn,
-                                         int slotIndex)
+    public ItemStack transferStackInSlot(EntityPlayer playerIn, int slotIndex)
     {
         ItemStack itemStack1 = null;
         Slot slot = (Slot)inventorySlots.get(slotIndex);
@@ -129,19 +128,17 @@ public class ContainerTaskerFurnace extends Container
             ItemStack itemStack2 = slot.getStack();
             itemStack1 = itemStack2.copy();
 
-            if (slotIndex == TileEntityTaskerFurnace.slotEnum.OUTPUT_SLOT
-                    .ordinal())
+            if (slotIndex == TileEntityTaskerFurnace.slotEnum.OUTPUT_SLOT.ordinal())
             {
-                if (!mergeItemStack(itemStack2, _sizeInventory,
-                        _sizeInventory +36, true))
+                if (!mergeItemStack(itemStack2, _sizeInventory, _sizeInventory +36, true))
                 {
                     return null;
                 }
 
+                // Basically this says, try to make me more.  One will be MORE than 2
                 slot.onSlotChange(itemStack2, itemStack1);
             }
-            else if (slotIndex != TileEntityTaskerFurnace.slotEnum.INPUT_SLOT
-                    .ordinal())
+            else if (slotIndex != TileEntityTaskerFurnace.slotEnum.INPUT_SLOT.ordinal())
             {
                 // check if there is a grinding recipe for the stack
 //                if (GrinderRecipes.instance().getGrindingResult(itemStack2) != null)
@@ -152,42 +149,32 @@ public class ContainerTaskerFurnace extends Container
 //                    }
 //                }
 //                else if (slotIndex >= _sizeInventory
-                if (slotIndex >= _sizeInventory
-                        && slotIndex < _sizeInventory +27) // player inventory slots
+                if (slotIndex >= _sizeInventory && slotIndex < _sizeInventory +27) // player inventory slots
                 {
-                    if (!mergeItemStack(itemStack2, _sizeInventory +27,
-                            _sizeInventory +36, false))
+                    if (!mergeItemStack(itemStack2, _sizeInventory +27, _sizeInventory +36, false))
                     {
                         return null;
                     }
                 }
                 else if (slotIndex >= _sizeInventory +27
                             && slotIndex < _sizeInventory +36
-                            && !mergeItemStack(itemStack2, _sizeInventory +1,
-                            _sizeInventory +27, false)) // hotbar slots
-                    {
-                        return null;
-                    }
-            }
-            else if (!mergeItemStack(itemStack2, _sizeInventory,
-                        _sizeInventory +36, false))
+                            && !mergeItemStack(itemStack2, _sizeInventory +1, _sizeInventory +27, false)) // hotbar slots
                 {
                     return null;
                 }
-
-            if (itemStack2.stackSize == 0)
-            {
-                slot.putStack((ItemStack)null);
             }
-            else
-            {
-                slot.onSlotChanged();
-            }
-
-            if (itemStack2.stackSize == itemStack1.stackSize)
+            else if (!mergeItemStack(itemStack2, _sizeInventory, _sizeInventory + 36, false))
             {
                 return null;
             }
+
+            if (itemStack2.stackSize == 0)
+                slot.putStack((ItemStack)null);
+            else
+                slot.onSlotChanged();
+
+            if (itemStack2.stackSize == itemStack1.stackSize)
+                return null;
 
             slot.onPickupFromSlot(playerIn, itemStack2);
         }

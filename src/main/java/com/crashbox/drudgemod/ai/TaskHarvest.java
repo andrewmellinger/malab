@@ -17,10 +17,12 @@ public class TaskHarvest extends TaskBase
 {
     /**
      * Create a new carry task.
-     *  @param tasker   Who made the task.
-     * @param center  Block to harvest.
+     *
+     * @param tasker   Who made the task.
+     * @param center   Block to harvest.
      * @param priority Priority of the task.
-     * @param sample A sample of the thing we are looking for.
+     * @param radius   Radius to search
+     * @param sample   A sample of the thing we are looking for.
      */
     public TaskHarvest(TaskMaster tasker, BlockPos center, int priority, int radius, int quantity, ItemStack sample)
     {
@@ -108,7 +110,7 @@ public class TaskHarvest extends TaskBase
         {
             LOGGER.debug("Getting next harvest list");
             // Find blocks in a tree
-            _harvestList = RingedSearcher.findTree(getEntity().getEntityWorld(), _focusBlock, _radius, 10, _sample );
+            _harvestList = RingedSearcher.findTree(getEntity().getEntityWorld(), _focusBlock, _radius, _height, _sample );
             if (_harvestList == null)
             {
                 // Didn't find any blocks anywhere
@@ -216,6 +218,7 @@ public class TaskHarvest extends TaskBase
     }
 
     private final int _radius;
+    private final int _height = 10;
     private final int _quantity;
     private final ItemStack _sample;
 

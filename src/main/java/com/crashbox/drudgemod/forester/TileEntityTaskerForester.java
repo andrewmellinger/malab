@@ -2,7 +2,11 @@ package com.crashbox.drudgemod.forester;
 
 import com.crashbox.drudgemod.ai.*;
 import com.crashbox.drudgemod.messaging.Message;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -50,7 +54,7 @@ public class TileEntityTaskerForester extends TileEntity
                 // Look around for work
 //                BlockPos target = AIUtils.findBlock(getWorld(), getPos(), 10, Blocks.log, getInProgress());
 
-                boolean hasMats = RingedSearcher.findBlock(getWorld(), getPos(), _searchRadius, 10, itemReq.getItemSample());
+                boolean hasMats = RingedSearcher.findBlock(getWorld(), getPos(), _searchRadius, _searchHeight, itemReq.getItemSample());
 
 //                if (target != null)
                 if (hasMats)
@@ -65,6 +69,22 @@ public class TileEntityTaskerForester extends TileEntity
                     // Add the offer to the AI
                     itemReq.getAIDrudge().offer(newOffer);
                 }
+            }
+            else if (msg instanceof MessageWorkerAvailability)
+            {
+                MessageWorkerAvailability availability = (MessageWorkerAvailability)msg;
+
+                EntityItem pickup = AIUtils.findFirstEntityOfTypeOnGround(getWorld(), getPos(), _searchRadius,
+                        Item.getItemFromBlock(Blocks.sapling));
+                BlockPos target = AIUtils.findEmptyOrchardSquare(getWorld(), getPos(), _searchRadius);
+
+                if (pickup != null && target != null)
+                {
+                    TaskBase task = new TaskPlantSapling(this, getPos(), 0, _searchRadius);
+                    LOGGER.debug("Posting task: " + task);
+                    availability.getAIDrudge().offer(task);
+                }
+
             }
         }
     }
@@ -84,6 +104,7 @@ public class TileEntityTaskerForester extends TileEntity
 
     private Forester _forester;
     private int _searchRadius = 5;
+    private int _searchHeight = 10;
     private static final Logger LOGGER = LogManager.getLogger();
 
 }

@@ -175,11 +175,18 @@ public class EntityAIDrudge extends EntityAIBase implements IMessageSender
                 return true;
             }
         }
+
         if (task instanceof TaskHarvest)
         {
             TaskHarvest harvest = (TaskHarvest)task;
             return true;
         }
+
+        if (task instanceof TaskPlantSapling)
+        {
+            return getEntity().getHeldItem() == null;
+        }
+
         return false;
     }
 

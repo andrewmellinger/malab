@@ -28,15 +28,12 @@ import java.util.Random;
  */
 public class BlockTaskerFurnace extends BlockContainer
 {
-//    public static final PropertyBool TRIGGERED = PropertyBool.create("triggered");
+    public static final String NAME = "taskerFurnace";
 
     public static final PropertyDirection FACING =
         PropertyDirection.create("facing",
                 EnumFacing.Plane.HORIZONTAL);
 
-    public static final String NAME = "taskerFurnace";
-
-    //TODO: In the future this should be protected
     public BlockTaskerFurnace()
     {
         super(Material.iron);
@@ -51,26 +48,25 @@ public class BlockTaskerFurnace extends BlockContainer
         lightOpacity = 20; // cast a light shadow
         setTickRandomly(false);
         useNeighborBrightness = false;
-
-        LOGGER.info("constructed");
     }
 
     @Override
     public TileEntity createNewTileEntity(World world, int i)
     {
-        LOGGER.debug("++++++ newTileEntity: " + world.isRemote);
         return new TileEntityTaskerFurnace();
     }
 
     @Override
     public void breakBlock(World inWorld, BlockPos inPos, IBlockState inBlockState)
     {
-        // TODO:  What does hasTileEntity do?  Do I really need this?
         if (hasTileEntity(inBlockState))
         {
             TileEntity entity = inWorld.getTileEntity(inPos);
             if (entity instanceof TileEntityTaskerFurnace)
             {
+//                InventoryHelper.dropInventoryItems(worldIn, pos,
+//                        (TileEntityGrinder)tileentity);
+//                worldIn.updateComparatorOutputLevel(pos, this);
                 ((TileEntityTaskerFurnace)entity).blockBroken();
             }
         }
@@ -152,7 +148,7 @@ public class BlockTaskerFurnace extends BlockContainer
     {
         if (!parWorld.isRemote)
         {
-            // I think this invokes the GUIHandlerTaskerFurnace
+            // This triggers the general GuiHandler
             entityPlayer.openGui(DrudgeMain.instance,
                     DrudgeMain.GUI_ENUM.FURNACE.ordinal(),
                     parWorld,
@@ -195,26 +191,6 @@ public class BlockTaskerFurnace extends BlockContainer
 //                2);
     }
 
-//    @Override
-//    public void breakBlock(
-//            World worldIn,
-//            BlockPos pos,
-//            IBlockState state)
-//    {
-//        if (!hasTileEntity)
-//        {
-//            TileEntity tileentity = worldIn.getTileEntity(pos);
-//
-//            if (tileentity instanceof TileEntityGrinder)
-//            {
-//                InventoryHelper.dropInventoryItems(worldIn, pos,
-//                        (TileEntityGrinder)tileentity);
-//                worldIn.updateComparatorOutputLevel(pos, this);
-//            }
-//        }
-//
-//        super.breakBlock(worldIn, pos, state);
-//    }
 
     @Override
     @SideOnly(Side.CLIENT)
