@@ -17,13 +17,8 @@ public class ContainerTaskerFurnace extends Container
     private final IInventory _tileTasker;
     private final int _sizeInventory;
     private int[] _trackedFields = { 0,0,0,0};
-    private int _remainingFuelBurnTicks;
-    private int _originalFuelBurnTicks;
-    private int _accumulatedItemSmeltTicks;
-    private int _totalItemSmeltTicks;
 
-    public ContainerTaskerFurnace(InventoryPlayer inventoryPlayer,
-            IInventory inventory)
+    public ContainerTaskerFurnace(InventoryPlayer inventoryPlayer, IInventory inventory)
     {
         // DEBUG
         LOGGER.debug("Constructed!!");

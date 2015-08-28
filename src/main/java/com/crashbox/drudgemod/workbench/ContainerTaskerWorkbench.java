@@ -1,188 +1,48 @@
 package com.crashbox.drudgemod.workbench;
 
-import com.crashbox.drudgemod.workbench.TileEntityTaskerWorkbench;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.*;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import net.minecraft.util.BlockPos;
+import net.minecraft.world.World;
 
 /**
  * Copyright 2015 Andrew O. Mellinger
  */
-public class ContainerTaskerWorkbench extends Container
+public class ContainerTaskerWorkbench extends ContainerWorkbench
 {
-    private final IInventory _tileTasker;
-    private final int _sizeInventory;
-    private int[] _trackedFields = { 0,0,0,0};
-    private int _remainingFuelBurnTicks;
-    private int _originalFuelBurnTicks;
-    private int _accumulatedItemSmeltTicks;
-    private int _totalItemSmeltTicks;
-
-    public ContainerTaskerWorkbench(InventoryPlayer inventoryPlayer,
-            IInventory inventory)
+    public ContainerTaskerWorkbench(InventoryPlayer playerInventory, World world, BlockPos pos, ItemStack[] items)
     {
-        // DEBUG
-        LOGGER.debug("Constructed!!");
+        super(playerInventory, world, pos);
+        _world = world;
+        _stacks = items;
 
-        _tileTasker = inventory;
-        _sizeInventory = _tileTasker.getSizeInventory();
-
-        // Set up all our main interaction slots
-//        addSlotToContainer(new Slot(_tileTasker,
-//                TileEntityTasker.slotEnum.INPUT_SLOT.ordinal(), 56, 17));
-//        addSlotToContainer(new Slot(_tileTasker,
-//                TileEntityTasker.slotEnum.FUEL_SLOT.ordinal(), 56, 53));
-//        addSlotToContainer(new SlotOutputWood(inventoryPlayer.player,
-//                _tileTasker, TileEntityTasker.slotEnum.OUTPUT_SLOT.ordinal(),
-//                116, 35));
-
-        // Set up all our main interaction slots
-        addSlotToContainer(new Slot(_tileTasker, 0, 56, 17));
-        addSlotToContainer(new SlotFurnaceFuel(_tileTasker, 1, 56, 53));
-        addSlotToContainer(new SlotFurnaceOutput(inventoryPlayer.player, _tileTasker, 2, 116, 35));
-
-        // TODO: Make reusable function
-
-        // add player inventory slots
-        // note that the slot numbers are within the player inventory so can
-        // be same as the tile entity inventory
-        int i;
-        for (i = 0; i < 3; ++i)
+        for (int x = 0; x < 9; ++x)
         {
-            for (int j = 0; j < 9; ++j)
-            {
-                addSlotToContainer(new Slot(inventoryPlayer, j+i*9+9, 8+j*18, 84+i*18));
-            }
+            this.craftMatrix.setInventorySlotContents(x, items[x]);
         }
-
-        // add hotbar slots
-        for (i = 0; i < 9; ++i)
-        {
-            addSlotToContainer(new Slot(inventoryPlayer, i, 8 + i * 18, 142));
-        }
-    }
-
-    @Override
-    public void addCraftingToCrafters(ICrafting listener)
-    {
-        super.addCraftingToCrafters(listener);
-        listener.func_175173_a(this, _tileTasker);
     }
 
     /**
-     * Looks for changes made in the container, sends them to every listener.
+     * Called when the container is closed.
      */
-    @Override
-    public void detectAndSendChanges()
+    public void onContainerClosed(EntityPlayer playerIn)
     {
-        super.detectAndSendChanges();
+        // What do we need to do with the inventory?
+        //super.onContainerClosed(playerIn);
 
-        // send updates to each crafter
-        for (Object crafter : crafters)
+        if (!_world.isRemote)
         {
-            ICrafting icrafting = (ICrafting) crafter;
-
-            // send all fields to each crafter
-            for (int n = 0; n < _trackedFields.length; ++n)
+            for (int i = 0; i < 9; ++i)
             {
-                int tmp = _tileTasker.getField(n);
-                if (_trackedFields[n] != tmp)
-                {
-                    icrafting.sendProgressBarUpdate(this, n, tmp);
-                }
+                _stacks[i] = this.craftMatrix.getStackInSlotOnClosing(i);
             }
-        }
-
-        // cache state for next time
-        for (int n = 0; n < _trackedFields.length; ++n)
-        {
-            _trackedFields[n] = _tileTasker.getField(n);
         }
     }
 
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void updateProgressBar(int id, int data)
-    {
-        _tileTasker.setField(id, data);
-    }
 
-    @Override
-    public boolean canInteractWith(EntityPlayer playerIn)
-    {
-        return _tileTasker.isUseableByPlayer(playerIn);
-    }
-
-    @Override
-    public ItemStack transferStackInSlot(EntityPlayer playerIn, int slotIndex)
-    {
-        ItemStack itemStack1 = null;
-        Slot slot = (Slot)inventorySlots.get(slotIndex);
-
-        if (slot != null && slot.getHasStack())
-        {
-            ItemStack itemStack2 = slot.getStack();
-            itemStack1 = itemStack2.copy();
-
-            if (slotIndex == TileEntityTaskerWorkbench.slotEnum.OUTPUT_SLOT.ordinal())
-            {
-                if (!mergeItemStack(itemStack2, _sizeInventory, _sizeInventory +36, true))
-                {
-                    return null;
-                }
-
-                // Basically this says, try to make me more.  One will be MORE than 2
-                slot.onSlotChange(itemStack2, itemStack1);
-            }
-            else if (slotIndex != TileEntityTaskerWorkbench.slotEnum.INPUT_SLOT.ordinal())
-            {
-                // check if there is a grinding recipe for the stack
-//                if (GrinderRecipes.instance().getGrindingResult(itemStack2) != null)
-//                {
-//                    if (!mergeItemStack(itemStack2, 0, 1, false))
-//                    {
-//                        return null;
-//                    }
-//                }
-//                else if (slotIndex >= _sizeInventory
-                if (slotIndex >= _sizeInventory && slotIndex < _sizeInventory +27) // player inventory slots
-                {
-                    if (!mergeItemStack(itemStack2, _sizeInventory +27, _sizeInventory +36, false))
-                    {
-                        return null;
-                    }
-                }
-                else if (slotIndex >= _sizeInventory +27
-                            && slotIndex < _sizeInventory +36
-                            && !mergeItemStack(itemStack2, _sizeInventory +1, _sizeInventory +27, false)) // hotbar slots
-                {
-                    return null;
-                }
-            }
-            else if (!mergeItemStack(itemStack2, _sizeInventory, _sizeInventory + 36, false))
-            {
-                return null;
-            }
-
-            if (itemStack2.stackSize == 0)
-                slot.putStack((ItemStack)null);
-            else
-                slot.onSlotChanged();
-
-            if (itemStack2.stackSize == itemStack1.stackSize)
-                return null;
-
-            slot.onPickupFromSlot(playerIn, itemStack2);
-        }
-
-        return itemStack1;
-    }
-
-    private static final Logger LOGGER = LogManager.getLogger();
+    private final ItemStack[] _stacks;
+    private final World _world;
 
 }

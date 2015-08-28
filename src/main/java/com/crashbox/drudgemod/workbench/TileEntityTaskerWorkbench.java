@@ -13,6 +13,7 @@ import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
+import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
@@ -76,6 +77,94 @@ public class TileEntityTaskerWorkbench extends TileEntityTaskerInventory impleme
     {
         return false;
     }
+
+    //=============================================================================================
+    // Tile Entity
+    //=============================================================================================
+    @Override
+    public void readFromNBT(NBTTagCompound compound)
+    {
+        super.readFromNBT(compound);
+        NBTTagList nbttaglist = compound.getTagList(NBT_ITEMS, 10);
+        _itemStacks = new ItemStack[getSizeInventory()];
+
+        for (int i = 0; i < nbttaglist.tagCount(); ++i)
+        {
+            NBTTagCompound nbtTagCompound = nbttaglist.getCompoundTagAt(i);
+            byte b0 = nbtTagCompound.getByte(NBT_SLOT);
+
+            if (b0 >= 0 && b0 < _itemStacks.length)
+            {
+                _itemStacks[b0] = ItemStack.loadItemStackFromNBT(
+                        nbtTagCompound);
+            }
+        }
+
+        _remainingFuelBurnTicks = compound.getShort(NBT_REMAINING_FUEL_BURN_TICKS);
+        _accumulatedItemSmeltTicks = compound.getShort(NBT_ACCUMULATED_ITEM_SMELT_TICKS);
+        _totalItemSmeltTicks = compound.getShort(NBT_TOTAL_ITEM_SMELT_TICKS);
+        LOGGER.debug("readFromNBT: _totalItemSmeltTicks: " + _totalItemSmeltTicks);
+
+        if (compound.hasKey(NBT_CUSTOM_NAME, 8))
+        {
+            _customName = compound.getString(NBT_CUSTOM_NAME);
+        }
+    }
+
+    @Override
+    public void writeToNBT(NBTTagCompound compound)
+    {
+        super.writeToNBT(compound);
+        compound.setShort(NBT_REMAINING_FUEL_BURN_TICKS, (short) _remainingFuelBurnTicks);
+        compound.setShort(NBT_ACCUMULATED_ITEM_SMELT_TICKS, (short) _accumulatedItemSmeltTicks);
+        compound.setShort(NBT_TOTAL_ITEM_SMELT_TICKS, (short) _totalItemSmeltTicks);
+        NBTTagList nbttaglist = new NBTTagList();
+
+        for (int i = 0; i < _itemStacks.length; ++i)
+        {
+            if (_itemStacks[i] != null)
+            {
+                NBTTagCompound nbtTagCompound = new NBTTagCompound();
+                nbtTagCompound.setByte(NBT_SLOT, (byte)i);
+                _itemStacks[i].writeToNBT(nbtTagCompound);
+                nbttaglist.appendTag(nbtTagCompound);
+            }
+        }
+
+        compound.setTag(NBT_ITEMS, nbttaglist);
+
+        if (hasCustomName())
+        {
+            compound.setString(NBT_CUSTOM_NAME, _customName);
+        }
+    }
+
+    @Override
+    public void setWorldObj(World worldIn)
+    {
+        LOGGER.debug("setWorldObj: " + worldIn);
+        super.setWorldObj(worldIn);
+        if (worldIn != null && !worldIn.isRemote)
+        {
+            _workbench = new Workbench(worldIn);
+        }
+        else
+        {
+            if (_workbench != null)
+                _workbench.terminate();
+            _workbench = null;
+        }
+    }
+
+
+    //=============================================================================================
+    // TileEntityLockable
+    //=============================================================================================
+
+    //=============================================================================================
+    // Inventory
+    //=============================================================================================
+
 
     @Override
     public int getSizeInventory()
@@ -169,6 +258,132 @@ public class TileEntityTaskerWorkbench extends TileEntityTaskerInventory impleme
     }
 
     @Override
+    public int getInventoryStackLimit()
+    {
+        return 64;
+    }
+
+    @Override
+    public boolean isUseableByPlayer(EntityPlayer playerIn)
+    {
+        return worldObj.getTileEntity(pos) != this ? false :
+                playerIn.getDistanceSq(pos.getX()+0.5D, pos.getY()+0.5D,
+                        pos.getZ()+0.5D) <= 64.0D;
+    }
+
+    @Override
+    public void openInventory(EntityPlayer playerIn) {}
+
+    @Override
+    public void closeInventory(EntityPlayer playerIn) {}
+
+    @Override
+    public boolean isItemValidForSlot(int index, ItemStack stack)
+    {
+        if ( index == INPUT_INDEX)
+        {
+            if (_itemStacks[INPUT_INDEX] == null)
+            {
+                return FurnaceRecipes.instance().getSmeltingResult(_itemStacks[0]) != null;
+            }
+            if (_itemStacks[FUEL_INDEX].isItemEqual(stack))
+            {
+                return true;
+            }
+        }
+
+
+        return index == slotEnum.INPUT_SLOT.ordinal() ? true : false;
+    }
+
+    @Override
+    public int getField(int id)
+    {
+        switch (id)
+        {
+            case FIELD_REMAINING_FUEL_BURN_TICKS:
+                return _remainingFuelBurnTicks;
+            case FIELD_ORIGINAL_FUEL_BURN_TICKS:
+                return _originalFuelBurnTicks;
+            case FIELD_ACCUMULATED_ITEM_SMELT_TICKS:
+                return _accumulatedItemSmeltTicks;
+            case FIELD_TOTAL_ITEM_SMELT_TICKS:
+//                LOGGER.debug("getField: _totalItemSmeltTicks: " + _totalItemSmeltTicks);
+                return _totalItemSmeltTicks;
+            default:
+                return 0;
+        }
+    }
+
+    @Override
+    public void setField(int id, int value)
+    {
+        switch (id)
+        {
+            case FIELD_REMAINING_FUEL_BURN_TICKS:
+                _remainingFuelBurnTicks = value;
+                break;
+            case FIELD_ORIGINAL_FUEL_BURN_TICKS:
+                _originalFuelBurnTicks = value;
+                break;
+            case FIELD_ACCUMULATED_ITEM_SMELT_TICKS:
+                _accumulatedItemSmeltTicks = value;
+                break;
+            case FIELD_TOTAL_ITEM_SMELT_TICKS:
+                _totalItemSmeltTicks = value;
+//                LOGGER.debug("setField: _totalItemSmeltTicks: " + _totalItemSmeltTicks);
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Override
+    public int getFieldCount()
+    {
+        return 4;
+    }
+
+    @Override
+    public void clear()
+    {
+        for (int i = 0; i < _itemStacks.length; ++i)
+        {
+            _itemStacks[i] = null;
+        }
+    }
+
+    //=============================================================================================
+    // ISidedInventory
+    //=============================================================================================
+
+    @Override
+    public int[] getSlotsForFace(EnumFacing side)
+    {
+        return side == EnumFacing.DOWN ? slotsBottom :
+                (side == EnumFacing.UP ? slotsTop : slotsSides);
+    }
+
+    @Override
+    public boolean canInsertItem(int index, ItemStack itemStackIn,
+            EnumFacing direction)
+    {
+        return isItemValidForSlot(index, itemStackIn);
+    }
+
+    @Override
+    public boolean canExtractItem(int parSlotIndex, ItemStack parStack,
+            EnumFacing parFacing)
+    {
+        return true;
+    }
+
+
+    //=============================================================================================
+    // IWorldNameable
+    //=============================================================================================
+
+    @Override
     public String getName()
     {
         return hasCustomName() ? _customName : "container.taskerWorkbench";
@@ -180,87 +395,9 @@ public class TileEntityTaskerWorkbench extends TileEntityTaskerInventory impleme
         return _customName != null && _customName.length() > 0;
     }
 
-    public void setCustomInventoryName(String parCustomName)
-    {
-        _customName = parCustomName;
-    }
-
-    @Override
-    public void readFromNBT(NBTTagCompound compound)
-    {
-        super.readFromNBT(compound);
-        NBTTagList nbttaglist = compound.getTagList(NBT_ITEMS, 10);
-        _itemStacks = new ItemStack[getSizeInventory()];
-
-        for (int i = 0; i < nbttaglist.tagCount(); ++i)
-        {
-            NBTTagCompound nbtTagCompound = nbttaglist.getCompoundTagAt(i);
-            byte b0 = nbtTagCompound.getByte(NBT_SLOT);
-
-            if (b0 >= 0 && b0 < _itemStacks.length)
-            {
-                _itemStacks[b0] = ItemStack.loadItemStackFromNBT(
-                        nbtTagCompound);
-            }
-        }
-
-        _remainingFuelBurnTicks = compound.getShort(NBT_REMAINING_FUEL_BURN_TICKS);
-        _accumulatedItemSmeltTicks = compound.getShort(NBT_ACCUMULATED_ITEM_SMELT_TICKS);
-        _totalItemSmeltTicks = compound.getShort(NBT_TOTAL_ITEM_SMELT_TICKS);
-        LOGGER.debug("readFromNBT: _totalItemSmeltTicks: " + _totalItemSmeltTicks);
-
-        if (compound.hasKey(NBT_CUSTOM_NAME, 8))
-        {
-            _customName = compound.getString(NBT_CUSTOM_NAME);
-        }
-    }
-
-    @Override
-    public void writeToNBT(NBTTagCompound compound)
-    {
-        super.writeToNBT(compound);
-        compound.setShort(NBT_REMAINING_FUEL_BURN_TICKS, (short) _remainingFuelBurnTicks);
-        compound.setShort(NBT_ACCUMULATED_ITEM_SMELT_TICKS, (short) _accumulatedItemSmeltTicks);
-        compound.setShort(NBT_TOTAL_ITEM_SMELT_TICKS, (short) _totalItemSmeltTicks);
-        NBTTagList nbttaglist = new NBTTagList();
-
-        for (int i = 0; i < _itemStacks.length; ++i)
-        {
-            if (_itemStacks[i] != null)
-            {
-                NBTTagCompound nbtTagCompound = new NBTTagCompound();
-                nbtTagCompound.setByte(NBT_SLOT, (byte)i);
-                _itemStacks[i].writeToNBT(nbtTagCompound);
-                nbttaglist.appendTag(nbtTagCompound);
-            }
-        }
-
-        compound.setTag(NBT_ITEMS, nbttaglist);
-
-        if (hasCustomName())
-        {
-            compound.setString(NBT_CUSTOM_NAME, _customName);
-        }
-    }
-
-    @Override
-    public int getInventoryStackLimit()
-    {
-        return 64;
-    }
-
-    public boolean isBurning()
-    {
-        return _remainingFuelBurnTicks > 0;
-    }
-
-
-    // this function indicates whether container texture should be drawn
-    @SideOnly(Side.CLIENT)
-    public static boolean isBurning(IInventory inventory)
-    {
-        return inventory.getField(0) > 0;
-    }
+    //=============================================================================================
+    // IUpdatePlayerListBox
+    //=============================================================================================
 
     @Override
     public void update()
@@ -338,6 +475,43 @@ public class TileEntityTaskerWorkbench extends TileEntityTaskerInventory impleme
         }
     }
 
+    //=============================================================================================
+    // IInteractionObject
+    //=============================================================================================
+
+    @Override
+    public String getGuiID()
+    {
+        return "drudge:taskerWorkbench";
+    }
+
+    @Override
+    public Container createContainer(InventoryPlayer playerInventory,
+            EntityPlayer playerIn)
+    {
+        // DEBUG
+        // Don't know when this is called.  I think the GuiHandler does all the construction
+        LOGGER.error("createContainer()");
+        return new ContainerTaskerWorkbench(playerInventory, getWorld(), getPos(), null);
+    }
+
+
+    //=============================================================================================
+    // Custom
+    //=============================================================================================
+
+    public boolean isBurning()
+    {
+        return _remainingFuelBurnTicks > 0;
+    }
+
+    // this function indicates whether container texture should be drawn
+    @SideOnly(Side.CLIENT)
+    public static boolean isBurning(IInventory inventory)
+    {
+        return inventory.getField(0) > 0;
+    }
+
     public int timeToBurnOneItem(ItemStack itemStack)
     {
         return 200;
@@ -410,156 +584,14 @@ public class TileEntityTaskerWorkbench extends TileEntityTaskerInventory impleme
                 _itemStacks[INPUT_INDEX] = null;
             }
         }
-
     }
 
-
+    @Deprecated
     private int getItemBurnTime(ItemStack itemStack)
     {
         return 0;
     }
 
-
-    @Override
-    public boolean isUseableByPlayer(EntityPlayer playerIn)
-    {
-        return worldObj.getTileEntity(pos) != this ? false :
-                playerIn.getDistanceSq(pos.getX()+0.5D, pos.getY()+0.5D,
-                        pos.getZ()+0.5D) <= 64.0D;
-    }
-
-    @Override
-    public void openInventory(EntityPlayer playerIn) {}
-
-    @Override
-    public void closeInventory(EntityPlayer playerIn) {}
-
-    @Override
-    public boolean isItemValidForSlot(int index, ItemStack stack)
-    {
-        if ( index == INPUT_INDEX)
-        {
-            if (_itemStacks[INPUT_INDEX] == null)
-            {
-                return FurnaceRecipes.instance().getSmeltingResult(_itemStacks[0]) != null;
-            }
-            if (_itemStacks[FUEL_INDEX].isItemEqual(stack))
-            {
-                return true;
-            }
-        }
-
-
-        return index == slotEnum.INPUT_SLOT.ordinal() ? true : false;
-    }
-
-    @Override
-    public int[] getSlotsForFace(EnumFacing side)
-    {
-        return side == EnumFacing.DOWN ? slotsBottom :
-                (side == EnumFacing.UP ? slotsTop : slotsSides);
-    }
-
-    @Override
-    public boolean canInsertItem(int index, ItemStack itemStackIn,
-                                 EnumFacing direction)
-    {
-        return isItemValidForSlot(index, itemStackIn);
-    }
-
-    @Override
-    public boolean canExtractItem(int parSlotIndex, ItemStack parStack,
-                                  EnumFacing parFacing)
-    {
-        return true;
-    }
-
-    @Override
-    public String getGuiID()
-    {
-        return "drudge:taskerWorkbench";
-    }
-
-    @Override
-    public Container createContainer(InventoryPlayer playerInventory,
-            EntityPlayer playerIn)
-    {
-        // DEBUG
-        // Don't know when this is called.  I think the GuiHandler does all the construction
-        LOGGER.error("createContainer()");
-        return new ContainerTaskerWorkbench(playerInventory, this);
-    }
-
-    @Override
-    public int getField(int id)
-    {
-        switch (id)
-        {
-            case FIELD_REMAINING_FUEL_BURN_TICKS:
-                return _remainingFuelBurnTicks;
-            case FIELD_ORIGINAL_FUEL_BURN_TICKS:
-                return _originalFuelBurnTicks;
-            case FIELD_ACCUMULATED_ITEM_SMELT_TICKS:
-                return _accumulatedItemSmeltTicks;
-            case FIELD_TOTAL_ITEM_SMELT_TICKS:
-//                LOGGER.debug("getField: _totalItemSmeltTicks: " + _totalItemSmeltTicks);
-                return _totalItemSmeltTicks;
-            default:
-                return 0;
-        }
-    }
-
-    @Override
-    public void setField(int id, int value)
-    {
-        switch (id)
-        {
-            case FIELD_REMAINING_FUEL_BURN_TICKS:
-                _remainingFuelBurnTicks = value;
-                break;
-            case FIELD_ORIGINAL_FUEL_BURN_TICKS:
-                _originalFuelBurnTicks = value;
-                break;
-            case FIELD_ACCUMULATED_ITEM_SMELT_TICKS:
-                _accumulatedItemSmeltTicks = value;
-                break;
-            case FIELD_TOTAL_ITEM_SMELT_TICKS:
-                _totalItemSmeltTicks = value;
-//                LOGGER.debug("setField: _totalItemSmeltTicks: " + _totalItemSmeltTicks);
-                break;
-            default:
-                break;
-        }
-    }
-
-    @Override
-    public int getFieldCount()
-    {
-        return 4;
-    }
-
-    @Override
-    public void clear()
-    {
-        for (int i = 0; i < _itemStacks.length; ++i)
-        {
-            _itemStacks[i] = null;
-        }
-    }
-
-    @Override
-    public String toString()
-    {
-        return "TileEntityTasker{" +
-                "_remainingFuelBurnTicks=" + _remainingFuelBurnTicks +
-                ", _originalFuelBurnTicks" + _originalFuelBurnTicks +
-                ", _accumulatedItemSmeltTicks=" + _accumulatedItemSmeltTicks +
-                ", _totalItemSmeltTicks=" + _totalItemSmeltTicks +
-                '}';
-    }
-
-
-    //---------------------------------------------------------------------------------------------
 
     private ItemStack getSmeltable()
     {
@@ -629,23 +661,6 @@ public class TileEntityTaskerWorkbench extends TileEntityTaskerInventory impleme
 
     //---------------------------------------------------------------------------------------------
 
-    @Override
-    public void setWorldObj(World worldIn)
-    {
-        LOGGER.debug("setWorldObj: " + worldIn);
-        super.setWorldObj(worldIn);
-        if (worldIn != null && !worldIn.isRemote)
-        {
-            _workbench = new Workbench(worldIn);
-        }
-        else
-        {
-            if (_workbench != null)
-                _workbench.terminate();
-            _workbench = null;
-        }
-    }
-
     // TaskMaster Workbench
     private class Workbench extends TaskMaster
     {
@@ -677,8 +692,24 @@ public class TileEntityTaskerWorkbench extends TileEntityTaskerInventory impleme
         }
     }
 
+
+    @Override
+    public String toString()
+    {
+        return "TileEntityTasker{" +
+                "_remainingFuelBurnTicks=" + _remainingFuelBurnTicks +
+                ", _originalFuelBurnTicks" + _originalFuelBurnTicks +
+                ", _accumulatedItemSmeltTicks=" + _accumulatedItemSmeltTicks +
+                ", _totalItemSmeltTicks=" + _totalItemSmeltTicks +
+                '}';
+    }
+
+    //---------------------------------------------------------------------------------------------
+
     private float _fuelRequestFraction = 0.5F;
     private float _smeltableRequestFraction = 0.5F;
+
+//    private InventoryCrafting _craftingInventory =  new InventoryCrafting(this, 3, 3);
 
     private Workbench _workbench;
     private static final Logger LOGGER = LogManager.getLogger();

@@ -30,8 +30,7 @@ public class BlockTaskerWorkbench extends BlockContainer
 {
     public static final String NAME = "taskerWorkbench";
 
-    public static final PropertyDirection FACING =
-        PropertyDirection.create("facing",
+    public static final PropertyDirection FACING = PropertyDirection.create("facing",
                 EnumFacing.Plane.HORIZONTAL);
 
     public BlockTaskerWorkbench()

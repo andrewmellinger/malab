@@ -28,7 +28,7 @@ public class GuiHandlerDrudge implements IGuiHandler
             return null;
 
         if (ID == DrudgeMain.GUI_ENUM.FURNACE.ordinal())
-                return new ContainerTaskerFurnace(player.inventory, (IInventory)tileEntity);
+            return new ContainerTaskerFurnace(player.inventory, (IInventory)tileEntity);
 
         return null;
     }
@@ -43,7 +43,7 @@ public class GuiHandlerDrudge implements IGuiHandler
             return null;
 
         if (ID == DrudgeMain.GUI_ENUM.FURNACE.ordinal())
-                return new GuiTaskerFurnace( player.inventory, (IInventory)tileEntity);
+            return new GuiTaskerFurnace( player.inventory, (IInventory)tileEntity);
 
         return null;
     }

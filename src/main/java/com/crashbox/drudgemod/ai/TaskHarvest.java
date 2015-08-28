@@ -232,7 +232,8 @@ public class TaskHarvest extends TaskBase
     private boolean _isBreaking;
 
     // How long to break a 1.0 hardness thing in ticks
-    private final int BASE_BREAK_TIME = 40;
+//    private final int BASE_BREAK_TIME = 40;
+    private final int BASE_BREAK_TIME = 20;
 
     private static final Logger LOGGER = LogManager.getLogger();
 

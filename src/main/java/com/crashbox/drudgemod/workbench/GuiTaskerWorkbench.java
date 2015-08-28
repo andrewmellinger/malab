@@ -26,8 +26,7 @@ public class GuiTaskerWorkbench extends GuiContainer
     public GuiTaskerWorkbench(InventoryPlayer parInventoryPlayer,
             IInventory parInventoryGrinder)
     {
-        super(new ContainerTaskerWorkbench(parInventoryPlayer,
-                parInventoryGrinder));
+        super(new ContainerTaskerWorkbench(parInventoryPlayer, null, null, null));
         _inventoryPlayer = parInventoryPlayer;
         _tileTasker = parInventoryGrinder;
 
