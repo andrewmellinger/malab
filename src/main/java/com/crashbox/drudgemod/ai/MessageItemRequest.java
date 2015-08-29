@@ -1,7 +1,6 @@
 package com.crashbox.drudgemod.ai;
 
 import com.crashbox.drudgemod.messaging.Message;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 /**
@@ -11,7 +10,7 @@ public class MessageItemRequest extends Message
 {
     public MessageItemRequest(EntityAIDrudge drudge, ItemStack itemSample, int quantity)
     {
-        super(drudge);
+        super(drudge, null);
         _drudgeAI = drudge;
         _itemSample = itemSample;
         _quantity = quantity;

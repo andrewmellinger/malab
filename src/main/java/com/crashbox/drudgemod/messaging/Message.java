@@ -5,15 +5,22 @@ package com.crashbox.drudgemod.messaging;
  */
 public class Message
 {
-    public Message(IMessageSender sender)
+    public Message(IMessager sender, IMessager target)
     {
         _sender = sender;
+        _target = target;
     }
 
-    public IMessageSender getSender()
+    public IMessager getSender()
     {
         return _sender;
     }
 
-    private IMessageSender _sender;
+    public IMessager getTarget()
+    {
+        return _sender;
+    }
+
+    private final IMessager _sender;
+    private final IMessager _target;
 }

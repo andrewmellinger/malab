@@ -1,6 +1,7 @@
 package com.crashbox.drudgemod.ai;
 
 import com.crashbox.drudgemod.EntityDrudge;
+import com.crashbox.drudgemod.beacon.BeaconBase;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
@@ -100,7 +101,6 @@ public abstract class TaskBase
     public void reject()
     {
         LOGGER.debug("Task rejected.");
-        _beacon.taskRejected(this);
     }
 
     // Called when completed
@@ -108,7 +108,6 @@ public abstract class TaskBase
     {
         LOGGER.debug("Task completed.");
         _complete = true;
-        _beacon.taskCompleted(this);
         _entityAI = null;
     }
 

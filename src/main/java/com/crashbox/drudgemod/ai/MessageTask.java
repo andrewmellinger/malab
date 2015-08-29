@@ -1,16 +1,16 @@
 package com.crashbox.drudgemod.ai;
 
 import com.crashbox.drudgemod.messaging.Message;
-import com.crashbox.drudgemod.messaging.IMessageSender;
+import com.crashbox.drudgemod.messaging.IMessager;
 
 /**
  * Copyright 2015 Andrew O. Mellinger
  */
 public class MessageTask extends Message
 {
-    public MessageTask(IMessageSender sender, TaskBase task)
+    public MessageTask(IMessager sender, TaskBase task)
     {
-        super(sender);
+        super(sender, null);
         _task = task;
     }
 

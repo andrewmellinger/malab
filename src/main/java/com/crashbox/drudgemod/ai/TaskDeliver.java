@@ -1,5 +1,6 @@
 package com.crashbox.drudgemod.ai;
 
+import com.crashbox.drudgemod.beacon.BeaconBase;
 import com.crashbox.drudgemod.beacon.TileEntityBeaconInventory;
 import net.minecraft.item.ItemStack;
 

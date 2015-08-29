@@ -1,4 +1,4 @@
-package com.crashbox.drudgemod.ai;
+package com.crashbox.drudgemod.beacon;
 
 import com.crashbox.drudgemod.messaging.Broadcaster;
 import com.crashbox.drudgemod.messaging.IListener;
@@ -9,6 +9,8 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.LinkedTransferQueue;
 
 /**
  * Copyright 2015 Andrew O. Mellinger
@@ -21,12 +23,8 @@ public abstract class BeaconBase
         if (!world.isRemote)
         {
             // TODO:  Deal with channel changes
-            LOGGER.debug("****************************************************************************");
-            LOGGER.debug("************************************************* TaskMaster BEFORE listener");
             _listener = new Listener();
-            LOGGER.debug("TaskMaster AFTER listener");
             Broadcaster.getInstance().subscribe(_inChannel, _listener);
-            LOGGER.debug("TaskMaster AFTER subscribe");
         }
     }
 
@@ -43,47 +41,31 @@ public abstract class BeaconBase
     }
 
     /**
+     * Should be called by the owne of this object to process all the messages.
+     * For example, in the TileEntity.
+     */
+    public void update()
+    {
+        for (Message msg : _messages)
+        {
+            handleMessage(msg);
+        }
+    }
+
+    /**
      * Extension point for beacon to see if they have appropriate work.
      * They should check to see if they have work.
      * @param msg The message indicating the worker is ready.
      */
     protected abstract void handleMessage(Message msg);
 
+    /**
+     * @return The channe we are attached to.
+     */
     public Broadcaster.Channel getChannel()
     {
         return _inChannel;
     }
-
-    //=============================================================================================
-    // Progress track
-
-    // Called by the Task when it is rejected
-    public void taskRejected(TaskBase task)
-    {
-        LOGGER.debug("REJECTED: Removing task from offer tracker: " + task);
-        _inProgress.remove(task);
-    }
-
-    // Called by the Task when it is completed
-    public void taskCompleted(TaskBase task)
-    {
-        LOGGER.debug("COMPLETED: Removing task from offer tracker: " + task);
-        _inProgress.remove(task);
-    }
-
-    // Called by subclasses to see what tasks there are
-    protected List<TaskBase> getInProgress()
-    {
-        return _inProgress;
-    }
-
-    // Called by subclass to add a task to the list
-    protected void addTask(TaskBase task)
-    {
-        LOGGER.debug("ADD_OFFER: Adding task to offer tracker: " + task);
-        _inProgress.add(task);
-    }
-
 
     //=============================================================================================
 
@@ -93,7 +75,7 @@ public abstract class BeaconBase
         @Override
         public void handleMessage(Message message)
         {
-            BeaconBase.this.handleMessage(message);
+            _messages.add(message);
         }
     }
 
@@ -101,14 +83,13 @@ public abstract class BeaconBase
     public String toString()
     {
         return "TaskMaster{" +
-                "_inProgress=" + _inProgress.size() +
                 ", _listener=" + Integer.toHexString(_listener.hashCode()) +
                 ", _inChannel=" + _inChannel +
                 '}';
     }
 
-    // Here we track made offers.
-    private List<TaskBase> _inProgress = new ArrayList<TaskBase>();
+
+    private final Queue<Message> _messages = new LinkedTransferQueue<Message>();
 
     private Listener _listener;
     private Broadcaster.Channel _inChannel = Broadcaster.Channel.RED;

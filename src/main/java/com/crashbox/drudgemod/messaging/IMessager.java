@@ -7,7 +7,7 @@ import net.minecraft.util.BlockPos;
  *
  *
  */
-public interface IMessageSender
+public interface IMessager
 {
     /**
      * How far is the sender from the provided postion?  This is used for computing priority, etc.

@@ -2,7 +2,7 @@ package com.crashbox.drudgemod.furnace;
 
 import com.crashbox.drudgemod.ai.MessageWorkerAvailability;
 import com.crashbox.drudgemod.ai.TaskDeliver;
-import com.crashbox.drudgemod.ai.BeaconBase;
+import com.crashbox.drudgemod.beacon.BeaconBase;
 import com.crashbox.drudgemod.messaging.Message;
 import com.crashbox.drudgemod.beacon.TileEntityBeaconInventory;
 import net.minecraft.block.state.IBlockState;
@@ -270,12 +270,16 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
         boolean isBurningFlag = isBurning();
         boolean dirtyFlag = false;
 
+        if (isBurning())
+        {
+            --_remainingFuelBurnTicks;
+        }
+
         if (!worldObj.isRemote)
         {
-            if (isBurning())
-            {
-                --_remainingFuelBurnTicks;
-            }
+            if (_furnace != null)
+                _furnace.update();
+
 
             // what does this do?
             if (!isBurning() && (_itemStacks[1] == null || _itemStacks[0] == null))
@@ -662,7 +666,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
             if (msg instanceof MessageWorkerAvailability)
             {
                 MessageWorkerAvailability availability = (MessageWorkerAvailability)msg;
-                LOGGER.debug("Furnace " + this + " is asked for work. In progress work: " + getInProgress().size());
+                LOGGER.debug("Furnace " + this + " is asked for work.");
 
                 int priority = smeltableNeedPriority();
 

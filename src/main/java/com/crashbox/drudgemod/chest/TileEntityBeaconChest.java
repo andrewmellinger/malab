@@ -1,27 +1,17 @@
 package com.crashbox.drudgemod.chest;
 
-import com.crashbox.drudgemod.ai.MessageWorkerAvailability;
-import com.crashbox.drudgemod.ai.TaskDeliver;
-import com.crashbox.drudgemod.ai.BeaconBase;
+import com.crashbox.drudgemod.beacon.BeaconBase;
 import com.crashbox.drudgemod.messaging.Message;
 import com.crashbox.drudgemod.beacon.TileEntityBeaconInventory;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -201,6 +191,8 @@ public class TileEntityBeaconChest extends TileEntityBeaconInventory implements 
         }
     }
 
+
+
     @Override
     public int getInventoryStackLimit()
     {
@@ -314,6 +306,13 @@ public class TileEntityBeaconChest extends TileEntityBeaconInventory implements 
     }
 
     //---------------------------------------------------------------------------------------------
+    public void blockBroken()
+    {
+
+    }
+
+
+
 
     @Override
     public void setWorldObj(World worldIn)

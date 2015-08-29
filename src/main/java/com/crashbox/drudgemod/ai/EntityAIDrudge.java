@@ -1,9 +1,8 @@
 package com.crashbox.drudgemod.ai;
 
-import com.crashbox.drudgemod.DrudgeUtils;
 import com.crashbox.drudgemod.EntityDrudge;
 import com.crashbox.drudgemod.messaging.Broadcaster;
-import com.crashbox.drudgemod.messaging.IMessageSender;
+import com.crashbox.drudgemod.messaging.IMessager;
 import com.crashbox.drudgemod.messaging.Message;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.item.ItemStack;
@@ -17,7 +16,7 @@ import java.util.Queue;
 /**
  * Copyright 2015 Andrew O. Mellinger
  */
-public class EntityAIDrudge extends EntityAIBase implements IMessageSender
+public class EntityAIDrudge extends EntityAIBase implements IMessager
 {
     public EntityAIDrudge(EntityDrudge entity)
     {

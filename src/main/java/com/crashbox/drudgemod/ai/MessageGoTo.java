@@ -1,7 +1,7 @@
 package com.crashbox.drudgemod.ai;
 
 import com.crashbox.drudgemod.messaging.Message;
-import com.crashbox.drudgemod.messaging.IMessageSender;
+import com.crashbox.drudgemod.messaging.IMessager;
 import net.minecraft.util.BlockPos;
 
 /**
@@ -9,9 +9,9 @@ import net.minecraft.util.BlockPos;
  */
 public class MessageGoTo extends Message
 {
-    public MessageGoTo(IMessageSender sender, BlockPos pos)
+    public MessageGoTo(IMessager sender, BlockPos pos)
     {
-        super(sender);
+        super(sender, null);
         _pos = pos;
     }
 

@@ -1,6 +1,7 @@
 package com.crashbox.drudgemod.ai;
 
 import com.crashbox.drudgemod.DrudgeUtils;
+import com.crashbox.drudgemod.beacon.BeaconBase;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
