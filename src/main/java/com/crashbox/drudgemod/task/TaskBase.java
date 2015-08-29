@@ -1,6 +1,7 @@
-package com.crashbox.drudgemod.ai;
+package com.crashbox.drudgemod.task;
 
 import com.crashbox.drudgemod.EntityDrudge;
+import com.crashbox.drudgemod.ai.EntityAIDrudge;
 import com.crashbox.drudgemod.beacon.BeaconBase;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;

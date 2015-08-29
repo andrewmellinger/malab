@@ -1,7 +1,7 @@
 package com.crashbox.drudgemod.furnace;
 
-import com.crashbox.drudgemod.ai.MessageWorkerAvailability;
-import com.crashbox.drudgemod.ai.TaskDeliver;
+import com.crashbox.drudgemod.messaging.MessageWorkerAvailability;
+import com.crashbox.drudgemod.task.TaskDeliver;
 import com.crashbox.drudgemod.beacon.BeaconBase;
 import com.crashbox.drudgemod.messaging.Message;
 import com.crashbox.drudgemod.beacon.TileEntityBeaconInventory;

@@ -1,6 +1,8 @@
-package com.crashbox.drudgemod.ai;
+package com.crashbox.drudgemod.task;
 
 import com.crashbox.drudgemod.DrudgeUtils;
+import com.crashbox.drudgemod.ai.AIUtils;
+import com.crashbox.drudgemod.ai.RingedSearcher;
 import com.crashbox.drudgemod.beacon.BeaconBase;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -111,7 +113,7 @@ public class TaskHarvest extends TaskBase
         {
             LOGGER.debug("Getting next harvest list");
             // Find blocks in a tree
-            _harvestList = RingedSearcher.findTree(getEntity().getEntityWorld(), _focusBlock, _radius, _height, _sample );
+            _harvestList = RingedSearcher.findTree(getEntity().getEntityWorld(), _focusBlock, _radius, _height, _sample);
             if (_harvestList == null)
             {
                 // Didn't find any blocks anywhere

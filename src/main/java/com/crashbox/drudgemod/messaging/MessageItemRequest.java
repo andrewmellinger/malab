@@ -1,5 +1,6 @@
-package com.crashbox.drudgemod.ai;
+package com.crashbox.drudgemod.messaging;
 
+import com.crashbox.drudgemod.ai.EntityAIDrudge;
 import com.crashbox.drudgemod.messaging.Message;
 import net.minecraft.item.ItemStack;
 

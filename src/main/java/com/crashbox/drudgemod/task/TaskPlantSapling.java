@@ -1,5 +1,6 @@
-package com.crashbox.drudgemod.ai;
+package com.crashbox.drudgemod.task;
 
+import com.crashbox.drudgemod.ai.AIUtils;
 import com.crashbox.drudgemod.beacon.BeaconBase;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;

@@ -1,4 +1,4 @@
-package com.crashbox.drudgemod.ai;
+package com.crashbox.drudgemod.messaging;
 
 import com.crashbox.drudgemod.messaging.Message;
 import com.crashbox.drudgemod.messaging.IMessager;

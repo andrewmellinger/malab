@@ -1,4 +1,4 @@
-package com.crashbox.drudgemod.ai;
+package com.crashbox.drudgemod.task;
 
 import com.crashbox.drudgemod.beacon.BeaconBase;
 import com.crashbox.drudgemod.beacon.TileEntityBeaconInventory;

@@ -1,7 +1,6 @@
-package com.crashbox.drudgemod.ai;
+package com.crashbox.drudgemod.messaging;
 
-import com.crashbox.drudgemod.messaging.Message;
-import com.crashbox.drudgemod.messaging.IMessager;
+import com.crashbox.drudgemod.task.TaskBase;
 
 /**
  * Copyright 2015 Andrew O. Mellinger

@@ -1,9 +1,11 @@
 package com.crashbox.drudgemod.ai;
 
 import com.crashbox.drudgemod.EntityDrudge;
-import com.crashbox.drudgemod.messaging.Broadcaster;
-import com.crashbox.drudgemod.messaging.IMessager;
-import com.crashbox.drudgemod.messaging.Message;
+import com.crashbox.drudgemod.messaging.*;
+import com.crashbox.drudgemod.task.TaskBase;
+import com.crashbox.drudgemod.task.TaskDeliver;
+import com.crashbox.drudgemod.task.TaskHarvest;
+import com.crashbox.drudgemod.task.TaskPlantSapling;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
