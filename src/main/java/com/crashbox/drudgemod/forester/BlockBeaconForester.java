@@ -14,11 +14,11 @@ import org.apache.logging.log4j.Logger;
 /**
  * Copyright 2015 Andrew O. Mellinger
  */
-public class BlockTaskerForester extends BlockContainer
+public class BlockBeaconForester extends BlockContainer
 {
-    public static final String NAME = "taskerForester";
+    public static final String NAME = "beaconForester";
 
-    public BlockTaskerForester()
+    public BlockBeaconForester()
     {
         super(Material.iron);
         setUnlocalizedName(DrudgeMain.MODID + "_" + NAME);
@@ -40,7 +40,7 @@ public class BlockTaskerForester extends BlockContainer
     @Override
     public TileEntity createNewTileEntity(World world, int i)
     {
-        return new TileEntityTaskerForester();
+        return new TileEntityBeaconForester();
     }
 
     @Override
@@ -50,9 +50,9 @@ public class BlockTaskerForester extends BlockContainer
         if (hasTileEntity(inBlockState))
         {
             TileEntity entity = inWorld.getTileEntity(inPos);
-            if (entity instanceof TileEntityTaskerForester)
+            if (entity instanceof TileEntityBeaconForester)
             {
-                ((TileEntityTaskerForester)entity).blockBroken();
+                ((TileEntityBeaconForester)entity).blockBroken();
             }
         }
 

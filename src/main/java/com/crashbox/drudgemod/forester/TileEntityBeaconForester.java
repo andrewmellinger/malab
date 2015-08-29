@@ -14,9 +14,9 @@ import org.apache.logging.log4j.Logger;
 /**
  * Copyright 2015 Andrew O. Mellinger
  */
-public class TileEntityTaskerForester extends TileEntity
+public class TileEntityBeaconForester extends TileEntity
 {
-    public static final String NAME = "tileEntityTaskerForester";
+    public static final String NAME = "tileEntityBeaconForester";
 
     @Override
     public void setWorldObj(World worldIn)
@@ -35,7 +35,7 @@ public class TileEntityTaskerForester extends TileEntity
         }
     }
 
-    private class Forester extends TaskMaster
+    private class Forester extends BeaconBase
     {
         private Forester(World world)
         {
@@ -97,7 +97,7 @@ public class TileEntityTaskerForester extends TileEntity
     @Override
     public String toString()
     {
-        return "TileEntityTaskerForester{" +
+        return "TileEntityBeaconForester{" +
                 "_forester=" + _forester +
                 '}';
     }

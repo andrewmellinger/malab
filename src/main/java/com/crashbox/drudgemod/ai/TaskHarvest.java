@@ -18,15 +18,15 @@ public class TaskHarvest extends TaskBase
     /**
      * Create a new carry task.
      *
-     * @param tasker   Who made the task.
+     * @param beacon   Who made the task.
      * @param center   Block to harvest.
      * @param priority Priority of the task.
      * @param radius   Radius to search
      * @param sample   A sample of the thing we are looking for.
      */
-    public TaskHarvest(TaskMaster tasker, BlockPos center, int priority, int radius, int quantity, ItemStack sample)
+    public TaskHarvest(BeaconBase beacon, BlockPos center, int priority, int radius, int quantity, ItemStack sample)
     {
-        super(tasker, center, priority);
+        super(beacon, center, priority);
         _radius = radius;
         _quantity = quantity;
         _sample = sample;

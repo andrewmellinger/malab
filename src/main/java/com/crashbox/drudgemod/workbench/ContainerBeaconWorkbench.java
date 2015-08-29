@@ -2,7 +2,6 @@ package com.crashbox.drudgemod.workbench;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.inventory.*;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
@@ -14,16 +13,16 @@ import org.apache.logging.log4j.Logger;
 /**
  * Copyright 2015 Andrew O. Mellinger
  */
-public class ContainerTaskerWorkbench extends Container
+public class ContainerBeaconWorkbench extends Container
 {
     /** The crafting matrix inventory (3x3). */
     public InventoryCrafting craftMatrix;
     public IInventory craftResult = new InventoryCraftResult();
-    private TileEntityTaskerWorkbench _workbench;
+    private TileEntityBeaconWorkbench _workbench;
     private World _world;
     private BlockPos _pos;
 
-    public ContainerTaskerWorkbench(InventoryPlayer playerInventory, TileEntityTaskerWorkbench workbench)
+    public ContainerBeaconWorkbench(InventoryPlayer playerInventory, TileEntityBeaconWorkbench workbench)
     {
         _workbench = workbench;
         craftMatrix = _workbench.makeInventory(this);

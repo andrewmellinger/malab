@@ -1,8 +1,8 @@
 package com.crashbox.drudgemod;
 
-import com.crashbox.drudgemod.furnace.BlockTaskerFurnace;
-import com.crashbox.drudgemod.forester.BlockTaskerForester;
-import com.crashbox.drudgemod.workbench.BlockTaskerWorkbench;
+import com.crashbox.drudgemod.furnace.BlockBeaconFurnace;
+import com.crashbox.drudgemod.forester.BlockBeaconForester;
+import com.crashbox.drudgemod.workbench.BlockBeaconWorkbench;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelZombie;
 import net.minecraft.client.renderer.entity.RenderItem;
@@ -42,19 +42,19 @@ public class ClientProxy extends CommonProxy
 
         // TODO: Explore this - what is meta
         renderItem.getItemModelMesher().register(
-                Item.getItemFromBlock(DrudgeMain.BLOCK_TASKER_FURNACE),
+                Item.getItemFromBlock(DrudgeMain.BLOCK_BEACON_FURNACE),
                 0,
-                new ModelResourceLocation(DrudgeMain.MODID + ":" + BlockTaskerFurnace.NAME, "inventory"));
+                new ModelResourceLocation(DrudgeMain.MODID + ":" + BlockBeaconFurnace.NAME, "inventory"));
 
         renderItem.getItemModelMesher().register(
-                Item.getItemFromBlock(DrudgeMain.BLOCK_TASKER_FORESTER),
+                Item.getItemFromBlock(DrudgeMain.BLOCK_BEACON_FORESTER),
                 0,
-                new ModelResourceLocation(DrudgeMain.MODID + ":" + BlockTaskerForester.NAME, "inventory"));
+                new ModelResourceLocation(DrudgeMain.MODID + ":" + BlockBeaconForester.NAME, "inventory"));
 
         renderItem.getItemModelMesher().register(
-                Item.getItemFromBlock(DrudgeMain.BLOCK_TASKER_WORKBENCH),
+                Item.getItemFromBlock(DrudgeMain.BLOCK_BEACON_WORKBENCH),
                 0,
-                new ModelResourceLocation(DrudgeMain.MODID + ":" + BlockTaskerWorkbench.NAME, "inventory"));
+                new ModelResourceLocation(DrudgeMain.MODID + ":" + BlockBeaconWorkbench.NAME, "inventory"));
     }
 
     @Override

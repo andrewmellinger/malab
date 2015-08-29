@@ -1,8 +1,6 @@
 package com.crashbox.drudgemod.furnace;
 
 import com.crashbox.drudgemod.DrudgeMain;
-import com.crashbox.drudgemod.furnace.ContainerTaskerFurnace;
-import com.crashbox.drudgemod.furnace.TileEntityTaskerFurnace;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -17,21 +15,21 @@ import org.apache.logging.log4j.Logger;
  * Copyright 2015 Andrew O. Mellinger
  */
 @SideOnly(Side.CLIENT)
-public class GuiTaskerFurnace extends GuiContainer
+public class GuiBeaconFurnace extends GuiContainer
 {
     private static final ResourceLocation grinderGuiTextures =
             new ResourceLocation(DrudgeMain.MODID
-                    +":textures/gui/container/taskerFurnace.png");
+                    +":textures/gui/container/beaconFurnace.png");
     private final InventoryPlayer _inventoryPlayer;
-    private final IInventory _tileTasker;
+    private final IInventory _tileBeacon;
 
-    public GuiTaskerFurnace(InventoryPlayer parInventoryPlayer,
+    public GuiBeaconFurnace(InventoryPlayer parInventoryPlayer,
             IInventory parInventoryGrinder)
     {
-        super(new ContainerTaskerFurnace(parInventoryPlayer,
+        super(new ContainerBeaconFurnace(parInventoryPlayer,
                 parInventoryGrinder));
         _inventoryPlayer = parInventoryPlayer;
-        _tileTasker = parInventoryGrinder;
+        _tileBeacon = parInventoryGrinder;
 
         LOGGER.debug( "Constructed: " + this);
     }
@@ -39,7 +37,7 @@ public class GuiTaskerFurnace extends GuiContainer
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
     {
-        String s = _tileTasker.getDisplayName().getUnformattedText();
+        String s = _tileBeacon.getDisplayName().getUnformattedText();
         fontRendererObj.drawString(s, xSize/2-fontRendererObj
                 .getStringWidth(s)/2, 6, 4210752);
         fontRendererObj.drawString(_inventoryPlayer.getDisplayName()
@@ -60,7 +58,7 @@ public class GuiTaskerFurnace extends GuiContainer
         drawTexturedModalRect(marginHorizontal, marginVertical, 0, 0,
                 xSize, ySize);
 
-        if(TileEntityTaskerFurnace.isBurning(_tileTasker))
+        if(TileEntityBeaconFurnace.isBurning(_tileBeacon))
         {
             int tmp = this.updateBurnIndicator(13);
             this.drawTexturedModalRect(marginHorizontal + 56, marginVertical + 36 + 12 - tmp, 176, 12 - tmp, 14, tmp + 1);
@@ -74,29 +72,29 @@ public class GuiTaskerFurnace extends GuiContainer
 
     private int getProgressLevel(int progressIndicatorPixelWidth)
     {
-        int ticksGrindingItemSoFar = _tileTasker.getField(2);
-        int ticksPerItem = _tileTasker.getField(3);
+        int ticksGrindingItemSoFar = _tileBeacon.getField(2);
+        int ticksPerItem = _tileBeacon.getField(3);
         return ticksPerItem != 0 && ticksGrindingItemSoFar != 0 ?
                 ticksGrindingItemSoFar*progressIndicatorPixelWidth/ticksPerItem
                 : 0;
     }
 
     private int updateBurnIndicator(int burnRemain) {
-        int originalBurnTime = _tileTasker.getField(1);
+        int originalBurnTime = _tileBeacon.getField(1);
         if(originalBurnTime == 0)
         {
             originalBurnTime = 200;
         }
 
-        return _tileTasker.getField(0) * burnRemain / originalBurnTime;
+        return _tileBeacon.getField(0) * burnRemain / originalBurnTime;
     }
 
     @Override
     public String toString()
     {
-        return "GuiTaskerFurnace{" +
+        return "GuiBeaconFurnace{" +
                 "_inventoryPlayer=" + _inventoryPlayer +
-                ", _tileTasker=" + _tileTasker +
+                ", _tileBeacon=" + _tileBeacon +
                 '}';
     }
 

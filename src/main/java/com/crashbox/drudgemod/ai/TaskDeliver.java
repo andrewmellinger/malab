@@ -1,6 +1,6 @@
 package com.crashbox.drudgemod.ai;
 
-import com.crashbox.drudgemod.tasker.TileEntityTaskerInventory;
+import com.crashbox.drudgemod.beacon.TileEntityBeaconInventory;
 import net.minecraft.item.ItemStack;
 
 /**
@@ -12,15 +12,15 @@ public class TaskDeliver extends TaskBase
 {
     /**
      * Create a new carry task.
-     *  @param tasker    Who made the task.
+     *  @param beacon    Who made the task.
      * @param recipient Target of the delivery.
      * @param itemSample  Then item to deliver.
      * @param slot      Where to place the items.
      * @param quantity How much they can handle
      */
-    public TaskDeliver(TaskMaster tasker, TileEntityTaskerInventory recipient, ItemStack itemSample, int slot, int quantity)
+    public TaskDeliver(BeaconBase beacon, TileEntityBeaconInventory recipient, ItemStack itemSample, int slot, int quantity)
     {
-        super(tasker, recipient.getPos(), 0);
+        super(beacon, recipient.getPos(), 0);
         _recipient = recipient;
         _itemSample = itemSample;
         _slot = slot;
@@ -83,7 +83,7 @@ public class TaskDeliver extends TaskBase
                 '}';
     }
 
-    private final TileEntityTaskerInventory _recipient;
+    private final TileEntityBeaconInventory _recipient;
     private final ItemStack _itemSample;
     private final int _slot;
     private final int _quantity;

@@ -1,12 +1,10 @@
 package com.crashbox.drudgemod.furnace;
 
-import com.crashbox.drudgemod.DrudgeUtils;
 import com.crashbox.drudgemod.ai.MessageWorkerAvailability;
 import com.crashbox.drudgemod.ai.TaskDeliver;
-import com.crashbox.drudgemod.ai.TaskMaster;
+import com.crashbox.drudgemod.ai.BeaconBase;
 import com.crashbox.drudgemod.messaging.Message;
-import com.crashbox.drudgemod.tasker.TileEntityTaskerInventory;
-import net.minecraft.block.Block;
+import com.crashbox.drudgemod.beacon.TileEntityBeaconInventory;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -27,7 +25,6 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraftforge.oredict.OreDictionary;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -35,7 +32,7 @@ import org.apache.logging.log4j.Logger;
 /**
  * Copyright 2015 Andrew O. Mellinger
  */
-public class TileEntityTaskerFurnace extends TileEntityTaskerInventory implements ISidedInventory
+public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implements ISidedInventory
 {
     public int INPUT_INDEX = 0;
     public int FUEL_INDEX = 1;
@@ -60,7 +57,7 @@ public class TileEntityTaskerFurnace extends TileEntityTaskerInventory implement
     private int _totalItemSmeltTicks = 200;
     private String _customName;
 
-    public static final String NAME = "tileEntityTaskerFurnace";
+    public static final String NAME = "tileEntityBeaconFurnace";
 
     public static final int FIELD_REMAINING_FUEL_BURN_TICKS = 0;
     public static final int FIELD_ORIGINAL_FUEL_BURN_TICKS = 1;
@@ -175,7 +172,7 @@ public class TileEntityTaskerFurnace extends TileEntityTaskerInventory implement
     @Override
     public String getName()
     {
-        return hasCustomName() ? _customName : "container.taskerFurnace";
+        return hasCustomName() ? _customName : "container.beaconFurnace";
     }
 
     @Override
@@ -482,7 +479,7 @@ public class TileEntityTaskerFurnace extends TileEntityTaskerInventory implement
     @Override
     public String getGuiID()
     {
-        return "drudge:taskerFurnace";
+        return "drudge:beaconFurnace";
     }
 
     @Override
@@ -492,7 +489,7 @@ public class TileEntityTaskerFurnace extends TileEntityTaskerInventory implement
         // DEBUG
         // Don't know when this is called.  I think the GuiHandler does all the construction
         LOGGER.error("createContainer()");
-        return new ContainerTaskerFurnace(playerInventory, this);
+        return new ContainerBeaconFurnace(playerInventory, this);
     }
 
     @Override
@@ -555,7 +552,7 @@ public class TileEntityTaskerFurnace extends TileEntityTaskerInventory implement
     @Override
     public String toString()
     {
-        return "TileEntityTasker{" +
+        return "TileEntityBeacon{" +
                 "_remainingFuelBurnTicks=" + _remainingFuelBurnTicks +
                 ", _originalFuelBurnTicks" + _originalFuelBurnTicks +
                 ", _accumulatedItemSmeltTicks=" + _accumulatedItemSmeltTicks +
@@ -652,7 +649,7 @@ public class TileEntityTaskerFurnace extends TileEntityTaskerInventory implement
     }
 
     // TaskMaster Furnace
-    private class Furnace extends TaskMaster
+    private class Furnace extends BeaconBase
     {
         Furnace(World world)
         {
@@ -675,7 +672,7 @@ public class TileEntityTaskerFurnace extends TileEntityTaskerInventory implement
                     LOGGER.debug("Furnace can use more smeltable: " + getSmeltableItemSample().getUnlocalizedName());
 
                     // Indicate we need some supplies
-                    availability.getAIDrudge().offer(new TaskDeliver(this, TileEntityTaskerFurnace.this,
+                    availability.getAIDrudge().offer(new TaskDeliver(this, TileEntityBeaconFurnace.this,
                             getSmeltableItemSample(), INPUT_INDEX, getSmeltableQuantityWanted()));
                 }
             }

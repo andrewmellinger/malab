@@ -1,11 +1,11 @@
 package com.crashbox.drudgemod;
 
-import com.crashbox.drudgemod.furnace.BlockTaskerFurnace;
-import com.crashbox.drudgemod.furnace.TileEntityTaskerFurnace;
-import com.crashbox.drudgemod.forester.BlockTaskerForester;
-import com.crashbox.drudgemod.forester.TileEntityTaskerForester;
-import com.crashbox.drudgemod.workbench.BlockTaskerWorkbench;
-import com.crashbox.drudgemod.workbench.TileEntityTaskerWorkbench;
+import com.crashbox.drudgemod.furnace.BlockBeaconFurnace;
+import com.crashbox.drudgemod.furnace.TileEntityBeaconFurnace;
+import com.crashbox.drudgemod.forester.BlockBeaconForester;
+import com.crashbox.drudgemod.forester.TileEntityBeaconForester;
+import com.crashbox.drudgemod.workbench.BlockBeaconWorkbench;
+import com.crashbox.drudgemod.workbench.TileEntityBeaconWorkbench;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
@@ -38,9 +38,9 @@ public class DrudgeMain
     public static final String NAME = "DrudgeMod";
     public static final String VERSION = "0.1.0";
 
-    public static Block BLOCK_TASKER_FURNACE;
-    public static Block BLOCK_TASKER_FORESTER;
-    public static Block BLOCK_TASKER_WORKBENCH;
+    public static Block BLOCK_BEACON_FURNACE;
+    public static Block BLOCK_BEACON_FORESTER;
+    public static Block BLOCK_BEACON_WORKBENCH;
 
     // This allows us to us one gui handler for many things
     public enum GUI_ENUM { FURNACE, WORKBENCH }
@@ -105,17 +105,17 @@ public class DrudgeMain
     private void preInitBlockAndItems()
     {
         // TOO: in the future move this to the client proxy
-        BLOCK_TASKER_FURNACE = new BlockTaskerFurnace();
-        GameRegistry.registerBlock(BLOCK_TASKER_FURNACE, BlockTaskerFurnace.NAME);
-        GameRegistry.registerTileEntity(TileEntityTaskerFurnace.class, TileEntityTaskerFurnace.NAME);
+        BLOCK_BEACON_FURNACE = new BlockBeaconFurnace();
+        GameRegistry.registerBlock(BLOCK_BEACON_FURNACE, BlockBeaconFurnace.NAME);
+        GameRegistry.registerTileEntity(TileEntityBeaconFurnace.class, TileEntityBeaconFurnace.NAME);
 
-        BLOCK_TASKER_FORESTER = new BlockTaskerForester();
-        GameRegistry.registerBlock(BLOCK_TASKER_FORESTER, BlockTaskerForester.NAME);
-        GameRegistry.registerTileEntity(TileEntityTaskerForester.class, TileEntityTaskerForester.NAME);
+        BLOCK_BEACON_FORESTER = new BlockBeaconForester();
+        GameRegistry.registerBlock(BLOCK_BEACON_FORESTER, BlockBeaconForester.NAME);
+        GameRegistry.registerTileEntity(TileEntityBeaconForester.class, TileEntityBeaconForester.NAME);
 
-        BLOCK_TASKER_WORKBENCH = new BlockTaskerWorkbench();
-        GameRegistry.registerBlock(BLOCK_TASKER_WORKBENCH, BlockTaskerWorkbench.NAME);
-        GameRegistry.registerTileEntity(TileEntityTaskerWorkbench.class, TileEntityTaskerWorkbench.NAME);
+        BLOCK_BEACON_WORKBENCH = new BlockBeaconWorkbench();
+        GameRegistry.registerBlock(BLOCK_BEACON_WORKBENCH, BlockBeaconWorkbench.NAME);
+        GameRegistry.registerTileEntity(TileEntityBeaconWorkbench.class, TileEntityBeaconWorkbench.NAME);
     }
 
 

@@ -13,9 +13,9 @@ import java.util.List;
 /**
  * Copyright 2015 Andrew O. Mellinger
  */
-public abstract class TaskMaster
+public abstract class BeaconBase
 {
-    protected TaskMaster(World world)
+    protected BeaconBase(World world)
     {
         // We only want to listen on the server
         if (!world.isRemote)
@@ -43,7 +43,7 @@ public abstract class TaskMaster
     }
 
     /**
-     * Extension point for taskers to see if they have appropriate work.
+     * Extension point for beacon to see if they have appropriate work.
      * They should check to see if they have work.
      * @param msg The message indicating the worker is ready.
      */
@@ -93,7 +93,7 @@ public abstract class TaskMaster
         @Override
         public void handleMessage(Message message)
         {
-            TaskMaster.this.handleMessage(message);
+            BeaconBase.this.handleMessage(message);
         }
     }
 

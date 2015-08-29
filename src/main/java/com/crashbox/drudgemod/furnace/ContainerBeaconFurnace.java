@@ -12,33 +12,24 @@ import org.apache.logging.log4j.Logger;
 /**
  * Copyright 2015 Andrew O. Mellinger
  */
-public class ContainerTaskerFurnace extends Container
+public class ContainerBeaconFurnace extends Container
 {
-    private final IInventory _tileTasker;
+    private final IInventory _tileBeacon;
     private final int _sizeInventory;
     private int[] _trackedFields = { 0,0,0,0};
 
-    public ContainerTaskerFurnace(InventoryPlayer inventoryPlayer, IInventory inventory)
+    public ContainerBeaconFurnace(InventoryPlayer inventoryPlayer, IInventory inventory)
     {
         // DEBUG
         LOGGER.debug("Constructed!!");
 
-        _tileTasker = inventory;
-        _sizeInventory = _tileTasker.getSizeInventory();
+        _tileBeacon = inventory;
+        _sizeInventory = _tileBeacon.getSizeInventory();
 
         // Set up all our main interaction slots
-//        addSlotToContainer(new Slot(_tileTasker,
-//                TileEntityTasker.slotEnum.INPUT_SLOT.ordinal(), 56, 17));
-//        addSlotToContainer(new Slot(_tileTasker,
-//                TileEntityTasker.slotEnum.FUEL_SLOT.ordinal(), 56, 53));
-//        addSlotToContainer(new SlotOutputWood(inventoryPlayer.player,
-//                _tileTasker, TileEntityTasker.slotEnum.OUTPUT_SLOT.ordinal(),
-//                116, 35));
-
-        // Set up all our main interaction slots
-        addSlotToContainer(new Slot(_tileTasker, 0, 56, 17));
-        addSlotToContainer(new SlotFurnaceFuel(_tileTasker, 1, 56, 53));
-        addSlotToContainer(new SlotFurnaceOutput(inventoryPlayer.player, _tileTasker, 2, 116, 35));
+        addSlotToContainer(new Slot(_tileBeacon, 0, 56, 17));
+        addSlotToContainer(new SlotFurnaceFuel(_tileBeacon, 1, 56, 53));
+        addSlotToContainer(new SlotFurnaceOutput(inventoryPlayer.player, _tileBeacon, 2, 116, 35));
 
         // TODO: Make reusable function
 
@@ -65,7 +56,7 @@ public class ContainerTaskerFurnace extends Container
     public void addCraftingToCrafters(ICrafting listener)
     {
         super.addCraftingToCrafters(listener);
-        listener.func_175173_a(this, _tileTasker);
+        listener.func_175173_a(this, _tileBeacon);
     }
 
     /**
@@ -84,7 +75,7 @@ public class ContainerTaskerFurnace extends Container
             // send all fields to each crafter
             for (int n = 0; n < _trackedFields.length; ++n)
             {
-                int tmp = _tileTasker.getField(n);
+                int tmp = _tileBeacon.getField(n);
                 if (_trackedFields[n] != tmp)
                 {
                     icrafting.sendProgressBarUpdate(this, n, tmp);
@@ -95,7 +86,7 @@ public class ContainerTaskerFurnace extends Container
         // cache state for next time
         for (int n = 0; n < _trackedFields.length; ++n)
         {
-            _trackedFields[n] = _tileTasker.getField(n);
+            _trackedFields[n] = _tileBeacon.getField(n);
         }
     }
 
@@ -103,13 +94,13 @@ public class ContainerTaskerFurnace extends Container
     @SideOnly(Side.CLIENT)
     public void updateProgressBar(int id, int data)
     {
-        _tileTasker.setField(id, data);
+        _tileBeacon.setField(id, data);
     }
 
     @Override
     public boolean canInteractWith(EntityPlayer playerIn)
     {
-        return _tileTasker.isUseableByPlayer(playerIn);
+        return _tileBeacon.isUseableByPlayer(playerIn);
     }
 
     @Override
@@ -123,7 +114,7 @@ public class ContainerTaskerFurnace extends Container
             ItemStack itemStack2 = slot.getStack();
             itemStack1 = itemStack2.copy();
 
-            if (slotIndex == TileEntityTaskerFurnace.slotEnum.OUTPUT_SLOT.ordinal())
+            if (slotIndex == TileEntityBeaconFurnace.slotEnum.OUTPUT_SLOT.ordinal())
             {
                 if (!mergeItemStack(itemStack2, _sizeInventory, _sizeInventory +36, true))
                 {
@@ -133,7 +124,7 @@ public class ContainerTaskerFurnace extends Container
                 // Basically this says, try to make me more.  One will be MORE than 2
                 slot.onSlotChange(itemStack2, itemStack1);
             }
-            else if (slotIndex != TileEntityTaskerFurnace.slotEnum.INPUT_SLOT.ordinal())
+            else if (slotIndex != TileEntityBeaconFurnace.slotEnum.INPUT_SLOT.ordinal())
             {
                 // check if there is a grinding recipe for the stack
 //                if (GrinderRecipes.instance().getGrindingResult(itemStack2) != null)

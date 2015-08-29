@@ -1,5 +1,5 @@
 {
-  "parent": "drudgemod:block/taskerFurnace",
+  "parent": "drudgemod:block/beaconWorkbench",
   "display": {
     "thirdperson": {
       "rotation": [ 10, -45, 170 ],

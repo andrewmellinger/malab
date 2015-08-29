@@ -1,4 +1,4 @@
-package com.crashbox.drudgemod.furnace;
+package com.crashbox.drudgemod.workbench;
 
 import com.crashbox.drudgemod.DrudgeMain;
 import net.minecraft.block.BlockContainer;
@@ -26,15 +26,14 @@ import java.util.Random;
 /**
  * Copyright 2015 Andrew O. Mellinger
  */
-public class BlockTaskerFurnace extends BlockContainer
+public class BlockBeaconWorkbench extends BlockContainer
 {
-    public static final String NAME = "taskerFurnace";
+    public static final String NAME = "beaconWorkbench";
 
-    public static final PropertyDirection FACING =
-        PropertyDirection.create("facing",
+    public static final PropertyDirection FACING = PropertyDirection.create("facing",
                 EnumFacing.Plane.HORIZONTAL);
 
-    public BlockTaskerFurnace()
+    public BlockBeaconWorkbench()
     {
         super(Material.iron);
         setUnlocalizedName(DrudgeMain.MODID + "_" + NAME);
@@ -53,7 +52,7 @@ public class BlockTaskerFurnace extends BlockContainer
     @Override
     public TileEntity createNewTileEntity(World world, int i)
     {
-        return new TileEntityTaskerFurnace();
+        return new TileEntityBeaconWorkbench();
     }
 
     @Override
@@ -62,12 +61,12 @@ public class BlockTaskerFurnace extends BlockContainer
         if (hasTileEntity(inBlockState))
         {
             TileEntity entity = inWorld.getTileEntity(inPos);
-            if (entity instanceof TileEntityTaskerFurnace)
+            if (entity instanceof TileEntityBeaconWorkbench)
             {
 //                InventoryHelper.dropInventoryItems(worldIn, pos,
 //                        (TileEntityGrinder)tileentity);
 //                worldIn.updateComparatorOutputLevel(pos, this);
-                ((TileEntityTaskerFurnace)entity).blockBroken();
+                ((TileEntityBeaconWorkbench)entity).blockBroken();
             }
         }
 
@@ -81,7 +80,7 @@ public class BlockTaskerFurnace extends BlockContainer
             Random rand,
             int fortune)
     {
-        return Item.getItemFromBlock(DrudgeMain.BLOCK_TASKER_FURNACE);
+        return Item.getItemFromBlock(DrudgeMain.BLOCK_BEACON_WORKBENCH);
     }
 
     @Override
@@ -150,7 +149,7 @@ public class BlockTaskerFurnace extends BlockContainer
         {
             // This triggers the general GuiHandler
             entityPlayer.openGui(DrudgeMain.instance,
-                    DrudgeMain.GUI_ENUM.FURNACE.ordinal(),
+                    DrudgeMain.GUI_ENUM.WORKBENCH.ordinal(),
                     parWorld,
                     parBlockPos.getX(),
                     parBlockPos.getY(),
@@ -196,7 +195,7 @@ public class BlockTaskerFurnace extends BlockContainer
     @SideOnly(Side.CLIENT)
     public Item getItem(World worldIn, BlockPos pos)
     {
-        return Item.getItemFromBlock(DrudgeMain.BLOCK_TASKER_FURNACE);
+        return Item.getItemFromBlock(DrudgeMain.BLOCK_BEACON_WORKBENCH);
     }
 
     @Override

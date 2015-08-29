@@ -7,16 +7,14 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 
-import java.util.Queue;
-
 /**
  * Copyright 2015 Andrew O. Mellinger
  */
 public class TaskPlantSapling extends TaskBase
 {
-    public TaskPlantSapling(TaskMaster tasker, BlockPos focusBlock, int priority, int radius)
+    public TaskPlantSapling(BeaconBase beacon, BlockPos focusBlock, int priority, int radius)
     {
-        super(tasker, focusBlock, priority);
+        super(beacon, focusBlock, priority);
         _radius = radius;
     }
 

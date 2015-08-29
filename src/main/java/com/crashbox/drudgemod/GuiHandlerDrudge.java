@@ -1,10 +1,10 @@
 package com.crashbox.drudgemod;
 
-import com.crashbox.drudgemod.furnace.ContainerTaskerFurnace;
-import com.crashbox.drudgemod.furnace.GuiTaskerFurnace;
-import com.crashbox.drudgemod.workbench.ContainerTaskerWorkbench;
-import com.crashbox.drudgemod.workbench.GuiTaskerWorkbench;
-import com.crashbox.drudgemod.workbench.TileEntityTaskerWorkbench;
+import com.crashbox.drudgemod.furnace.ContainerBeaconFurnace;
+import com.crashbox.drudgemod.furnace.GuiBeaconFurnace;
+import com.crashbox.drudgemod.workbench.ContainerBeaconWorkbench;
+import com.crashbox.drudgemod.workbench.GuiBeaconWorkbench;
+import com.crashbox.drudgemod.workbench.TileEntityBeaconWorkbench;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.tileentity.TileEntity;
@@ -32,10 +32,10 @@ public class GuiHandlerDrudge implements IGuiHandler
             return null;
 
         if (ID == DrudgeMain.GUI_ENUM.FURNACE.ordinal())
-            return new ContainerTaskerFurnace(player.inventory, (IInventory)tileEntity);
+            return new ContainerBeaconFurnace(player.inventory, (IInventory)tileEntity);
 
         if (ID == DrudgeMain.GUI_ENUM.WORKBENCH.ordinal())
-            return new ContainerTaskerWorkbench(player.inventory, (TileEntityTaskerWorkbench)tileEntity);
+            return new ContainerBeaconWorkbench(player.inventory, (TileEntityBeaconWorkbench)tileEntity);
 
         return null;
     }
@@ -50,10 +50,10 @@ public class GuiHandlerDrudge implements IGuiHandler
             return null;
 
         if (ID == DrudgeMain.GUI_ENUM.FURNACE.ordinal())
-            return new GuiTaskerFurnace( player.inventory, (IInventory)tileEntity);
+            return new GuiBeaconFurnace( player.inventory, (IInventory)tileEntity);
 
         if (ID == DrudgeMain.GUI_ENUM.WORKBENCH.ordinal())
-            return new GuiTaskerWorkbench( player.inventory, (TileEntityTaskerWorkbench)tileEntity);
+            return new GuiBeaconWorkbench( player.inventory, (TileEntityBeaconWorkbench)tileEntity);
 
         return null;
     }

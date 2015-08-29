@@ -1,7 +1,6 @@
 package com.crashbox.drudgemod.ai;
 
 import com.crashbox.drudgemod.EntityDrudge;
-import com.crashbox.drudgemod.messaging.Message;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
@@ -14,13 +13,13 @@ public abstract class TaskBase
 {
     /**
      * Base class for all tasks.
-     * @param tasker This is the TaskMaster who originated the tasks.
+     * @param beacon This is the TaskMaster who originated the tasks.
      * @param focusBlock The block we are focused on.
      * @param priority The priority of the task.
      */
-    protected TaskBase(TaskMaster tasker, BlockPos focusBlock, int priority)
+    protected TaskBase(BeaconBase beacon, BlockPos focusBlock, int priority)
     {
-        _tasker = tasker;
+        _beacon = beacon;
         _focusBlock = focusBlock;
         _priority = priority;
     }
@@ -101,7 +100,7 @@ public abstract class TaskBase
     public void reject()
     {
         LOGGER.debug("Task rejected.");
-        _tasker.taskRejected(this);
+        _beacon.taskRejected(this);
     }
 
     // Called when completed
@@ -109,7 +108,7 @@ public abstract class TaskBase
     {
         LOGGER.debug("Task completed.");
         _complete = true;
-        _tasker.taskCompleted(this);
+        _beacon.taskCompleted(this);
         _entityAI = null;
     }
 
@@ -139,14 +138,14 @@ public abstract class TaskBase
     public String toString()
     {
         return "TaskBase{" +
-                "_tasker=" + _tasker +
+                "_beacon=" + _beacon +
                 ", _focusBlock=" + _focusBlock +
                 ", _accepted=" + _accepted +
                 '}';
     }
 
     // Who generated the task
-    protected final TaskMaster _tasker;
+    protected final BeaconBase _beacon;
 
     // Is the task focused on a particular block such as harvesting?
     protected BlockPos _focusBlock;

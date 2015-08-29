@@ -5,7 +5,6 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.registry.LanguageRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
@@ -15,19 +14,19 @@ import org.apache.logging.log4j.Logger;
  * Copyright 2015 Andrew O. Mellinger
  */
 @SideOnly(Side.CLIENT)
-public class GuiTaskerWorkbench extends GuiContainer
+public class GuiBeaconWorkbench extends GuiContainer
 {
     private static final ResourceLocation grinderGuiTextures =
             new ResourceLocation(DrudgeMain.MODID
-                +":textures/gui/container/taskerWorkbench.png");
+                +":textures/gui/container/beaconWorkbench.png");
     private final InventoryPlayer _inventoryPlayer;
-    private final TileEntityTaskerWorkbench _tileWorkbench;
+    private final TileEntityBeaconWorkbench _tileWorkbench;
 
-    public GuiTaskerWorkbench(InventoryPlayer parInventoryPlayer,
-            TileEntityTaskerWorkbench workbench)
+    public GuiBeaconWorkbench(InventoryPlayer parInventoryPlayer,
+            TileEntityBeaconWorkbench workbench)
     {
         // We need to set yp our own craft matrix.
-        super(new ContainerTaskerWorkbench(parInventoryPlayer, workbench));
+        super(new ContainerBeaconWorkbench(parInventoryPlayer, workbench));
 
         _inventoryPlayer = parInventoryPlayer;
         _tileWorkbench = workbench;
@@ -63,7 +62,7 @@ public class GuiTaskerWorkbench extends GuiContainer
         drawTexturedModalRect(marginHorizontal, marginVertical, 0, 0,
                 xSize, ySize);
 
-//        if(TileEntityTaskerWorkbench.isBurning(_tileWorkbench))
+//        if(TileEntityBeaconWorkbench.isBurning(_tileWorkbench))
 //        {
 //            int tmp = this.updateBurnIndicator(13);
 //            this.drawTexturedModalRect(marginHorizontal + 56, marginVertical + 36 + 12 - tmp, 176, 12 - tmp, 14, tmp + 1);
@@ -97,7 +96,7 @@ public class GuiTaskerWorkbench extends GuiContainer
     @Override
     public String toString()
     {
-        return "GuiTaskerWorkbench{" +
+        return "GuiBeaconWorkbench{" +
                 "_inventoryPlayer=" + _inventoryPlayer +
                 ", _tileWorkbench=" + _tileWorkbench +
                 '}';

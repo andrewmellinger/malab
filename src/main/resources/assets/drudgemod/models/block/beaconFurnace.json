@@ -1,6 +1,6 @@
 {
   "parent": "block/cube_all",
   "textures": {
-    "all": "drudgemod:blocks/taskerForester"
+    "all": "drudgemod:blocks/beaconFurnace"
   }
 }

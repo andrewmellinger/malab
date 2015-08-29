@@ -36,7 +36,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessageSender
     }
 
     /**
-     * This is called by Taskers when the Worker indicates it may have work.  This
+     * This is called by Beacons when the Worker indicates it may have work.  This
      * must be re-entrant as the worked can be called at any time.   This is expected
      * to be call while we have SYNCHRONOUSLY issued the message available call.
      * @param offer The work offered

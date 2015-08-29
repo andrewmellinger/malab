@@ -1,11 +1,5 @@
 package com.crashbox.drudgemod.workbench;
 
-import com.crashbox.drudgemod.DrudgeMain;
-import com.crashbox.drudgemod.ai.MessageWorkerAvailability;
-import com.crashbox.drudgemod.ai.TaskDeliver;
-import com.crashbox.drudgemod.ai.TaskMaster;
-import com.crashbox.drudgemod.messaging.Message;
-import com.crashbox.drudgemod.tasker.TileEntityTaskerInventory;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -19,10 +13,8 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.server.gui.IUpdatePlayerListBox;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityLockable;
 import net.minecraft.util.*;
 import net.minecraft.world.IInteractionObject;
-import net.minecraft.world.IWorldNameable;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -33,7 +25,7 @@ import org.apache.logging.log4j.Logger;
 /**
  * Copyright 2015 Andrew O. Mellinger
  */
-public class TileEntityTaskerWorkbench extends TileEntity implements IUpdatePlayerListBox, IInteractionObject
+public class TileEntityBeaconWorkbench extends TileEntity implements IUpdatePlayerListBox, IInteractionObject
 {
     public int INPUT_INDEX = 0;
     public int FUEL_INDEX = 1;
@@ -58,7 +50,7 @@ public class TileEntityTaskerWorkbench extends TileEntity implements IUpdatePlay
     public int _totalItemSmeltTicks = 200;
     private String _customName;
 
-    public static final String NAME = "tileEntityTaskerWorkbench";
+    public static final String NAME = "tileEntityBeaconWorkbench";
 
     public static final int FIELD_REMAINING_FUEL_BURN_TICKS = 0;
     public static final int FIELD_ORIGINAL_FUEL_BURN_TICKS = 1;
@@ -73,7 +65,7 @@ public class TileEntityTaskerWorkbench extends TileEntity implements IUpdatePlay
     private static final String NBT_TOTAL_ITEM_SMELT_TICKS = "TotalSmeltTime";
 
 
-    public TileEntityTaskerWorkbench()
+    public TileEntityBeaconWorkbench()
     {
 
     }
@@ -169,14 +161,14 @@ public class TileEntityTaskerWorkbench extends TileEntity implements IUpdatePlay
     // TileEntityLockable
     //=============================================================================================
 
-    public InventoryTaskerWorkbench makeInventory(ContainerTaskerWorkbench container)
+    public InventoryBeaconWorkbench makeInventory(ContainerBeaconWorkbench container)
     {
-        return new InventoryTaskerWorkbench(container);
+        return new InventoryBeaconWorkbench(container);
     }
 
-    private class InventoryTaskerWorkbench extends InventoryCrafting
+    private class InventoryBeaconWorkbench extends InventoryCrafting
     {
-        private InventoryTaskerWorkbench(Container container)
+        private InventoryBeaconWorkbench(Container container)
         {
             super(container, 3, 3);
         }
@@ -411,7 +403,7 @@ public class TileEntityTaskerWorkbench extends TileEntity implements IUpdatePlay
     @Override
     public String getName()
     {
-        return hasCustomName() ? _customName : "container.taskerWorkbench";
+        return hasCustomName() ? _customName : "container.beaconWorkbench";
     }
 
     @Override
@@ -422,7 +414,7 @@ public class TileEntityTaskerWorkbench extends TileEntity implements IUpdatePlay
 
     public IChatComponent getDisplayName()
     {
-        return new ChatComponentTranslation("container.taskerWorkbench");
+        return new ChatComponentTranslation("container.beaconWorkbench");
     }
 
     //=============================================================================================
@@ -432,7 +424,7 @@ public class TileEntityTaskerWorkbench extends TileEntity implements IUpdatePlay
     @Override
     public String getGuiID()
     {
-        return "drudge:taskerWorkbench";
+        return "drudge:beaconWorkbench";
     }
 
     @Override
@@ -538,7 +530,7 @@ public class TileEntityTaskerWorkbench extends TileEntity implements IUpdatePlay
 
     // this function indicates whether container texture should be drawn
     @SideOnly(Side.CLIENT)
-    public static boolean isBurning(TileEntityTaskerWorkbench workbench)
+    public static boolean isBurning(TileEntityBeaconWorkbench workbench)
     {
         return workbench._remainingFuelBurnTicks > 0;
     }
@@ -717,7 +709,7 @@ public class TileEntityTaskerWorkbench extends TileEntity implements IUpdatePlay
 //                    LOGGER.debug("Workbench can use more smeltable: " + getSmeltableItemSample().getUnlocalizedName());
 //
 //                    // Indicate we need some supplies
-//                    availability.getAIDrudge().offer(new TaskDeliver(this, TileEntityTaskerWorkbench.this,
+//                    availability.getAIDrudge().offer(new TaskDeliver(this, TileEntityBeaconWorkbench.this,
 //                            getSmeltableItemSample(), INPUT_INDEX, getSmeltableQuantityWanted()));
 //                }
 //            }
@@ -728,7 +720,7 @@ public class TileEntityTaskerWorkbench extends TileEntity implements IUpdatePlay
     @Override
     public String toString()
     {
-        return "TileEntityTaskerWorkbench{" +
+        return "TileEntityBeaconWorkbench{" +
                 "_remainingFuelBurnTicks=" + _remainingFuelBurnTicks +
                 ", _originalFuelBurnTicks" + _originalFuelBurnTicks +
                 ", _accumulatedItemSmeltTicks=" + _accumulatedItemSmeltTicks +

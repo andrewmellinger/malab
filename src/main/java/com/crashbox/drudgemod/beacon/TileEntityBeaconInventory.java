@@ -1,9 +1,7 @@
-package com.crashbox.drudgemod.tasker;
+package com.crashbox.drudgemod.beacon;
 
 import com.crashbox.drudgemod.messaging.IMessageSender;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.gui.IUpdatePlayerListBox;
 import net.minecraft.tileentity.TileEntityLockable;
@@ -11,7 +9,7 @@ import net.minecraft.tileentity.TileEntityLockable;
 /**
  * Copyright 2015 Andrew O. Mellinger
  */
-public abstract class TileEntityTaskerInventory extends TileEntityLockable implements IUpdatePlayerListBox, IInventory,
+public abstract class TileEntityBeaconInventory extends TileEntityLockable implements IUpdatePlayerListBox, IInventory,
         IMessageSender
 {
     public ItemStack mergeIntoSlot(ItemStack stack, int slot)
