@@ -272,13 +272,14 @@ public class TileEntityTaskerFurnace extends TileEntityTaskerInventory implement
         // Refactor
         boolean isBurningFlag = isBurning();
         boolean dirtyFlag = false;
-        if (isBurning())
-        {
-            --_remainingFuelBurnTicks;
-        }
 
         if (!worldObj.isRemote)
         {
+            if (isBurning())
+            {
+                --_remainingFuelBurnTicks;
+            }
+
             // what does this do?
             if (!isBurning() && (_itemStacks[1] == null || _itemStacks[0] == null))
             {

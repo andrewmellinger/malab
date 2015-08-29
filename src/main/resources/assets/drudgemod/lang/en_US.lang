@@ -4,4 +4,6 @@ container.taskerFurnace=TaskerFurnace
 tile.drudgemod_taskerForester.name=Tasker Forester (tile)
 item.drudgemod_taskerForester.name=Tasker Forester (item)
 container.taskerForester=TaskerForester
-
+tile.drudgemod_taskerWorkbench.name=Tasker Workbench (tile)
+item.drudgemod_taskerWorkbench.name=Tasker Workbench (item)
+container.taskerWorkbench=TaskerWorkbench

@@ -4,8 +4,8 @@ import com.crashbox.drudgemod.DrudgeMain;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.common.registry.LanguageRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
@@ -19,16 +19,18 @@ public class GuiTaskerWorkbench extends GuiContainer
 {
     private static final ResourceLocation grinderGuiTextures =
             new ResourceLocation(DrudgeMain.MODID
-                    +":textures/gui/container/taskerWorkbench.png");
+                +":textures/gui/container/taskerWorkbench.png");
     private final InventoryPlayer _inventoryPlayer;
-    private final IInventory _tileTasker;
+    private final TileEntityTaskerWorkbench _tileWorkbench;
 
     public GuiTaskerWorkbench(InventoryPlayer parInventoryPlayer,
-            IInventory parInventoryGrinder)
+            TileEntityTaskerWorkbench workbench)
     {
-        super(new ContainerTaskerWorkbench(parInventoryPlayer, null, null, null));
+        // We need to set yp our own craft matrix.
+        super(new ContainerTaskerWorkbench(parInventoryPlayer, workbench));
+
         _inventoryPlayer = parInventoryPlayer;
-        _tileTasker = parInventoryGrinder;
+        _tileWorkbench = workbench;
 
         LOGGER.debug( "Constructed: " + this);
     }
@@ -36,7 +38,10 @@ public class GuiTaskerWorkbench extends GuiContainer
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
     {
-        String s = _tileTasker.getDisplayName().getUnformattedText();
+        // TODO: What is all this?
+//        LOGGER.debug("drawGuiContainerForegroundLayer");
+//        String s = _tileWorkbench.getDisplayName().getUnformattedText();
+        String s = _tileWorkbench.getDisplayName().getUnformattedText();
         fontRendererObj.drawString(s, xSize/2-fontRendererObj
                 .getStringWidth(s)/2, 6, 4210752);
         fontRendererObj.drawString(_inventoryPlayer.getDisplayName()
@@ -50,6 +55,7 @@ public class GuiTaskerWorkbench extends GuiContainer
     protected void drawGuiContainerBackgroundLayer(float partialTicks,
                                                    int mouseX, int mouseY)
     {
+//        LOGGER.debug("drawGuiContainerBackgroundLayer");
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         mc.getTextureManager().bindTexture(grinderGuiTextures);
         int marginHorizontal = (width - xSize) / 2;
@@ -57,35 +63,35 @@ public class GuiTaskerWorkbench extends GuiContainer
         drawTexturedModalRect(marginHorizontal, marginVertical, 0, 0,
                 xSize, ySize);
 
-        if(TileEntityTaskerWorkbench.isBurning(_tileTasker))
-        {
-            int tmp = this.updateBurnIndicator(13);
-            this.drawTexturedModalRect(marginHorizontal + 56, marginVertical + 36 + 12 - tmp, 176, 12 - tmp, 14, tmp + 1);
-        }
+//        if(TileEntityTaskerWorkbench.isBurning(_tileWorkbench))
+//        {
+//            int tmp = this.updateBurnIndicator(13);
+//            this.drawTexturedModalRect(marginHorizontal + 56, marginVertical + 36 + 12 - tmp, 176, 12 - tmp, 14, tmp + 1);
+//        }
 
-        // Draw progress indicator
-        int progressLevel = getProgressLevel(24);
-        drawTexturedModalRect(marginHorizontal + 79, marginVertical + 34,
-                176, 14, progressLevel + 1, 16);
+//        // Draw progress indicator
+//        int progressLevel = getProgressLevel(24);
+//        drawTexturedModalRect(marginHorizontal + 79, marginVertical + 34,
+//                176, 14, progressLevel + 1, 16);
     }
 
     private int getProgressLevel(int progressIndicatorPixelWidth)
     {
-        int ticksGrindingItemSoFar = _tileTasker.getField(2);
-        int ticksPerItem = _tileTasker.getField(3);
-        return ticksPerItem != 0 && ticksGrindingItemSoFar != 0 ?
-                ticksGrindingItemSoFar*progressIndicatorPixelWidth/ticksPerItem
+        int totalSoFar = _tileWorkbench._accumulatedItemSmeltTicks;
+        int ticksPerItem = _tileWorkbench._totalItemSmeltTicks;
+        return ticksPerItem != 0 && totalSoFar != 0 ?
+                totalSoFar*progressIndicatorPixelWidth/ticksPerItem
                 : 0;
     }
 
     private int updateBurnIndicator(int burnRemain) {
-        int originalBurnTime = _tileTasker.getField(1);
+        int originalBurnTime = _tileWorkbench._originalFuelBurnTicks;
         if(originalBurnTime == 0)
         {
             originalBurnTime = 200;
         }
 
-        return _tileTasker.getField(0) * burnRemain / originalBurnTime;
+        return _tileWorkbench._remainingFuelBurnTicks * burnRemain / originalBurnTime;
     }
 
     @Override
@@ -93,7 +99,7 @@ public class GuiTaskerWorkbench extends GuiContainer
     {
         return "GuiTaskerWorkbench{" +
                 "_inventoryPlayer=" + _inventoryPlayer +
-                ", _tileTasker=" + _tileTasker +
+                ", _tileWorkbench=" + _tileWorkbench +
                 '}';
     }
 

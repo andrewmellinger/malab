@@ -113,9 +113,9 @@ public class DrudgeMain
         GameRegistry.registerBlock(BLOCK_TASKER_FORESTER, BlockTaskerForester.NAME);
         GameRegistry.registerTileEntity(TileEntityTaskerForester.class, TileEntityTaskerForester.NAME);
 
-//        BLOCK_TASKER_WORKBENCH = new BlockTaskerWorkbench();
-//        GameRegistry.registerBlock(BLOCK_TASKER_WORKBENCH, BlockTaskerWorkbench.NAME);
-//        GameRegistry.registerTileEntity(TileEntityTaskerWorkbench.class, TileEntityTaskerWorkbench.NAME);
+        BLOCK_TASKER_WORKBENCH = new BlockTaskerWorkbench();
+        GameRegistry.registerBlock(BLOCK_TASKER_WORKBENCH, BlockTaskerWorkbench.NAME);
+        GameRegistry.registerTileEntity(TileEntityTaskerWorkbench.class, TileEntityTaskerWorkbench.NAME);
     }
 
 
