@@ -7,3 +7,6 @@ container.beaconForester=BeaconForester
 tile.drudgemod_beaconWorkbench.name=Beacon Workbench (tile)
 item.drudgemod_beaconWorkbench.name=Beacon Workbench (item)
 container.beaconWorkbench=BeaconWorkbench
+tile.drudgemod_beaconChest.name=Beacon Chest (tile)
+item.drudgemod_beaconChest.name=Beacon Chest (item)
+container.beaconChest=BeaconChest

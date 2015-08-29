@@ -41,9 +41,10 @@ public class DrudgeMain
     public static Block BLOCK_BEACON_FURNACE;
     public static Block BLOCK_BEACON_FORESTER;
     public static Block BLOCK_BEACON_WORKBENCH;
+    public static Block BLOCK_BEACON_CHEST;
 
     // This allows us to us one gui handler for many things
-    public enum GUI_ENUM { FURNACE, WORKBENCH }
+    public enum GUI_ENUM { FURNACE, WORKBENCH, CHEST }
 
     // These are the blocks and items we load that other parts need to use.
     //public static ItemThrowableTorch ITEM_THROWABLE_TORCH;
