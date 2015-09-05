@@ -1,18 +1,25 @@
 package com.crashbox.drudgemod.messaging;
 
-import com.crashbox.drudgemod.ai.EntityAIDrudge;
-import com.crashbox.drudgemod.messaging.Message;
+import com.crashbox.drudgemod.task.TaskBase;
+import com.crashbox.drudgemod.task.TaskDeliver;
 import net.minecraft.item.ItemStack;
 
 /**
  * Copyright 2015 Andrew O. Mellinger
  */
-public class MessageItemRequest extends Message
+public class MessageItemRequest extends  MessageTaskRequest
 {
-    public MessageItemRequest(EntityAIDrudge drudge, ItemStack itemSample, int quantity)
+    public MessageItemRequest(IMessager sender, IMessager receiver, ItemStack itemSample, int quantity)
     {
-        super(drudge, null);
-        _drudgeAI = drudge;
+        super(sender, receiver, TaskDeliver.class, 0);
+        _itemSample = itemSample;
+        _quantity = quantity;
+    }
+
+    public MessageItemRequest(IMessager sender, IMessager receiver, Class<? extends TaskBase> clazz, int priority,
+            ItemStack itemSample, int quantity)
+    {
+        super(sender, receiver, clazz, priority);
         _itemSample = itemSample;
         _quantity = quantity;
     }
@@ -20,11 +27,6 @@ public class MessageItemRequest extends Message
     public ItemStack getItemSample()
     {
         return _itemSample;
-    }
-
-    public EntityAIDrudge getAIDrudge()
-    {
-        return _drudgeAI;
     }
 
     public int getQuantity()
@@ -35,14 +37,12 @@ public class MessageItemRequest extends Message
     @Override
     public String toString()
     {
-        return "MessageItemRequest{" +
-                "_drudgeAI=" + Integer.toHexString(_drudgeAI.hashCode()) +
+        return "MessageDeliverRequest{" +
                 ", _itemSample=" + _itemSample +
                 ", _quantity=" + _quantity +
                 '}';
     }
 
-    private final EntityAIDrudge _drudgeAI;
     private final ItemStack _itemSample;
     private final int _quantity;
 }

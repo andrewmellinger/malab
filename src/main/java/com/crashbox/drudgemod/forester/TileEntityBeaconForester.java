@@ -2,12 +2,7 @@ package com.crashbox.drudgemod.forester;
 
 import com.crashbox.drudgemod.ai.*;
 import com.crashbox.drudgemod.beacon.BeaconBase;
-import com.crashbox.drudgemod.messaging.Message;
-import com.crashbox.drudgemod.messaging.MessageItemRequest;
-import com.crashbox.drudgemod.messaging.MessageWorkerAvailability;
-import com.crashbox.drudgemod.task.TaskBase;
-import com.crashbox.drudgemod.task.TaskHarvest;
-import com.crashbox.drudgemod.task.TaskPlantSapling;
+import com.crashbox.drudgemod.messaging.*;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
@@ -21,7 +16,7 @@ import org.apache.logging.log4j.Logger;
 /**
  * Copyright 2015 Andrew O. Mellinger
  */
-public class TileEntityBeaconForester extends TileEntity implements IUpdatePlayerListBox
+public class TileEntityBeaconForester extends TileEntity implements IUpdatePlayerListBox, IMessager
 {
     public static final String NAME = "tileEntityBeaconForester";
 
@@ -57,6 +52,20 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
 
 
 
+
+
+
+    @Override
+    public int getRadius()
+    {
+        return _searchRadius;
+    }
+
+
+
+
+
+
     private class Forester extends BeaconBase
     {
         private Forester(World world)
@@ -73,34 +82,17 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
                 MessageItemRequest itemReq = (MessageItemRequest)msg;
                 LOGGER.debug("Forester " + this + " is asked for work.");
 
-                // Look around for work
-//                BlockPos target = AIUtils.findBlock(getWorld(), getPos(), 10, Blocks.log, getInProgress());
-
-                boolean hasMats = RingedSearcher.findBlock(getWorld(), getPos(), _searchRadius, _searchHeight, itemReq.getItemSample());
-
-//                if (target != null)
+                // Look around and see if we have any of these.
+                boolean hasMats = RingedSearcher.detectBlock(getWorld(), getPos(), _searchRadius, _searchHeight, itemReq
+                        .getItemSample());
                 if (hasMats)
                 {
-                    // Offer a task, at our area
-//                    TaskBase newOffer = new TaskHarvest(this, target, 0, _searchRadius, 1);
-                    TaskBase newOffer = new TaskHarvest(this, getPos(), 0, _searchRadius, itemReq.getQuantity(), itemReq.getItemSample());
+                    // Offer a task, at our area for the requested thing.
+                    MessageHarvestRequest req = new MessageHarvestRequest(TileEntityBeaconForester.this, itemReq.getSender(),
+                            0, itemReq.getItemSample(), itemReq.getQuantity());
 
-                    // Stash off the offers so we can track what we have already offered
-
-
-
-
-
-
-
-
-
-
-
-//                    addTask(newOffer);
-
-                    // Add the offer to the AI
-                    itemReq.getAIDrudge().offer(newOffer);
+                    LOGGER.debug("Posting request: " + req);
+                    Broadcaster.postMessage(req, getChannel());
                 }
             }
             else if (msg instanceof MessageWorkerAvailability)
@@ -113,11 +105,12 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
 
                 if (pickup != null && target != null)
                 {
-                    TaskBase task = new TaskPlantSapling(this, getPos(), 0, _searchRadius);
-                    LOGGER.debug("Posting task: " + task);
-                    availability.getAIDrudge().offer(task);
-                }
+                    MessagePlantSaplings req = new MessagePlantSaplings(TileEntityBeaconForester.this,
+                            availability.getSender(), 0);
 
+                    LOGGER.debug("Posting request: " + req);
+                    Broadcaster.postMessage(req, getChannel());
+                }
             }
         }
     }

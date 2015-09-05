@@ -2,18 +2,14 @@ package com.crashbox.drudgemod.ai;
 
 import com.crashbox.drudgemod.EntityDrudge;
 import com.crashbox.drudgemod.messaging.*;
-import com.crashbox.drudgemod.task.TaskBase;
-import com.crashbox.drudgemod.task.TaskDeliver;
-import com.crashbox.drudgemod.task.TaskHarvest;
-import com.crashbox.drudgemod.task.TaskPlantSapling;
+import com.crashbox.drudgemod.task.*;
 import net.minecraft.entity.ai.EntityAIBase;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.*;
+import java.util.concurrent.LinkedTransferQueue;
 
 /**
  * Copyright 2015 Andrew O. Mellinger
@@ -23,7 +19,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
     public EntityAIDrudge(EntityDrudge entity)
     {
         this(entity, DEFAULT_SPEED, DEFAULT_RANGE);
-//        Broadcaster.getInstance().subscribe(Broadcaster.Channel.RED, new MyListener());
+        Broadcaster.getInstance().subscribe(Broadcaster.Channel.RED, new MyListener());
     }
 
     public EntityAIDrudge(EntityDrudge entity, double speed, int range)
@@ -36,239 +32,380 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         return _entity;
     }
 
-    /**
-     * This is called by Beacons when the Worker indicates it may have work.  This
-     * must be re-entrant as the worked can be called at any time.   This is expected
-     * to be call while we have SYNCHRONOUSLY issued the message available call.
-     * @param offer The work offered
-     */
-    public void offer(TaskBase offer)
-    {
-        LOGGER.debug("Offer made to bot: " + this);
-        _offers.add(offer);
-    }
-
     @Override
     public boolean shouldExecute()
     {
+        // This will help us to answer messages.
+        processMessages();
+
+        // Once in a while we want to tell people we need more
         if (System.currentTimeMillis() < _nextElicit )
         {
             return false;
         }
 
         _nextElicit = System.currentTimeMillis() + CHECK_DELAY_MILLIS;
-        return elicit();
+        return true;
     }
 
     @Override
     public void startExecuting()
     {
-        _currentTask.execute();
+        _currentTask = null;
+        _requestEndMS = System.currentTimeMillis() + REQUEST_TIMEOUT_MS;
+        _state = State.ELICITING;
+        Broadcaster.postMessage(new MessageWorkerAvailability(_entity.worldObj, this), _channel);
     }
-
 
     @Override
     public boolean continueExecuting()
     {
-        return (_currentTask != null);
+        return _state != State.IDLING;
     }
 
     @Override
     public void resetTask()
     {
-        if (_currentTask != null)
-        {
-            _currentTask.resetTask();
-        }
+        startExecuting();
     }
 
     @Override
     public void updateTask()
     {
-        if (_currentTask != null)
+        processMessages();
+        switch (_state)
         {
-            if (_currentTask.isComplete())
-                _currentTask = _currentTask.getNextTask();
-
-            if (_currentTask != null)
-                _currentTask.updateTask();
+            case IDLING:
+                break;
+            case ELICITING:
+                _state = elicit();
+                break;
+            case TRANSITING:
+                _state = transition();
+                break;
+            case TARGETING:
+                _state = target();
+                break;
+            case PERFORMING:
+                _state = perform();
+                break;
         }
     }
 
     // ================
-    // IMessageSender
+    // IMessager
+
     @Override
-    public int distanceTo(BlockPos pos)
+    public BlockPos getPos()
     {
-        return 0;
+        return getEntity().getPosition();
     }
 
-    private TaskBase elicit(Message msg)
+    @Override
+    public int getRadius()
     {
-        LOGGER.debug("Eliciting: " + msg);
-        Queue<TaskBase> previous = new LinkedList<TaskBase>(_offers);
-        _offers.clear();
+        return 3;
+    }
 
-        // Post message
-        Broadcaster.postMessage(msg, _channel);
+    //=============================================================================================
 
-        // If we didn't get any new offers we are done
-        if (_offers.size() == 0)
+    private void processMessages()
+    {
+        Message msg;
+        while ((msg = _messages.poll()) != null)
         {
-            LOGGER.debug("No offers made.");
-            _offers.addAll(previous);
-            return null;
-        }
-
-        // Find highest offer, and see if we can do it.
-        TaskBase highest;
-        while ((highest = findHighest(_offers)) != null)
-        {
-            LOGGER.debug("Processing highest: " + highest);
-            if (!canPerform(highest))
-            {
-                LOGGER.debug("Can't perform task, rejecting: " + highest);
-                highest.reject();
+            // Skip ones intended for someone else.
+            if (msg.getTarget() != null && msg.getTarget() != this)
                 continue;
-            }
 
-            Message preReq = checkPrerequisite(highest);
-            if (preReq != null)
+            // Filter all task requests
+            if (msg instanceof MessageTaskRequest && _currentTask == null)
             {
-                LOGGER.debug("Has pre-req: " + preReq);
-                TaskBase preReqTask = elicit(preReq);
-                if (preReqTask == null)
-                {
-                    // Couldn't find a task for the pre-req
-                    LOGGER.debug("Couldn't find task for pre-req rejecting.");
-                    highest.reject();
-                }
+                if (msg.getCause() == null)
+                    _proposedTasks.add(_taskFactory.makeTaskFromMessage(this, (MessageTaskRequest) msg));
                 else
-                {
-                    preReqTask.setNextTask(highest);
-                    highest = preReqTask;
-                    rejectOffers();
-                    _offers.addAll(previous);
-                    return highest;
-                }
+                    _responseTasks.add((MessageTaskRequest)msg);
+            }
+            else if (msg.getCause() != null)
+            {
+                // If it has a 'cause' it is a response to something we sent before.
+                _responses.add(msg);
             }
             else
             {
-                return highest;
+                // Process it
+                LOGGER.debug("Unhandled message: " + msg);
             }
         }
-
-        // Ran out of offers
-        LOGGER.debug("Ran out of offers.");
-
-        _offers.addAll(previous);
-        return null;
     }
 
-    private boolean canPerform(TaskBase task)
+    //=============================================================================================
+    // ELICITING
+
+    private State elicit()
     {
-        if (task instanceof TaskDeliver)
+        // If we have some tasks to link, then let's do that
+        linkupResponses(_responseTasks);
+
+        // Try to resolve to the issue back messages
+        resolveAllTasks();
+
+        // IMPROVEMENT:  We could stop accepting new ones and only process resolves.  This
+        // could shorten the time we wait.  So have two timeouts.  New starter task arrival
+        // and entire elicitation arrival.
+
+        // When we hit the timeout we are done.
+        if (System.currentTimeMillis() > _requestEndMS)
         {
-            TaskDeliver deliver = (TaskDeliver)task;
-            ItemStack held = getEntity().getHeldItem();
-            if (held == null || held.isItemEqual(deliver.getItemSample()))
+            _currentTask = selectNextTask();
+            _proposedTasks.clear();
+            return State.TRANSITING;
+        }
+
+        // Ask for a new task
+        return State.ELICITING;
+    }
+
+    private void linkupResponses(List<MessageTaskRequest> responses)
+    {
+        for (int x = 0; x < _proposedTasks.size(); ++x)
+        {
+            List<MessageTaskRequest> taskResponses = getAllForTask(responses, _proposedTasks.get(x));
+            if (taskResponses.size() > 0)
             {
-                return true;
+                MessageTaskRequest opt = findBestResponseOption(taskResponses);
+                TaskBase newTask = _taskFactory.makeTaskFromMessage(null, (MessageTaskRequest) opt);
+                newTask.setNextTask(_proposedTasks.get(x));
+                _proposedTasks.set(x, newTask);
             }
+
+            if (responses.size() == 0)
+                return;
         }
 
-        if (task instanceof TaskHarvest)
-        {
-            TaskHarvest harvest = (TaskHarvest)task;
-            return true;
-        }
-
-        if (task instanceof TaskPlantSapling)
-        {
-            return getEntity().getHeldItem() == null;
-        }
-
-        return false;
+        // TODO:  At this point we have unused responses.  Log them
     }
 
-    private Message checkPrerequisite(TaskBase task)
+    private List<MessageTaskRequest> getAllForTask(List<MessageTaskRequest> responses, TaskBase task)
     {
-        if (task instanceof TaskDeliver)
+        List<MessageTaskRequest> result = new ArrayList<MessageTaskRequest>();
+
+        Iterator<MessageTaskRequest> iterator = responses.iterator();
+        while (iterator.hasNext())
         {
-            TaskDeliver deliver = (TaskDeliver)task;
-            if (getEntity().getHeldItem() == null)
+            MessageTaskRequest msg =  iterator.next();
+            if (msg.getCause() == task)
             {
-                return new MessageItemRequest(this, deliver.getItemSample(), deliver.getQuantity());
+                iterator.remove();
+                result.add(msg);
             }
         }
-        return null;
+
+        return result;
     }
 
-    private void rejectOffers()
+    private MessageTaskRequest findBestResponseOption(List<MessageTaskRequest> messages)
     {
-        TaskBase task;
-        while ((task = _offers.poll()) != null)
+        // For now just find the first
+        return messages.get(0);
+    }
+
+    private void resolveAllTasks()
+    {
+        for (TaskBase task : _proposedTasks)
         {
-            task.reject();
+            if (task.getResolving() == TaskBase.Resolving.UNRESOLVED)
+            {
+                // Get a new message send it out
+                Message msg = task.resolve();
+                if (msg != null)
+                {
+                    Broadcaster.postMessage(msg, _channel);
+                }
+            }
         }
     }
 
-    private TaskBase findHighest(Queue<TaskBase> list)
+    private TaskBase selectNextTask()
     {
-        return list.poll();
-    }
+        int bestValue = Integer.MIN_VALUE;
+        TaskBase bestTask = null;
 
-
-    /**
-     * This asks everyone on our communications channel if there is work for us.
-     * @return True if we have a new task.
-     */
-    private boolean elicit()
-    {
-        LOGGER.debug("Eliciting work: " + this);
-        _offers.clear();
-
-        // Send availability message
-        // When we return the offers should be full.
-        TaskBase task = elicit(new MessageWorkerAvailability(_entity.worldObj, this));
-
-        // If we have one, accept all
-        if (task != null)
+        for (TaskBase task : _proposedTasks)
         {
-            _currentTask = task;
-            task.accept(this);
-            while ((task = task.getNextTask()) != null)
-                task.accept(this);
-            _offers.clear();
-            return true;
+            // If unresolved (has pre-reqs) then skip it
+            if (task.getResolving() == TaskBase.Resolving.RESOLVED)
+            {
+                int value = getTaskValue(task);
+                if (value > bestValue)
+                {
+                    bestValue = value;
+                    bestTask = task;
+                }
+            }
         }
-        _offers.clear();
-        return false;
+
+        // Find highest resolved.
+        return bestTask;
     }
 
-    // This computes the cost of each task
-    // Zero or negative numbers mean we won't do it at all.
-    private int computeWeight(TaskBase offer)
+    private int getTaskValue(TaskBase task)
     {
-        // First come first serve
-        return 1;
+        // The cost is the transit time (distance) currently linear for each one
+        // added in its inherent cost.
+        BlockPos startPos = getEntity().getPosition();
+        int cost = computeDistanceCost(startPos, task) + task.getValue();
+        while (task.getNextTask() != null)
+        {
+            startPos = task.getRequester().getPos();
+            task = task.getNextTask();
+            cost += computeDistanceCost(startPos, task) + task.getValue();
+        }
+
+        return cost;
     }
 
-    @Override
-    public String toString()
+    private int computeDistanceCost(BlockPos startPos, TaskBase task)
     {
-        return "EntityAIDrudge{" +
-//                "_entity=" + _entity +
-//                ", _nextElicit=" + _nextElicit +
-//                ", _channel=" + _channel +
-//                ", _currentTask=" + _currentTask +
-//                ", _offers=" + _offers +
-                '}';
+        return (int) Math.sqrt(startPos.distanceSq(task.getRequester().getPos()));
+    }
+
+
+
+    //=============================================================================================
+    // TRANSITIONING
+
+    // In this function we transition to the target site. It might be far away.
+    private State transition()
+    {
+        // If within 20, then issue location request and to start targeting
+        if (posInAreaXY(getPos(), _currentTask.getRequester().getPos(), 20))
+        {
+            requestWorkAreas();
+            return State.TARGETING;
+        }
+        else if (!getEntity().getNavigator().noPath())
+        {
+            // If we have no path, then we are done.
+            resetTask();
+            return State.IDLING;
+        }
+
+        return State.TRANSITING;
+    }
+
+    //=============================================================================================
+    // TARGETING
+
+    private State target()
+    {
+        // Collect work areas from other bots.
+        extractWorkAreas();
+
+        // After some period of time, get the task top generate a workArea based on its specifics
+        if (_workArea == null && System.currentTimeMillis() > _requestEndMS)
+        {
+            _workArea = _currentTask.selectWorkArea(_workAreas);
+            tryMoveTo(_workArea);
+        }
+
+        // If we have no path, then we are done.
+        if (!getEntity().getNavigator().noPath())
+        {
+            if (inProximity(_workArea))
+            {
+                return State.PERFORMING;
+            }
+        }
+
+        return State.TARGETING;
+    }
+
+    private void requestWorkAreas()
+    {
+        _requestEndMS = System.currentTimeMillis() + REQUEST_TIMEOUT_MS;
+    }
+
+    private void extractWorkAreas()
+    {
+        Iterator<Message> iter = _responses.iterator();
+        while (iter.hasNext())
+        {
+            Message next =  iter.next();
+            if (next instanceof MessageWorkArea)
+            {
+                if (_workArea == null && next.getCause() == _currentTask && System.currentTimeMillis() < _requestEndMS)
+                    _workAreas.add(((MessageWorkArea) next).getWorkArea());
+
+                iter.remove();
+            }
+        }
+    }
+
+    //=============================================================================================
+    // PERFORMING
+
+    private State perform()
+    {
+        // Update the task
+        if (_currentTask != null)
+        {
+            _currentTask.updateTask();
+            if (_currentTask.isComplete())
+            {
+                _currentTask = _currentTask.getNextTask();
+                if (_currentTask != null)
+                {
+                    tryMoveTo(_currentTask.getRequester().getPos());
+                    return State.TRANSITING;
+                }
+                else
+                {
+                    return State.IDLING;
+                }
+            }
+        }
+
+        return State.IDLING;
+    }
+
+    //=============================================================================================
+
+    private boolean posInAreaXY(BlockPos pos, BlockPos center, int radius)
+    {
+        return (center.getX() - radius <= pos.getX() && pos.getX() <= center.getX() + radius &&
+                center.getZ() - radius <= pos.getZ() && pos.getZ() <= center.getZ() + radius);
+    }
+
+    // Convenience method
+    public boolean tryMoveTo(BlockPos pos)
+    {
+        return getEntity().getNavigator().tryMoveToXYZ(pos.getX(), pos.getY(), pos.getZ(), getEntity().getSpeed());
+    }
+
+    public boolean inProximity(BlockPos pos)
+    {
+        double dist = getEntity().getPosition().distanceSq(pos);
+        return (dist < 4.2);
+    }
+
+    //=============================================================================================
+
+    class MyListener implements IListener
+    {
+        @Override
+        public void handleMessage(Message message)
+        {
+            _messages.add(message);
+        }
     }
 
     //========================
     // PRIVATES
     private EntityDrudge _entity;
+
+    private enum State { IDLING, ELICITING, TRANSITING, TARGETING, PERFORMING }
+    private State _state = State.ELICITING;
 
     private static final int CHECK_DELAY_MILLIS = 3000;
     private static final int DEFAULT_RANGE = 10;
@@ -276,6 +413,21 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
 
     private long _nextElicit = 0;
 
+    // Time we wait for messages.  5 ticks (250 ms) is usually good enough
+    private static final long REQUEST_TIMEOUT_MS = 250;
+    private long _requestEndMS = 0;
+
+    // For Targeting
+    private BlockPos _workArea = null;
+
+    private TaskFactory _taskFactory = new TaskFactory();
+
+    // Queue of messages
+    private final Queue<Message> _messages = new LinkedTransferQueue<Message>();
+    private final List<Message> _responses = new LinkedList<Message>();
+    private final List<TaskBase> _proposedTasks = new ArrayList<TaskBase>();
+    private final List<MessageTaskRequest> _responseTasks = new LinkedList<MessageTaskRequest>();
+    private final List<BlockPos> _workAreas = new ArrayList<BlockPos>();
 
     // This is the channel we send and listen on.
     private Broadcaster.Channel _channel = Broadcaster.Channel.RED;
@@ -283,11 +435,5 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
     // Do we have a current task we are pursuing?
     private TaskBase _currentTask;
 
-    // List of tasks tht have been offered to us.
-    private final Queue<TaskBase> _offers = new LinkedList<TaskBase>();
-
-
     private static final Logger LOGGER = LogManager.getLogger();
-
-
 }

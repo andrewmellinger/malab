@@ -278,39 +278,6 @@ public class AIUtils
         return null;
     }
 
-    public static BlockPos findBlock(World world, BlockPos startPos, int range, Block blockType, List<TaskBase> exclude )
-    {
-        for ( int x = startPos.getX() - range; x < startPos.getX() + range; ++x)
-        {
-            for ( int y = startPos.getY() - range; y < startPos.getY() + range; ++y)
-            {
-                for ( int z = startPos.getZ() - range; z < startPos.getZ() + range; ++z)
-                {
-                    BlockPos target = new BlockPos(x, y, z);
-                    IBlockState state = world.getBlockState(target);
-
-                    if (state.getBlock() == blockType)
-                    {
-                        // Make sure we don't already have a task focused on this block
-                        boolean foundOne = false;
-                        for (TaskBase task : exclude)
-                        {
-                            if (task.getFocusBlock() != null && task.getFocusBlock().equals(target))
-                            {
-                                foundOne = true;
-                                break;
-                            }
-                        }
-
-                        // Since we got here we are okay
-                        if (!foundOne)
-                            return target;
-                    }
-                }
-            }
-        }
-        return null;
-    }
 
     public static interface BlockVisitor
     {

@@ -9,7 +9,7 @@ public class MessageTask extends Message
 {
     public MessageTask(IMessager sender, TaskBase task)
     {
-        super(sender, null);
+        super(sender, null, null);
         _task = task;
     }
 

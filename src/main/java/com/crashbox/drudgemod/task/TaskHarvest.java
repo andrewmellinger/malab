@@ -2,15 +2,19 @@ package com.crashbox.drudgemod.task;
 
 import com.crashbox.drudgemod.DrudgeUtils;
 import com.crashbox.drudgemod.ai.AIUtils;
+import com.crashbox.drudgemod.ai.EntityAIDrudge;
 import com.crashbox.drudgemod.ai.RingedSearcher;
-import com.crashbox.drudgemod.beacon.BeaconBase;
+import com.crashbox.drudgemod.messaging.Message;
+import com.crashbox.drudgemod.messaging.MessageHarvestRequest;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
+import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.List;
 import java.util.Queue;
 
 /**
@@ -18,29 +22,20 @@ import java.util.Queue;
  */
 public class TaskHarvest extends TaskBase
 {
-    /**
-     * Create a new carry task.
-     *
-     * @param beacon   Who made the task.
-     * @param center   Block to harvest.
-     * @param priority Priority of the task.
-     * @param radius   Radius to search
-     * @param sample   A sample of the thing we are looking for.
-     */
-    public TaskHarvest(BeaconBase beacon, BlockPos center, int priority, int radius, int quantity, ItemStack sample)
+    public TaskHarvest(EntityAIDrudge performer, MessageHarvestRequest message)
     {
-        super(beacon, center, priority);
-        _radius = radius;
-        _quantity = quantity;
-        _sample = sample;
+        super(performer, message.getSender(), message.getPriority());
+        _radius = message.getSender().getRadius();
+        _quantity = message.getQuantity();
+        _sample = message.getSample();
+        setResolving(Resolving.RESOLVED);
     }
 
     @Override
     public void execute()
     {
-        // All we do for now is move near the center block then find material
-        getEntity().getNavigator()
-                .tryMoveToXYZ(_focusBlock.getX(), _focusBlock.getY(), _focusBlock.getZ(), getEntity().getSpeed());
+        // Go to the sender.
+        tryMoveTo(getRequester().getPos());
     }
 
     @Override
@@ -82,7 +77,7 @@ public class TaskHarvest extends TaskBase
             else
             {
                 // If we didn't get close enough, try finding again
-                LOGGER.debug("NOT Breaking at at: " + _focusBlock);
+                LOGGER.debug("NOT Breaking at at: " + _targetBlock);
             }
         }
 
@@ -98,6 +93,39 @@ public class TaskHarvest extends TaskBase
         startNavigation();
     }
 
+    @Override
+    public Message resolve()
+    {
+        // TODO:  If we have something in inventory, find some place to deposit it.
+        // return new MessageStorageRequest()
+        return null;
+    }
+
+    @Override
+    public int getValue()
+    {
+        // SWAG
+        return _priority -10;
+    }
+
+    @Override
+    public BlockPos selectWorkArea(List<BlockPos> others)
+    {
+        // TODO:  Use better searcher
+        RingedSearcher searcher = new RingedSearcher(getRequester().getPos(), getRequester().getRadius(), 10);
+        for (BlockPos pos : searcher)
+        {
+            if (DrudgeUtils.willDrop(getWorld(), pos, _sample))
+            {
+                if (!DrudgeUtils.pointInAreas(pos, others, 1))
+                    return pos;
+            }
+        }
+
+        return null;
+    }
+
+    //=============
 
     private boolean findNextBlock()
     {
@@ -113,7 +141,7 @@ public class TaskHarvest extends TaskBase
         {
             LOGGER.debug("Getting next harvest list");
             // Find blocks in a tree
-            _harvestList = RingedSearcher.findTree(getEntity().getEntityWorld(), _focusBlock, _radius, _height, _sample);
+            _harvestList = RingedSearcher.findTree(getEntity().getEntityWorld(), getRequester().getPos(), _radius, _height, _sample);
             if (_harvestList == null)
             {
                 // Didn't find any blocks anywhere
@@ -205,7 +233,8 @@ public class TaskHarvest extends TaskBase
     private boolean startNavigation()
     {
         // At this point we have a harvest block, set a block to walk to
-        _targetBlock = new BlockPos(_harvestBlock.getX(), _focusBlock.getY(), _harvestBlock.getZ());
+
+        _targetBlock = new BlockPos(_harvestBlock.getX(), getRequester().getPos().getY(), _harvestBlock.getZ());
         LOGGER.debug("Made new target block.  Moving tio: " + _targetBlock);
 
         return getEntity().getNavigator()

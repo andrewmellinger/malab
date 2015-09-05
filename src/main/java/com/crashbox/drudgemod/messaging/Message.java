@@ -5,10 +5,17 @@ package com.crashbox.drudgemod.messaging;
  */
 public class Message
 {
-    public Message(IMessager sender, IMessager target)
+    /**
+     * Base class for messages.
+     * @param sender Who sent the message.
+     * @param target Intended recipient, null for broadcast.
+     * @param cause Reason we sent this.  Used for linking return messages.
+     */
+    protected Message(IMessager sender, IMessager target, Object cause)
     {
         _sender = sender;
         _target = target;
+        _cause = cause;
     }
 
     public IMessager getSender()
@@ -18,9 +25,15 @@ public class Message
 
     public IMessager getTarget()
     {
-        return _sender;
+        return _target;
+    }
+
+    public Object getCause()
+    {
+        return _cause;
     }
 
     private final IMessager _sender;
     private final IMessager _target;
+    private final Object _cause;
 }

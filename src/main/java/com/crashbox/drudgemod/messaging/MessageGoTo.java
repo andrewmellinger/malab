@@ -1,7 +1,5 @@
 package com.crashbox.drudgemod.messaging;
 
-import com.crashbox.drudgemod.messaging.Message;
-import com.crashbox.drudgemod.messaging.IMessager;
 import net.minecraft.util.BlockPos;
 
 /**
@@ -11,7 +9,7 @@ public class MessageGoTo extends Message
 {
     public MessageGoTo(IMessager sender, BlockPos pos)
     {
-        super(sender, null);
+        super(sender, null, null);
         _pos = pos;
     }
 

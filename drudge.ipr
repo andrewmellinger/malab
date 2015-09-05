@@ -179,6 +179,13 @@
     </option>
     <option name="PREFERRED_PROJECT_CODE_STYLE" value="Default (1)" />
   </component>
+  <component name="ProjectDictionaryState">
+    <dictionary name="andrew">
+      <words>
+        <w>messager</w>
+      </words>
+    </dictionary>
+  </component>
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/drudge.iml" filepath="$PROJECT_DIR$/drudge.iml" />

@@ -1,7 +1,8 @@
 package com.crashbox.drudgemod.furnace;
 
+import com.crashbox.drudgemod.messaging.Broadcaster;
+import com.crashbox.drudgemod.messaging.MessageDeliverRequest;
 import com.crashbox.drudgemod.messaging.MessageWorkerAvailability;
-import com.crashbox.drudgemod.task.TaskDeliver;
 import com.crashbox.drudgemod.beacon.BeaconBase;
 import com.crashbox.drudgemod.messaging.Message;
 import com.crashbox.drudgemod.beacon.TileEntityBeaconInventory;
@@ -626,12 +627,14 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
     }
 
     //---------------------------------------------------------------------------------------------
+    // IMessager
 
     @Override
-    public int distanceTo(BlockPos pos)
+    public int getRadius()
     {
         return 0;
     }
+
 
     //---------------------------------------------------------------------------------------------
 
@@ -652,7 +655,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
         }
     }
 
-    // TaskMaster Furnace
+    // This is responsible for all message handling
     private class Furnace extends BeaconBase
     {
         Furnace(World world)
@@ -675,9 +678,12 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
                     // Find smeltable
                     LOGGER.debug("Furnace can use more smeltable: " + getSmeltableItemSample().getUnlocalizedName());
 
-                    // Indicate we need some supplies
-                    availability.getAIDrudge().offer(new TaskDeliver(this, TileEntityBeaconFurnace.this,
-                            getSmeltableItemSample(), INPUT_INDEX, getSmeltableQuantityWanted()));
+                    // Send a message back to this guy telling him that we could use more
+                    MessageDeliverRequest req = new MessageDeliverRequest(TileEntityBeaconFurnace.this,
+                            availability.getSender(), 0, getSmeltableItemSample(),
+                            getSmeltableQuantityWanted(), INPUT_INDEX);
+
+                    Broadcaster.postMessage(req, getChannel());
                 }
             }
         }

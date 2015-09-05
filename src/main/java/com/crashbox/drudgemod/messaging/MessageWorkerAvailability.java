@@ -1,7 +1,6 @@
 package com.crashbox.drudgemod.messaging;
 
 import com.crashbox.drudgemod.ai.EntityAIDrudge;
-import com.crashbox.drudgemod.messaging.Message;
 import net.minecraft.world.World;
 
 /**
@@ -18,7 +17,7 @@ public class MessageWorkerAvailability extends Message
      */
     public MessageWorkerAvailability(World world, EntityAIDrudge drudge)
     {
-        super(drudge, null);
+        super(drudge, null, null);
         _drudgeAI = drudge;
         _world = world;
     }

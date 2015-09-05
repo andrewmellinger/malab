@@ -11,6 +11,8 @@ import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.List;
+
 /**
  * Copyright 2015 Andrew O. Mellinger
  */
@@ -78,6 +80,23 @@ public class DrudgeUtils
             }
         }
 
+        return false;
+    }
+
+
+    public static boolean pointInArea(BlockPos point, BlockPos center, int radius)
+    {
+        return ( point.getX() < center.getX() - radius || point.getX() > center.getX() + radius ||
+                 point.getZ() < center.getZ() - radius || point.getZ() > center.getZ() + radius );
+    }
+
+    public static boolean pointInAreas(BlockPos point, List<BlockPos> centers, int radius)
+    {
+        for (BlockPos pos : centers)
+        {
+            if (pointInArea(point, pos, radius))
+                return true;
+        }
         return false;
     }
 

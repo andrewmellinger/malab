@@ -299,8 +299,9 @@ public class TileEntityBeaconChest extends TileEntityBeaconInventory implements 
 
     //---------------------------------------------------------------------------------------------
 
+
     @Override
-    public int distanceTo(BlockPos pos)
+    public int getRadius()
     {
         return 0;
     }

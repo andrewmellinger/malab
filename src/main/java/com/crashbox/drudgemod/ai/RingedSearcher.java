@@ -39,18 +39,23 @@ public class RingedSearcher  implements Iterable<BlockPos>
         return null;
     }
 
-    public static boolean findBlock(World world, BlockPos center, int radius, int height, ItemStack sample)
+    public static boolean detectBlock(World world, BlockPos center, int radius, int height, ItemStack sample)
+    {
+        return (findBlock(world, center, radius, height, sample) != null);
+    }
+
+    public static BlockPos findBlock(World world, BlockPos center, int radius, int height, ItemStack sample)
     {
         RingedSearcher searcher = new RingedSearcher(center, radius, height);
         for (BlockPos pos : searcher)
         {
             if (DrudgeUtils.willDrop(world, pos, sample))
             {
-                return true;
+                return pos;
             }
         }
 
-        return false;
+        return null;
     }
 
 
