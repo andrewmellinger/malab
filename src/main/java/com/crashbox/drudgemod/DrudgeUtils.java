@@ -83,6 +83,14 @@ public class DrudgeUtils
         return false;
     }
 
+    public static boolean sqDistanceXY(BlockPos pos1, BlockPos pos2, int diff)
+    {
+        // We only use XZ.
+        int xOffset = pos1.getX() - pos2.getX();
+        int zOffset = pos1.getZ() - pos2.getZ();
+        int dist = (xOffset * xOffset) + (zOffset * zOffset);
+        return (dist <= diff);
+    }
 
     public static boolean pointInArea(BlockPos point, BlockPos center, int radius)
     {
@@ -98,6 +106,15 @@ public class DrudgeUtils
                 return true;
         }
         return false;
+    }
+
+
+    public static String objID(Object obj)
+    {
+        if (obj == null)
+            return "null";
+
+        return obj.getClass().getSimpleName() + "@" + Integer.toHexString(obj.hashCode());
     }
 
 

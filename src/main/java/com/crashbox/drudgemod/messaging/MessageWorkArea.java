@@ -9,7 +9,7 @@ public class MessageWorkArea extends Message
 {
     public MessageWorkArea(IMessager sender, IMessager target, Object cause, BlockPos area)
     {
-        super(sender, target, cause);
+        super(sender, target, cause, 0);
         _pos = new BlockPos(area);
     }
 

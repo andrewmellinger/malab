@@ -1,5 +1,6 @@
 package com.crashbox.drudgemod.task;
 
+import com.crashbox.drudgemod.DrudgeUtils;
 import com.crashbox.drudgemod.EntityDrudge;
 import com.crashbox.drudgemod.ai.EntityAIDrudge;
 import com.crashbox.drudgemod.messaging.IMessager;
@@ -132,15 +133,29 @@ public abstract class TaskBase
     // Convenience method
     public boolean tryMoveTo(BlockPos pos)
     {
-        return getEntity().getNavigator().tryMoveToXYZ(pos.getX(), pos.getY(), pos.getZ(), getEntity().getSpeed());
+        return getPerformer().tryMoveTo(pos);
     }
 
     @Override
     public String toString()
     {
-        return "TaskBase{" +
-                "_requester=" + _requester +
-                '}';
+        StringBuilder builder = new StringBuilder();
+        builder.append(this.getClass().getSimpleName());
+        builder.append("@");
+        builder.append(Integer.toHexString(this.hashCode()));
+        builder.append("{");
+        debugInfo(builder);
+        builder.append("}");
+        return builder.toString();
+    }
+
+    public void debugInfo(StringBuilder builder)
+    {
+        builder.append("performer=").append(DrudgeUtils.objID(_requester));
+        builder.append(", requester=").append(DrudgeUtils.objID(_requester));
+        builder.append(", priority=").append(_priority);
+        builder.append(", nextTask=").append(DrudgeUtils.objID(_nextTask));
+        builder.append(", resolving=").append(_resolving);
     }
 
     // Who is executing the task?

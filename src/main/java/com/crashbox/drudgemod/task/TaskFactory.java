@@ -25,6 +25,13 @@ public class TaskFactory
         else if (taskClass == TaskPlantSapling.class && message instanceof MessagePlantSaplings)
             return new TaskPlantSapling(performer, (MessagePlantSaplings)message);
 
+        else if (taskClass == TaskDeliver.class && message instanceof  MessageDeliverRequest)
+            return new TaskDeliver(performer, (MessageDeliverRequest)message);
+
+
+
+
+
         LOGGER.error("Failed to construct task for " + message);
         return null;
     }

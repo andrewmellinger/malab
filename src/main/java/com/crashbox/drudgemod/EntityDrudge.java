@@ -31,8 +31,8 @@ public class EntityDrudge extends EntityCreature
         // standard attributes registered to EntityLivingBase
         getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(40.0D);
 //        getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(1.0D);
-//        getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.4D);
-        getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.6D);
+        getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.4D);
+//        getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.6D);
         getEntityAttribute(SharedMonsterAttributes.knockbackResistance).setBaseValue(0.8D);
         getEntityAttribute(SharedMonsterAttributes.followRange).setBaseValue(64.0D);
 

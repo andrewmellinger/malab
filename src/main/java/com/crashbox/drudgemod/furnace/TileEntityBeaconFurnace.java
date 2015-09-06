@@ -1,5 +1,6 @@
 package com.crashbox.drudgemod.furnace;
 
+import com.crashbox.drudgemod.DrudgeUtils;
 import com.crashbox.drudgemod.messaging.Broadcaster;
 import com.crashbox.drudgemod.messaging.MessageDeliverRequest;
 import com.crashbox.drudgemod.messaging.MessageWorkerAvailability;
@@ -668,8 +669,9 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
         {
             if (msg instanceof MessageWorkerAvailability)
             {
+                LOGGER.debug("Furnace " + this + " is asked for work." + msg);
+
                 MessageWorkerAvailability availability = (MessageWorkerAvailability)msg;
-                LOGGER.debug("Furnace " + this + " is asked for work.");
 
                 int priority = smeltableNeedPriority();
 
@@ -680,7 +682,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
 
                     // Send a message back to this guy telling him that we could use more
                     MessageDeliverRequest req = new MessageDeliverRequest(TileEntityBeaconFurnace.this,
-                            availability.getSender(), 0, getSmeltableItemSample(),
+                            availability.getSender(), msg.getCause(), 0, getSmeltableItemSample(),
                             getSmeltableQuantityWanted(), INPUT_INDEX);
 
                     Broadcaster.postMessage(req, getChannel());

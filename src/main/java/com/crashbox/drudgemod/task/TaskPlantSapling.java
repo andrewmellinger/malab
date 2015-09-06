@@ -1,5 +1,6 @@
 package com.crashbox.drudgemod.task;
 
+import com.crashbox.drudgemod.DrudgeUtils;
 import com.crashbox.drudgemod.ai.AIUtils;
 import com.crashbox.drudgemod.ai.EntityAIDrudge;
 import com.crashbox.drudgemod.messaging.Message;
@@ -152,14 +153,11 @@ public class TaskPlantSapling extends TaskBase
     }
 
     @Override
-    public String toString()
+    public void debugInfo(StringBuilder builder)
     {
-        return "TaskPlantSapling{" +
-                "_goingTo=" + _goingTo +
-                ", _currentPickup=" + _currentPickup +
-                ", _plantingTarget=" + _plantingTarget +
-                '}';
+        builder.append(" performer=").append(DrudgeUtils.objID(_requester));
     }
+
 
     // State management
     private enum GoingTo { SITE, COLLECTION, PLANTING}

@@ -9,7 +9,7 @@ public class MessageGoTo extends Message
 {
     public MessageGoTo(IMessager sender, BlockPos pos)
     {
-        super(sender, null, null);
+        super(sender, null, null, 0);
         _pos = pos;
     }
 

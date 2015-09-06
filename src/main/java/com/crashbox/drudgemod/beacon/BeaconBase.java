@@ -46,7 +46,8 @@ public abstract class BeaconBase
      */
     public void update()
     {
-        for (Message msg : _messages)
+        Message msg;
+        while (( msg = _messages.poll()) != null)
         {
             handleMessage(msg);
         }
@@ -82,7 +83,7 @@ public abstract class BeaconBase
     @Override
     public String toString()
     {
-        return "TaskMaster{" +
+        return "Beacon{" +
                 ", _listener=" + Integer.toHexString(_listener.hashCode()) +
                 ", _inChannel=" + _inChannel +
                 '}';

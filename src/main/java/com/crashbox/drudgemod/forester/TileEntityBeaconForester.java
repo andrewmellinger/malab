@@ -1,5 +1,6 @@
 package com.crashbox.drudgemod.forester;
 
+import com.crashbox.drudgemod.DrudgeUtils;
 import com.crashbox.drudgemod.ai.*;
 import com.crashbox.drudgemod.beacon.BeaconBase;
 import com.crashbox.drudgemod.messaging.*;
@@ -50,21 +51,11 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
         _forester.terminate();
     }
 
-
-
-
-
-
     @Override
     public int getRadius()
     {
         return _searchRadius;
     }
-
-
-
-
-
 
     private class Forester extends BeaconBase
     {
@@ -79,8 +70,9 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
         {
             if (msg instanceof MessageItemRequest)
             {
+                LOGGER.debug("Forester " + this + " is asked for items." + msg);
+
                 MessageItemRequest itemReq = (MessageItemRequest)msg;
-                LOGGER.debug("Forester " + this + " is asked for work.");
 
                 // Look around and see if we have any of these.
                 boolean hasMats = RingedSearcher.detectBlock(getWorld(), getPos(), _searchRadius, _searchHeight, itemReq
@@ -89,29 +81,31 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
                 {
                     // Offer a task, at our area for the requested thing.
                     MessageHarvestRequest req = new MessageHarvestRequest(TileEntityBeaconForester.this, itemReq.getSender(),
-                            0, itemReq.getItemSample(), itemReq.getQuantity());
+                            msg.getCause(), 0, itemReq.getItemSample(), itemReq.getQuantity());
 
                     LOGGER.debug("Posting request: " + req);
                     Broadcaster.postMessage(req, getChannel());
                 }
             }
-            else if (msg instanceof MessageWorkerAvailability)
-            {
-                MessageWorkerAvailability availability = (MessageWorkerAvailability)msg;
-
-                EntityItem pickup = AIUtils.findFirstEntityOfTypeOnGround(getWorld(), getPos(), _searchRadius,
-                        Item.getItemFromBlock(Blocks.sapling));
-                BlockPos target = AIUtils.findEmptyOrchardSquare(getWorld(), getPos(), _searchRadius);
-
-                if (pickup != null && target != null)
-                {
-                    MessagePlantSaplings req = new MessagePlantSaplings(TileEntityBeaconForester.this,
-                            availability.getSender(), 0);
-
-                    LOGGER.debug("Posting request: " + req);
-                    Broadcaster.postMessage(req, getChannel());
-                }
-            }
+//            else if (msg instanceof MessageWorkerAvailability)
+//            {
+//                LOGGER.debug("Forester " + this + " is asked for work." + msg);
+//
+//                MessageWorkerAvailability availability = (MessageWorkerAvailability)msg;
+//
+//                EntityItem pickup = AIUtils.findFirstEntityOfTypeOnGround(getWorld(), getPos(), _searchRadius,
+//                        Item.getItemFromBlock(Blocks.sapling));
+//                BlockPos target = AIUtils.findEmptyOrchardSquare(getWorld(), getPos(), _searchRadius);
+//
+//                if (pickup != null && target != null)
+//                {
+//                    MessagePlantSaplings req = new MessagePlantSaplings(TileEntityBeaconForester.this,
+//                            availability.getSender(), msg.getCause(), 0);
+//
+//                    LOGGER.debug("Posting request: " + req);
+//                    Broadcaster.postMessage(req, getChannel());
+//                }
+//            }
         }
     }
 

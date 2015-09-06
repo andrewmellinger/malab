@@ -69,7 +69,7 @@ public class TaskHarvest extends TaskBase
         // If we have a target block, then let's see if we are close enough to start breaking
         if (_targetBlock != null)
         {
-            if ( getEntity().getPosition().distanceSq(_targetBlock) < 4.2)
+            if ( DrudgeUtils.sqDistanceXY(getEntity().getPosition(), _targetBlock, 4 ))
             {
                 startBreaking();
                 return;
@@ -212,7 +212,7 @@ public class TaskHarvest extends TaskBase
             targetStack.stackSize = 0;
 
             IBlockState blockState = getEntity().getEntityWorld().getBlockState(_harvestBlock);
-            Block blockType = blockState.getBlock();
+            //Block blockType = blockState.getBlock();
 
             getEntity().setCurrentItemOrArmor(0, targetStack);
         }
@@ -233,20 +233,19 @@ public class TaskHarvest extends TaskBase
     private boolean startNavigation()
     {
         // At this point we have a harvest block, set a block to walk to
-
         _targetBlock = new BlockPos(_harvestBlock.getX(), getRequester().getPos().getY(), _harvestBlock.getZ());
-        LOGGER.debug("Made new target block.  Moving tio: " + _targetBlock);
+        LOGGER.debug("Made new target block.  Moving to: " + _targetBlock);
 
-        return getEntity().getNavigator()
-                .tryMoveToXYZ(_targetBlock.getX(), _targetBlock.getY(), _targetBlock.getZ(), getEntity().getSpeed());
+        return tryMoveTo(_targetBlock);
     }
 
-
-
-    @Override
-    public String toString()
+    public void debugInfo(StringBuilder builder)
     {
-        return "TaskHarvest{}";
+        super.debugInfo(builder);
+        builder.append(", radius=").append(_radius);
+        builder.append(", height=").append(_height);
+        builder.append(", quantity=").append(_quantity);
+        builder.append(", sample=").append(_sample);
     }
 
     private final int _radius;

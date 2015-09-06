@@ -17,7 +17,7 @@ public class MessageWorkerAvailability extends Message
      */
     public MessageWorkerAvailability(World world, EntityAIDrudge drudge)
     {
-        super(drudge, null, null);
+        super(drudge, null, MessageWorkerAvailability.class, 0);
         _drudgeAI = drudge;
         _world = world;
     }

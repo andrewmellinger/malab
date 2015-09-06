@@ -1,5 +1,6 @@
 package com.crashbox.drudgemod.ai;
 
+import com.crashbox.drudgemod.DrudgeUtils;
 import com.crashbox.drudgemod.EntityDrudge;
 import com.crashbox.drudgemod.messaging.*;
 import com.crashbox.drudgemod.task.*;
@@ -7,6 +8,7 @@ import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.util.BlockPos;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.Sys;
 
 import java.util.*;
 import java.util.concurrent.LinkedTransferQueue;
@@ -35,26 +37,18 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
     @Override
     public boolean shouldExecute()
     {
-        // This will help us to answer messages.
-        processMessages();
-
-        // Once in a while we want to tell people we need more
-        if (System.currentTimeMillis() < _nextElicit )
-        {
-            return false;
-        }
-
-        _nextElicit = System.currentTimeMillis() + CHECK_DELAY_MILLIS;
-        return true;
+        updateTask();
+        return (_currentTask != null);
     }
 
     @Override
     public void startExecuting()
     {
-        _currentTask = null;
-        _requestEndMS = System.currentTimeMillis() + REQUEST_TIMEOUT_MS;
-        _state = State.ELICITING;
-        Broadcaster.postMessage(new MessageWorkerAvailability(_entity.worldObj, this), _channel);
+        // The update task loop starts it
+//        _currentTask = null;
+//        _requestEndMS = System.currentTimeMillis() + REQUEST_TIMEOUT_MS;
+//        _state = State.ELICITING;
+//        Broadcaster.postMessage(new MessageWorkerAvailability(_entity.worldObj, this), _channel);
     }
 
     @Override
@@ -73,9 +67,11 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
     public void updateTask()
     {
         processMessages();
+        //LOGGER.debug("UpdateTask: " + _state);
         switch (_state)
         {
             case IDLING:
+                _state = idle();
                 break;
             case ELICITING:
                 _state = elicit();
@@ -114,6 +110,10 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         Message msg;
         while ((msg = _messages.poll()) != null)
         {
+            // If we sent it, skip it
+            if (msg.getSender() == this)
+                continue;
+
             // Skip ones intended for someone else.
             if (msg.getTarget() != null && msg.getTarget() != this)
                 continue;
@@ -121,7 +121,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
             // Filter all task requests
             if (msg instanceof MessageTaskRequest && _currentTask == null)
             {
-                if (msg.getCause() == null)
+                if (msg.getCause() == MessageWorkerAvailability.class)
                     _proposedTasks.add(_taskFactory.makeTaskFromMessage(this, (MessageTaskRequest) msg));
                 else
                     _responseTasks.add((MessageTaskRequest)msg);
@@ -133,11 +133,31 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
             }
             else
             {
+                // Handle immediately
+
                 // Process it
                 LOGGER.debug("Unhandled message: " + msg);
             }
         }
     }
+
+    //=============================================================================================
+    // IDLING
+
+    private State idle()
+    {
+        // Once in a while we want to tell people we need more
+        if (System.currentTimeMillis() > _nextElicit )
+        {
+            LOGGER.debug("Idle timeout over.");
+            _nextElicit = System.currentTimeMillis() + CHECK_DELAY_MILLIS;
+            _requestEndMS = System.currentTimeMillis() + REQUEST_TIMEOUT_MS;
+            Broadcaster.postMessage(new MessageWorkerAvailability(_entity.worldObj, this), _channel);
+            return State.ELICITING;
+        }
+        return State.IDLING;
+    }
+
 
     //=============================================================================================
     // ELICITING
@@ -159,6 +179,12 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         {
             _currentTask = selectNextTask();
             _proposedTasks.clear();
+
+            if (_currentTask == null)
+            {
+                return State.IDLING;
+            }
+
             return State.TRANSITING;
         }
 
@@ -174,7 +200,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
             if (taskResponses.size() > 0)
             {
                 MessageTaskRequest opt = findBestResponseOption(taskResponses);
-                TaskBase newTask = _taskFactory.makeTaskFromMessage(null, (MessageTaskRequest) opt);
+                TaskBase newTask = _taskFactory.makeTaskFromMessage(this, (MessageTaskRequest) opt);
                 newTask.setNextTask(_proposedTasks.get(x));
                 _proposedTasks.set(x, newTask);
             }
@@ -183,7 +209,10 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
                 return;
         }
 
-        // TODO:  At this point we have unused responses.  Log them
+        for (MessageTaskRequest response : responses)
+        {
+            LOGGER.debug(response);
+        }
     }
 
     private List<MessageTaskRequest> getAllForTask(List<MessageTaskRequest> responses, TaskBase task)
@@ -216,6 +245,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         {
             if (task.getResolving() == TaskBase.Resolving.UNRESOLVED)
             {
+                LOGGER.debug("Resolving: " + task);
                 // Get a new message send it out
                 Message msg = task.resolve();
                 if (msg != null)
@@ -282,10 +312,12 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         if (posInAreaXY(getPos(), _currentTask.getRequester().getPos(), 20))
         {
             requestWorkAreas();
+            _requestEndMS = System.currentTimeMillis() + REQUEST_TIMEOUT_MS;
             return State.TARGETING;
         }
         else if (!getEntity().getNavigator().noPath())
         {
+            LOGGER.debug("Couldn't get a path during transition, idling");
             // If we have no path, then we are done.
             resetTask();
             return State.IDLING;
@@ -299,22 +331,36 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
 
     private State target()
     {
-        // Collect work areas from other bots.
+        // Collect work area messages from other bots
         extractWorkAreas();
 
         // After some period of time, get the task top generate a workArea based on its specifics
         if (_workArea == null && System.currentTimeMillis() > _requestEndMS)
         {
             _workArea = _currentTask.selectWorkArea(_workAreas);
+            if (_workArea == null)
+            {
+                LOGGER.debug("Failed to find work area, aborting. " + _currentTask);
+                _currentTask = null;
+                return State.IDLING;
+            }
+
+            LOGGER.debug("Determining work area and moving to it: " + _workArea + " currently at: " + getPos());
             tryMoveTo(_workArea);
         }
 
         // If we have no path, then we are done.
-        if (!getEntity().getNavigator().noPath())
+        if (_workArea != null && getEntity().getNavigator().noPath())
         {
             if (inProximity(_workArea))
             {
                 return State.PERFORMING;
+            }
+            else
+            {
+                LOGGER.debug("Failed to move work area. Idling. Distance: " + getEntity().getPosition().distanceSq(_workArea));
+                _currentTask = null;
+                return State.IDLING;
             }
         }
 
@@ -323,6 +369,9 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
 
     private void requestWorkAreas()
     {
+        // TODO: Request work areas
+        _workArea = null;
+        _workAreas.clear();
         _requestEndMS = System.currentTimeMillis() + REQUEST_TIMEOUT_MS;
     }
 
@@ -356,17 +405,19 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
                 _currentTask = _currentTask.getNextTask();
                 if (_currentTask != null)
                 {
+                    LOGGER.debug("Task complete, finding starting next: " + _currentTask);
                     tryMoveTo(_currentTask.getRequester().getPos());
                     return State.TRANSITING;
                 }
                 else
                 {
+                    LOGGER.debug("Task complete, switching to idle");
                     return State.IDLING;
                 }
             }
         }
 
-        return State.IDLING;
+        return State.PERFORMING;
     }
 
     //=============================================================================================
@@ -380,13 +431,13 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
     // Convenience method
     public boolean tryMoveTo(BlockPos pos)
     {
+        LOGGER.debug("Speed: " + getEntity().getSpeed());
         return getEntity().getNavigator().tryMoveToXYZ(pos.getX(), pos.getY(), pos.getZ(), getEntity().getSpeed());
     }
 
     public boolean inProximity(BlockPos pos)
     {
-        double dist = getEntity().getPosition().distanceSq(pos);
-        return (dist < 4.2);
+        return DrudgeUtils.sqDistanceXY(getEntity().getPosition(), pos, 4);
     }
 
     //=============================================================================================
@@ -405,7 +456,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
     private EntityDrudge _entity;
 
     private enum State { IDLING, ELICITING, TRANSITING, TARGETING, PERFORMING }
-    private State _state = State.ELICITING;
+    private State _state = State.IDLING;
 
     private static final int CHECK_DELAY_MILLIS = 3000;
     private static final int DEFAULT_RANGE = 10;

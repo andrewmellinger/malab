@@ -1,5 +1,6 @@
 package com.crashbox.drudgemod.task;
 
+import com.crashbox.drudgemod.DrudgeUtils;
 import com.crashbox.drudgemod.ai.EntityAIDrudge;
 import com.crashbox.drudgemod.beacon.TileEntityBeaconInventory;
 import com.crashbox.drudgemod.messaging.IMessager;
@@ -88,7 +89,7 @@ public class TaskDeliver extends TaskBase
 
         // Return a message showing what we need.
         setResolving(Resolving.RESOLVING);
-        return new MessageItemRequest(getPerformer(), null, _itemSample, _quantity);
+        return new MessageItemRequest(getPerformer(), null, this, _itemSample, _quantity);
     }
 
     @Override
@@ -98,7 +99,6 @@ public class TaskDeliver extends TaskBase
         return _priority;
     }
 
-
     @Override
     public BlockPos selectWorkArea(List<BlockPos> others)
     {
@@ -107,14 +107,12 @@ public class TaskDeliver extends TaskBase
     }
 
     @Override
-    public String toString()
+    public void debugInfo(StringBuilder builder)
     {
-        return "TaskCarryTo{" +
-                "_requester=" + Integer.toHexString(getRequester().hashCode()) +
-                ", _itemSample=" + _itemSample +
-                ", _slot=" + _slot +
-                ", _quantity=" + _quantity +
-                '}';
+        super.debugInfo(builder);
+        builder.append(", itemSample=").append(_itemSample);
+        builder.append(", slot=").append(_slot);
+        builder.append(", quantity=").append(_quantity);
     }
 
     private final ItemStack _itemSample;

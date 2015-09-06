@@ -7,19 +7,12 @@ import net.minecraft.item.ItemStack;
 /**
  * Copyright 2015 Andrew O. Mellinger
  */
-public class MessageItemRequest extends  MessageTaskRequest
+public class MessageItemRequest extends  Message
 {
-    public MessageItemRequest(IMessager sender, IMessager receiver, ItemStack itemSample, int quantity)
+    // TODO: Item request don't go to drudges
+    public MessageItemRequest(IMessager sender, IMessager receiver, Object cause, ItemStack itemSample, int quantity)
     {
-        super(sender, receiver, TaskDeliver.class, 0);
-        _itemSample = itemSample;
-        _quantity = quantity;
-    }
-
-    public MessageItemRequest(IMessager sender, IMessager receiver, Class<? extends TaskBase> clazz, int priority,
-            ItemStack itemSample, int quantity)
-    {
-        super(sender, receiver, clazz, priority);
+        super(sender, receiver, cause, 0);
         _itemSample = itemSample;
         _quantity = quantity;
     }
@@ -34,13 +27,11 @@ public class MessageItemRequest extends  MessageTaskRequest
         return _quantity;
     }
 
-    @Override
-    public String toString()
+    public void debugInfo(StringBuilder builder)
     {
-        return "MessageDeliverRequest{" +
-                ", _itemSample=" + _itemSample +
-                ", _quantity=" + _quantity +
-                '}';
+        super.debugInfo(builder);
+        builder.append(", _itemSample=").append(_itemSample);
+        builder.append(", _quantity=").append(_quantity);
     }
 
     private final ItemStack _itemSample;

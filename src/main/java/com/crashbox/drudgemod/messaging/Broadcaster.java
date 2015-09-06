@@ -48,6 +48,7 @@ public class Broadcaster
             {
                 if (tmp == listener)
                 {
+                    LOGGER.warn("Trying to re-register same listener! " + listener);
                     foundIt = true;
                     break;
                 }
@@ -84,6 +85,7 @@ public class Broadcaster
                 listenerList = new ArrayList<IListener>(_queue.get(channel));
             }
         }
+        //LOGGER.debug("Send message to list of size: " + listenerList.size() + " msg: " + message);
         if (listenerList != null)
         {
             for (IListener tmp : listenerList)
