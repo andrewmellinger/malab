@@ -74,7 +74,7 @@ public class TaskDeliver extends TaskBase
                 LOGGER.warn("Could not deliver item to target. It isn't an inventory: " + getRequester());
             getEntity().setCurrentItemOrArmor(0, current);
         }
-        complete();
+        setState(State.SUCCESS);
     }
 
     @Override

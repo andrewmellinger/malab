@@ -63,7 +63,7 @@ public class TaskPlantSapling extends TaskBase
         }
 
         if (done)
-            complete();
+            setState(State.SUCCESS);
     }
 
     @Override

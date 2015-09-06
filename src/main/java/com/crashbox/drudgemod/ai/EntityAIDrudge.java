@@ -311,6 +311,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         // If within 20, then issue location request and to start targeting
         if (posInAreaXY(getPos(), _currentTask.getRequester().getPos(), 20))
         {
+            LOGGER.debug("Within distance, switching to targeting.");
             requestWorkAreas();
             _requestEndMS = System.currentTimeMillis() + REQUEST_TIMEOUT_MS;
             return State.TARGETING;
@@ -345,7 +346,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
                 return State.IDLING;
             }
 
-            LOGGER.debug("Determining work area and moving to it: " + _workArea + " currently at: " + getPos());
+            LOGGER.debug("Determining work area and redirecting: " + _workArea + " currently at: " + getPos());
             tryMoveTo(_workArea);
         }
 
@@ -400,7 +401,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         if (_currentTask != null)
         {
             _currentTask.updateTask();
-            if (_currentTask.isComplete())
+            if (_currentTask.getState() == TaskBase.State.SUCCESS)
             {
                 _currentTask = _currentTask.getNextTask();
                 if (_currentTask != null)
@@ -415,9 +416,23 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
                     return State.IDLING;
                 }
             }
+            else if (_currentTask.getState() == TaskBase.State.FAILED)
+            {
+                LOGGER.debug("Task failed, switching to idle");
+                return State.IDLING;
+            }
         }
 
         return State.PERFORMING;
+    }
+
+
+    //=============================================================================================
+
+    private State abortTaskChain()
+    {
+        _currentTask = null;
+        return State.IDLING;
     }
 
     //=============================================================================================

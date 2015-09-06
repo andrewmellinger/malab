@@ -18,6 +18,7 @@ import java.util.List;
 public abstract class TaskBase
 {
     public enum Resolving { UNRESOLVED, RESOLVING, RESOLVED }
+    public enum State { INPROGRESS, SUCCESS, FAILED }
 
     /**
      * Base class for all tasks.
@@ -60,7 +61,7 @@ public abstract class TaskBase
      */
     public boolean continueExecution()
     {
-        return !_complete;
+        return _state == State.INPROGRESS;
     }
 
     public abstract void resetTask();
@@ -69,15 +70,13 @@ public abstract class TaskBase
 
     //=============================================================================================
 
-
-
     // Make sure it fixes pre-requisites
-
     public abstract Message resolve();
 
     // The value.  The higher the number the better.
     public abstract int getValue();
 
+    // The task will figure out exactly where to go
     public abstract BlockPos selectWorkArea(List<BlockPos> others);
 
     //=============================================================================================
@@ -109,18 +108,16 @@ public abstract class TaskBase
         _resolving = resolving;
     }
 
-    // =======================
-    // Called when completed
-    public void complete()
+    public State getState()
     {
-        LOGGER.debug("Task completed.");
-        _complete = true;
+        return _state;
     }
 
-    public boolean isComplete()
+    public void setState(State state)
     {
-        return _complete;
+        _state = state;
     }
+
 
 
     public World getWorld()
@@ -158,6 +155,10 @@ public abstract class TaskBase
         builder.append(", resolving=").append(_resolving);
     }
 
+
+
+    public State _state = State.INPROGRESS;
+
     // Who is executing the task?
     protected final EntityAIDrudge _performer;
 
@@ -169,9 +170,6 @@ public abstract class TaskBase
 
     // Use for chaining
     protected TaskBase _nextTask;
-
-    // When was the task accepted?  0 for not accepted.
-    private boolean _complete = false;
 
     private Resolving _resolving = Resolving.UNRESOLVED;
 

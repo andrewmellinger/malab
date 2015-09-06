@@ -19,7 +19,9 @@ public class EntityDrudge extends EntityCreature
 
     public double getSpeed()
     {
-        return getEntityAttribute(SharedMonsterAttributes.movementSpeed).getAttributeValue();
+        // TODO: Somehow movement speed got set to 0.6 so we need to do this manually
+        return 0.4D;
+        //return getEntityAttribute(SharedMonsterAttributes.movementSpeed).getAttributeValue();
     }
 
     // you don't have to call this as it is called automatically during EntityLiving subclass creation
@@ -47,8 +49,6 @@ public class EntityDrudge extends EntityCreature
 //        return true;
 //    }
 
-
-
     protected void setupAI()
     {
         // http://jabelarminecraft.blogspot.com/p/minecraft-forge-1721710-custom-entity-ai.html
@@ -72,19 +72,25 @@ public class EntityDrudge extends EntityCreature
         targetTasks.taskEntries.clear();
     }
 
+    /**
+     * @return The number of things this can carry.
+     */
     public int getCarryCapacity()
     {
         return _carryCapacity;
     }
 
-    public float getMiningSpeed()
+    /**
+     * @return A performance modifier for mining speed.  Lower faster.
+     */
+    public float getWorkSpeedFactor()
     {
-        return _miningSpeed;
+        return _workSpeedFactor;
     }
 
     // How many things we can carry.
     private int _carryCapacity = 4;
 
-    // Multiplier on mining speed, a percentage.  Base drudge is 1.0;
-    private float _miningSpeed = 1.0F;
+    // Multiplier on mining speed, a percentage.  Base drudge is 1.0;  Lower faster.
+    private float _workSpeedFactor = 1.0F;
 }

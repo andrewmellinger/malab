@@ -6,11 +6,9 @@ import com.crashbox.drudgemod.ai.EntityAIDrudge;
 import com.crashbox.drudgemod.ai.RingedSearcher;
 import com.crashbox.drudgemod.messaging.Message;
 import com.crashbox.drudgemod.messaging.MessageHarvestRequest;
-import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
-import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -61,7 +59,7 @@ public class TaskHarvest extends TaskBase
         {
             if (!handleBreaking())
             {
-                complete();
+                setState(State.SUCCESS);
             }
             return;
         }
@@ -84,7 +82,10 @@ public class TaskHarvest extends TaskBase
         // Try to identify another block to break.
         if (!findNextBlock())
         {
-            complete();
+            if (getEntity().getHeldItem() == null)
+                setState(State.FAILED);
+            else
+                setState(State.SUCCESS);
             return;
         }
 
@@ -159,7 +160,9 @@ public class TaskHarvest extends TaskBase
     private void startBreaking()
     {
         IBlockState state = getEntity().getEntityWorld().getBlockState(_harvestBlock);
-        _breakTotalNeeded = (int)(BASE_BREAK_TIME * state.getBlock().getBlockHardness(getEntity().getEntityWorld(), _harvestBlock));
+        _breakTotalNeeded = (int)(BASE_BREAK_TIME *
+                            state.getBlock().getBlockHardness(getEntity().getEntityWorld(), _harvestBlock) *
+                            getEntity().getWorkSpeedFactor());
         _isBreaking = true;
         _breakingProgress = 0;
         _previousBreakProgress = 0;
