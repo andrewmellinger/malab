@@ -23,7 +23,7 @@ public abstract class BeaconBase
         {
             // TODO:  Deal with channel changes
             _listener = new Listener();
-            Broadcaster.getInstance().subscribe(_inChannel, _listener);
+            Broadcaster.getInstance().subscribe(_listener);
         }
     }
 
@@ -34,7 +34,7 @@ public abstract class BeaconBase
     {
         if (_listener != null)
         {
-            Broadcaster.getInstance().unsubscribe(_inChannel, _listener);
+            Broadcaster.getInstance().unsubscribe(_listener);
             _listener = null;
         }
     }
@@ -75,14 +75,6 @@ public abstract class BeaconBase
      */
     protected abstract void handleMessage(Message msg);
 
-    /**
-     * @return The channel we are attached to.
-     */
-    public Broadcaster.Channel getChannel()
-    {
-        return _inChannel;
-    }
-
     //=============================================================================================
 
     protected void handleWorkAccepted(MessageWorkAccepted msg)
@@ -112,7 +104,6 @@ public abstract class BeaconBase
     {
         return "Beacon{" +
                 ", _listener=" + Integer.toHexString(_listener.hashCode()) +
-                ", _inChannel=" + _inChannel +
                 '}';
     }
 
@@ -125,7 +116,6 @@ public abstract class BeaconBase
     private final Queue<Message> _messages = new LinkedTransferQueue<Message>();
 
     private Listener _listener;
-    private Broadcaster.Channel _inChannel = Broadcaster.Channel.RED;
 
     // We only want to respond everyone once in a while.  They send us a message
     // when they accept

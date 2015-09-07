@@ -23,75 +23,37 @@ public class Broadcaster
         return BROADCASTER;
     }
 
-    public static void postMessage(Message message, Channel channel)
+    public static void postMessage(Message message)
     {
-        getInstance().broadcastSync(message, channel);
+        getInstance().broadcastSync(message);
     }
 
-    // Numbers
-    public enum Channel { BLACK, WHITE, RED, GREEN, BLUE }
-
-    public void subscribe(Channel channel, IListener listener)
+    public void subscribe(IListener listener)
     {
         synchronized (_lock)
         {
-            if (!_queue.containsKey(channel))
-            {
-                _queue.put(channel, new ArrayList<IListener>());
-            }
-
-            List<IListener> listenerList = _queue.get(channel);
-
-            // We don't like dupes
-            boolean foundIt = false;
-            for (IListener tmp : listenerList)
-            {
-                if (tmp == listener)
-                {
-                    LOGGER.warn("Trying to re-register same listener! " + listener);
-                    foundIt = true;
-                    break;
-                }
-            }
-
-            if (!foundIt)
-            {
-                listenerList.add(listener);
-            }
+            if (!_listeners.contains(listener))
+                _listeners.add(listener);
         }
     }
 
-    public void unsubscribe(Channel channel, IListener listener)
+    public void unsubscribe(IListener listener)
     {
         synchronized (_lock)
         {
-            List<IListener> listenerList = _queue.get(channel);
-            listenerList.remove(listener);
+            _listeners.remove(listener);
         }
     }
 
     /**
      * This is synchronous!
      * @param message The message to send.
-     * @param channel The channel on which to send.
      */
-    public void broadcastSync(Message message, Channel channel)
+    public void broadcastSync(Message message)
     {
-        List<IListener> listenerList = null;
-        synchronized (_lock)
+        for (IListener tmp : _listeners)
         {
-            if (_queue.containsKey(channel))
-            {
-                listenerList = new ArrayList<IListener>(_queue.get(channel));
-            }
-        }
-        //LOGGER.debug("Send message to list of size: " + listenerList.size() + " msg: " + message);
-        if (listenerList != null)
-        {
-            for (IListener tmp : listenerList)
-            {
-                tmp.handleMessage(message);
-            }
+            tmp.handleMessage(message);
         }
     }
 
@@ -99,7 +61,7 @@ public class Broadcaster
 
     // TODO: Make listener list weak
     private final Object _lock = new Object();
-    private final Map<Channel, List<IListener>> _queue = new HashMap<Channel, List<IListener>>();
+    private final List<IListener> _listeners = new ArrayList<IListener>();
 
     private static Broadcaster BROADCASTER;
 

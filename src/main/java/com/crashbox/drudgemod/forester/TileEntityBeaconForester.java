@@ -1,6 +1,5 @@
 package com.crashbox.drudgemod.forester;
 
-import com.crashbox.drudgemod.DrudgeUtils;
 import com.crashbox.drudgemod.ai.*;
 import com.crashbox.drudgemod.beacon.BeaconBase;
 import com.crashbox.drudgemod.messaging.*;
@@ -90,7 +89,7 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
                             msg.getCause(), 0, itemReq.getItemSample(), itemReq.getQuantity());
 
                     LOGGER.debug("Posting request: " + req);
-                    Broadcaster.postMessage(req, getChannel());
+                    Broadcaster.postMessage(req);
                 }
             }
             else if (msg instanceof MessageWorkerAvailability && timeForAvailabilityResponse())
@@ -111,7 +110,7 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
                             availability.getSender(), msg.getCause(), 0);
 
                     LOGGER.debug("Posting request: " + req);
-                    Broadcaster.postMessage(req, getChannel());
+                    Broadcaster.postMessage(req);
                 }
             }
         }

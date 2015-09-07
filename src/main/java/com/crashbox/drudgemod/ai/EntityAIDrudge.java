@@ -20,7 +20,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
     public EntityAIDrudge(EntityDrudge entity)
     {
         this._entity = entity;
-        Broadcaster.getInstance().subscribe(Broadcaster.Channel.RED, new MyListener());
+        Broadcaster.getInstance().subscribe(new MyListener());
         _name = makeName();
         _entity.setCustomNameTag(_name);
     }
@@ -117,7 +117,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
             if (msg instanceof MessageRequestWorkArea)
             {
                 if (_workArea != null)
-                    Broadcaster.postMessage(new MessageWorkArea(this, msg.getSender(), msg.getCause(), _workArea), _channel);
+                    Broadcaster.postMessage(new MessageWorkArea(this, msg.getSender(), msg.getCause(), _workArea));
                 continue;
             }
 
@@ -155,7 +155,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
             LOGGER.debug(id() + " Idle timeout over.");
             _nextElicit = System.currentTimeMillis() + CHECK_DELAY_MILLIS;
             _requestEndMS = System.currentTimeMillis() + REQUEST_TIMEOUT_MS;
-            Broadcaster.postMessage(new MessageWorkerAvailability(_entity.worldObj, this), _channel);
+            Broadcaster.postMessage(new MessageWorkerAvailability(_entity.worldObj, this));
             return State.ELICITING;
         }
         return State.IDLING;
@@ -255,7 +255,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
                 Message msg = task.resolve();
                 if (msg != null)
                 {
-                    Broadcaster.postMessage(msg, _channel);
+                    Broadcaster.postMessage(msg);
                 }
             }
         }
@@ -290,7 +290,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
             delay += ( computeDistanceCost(startPos, task) * 500);
             startPos = task.getRequester().getPos();
             Message msg = new MessageWorkAccepted(this, task.getRequester(), null, 0, delay);
-            Broadcaster.postMessage(msg, _channel);
+            Broadcaster.postMessage(msg);
             task = task.getNextTask();
             // Just add two seconds
             delay += 2000;
@@ -305,20 +305,21 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         // The cost is the transit time (distance) currently linear for each one
         // added in its inherent cost.
         BlockPos startPos = getEntity().getPosition();
-        int cost = computeDistanceCost(startPos, task) + task.getValue();
+        int value = computeDistanceCost(startPos, task) + task.getValue();
         while (task.getNextTask() != null)
         {
             startPos = task.getRequester().getPos();
             task = task.getNextTask();
-            cost += computeDistanceCost(startPos, task) + task.getValue();
+            value -= computeDistanceCost(startPos, task);
+            value += task.getValue();
         }
 
-        return cost;
+        return value;
     }
 
     private int computeDistanceCost(BlockPos startPos, TaskBase task)
     {
-        return (int) Math.sqrt(startPos.distanceSq(task.getRequester().getPos()));
+        return ( (int) Math.sqrt(startPos.distanceSq(task.getRequester().getPos())) ) / 10;
     }
 
 
@@ -391,7 +392,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
 
     private void requestWorkAreas()
     {
-        Broadcaster.postMessage(new MessageRequestWorkArea(this, null, _currentTask, 0), _channel);
+        Broadcaster.postMessage(new MessageRequestWorkArea(this, null, _currentTask, 0));
 
         // TODO: Request work areas
         _workArea = null;
@@ -570,9 +571,6 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
     private final List<TaskBase> _proposedTasks = new ArrayList<TaskBase>();
     private final List<MessageTaskRequest> _responseTasks = new LinkedList<MessageTaskRequest>();
     private final List<BlockPos> _workAreas = new ArrayList<BlockPos>();
-
-    // This is the channel we send and listen on.
-    private Broadcaster.Channel _channel = Broadcaster.Channel.RED;
 
     // Do we have a current task we are pursuing?
     private TaskBase _currentTask;

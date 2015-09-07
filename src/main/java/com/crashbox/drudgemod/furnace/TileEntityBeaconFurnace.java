@@ -674,7 +674,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
         {
             if (msg instanceof MessageWorkerAvailability && timeForAvailabilityResponse())
             {
-                LOGGER.debug("Furnace " + this + " is asked for work." + msg);
+                // LOGGER.debug("Furnace " + this + " is asked for work." + msg);
 
                 MessageWorkerAvailability availability = (MessageWorkerAvailability)msg;
 
@@ -690,7 +690,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
                             availability.getSender(), msg.getCause(), priority, getSmeltableItemSample(),
                             getSmeltableQuantityWanted(), INPUT_INDEX);
 
-                    Broadcaster.postMessage(req, getChannel());
+                    Broadcaster.postMessage(req);
                 }
             }
         }
