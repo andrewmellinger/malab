@@ -133,6 +133,13 @@ public abstract class TaskBase
         return getPerformer().tryMoveTo(pos);
     }
 
+
+    public void debugLog(Logger logger, String message)
+    {
+        logger.debug(getPerformer().id() + " " + message);
+    }
+
+
     @Override
     public String toString()
     {

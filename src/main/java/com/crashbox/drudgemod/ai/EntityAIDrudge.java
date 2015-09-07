@@ -305,13 +305,14 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         // The cost is the transit time (distance) currently linear for each one
         // added in its inherent cost.
         BlockPos startPos = getEntity().getPosition();
-        int value = computeDistanceCost(startPos, task) + task.getValue();
+        int value = task.getValue();
+        value -= computeDistanceCost(startPos, task);
         while (task.getNextTask() != null)
         {
             startPos = task.getRequester().getPos();
             task = task.getNextTask();
-            value -= computeDistanceCost(startPos, task);
             value += task.getValue();
+            value -= computeDistanceCost(startPos, task);
         }
 
         return value;

@@ -76,7 +76,7 @@ public class TaskHarvest extends TaskBase
             {
                 // If we didn't get close enough, try finding again
                 _targetBlock = null;
-                LOGGER.debug("NOT Breaking at at: " + _targetBlock);
+                debugLog(LOGGER, "NOT Breaking at at: " + _targetBlock);
             }
         }
 
@@ -85,7 +85,7 @@ public class TaskHarvest extends TaskBase
         {
             if (getEntity().getHeldItem() == null)
             {
-                LOGGER.debug("Failed to find next block and empty.  Aborting");
+                debugLog(LOGGER, "Failed to find next block and empty.  Aborting");
                 setState(State.FAILED);
             }
             else
@@ -139,20 +139,20 @@ public class TaskHarvest extends TaskBase
         // Find things to harvest
         if (_harvestList != null)
         {
-            LOGGER.debug("Getting next harvest block");
+            //debugLog(LOGGER, "Getting next harvest block");
             _harvestBlock = _harvestList.poll();
         }
 
         // Get the next block to harvest
         if (_harvestBlock == null)
         {
-            LOGGER.debug("Getting next harvest list");
+            //debugLog(LOGGER, "Getting next harvest list");
             // Find blocks in a tree
             _harvestList = RingedSearcher.findTree(getEntity().getEntityWorld(), getRequester().getPos(), _radius, _height, _sample);
             if (_harvestList == null)
             {
                 // Didn't find any blocks anywhere
-                LOGGER.debug("Didn't find any blocks to harvest.  Done.");
+                debugLog(LOGGER, "Didn't find any blocks to harvest.  Done.");
                 getPerformer().updateWorkArea(null);
                 return false;
             }
@@ -174,7 +174,7 @@ public class TaskHarvest extends TaskBase
         _isBreaking = true;
         _breakingProgress = 0;
         _previousBreakProgress = 0;
-        LOGGER.debug("Start breaking. Need: " + _breakTotalNeeded);
+        //debugLog(LOGGER, "Start breaking. Need: " + _breakTotalNeeded);
     }
 
     /** @return True to continue harvesting */
@@ -183,13 +183,13 @@ public class TaskHarvest extends TaskBase
         _isBreaking = updateBreak();
         if (!_isBreaking)
         {
-            LOGGER.debug("Finished breaking, harvesting.");
+            //debugLog(LOGGER, "Finished breaking, harvesting.");
             if (harvestBlock())
             {
                 if (getEntity().getHeldItem().stackSize >= getEntity().getCarryCapacity() ||
                         getEntity().getHeldItem().stackSize >= _quantity)
                 {
-                    LOGGER.debug("Reached capacity.  Done");
+                    //debugLog(LOGGER, "Reached capacity.  Done");
                     _targetBlock = null;
                     return false;
                 }
@@ -224,9 +224,6 @@ public class TaskHarvest extends TaskBase
             targetStack = _sample.copy();
             targetStack.stackSize = 0;
 
-            //IBlockState blockState = getEntity().getEntityWorld().getBlockState(_harvestBlock);
-            //Block blockType = blockState.getBlock();
-
             getEntity().setCurrentItemOrArmor(0, targetStack);
         }
         else
@@ -249,7 +246,7 @@ public class TaskHarvest extends TaskBase
     {
         // At this point we have a harvest block, set a block to walk to
         _targetBlock = new BlockPos(_harvestBlock.getX(), getRequester().getPos().getY(), _harvestBlock.getZ());
-        LOGGER.debug("Made new target block.  Moving to: " + _targetBlock);
+        //debugLog(LOGGER, "Made new target block.  Moving to: " + _targetBlock);
 
         return tryMoveTo(_targetBlock);
     }
