@@ -260,7 +260,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         {
             if (task.getResolving() == TaskBase.Resolving.UNRESOLVED)
             {
-                LOGGER.debug(id() + " Resolving: " + task);
+                //LOGGER.debug(id() + " Resolving: " + task);
                 // Get a new message send it out
                 Message msg = task.resolve();
                 if (msg != null)

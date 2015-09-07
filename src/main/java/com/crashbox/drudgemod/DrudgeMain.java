@@ -39,6 +39,7 @@ public class DrudgeMain
     public static final String VERSION = "0.1.0";
 
     public static Block BLOCK_BEACON_FURNACE;
+    public static Block BLOCK_BEACON_FURNACE_LIT;
     public static Block BLOCK_BEACON_FORESTER;
     public static Block BLOCK_BEACON_WORKBENCH;
     public static Block BLOCK_BEACON_CHEST;
@@ -106,9 +107,13 @@ public class DrudgeMain
     private void preInitBlockAndItems()
     {
         // TOO: in the future move this to the client proxy
-        BLOCK_BEACON_FURNACE = new BlockBeaconFurnace();
+        BLOCK_BEACON_FURNACE = new BlockBeaconFurnace(false);
         GameRegistry.registerBlock(BLOCK_BEACON_FURNACE, BlockBeaconFurnace.NAME);
         GameRegistry.registerTileEntity(TileEntityBeaconFurnace.class, TileEntityBeaconFurnace.NAME);
+
+        BLOCK_BEACON_FURNACE_LIT = new BlockBeaconFurnace(true);
+        GameRegistry.registerBlock(BLOCK_BEACON_FURNACE_LIT, BlockBeaconFurnace.NAME_LIT);
+        //GameRegistry.registerTileEntity(TileEntityBeaconFurnace.class, TileEntityBeaconFurnace.NAME);
 
         BLOCK_BEACON_FORESTER = new BlockBeaconForester();
         GameRegistry.registerBlock(BLOCK_BEACON_FORESTER, BlockBeaconForester.NAME);

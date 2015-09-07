@@ -332,7 +332,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
             if (isBurningFlag != isBurning())
             {
                 dirtyFlag = true;
-                //BlockFurnace.setState(isBurning(), worldObj, pos);
+                BlockBeaconFurnace.setState(isBurning(), worldObj, pos);
             }
         }
 

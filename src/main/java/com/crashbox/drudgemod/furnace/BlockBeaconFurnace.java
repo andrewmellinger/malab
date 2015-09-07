@@ -10,6 +10,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -29,16 +30,19 @@ import java.util.Random;
 public class BlockBeaconFurnace extends BlockContainer
 {
     public static final String NAME = "beaconFurnace";
+    public static final String NAME_LIT = "beaconFurnaceLit";
 
     public static final PropertyDirection FACING =
         PropertyDirection.create("facing",
                 EnumFacing.Plane.HORIZONTAL);
 
-    public BlockBeaconFurnace()
+    public BlockBeaconFurnace(boolean lit)
     {
         super(Material.iron);
         setUnlocalizedName(DrudgeMain.MODID + "_" + NAME);
         setCreativeTab(CreativeTabs.tabRedstone);
+
+        _isLit = lit;
 
         setDefaultState(blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));
         stepSound = soundTypeSnow;
@@ -49,6 +53,33 @@ public class BlockBeaconFurnace extends BlockContainer
         setTickRandomly(false);
         useNeighborBrightness = false;
     }
+
+    public static void setState(boolean active, World worldIn, BlockPos pos)
+    {
+        IBlockState iblockstate = worldIn.getBlockState(pos);
+        TileEntity tileentity = worldIn.getTileEntity(pos);
+        //keepInventory = true;
+
+        if (active)
+        {
+            worldIn.setBlockState(pos, DrudgeMain.BLOCK_BEACON_FURNACE_LIT.getDefaultState());
+            worldIn.setBlockState(pos, DrudgeMain.BLOCK_BEACON_FURNACE_LIT.getDefaultState());
+        }
+        else
+        {
+            worldIn.setBlockState(pos, DrudgeMain.BLOCK_BEACON_FURNACE.getDefaultState());
+            worldIn.setBlockState(pos, DrudgeMain.BLOCK_BEACON_FURNACE.getDefaultState());
+        }
+
+        //keepInventory = false;
+
+        if (tileentity != null)
+        {
+            tileentity.validate();
+            worldIn.setTileEntity(pos, tileentity);
+        }
+    }
+
 
     @Override
     public TileEntity createNewTileEntity(World world, int i)
@@ -283,5 +314,6 @@ public class BlockBeaconFurnace extends BlockContainer
 //        }
 //    }
 
+    private final boolean _isLit;
     private static final Logger LOGGER = LogManager.getLogger();
 }

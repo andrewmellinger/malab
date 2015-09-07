@@ -1,8 +1,8 @@
 {
   "parent": "block/cube_bottom_top",
   "textures": {
-    "top": "drudgemod:blocks/beaconFurnace_top_off",
-    "side": "drudgemod:blocks/beaconFurnace_side_off",
+    "top": "drudgemod:blocks/beaconFurnace_top_on",
+    "side": "drudgemod:blocks/beaconFurnace_side_on",
     "bottom": "drudgemod:blocks/beaconFurnace_bottom"
   }
 }
