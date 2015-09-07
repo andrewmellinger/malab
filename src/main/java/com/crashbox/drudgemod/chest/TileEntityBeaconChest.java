@@ -1,6 +1,7 @@
 package com.crashbox.drudgemod.chest;
 
 import com.crashbox.drudgemod.beacon.BeaconBase;
+import com.crashbox.drudgemod.messaging.IMessager;
 import com.crashbox.drudgemod.messaging.Message;
 import com.crashbox.drudgemod.beacon.TileEntityBeaconInventory;
 import net.minecraft.block.state.IBlockState;
@@ -338,6 +339,12 @@ public class TileEntityBeaconChest extends TileEntityBeaconInventory implements 
         Chest(World world)
         {
             super(world);
+        }
+
+        @Override
+        protected IMessager getSender()
+        {
+            return TileEntityBeaconChest.this;
         }
 
         @Override

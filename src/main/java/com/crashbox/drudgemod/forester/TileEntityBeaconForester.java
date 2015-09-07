@@ -66,11 +66,17 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
         }
 
         @Override
+        protected IMessager getSender()
+        {
+            return TileEntityBeaconForester.this;
+        }
+
+        @Override
         protected void handleMessage(Message msg)
         {
             if (msg instanceof MessageItemRequest)
             {
-                LOGGER.debug("Forester " + this + " is asked for items." + msg);
+                //LOGGER.debug("Forester " + this + " is asked for items." + msg);
 
                 MessageItemRequest itemReq = (MessageItemRequest)msg;
 
@@ -89,7 +95,7 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
             }
             else if (msg instanceof MessageWorkerAvailability && timeForAvailabilityResponse())
             {
-                LOGGER.debug("Forester " + this + " is asked for work." + msg);
+                //LOGGER.debug("Forester " + this + " is asked for work." + msg);
 
                 MessageWorkerAvailability availability = (MessageWorkerAvailability)msg;
 
@@ -97,7 +103,7 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
                         Item.getItemFromBlock(Blocks.sapling));
                 BlockPos target = AIUtils.findEmptyOrchardSquare(getWorld(), getPos(), _searchRadius);
 
-                LOGGER.debug("pickup=" + pickup + " , target=" + target);
+                //LOGGER.debug("pickup=" + pickup + " , target=" + target);
 
                 if (pickup != null && target != null)
                 {

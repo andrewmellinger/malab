@@ -5,6 +5,9 @@ import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAISwimming;
 import net.minecraft.world.World;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 /**
  * Copyright 2015 Andrew o. Mellinger
@@ -48,6 +51,15 @@ public class EntityDrudge extends EntityCreature
 //    {
 //        return true;
 //    }
+
+
+    @Override
+    protected void onDeathUpdate()
+    {
+        super.onDeathUpdate();
+
+        LOGGER.debug(getCustomNameTag() + " !!!!!!!!!!!!! Entity died.");
+    }
 
     protected void setupAI()
     {
@@ -93,4 +105,7 @@ public class EntityDrudge extends EntityCreature
 
     // Multiplier on mining speed, a percentage.  Base drudge is 1.0;  Lower faster.
     private float _workSpeedFactor = 1.0F;
+
+
+    private static final Logger LOGGER = LogManager.getLogger();
 }

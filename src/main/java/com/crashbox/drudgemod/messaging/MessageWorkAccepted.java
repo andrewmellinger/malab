@@ -1,5 +1,7 @@
 package com.crashbox.drudgemod.messaging;
 
+import com.crashbox.drudgemod.DrudgeUtils;
+
 /**
  * Copyright 2015 Andrew O. Mellinger
  */
@@ -14,6 +16,12 @@ public class MessageWorkAccepted extends Message
     public int getDelayMS()
     {
         return _delayMS;
+    }
+
+    public void debugInfo(StringBuilder builder)
+    {
+        super.debugInfo(builder);
+        builder.append(", delay=").append(_delayMS);
     }
 
     private final int _delayMS;

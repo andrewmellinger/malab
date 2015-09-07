@@ -11,6 +11,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
+import net.minecraft.world.World;
 
 import java.util.List;
 
@@ -110,9 +111,14 @@ public class TaskPlantSapling extends TaskBase
     private boolean handleCollection()
     {
         // Pick up next entry
-        getEntity().setCurrentItemOrArmor(0, _currentPickup.getEntityItem());
-        getEntity().getEntityWorld().removeEntity(_currentPickup);
+        ItemStack collected = AIUtils.collectEntityIntoNewStack(getWorld(), _currentPickup.getPosition(), 2, Item.getItemFromBlock(Blocks.sapling));
         _currentPickup = null;
+
+        // If we found something in here, let's grab it, otherwise try again
+        if (collected.stackSize > 0)
+            getEntity().setCurrentItemOrArmor(0, collected);
+        else
+            return locateSapling();
 
         // Go to next planting spot
         _plantingTarget = AIUtils.findEmptyOrchardSquare(getWorld(), getRequester().getPos(),

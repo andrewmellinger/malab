@@ -6,7 +6,8 @@
     </Console>
 </Appenders>
 <Loggers>
-    <Root level="trace">
+    <Logger name="com.crashbox" level="trace" additivity="true"/>
+    <Root level="warn">
         <AppenderRef ref="Console"/>
     </Root>
 </Loggers>

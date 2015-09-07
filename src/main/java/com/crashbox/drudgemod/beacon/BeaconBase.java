@@ -1,9 +1,7 @@
 package com.crashbox.drudgemod.beacon;
 
-import com.crashbox.drudgemod.messaging.Broadcaster;
-import com.crashbox.drudgemod.messaging.IListener;
-import com.crashbox.drudgemod.messaging.Message;
-import com.crashbox.drudgemod.messaging.MessageWorkAccepted;
+import com.crashbox.drudgemod.DrudgeUtils;
+import com.crashbox.drudgemod.messaging.*;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -42,7 +40,7 @@ public abstract class BeaconBase
     }
 
     /**
-     * Should be called by the owne of this object to process all the messages.
+     * Should be called by the owner of this object to process all the messages.
      * For example, in the TileEntity.
      */
     public void update()
@@ -50,9 +48,13 @@ public abstract class BeaconBase
         Message msg;
         while (( msg = _messages.poll()) != null)
         {
-            if (msg instanceof MessageWorkAccepted && msg.getTarget() == this)
+            if (msg instanceof MessageWorkAccepted)
             {
-                handleWorkAccepted((MessageWorkAccepted) msg);
+                if (msg.getTarget() == getSender())
+                {
+                    //LOGGER.debug(id() + " got accepted work message.: " + msg);
+                    handleWorkAccepted((MessageWorkAccepted) msg);
+                }
                 continue;
             }
 
@@ -60,6 +62,11 @@ public abstract class BeaconBase
             handleMessage(msg);
         }
     }
+
+    /**
+     * @return The object that sends messages.  This is usually a tile entity or drudge.
+     */
+    protected abstract IMessager getSender();
 
     /**
      * Extension point for beacon to see if they have appropriate work.
@@ -107,6 +114,11 @@ public abstract class BeaconBase
                 ", _listener=" + Integer.toHexString(_listener.hashCode()) +
                 ", _inChannel=" + _inChannel +
                 '}';
+    }
+
+    public String id()
+    {
+        return DrudgeUtils.objID(this);
     }
 
 

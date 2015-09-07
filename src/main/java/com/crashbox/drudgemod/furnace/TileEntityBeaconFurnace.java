@@ -1,10 +1,7 @@
 package com.crashbox.drudgemod.furnace;
 
-import com.crashbox.drudgemod.messaging.Broadcaster;
-import com.crashbox.drudgemod.messaging.MessageDeliverRequest;
-import com.crashbox.drudgemod.messaging.MessageWorkerAvailability;
+import com.crashbox.drudgemod.messaging.*;
 import com.crashbox.drudgemod.beacon.BeaconBase;
-import com.crashbox.drudgemod.messaging.Message;
 import com.crashbox.drudgemod.beacon.TileEntityBeaconInventory;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -664,6 +661,12 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
         Furnace(World world)
         {
             super(world);
+        }
+
+        @Override
+        protected IMessager getSender()
+        {
+            return TileEntityBeaconFurnace.this;
         }
 
         @Override

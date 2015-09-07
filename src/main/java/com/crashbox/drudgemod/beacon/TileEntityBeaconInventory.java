@@ -16,7 +16,12 @@ public abstract class TileEntityBeaconInventory extends TileEntityLockable imple
     {
         ItemStack current = getStackInSlot(slot);
 
-        if (current.isItemEqual(stack))
+        // We might have been told to put things into a slot that might have become empty
+        if (current == null)
+        {
+            setInventorySlotContents(slot, stack);
+        }
+        else if (current.isItemEqual(stack))
         {
             int freeSpace = current.getMaxStackSize() - current.stackSize;
             if (freeSpace > stack.stackSize)

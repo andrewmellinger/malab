@@ -19,13 +19,10 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
 {
     public EntityAIDrudge(EntityDrudge entity)
     {
-        this(entity, DEFAULT_SPEED, DEFAULT_RANGE);
-        Broadcaster.getInstance().subscribe(Broadcaster.Channel.RED, new MyListener());
-    }
-
-    public EntityAIDrudge(EntityDrudge entity, double speed, int range)
-    {
         this._entity = entity;
+        Broadcaster.getInstance().subscribe(Broadcaster.Channel.RED, new MyListener());
+        _name = makeName();
+        _entity.setCustomNameTag(_name);
     }
 
     public EntityDrudge getEntity()
@@ -139,10 +136,10 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
             }
             else
             {
-                // Handle immediately
-
-                // Process it
-                LOGGER.debug("Unhandled message: " + msg);
+                if (_currentTask != null && msg instanceof MessageTaskRequest )
+                    LOGGER.debug(id() + " Have task, ignoring message: " + msg);
+                else
+                    LOGGER.debug(id() + " No task ignoring message: " + msg);
             }
         }
     }
@@ -155,7 +152,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         // Once in a while we want to tell people we need more
         if (System.currentTimeMillis() > _nextElicit )
         {
-            LOGGER.debug("Idle timeout over.");
+            LOGGER.debug(id() + " Idle timeout over.");
             _nextElicit = System.currentTimeMillis() + CHECK_DELAY_MILLIS;
             _requestEndMS = System.currentTimeMillis() + REQUEST_TIMEOUT_MS;
             Broadcaster.postMessage(new MessageWorkerAvailability(_entity.worldObj, this), _channel);
@@ -191,7 +188,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
                 return State.IDLING;
             }
 
-            LOGGER.debug("Selected task: " + _currentTask);
+            LOGGER.debug(id() +  "Selected task: " + _currentTask);
             tryMoveTo(_currentTask.getRequester().getPos());
             return State.TRANSITING;
         }
@@ -217,10 +214,10 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
                 return;
         }
 
-        for (MessageTaskRequest response : responses)
-        {
-            LOGGER.debug(response);
-        }
+//        for (MessageTaskRequest response : responses)
+//        {
+//            LOGGER.debug(id() + " Unhandled response: " + response + " us: " + this);
+//        }
     }
 
     private List<MessageTaskRequest> getAllForTask(List<MessageTaskRequest> responses, TaskBase task)
@@ -253,7 +250,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         {
             if (task.getResolving() == TaskBase.Resolving.UNRESOLVED)
             {
-                LOGGER.debug("Resolving: " + task);
+                LOGGER.debug(id() + " Resolving: " + task);
                 // Get a new message send it out
                 Message msg = task.resolve();
                 if (msg != null)
@@ -292,7 +289,8 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
             // Five hundred millis for each block we need to walk. TODO:  Rework in entity speed.
             delay += ( computeDistanceCost(startPos, task) * 500);
             startPos = task.getRequester().getPos();
-            Broadcaster.postMessage(new MessageWorkAccepted(this, task.getRequester(), null, 0, delay), _channel);
+            Message msg = new MessageWorkAccepted(this, task.getRequester(), null, 0, delay);
+            Broadcaster.postMessage(msg, _channel);
             task = task.getNextTask();
             // Just add two seconds
             delay += 2000;
@@ -334,13 +332,13 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         // If within 20, then issue location request and to start targeting
         if (posInAreaXY(getPos(), _currentTask.getRequester().getPos(), 20))
         {
-            LOGGER.debug("Within distance, switching to targeting.");
+            LOGGER.debug(id() + " Within distance, switching to targeting.");
             requestWorkAreas();
             return State.TARGETING;
         }
         else if (!getEntity().getNavigator().noPath())
         {
-            LOGGER.debug("Couldn't get a path during transition, idling");
+            LOGGER.debug(id() + " Couldn't get a path during transition, idling");
             // If we have no path, then we are done.
             resetTask();
             return State.IDLING;
@@ -363,12 +361,12 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
             _workArea = _currentTask.selectWorkArea(_workAreas);
             if (_workArea == null)
             {
-                LOGGER.debug("Failed to find work area, aborting. " + _currentTask);
+                LOGGER.debug(id() + " Failed to find work area, aborting. " + _currentTask);
                 _currentTask = null;
                 return State.IDLING;
             }
 
-            LOGGER.debug("Determining work area and redirecting: " + _workArea + " currently at: " + getPos());
+            LOGGER.debug(id() + " Determining work area and redirecting: " + _workArea + " currently at: " + getPos());
             tryMoveTo(_workArea);
         }
 
@@ -440,20 +438,20 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
                 _currentTask = _currentTask.getNextTask();
                 if (_currentTask != null)
                 {
-                    LOGGER.debug("Task complete, finding starting next: " + _currentTask);
+                    LOGGER.debug(id() + " Task complete, finding starting next: " + _currentTask);
                     tryMoveTo(_currentTask.getRequester().getPos());
                     _workArea = null;
                     return State.TRANSITING;
                 }
                 else
                 {
-                    LOGGER.debug("Task complete, switching to idle");
+                    LOGGER.debug(id() + " Task complete, switching to idle");
                     return State.IDLING;
                 }
             }
             else if (_currentTask.getState() == TaskBase.State.FAILED)
             {
-                LOGGER.debug("Task failed, switching to idle");
+                LOGGER.debug(id() + " Task failed, switching to idle");
                 return State.IDLING;
             }
         }
@@ -481,7 +479,6 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
     // Convenience method
     public boolean tryMoveTo(BlockPos pos)
     {
-        LOGGER.debug("Speed: " + getEntity().getSpeed());
         return getEntity().getNavigator().tryMoveToXYZ(pos.getX(), pos.getY(), pos.getZ(), getEntity().getSpeed());
     }
 
@@ -501,8 +498,52 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         }
     }
 
+
+    //=============================================================================================
+
+    public String id()
+    {
+        return _name;
+    }
+
+    @Override
+    public String toString()
+    {
+        return id() +
+                "{ _state=" + _state +
+                ", _currentTask=" + _currentTask +
+                ", _nextElicit=" + _nextElicit +
+                ", _requestEndMS=" + _requestEndMS +
+                ", _workArea=" + _workArea +
+                ", _messagesSize=" + _messages.size() +
+                ", _responsesSize=" + _responses.size() +
+                ", _proposedTasksSize=" + _proposedTasks.size() +
+                ", _responseTasksSize=" + _responseTasks.size() +
+                '}';
+    }
+
+
+    private static String makeName()
+    {
+        int idx = NAME_INDEX % NAMES.length;
+        int suffix = NAME_INDEX / NAMES.length;
+        String name = NAMES[idx];
+        if (suffix > 0)
+            name = name + suffix;
+
+        NAME_INDEX++;
+
+        return name;
+    }
+
+    private static String[] NAMES = { "takara", "akai", "frodo", "sam", "merry", "pippin", "gimli", "legolas", "larry", "moe", "curly", "sleepy", "grumpy", "dopey", "doc", "bashful" };
+
+    private static int NAME_INDEX = 0;
+
+
     //========================
     // PRIVATES
+    private final String _name;
     private EntityDrudge _entity;
 
     private enum State { IDLING, ELICITING, TRANSITING, TARGETING, PERFORMING }
