@@ -3,13 +3,13 @@ package com.crashbox.drudgemod.beacon;
 import com.crashbox.drudgemod.messaging.Broadcaster;
 import com.crashbox.drudgemod.messaging.IListener;
 import com.crashbox.drudgemod.messaging.Message;
+import com.crashbox.drudgemod.messaging.MessageWorkAccepted;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Queue;
+import java.util.Random;
 import java.util.concurrent.LinkedTransferQueue;
 
 /**
@@ -19,6 +19,7 @@ public abstract class BeaconBase
 {
     protected BeaconBase(World world)
     {
+        Random rand = new Random();
         // We only want to listen on the server
         if (!world.isRemote)
         {
@@ -49,6 +50,13 @@ public abstract class BeaconBase
         Message msg;
         while (( msg = _messages.poll()) != null)
         {
+            if (msg instanceof MessageWorkAccepted && msg.getTarget() == this)
+            {
+                handleWorkAccepted((MessageWorkAccepted) msg);
+                continue;
+            }
+
+            // Let them handle it
             handleMessage(msg);
         }
     }
@@ -61,11 +69,23 @@ public abstract class BeaconBase
     protected abstract void handleMessage(Message msg);
 
     /**
-     * @return The channe we are attached to.
+     * @return The channel we are attached to.
      */
     public Broadcaster.Channel getChannel()
     {
         return _inChannel;
+    }
+
+    //=============================================================================================
+
+    protected void handleWorkAccepted(MessageWorkAccepted msg)
+    {
+        _nextAvailabilityResponseMS = System.currentTimeMillis() + msg.getDelayMS();
+    }
+
+    protected boolean timeForAvailabilityResponse()
+    {
+        return System.currentTimeMillis() > _nextAvailabilityResponseMS;
     }
 
     //=============================================================================================
@@ -94,6 +114,11 @@ public abstract class BeaconBase
 
     private Listener _listener;
     private Broadcaster.Channel _inChannel = Broadcaster.Channel.RED;
+
+    // We only want to respond everyone once in a while.  They send us a message
+    // when they accept
+    private long _nextAvailabilityResponseMS = 0;
+
 
     private static final Logger LOGGER = LogManager.getLogger();
 

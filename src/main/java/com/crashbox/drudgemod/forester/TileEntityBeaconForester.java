@@ -87,25 +87,27 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
                     Broadcaster.postMessage(req, getChannel());
                 }
             }
-//            else if (msg instanceof MessageWorkerAvailability)
-//            {
-//                LOGGER.debug("Forester " + this + " is asked for work." + msg);
-//
-//                MessageWorkerAvailability availability = (MessageWorkerAvailability)msg;
-//
-//                EntityItem pickup = AIUtils.findFirstEntityOfTypeOnGround(getWorld(), getPos(), _searchRadius,
-//                        Item.getItemFromBlock(Blocks.sapling));
-//                BlockPos target = AIUtils.findEmptyOrchardSquare(getWorld(), getPos(), _searchRadius);
-//
-//                if (pickup != null && target != null)
-//                {
-//                    MessagePlantSaplings req = new MessagePlantSaplings(TileEntityBeaconForester.this,
-//                            availability.getSender(), msg.getCause(), 0);
-//
-//                    LOGGER.debug("Posting request: " + req);
-//                    Broadcaster.postMessage(req, getChannel());
-//                }
-//            }
+            else if (msg instanceof MessageWorkerAvailability && timeForAvailabilityResponse())
+            {
+                LOGGER.debug("Forester " + this + " is asked for work." + msg);
+
+                MessageWorkerAvailability availability = (MessageWorkerAvailability)msg;
+
+                EntityItem pickup = AIUtils.findFirstEntityOfTypeOnGround(getWorld(), getPos(), _searchRadius,
+                        Item.getItemFromBlock(Blocks.sapling));
+                BlockPos target = AIUtils.findEmptyOrchardSquare(getWorld(), getPos(), _searchRadius);
+
+                LOGGER.debug("pickup=" + pickup + " , target=" + target);
+
+                if (pickup != null && target != null)
+                {
+                    MessagePlantSaplings req = new MessagePlantSaplings(TileEntityBeaconForester.this,
+                            availability.getSender(), msg.getCause(), 0);
+
+                    LOGGER.debug("Posting request: " + req);
+                    Broadcaster.postMessage(req, getChannel());
+                }
+            }
         }
     }
 

@@ -8,7 +8,6 @@ import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.util.BlockPos;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.lwjgl.Sys;
 
 import java.util.*;
 import java.util.concurrent.LinkedTransferQueue;
@@ -118,6 +117,13 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
             if (msg.getTarget() != null && msg.getTarget() != this)
                 continue;
 
+            if (msg instanceof MessageRequestWorkArea)
+            {
+                if (_workArea != null)
+                    Broadcaster.postMessage(new MessageWorkArea(this, msg.getSender(), msg.getCause(), _workArea), _channel);
+                continue;
+            }
+
             // Filter all task requests
             if (msg instanceof MessageTaskRequest && _currentTask == null)
             {
@@ -185,6 +191,8 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
                 return State.IDLING;
             }
 
+            LOGGER.debug("Selected task: " + _currentTask);
+            tryMoveTo(_currentTask.getRequester().getPos());
             return State.TRANSITING;
         }
 
@@ -275,6 +283,21 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
             }
         }
 
+        // Tell everyone we are accepting work
+        TaskBase task = bestTask;
+        int delay = 2000;
+        BlockPos startPos = getPos();
+        while (task != null)
+        {
+            // Five hundred millis for each block we need to walk. TODO:  Rework in entity speed.
+            delay += ( computeDistanceCost(startPos, task) * 500);
+            startPos = task.getRequester().getPos();
+            Broadcaster.postMessage(new MessageWorkAccepted(this, task.getRequester(), null, 0, delay), _channel);
+            task = task.getNextTask();
+            // Just add two seconds
+            delay += 2000;
+        }
+
         // Find highest resolved.
         return bestTask;
     }
@@ -313,7 +336,6 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         {
             LOGGER.debug("Within distance, switching to targeting.");
             requestWorkAreas();
-            _requestEndMS = System.currentTimeMillis() + REQUEST_TIMEOUT_MS;
             return State.TARGETING;
         }
         else if (!getEntity().getNavigator().noPath())
@@ -359,7 +381,8 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
             }
             else
             {
-                LOGGER.debug("Failed to move work area. Idling. Distance: " + getEntity().getPosition().distanceSq(_workArea));
+                LOGGER.debug("Failed to move work area. Idling. Distance: " +
+                        DrudgeUtils.sqDistXZ(getEntity().getPosition(), _workArea));
                 _currentTask = null;
                 return State.IDLING;
             }
@@ -370,6 +393,8 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
 
     private void requestWorkAreas()
     {
+        Broadcaster.postMessage(new MessageRequestWorkArea(this, null, _currentTask, 0), _channel);
+
         // TODO: Request work areas
         _workArea = null;
         _workAreas.clear();
@@ -392,6 +417,15 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         }
     }
 
+    /**
+     * Used by tasks to update the work area once we are working.
+     * @param pos The new work area.
+     */
+    public void updateWorkArea(BlockPos pos)
+    {
+        _workArea = pos;
+    }
+
     //=============================================================================================
     // PERFORMING
 
@@ -408,6 +442,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
                 {
                     LOGGER.debug("Task complete, finding starting next: " + _currentTask);
                     tryMoveTo(_currentTask.getRequester().getPos());
+                    _workArea = null;
                     return State.TRANSITING;
                 }
                 else
@@ -452,7 +487,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
 
     public boolean inProximity(BlockPos pos)
     {
-        return DrudgeUtils.sqDistanceXY(getEntity().getPosition(), pos, 4);
+        return DrudgeUtils.isWithinSqDist(getEntity().getPosition(), pos, 9);
     }
 
     //=============================================================================================

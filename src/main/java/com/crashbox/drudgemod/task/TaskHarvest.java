@@ -67,7 +67,7 @@ public class TaskHarvest extends TaskBase
         // If we have a target block, then let's see if we are close enough to start breaking
         if (_targetBlock != null)
         {
-            if ( DrudgeUtils.sqDistanceXY(getEntity().getPosition(), _targetBlock, 4 ))
+            if ( DrudgeUtils.isWithinSqDist(getEntity().getPosition(), _targetBlock, 4))
             {
                 startBreaking();
                 return;
@@ -75,6 +75,7 @@ public class TaskHarvest extends TaskBase
             else
             {
                 // If we didn't get close enough, try finding again
+                _targetBlock = null;
                 LOGGER.debug("NOT Breaking at at: " + _targetBlock);
             }
         }
@@ -83,9 +84,14 @@ public class TaskHarvest extends TaskBase
         if (!findNextBlock())
         {
             if (getEntity().getHeldItem() == null)
+            {
+                LOGGER.debug("Failed to find next block and empty.  Aborting");
                 setState(State.FAILED);
+            }
             else
+            {
                 setState(State.SUCCESS);
+            }
             return;
         }
 
@@ -106,7 +112,7 @@ public class TaskHarvest extends TaskBase
     public int getValue()
     {
         // SWAG
-        return _priority -10;
+        return _priority - 10;
     }
 
     @Override
@@ -147,6 +153,7 @@ public class TaskHarvest extends TaskBase
             {
                 // Didn't find any blocks anywhere
                 LOGGER.debug("Didn't find any blocks to harvest.  Done.");
+                getPerformer().updateWorkArea(null);
                 return false;
             }
 
@@ -154,6 +161,7 @@ public class TaskHarvest extends TaskBase
             _harvestBlock = _harvestList.poll();
         }
 
+        getPerformer().updateWorkArea(_harvestBlock);
         return true;
     }
 
@@ -169,20 +177,22 @@ public class TaskHarvest extends TaskBase
         LOGGER.debug("Start breaking. Need: " + _breakTotalNeeded);
     }
 
-    /** @return True to continue breaking */
+    /** @return True to continue harvesting */
     private boolean handleBreaking()
     {
         _isBreaking = updateBreak();
         if (!_isBreaking)
         {
             LOGGER.debug("Finished breaking, harvesting.");
-            harvestBlock();
-
-            if (getEntity().getHeldItem().stackSize >= getEntity().getCarryCapacity() ||
-                    getEntity().getHeldItem().stackSize >= _quantity)
+            if (harvestBlock())
             {
-                LOGGER.debug("Reached capacity.  Done");
-                return false;
+                if (getEntity().getHeldItem().stackSize >= getEntity().getCarryCapacity() ||
+                        getEntity().getHeldItem().stackSize >= _quantity)
+                {
+                    LOGGER.debug("Reached capacity.  Done");
+                    _targetBlock = null;
+                    return false;
+                }
             }
             _targetBlock = null;
         }
@@ -203,10 +213,10 @@ public class TaskHarvest extends TaskBase
             this._previousBreakProgress = i;
         }
 
-        return (this._breakingProgress != _breakTotalNeeded);
+        return (this._breakingProgress < _breakTotalNeeded);
     }
 
-    private void harvestBlock()
+    private boolean harvestBlock()
     {
         ItemStack targetStack = getEntity().getHeldItem();
         if (targetStack == null)
@@ -214,7 +224,7 @@ public class TaskHarvest extends TaskBase
             targetStack = _sample.copy();
             targetStack.stackSize = 0;
 
-            IBlockState blockState = getEntity().getEntityWorld().getBlockState(_harvestBlock);
+            //IBlockState blockState = getEntity().getEntityWorld().getBlockState(_harvestBlock);
             //Block blockType = blockState.getBlock();
 
             getEntity().setCurrentItemOrArmor(0, targetStack);
@@ -223,7 +233,7 @@ public class TaskHarvest extends TaskBase
         {
             // It changed or won't drop the right thing, bail.
             if (!DrudgeUtils.willDrop(getEntity().getEntityWorld(), _harvestBlock, targetStack))
-                return;
+                return false;
         }
 
         ///// BREAK
@@ -231,6 +241,8 @@ public class TaskHarvest extends TaskBase
 
         ///// PICKUP
         AIUtils.collectEntityIntoStack(getEntity().getEntityWorld(), _harvestBlock, 3, targetStack);
+
+        return true;
     }
 
     private boolean startNavigation()
@@ -256,8 +268,11 @@ public class TaskHarvest extends TaskBase
     private final int _quantity;
     private final ItemStack _sample;
 
+    // Blocks we are breaking
     private Queue<BlockPos> _harvestList;
     private BlockPos _harvestBlock;
+
+    // Spot on ground we move to.
     private BlockPos _targetBlock;
 
     private int _breakTotalNeeded;

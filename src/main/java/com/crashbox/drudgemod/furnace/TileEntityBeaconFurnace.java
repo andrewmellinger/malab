@@ -1,6 +1,5 @@
 package com.crashbox.drudgemod.furnace;
 
-import com.crashbox.drudgemod.DrudgeUtils;
 import com.crashbox.drudgemod.messaging.Broadcaster;
 import com.crashbox.drudgemod.messaging.MessageDeliverRequest;
 import com.crashbox.drudgemod.messaging.MessageWorkerAvailability;
@@ -582,12 +581,15 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
             return 0;
         }
 
+        // We have a priority based on space
         int size = _itemStacks[INPUT_INDEX].stackSize;
-        if ( size < (_itemStacks[INPUT_INDEX].getMaxStackSize() * _smeltableRequestFraction))
-        {
-            return 1;
-        }
-        return 0;
+        int maxSize = _itemStacks[INPUT_INDEX].getMaxStackSize();;
+        int space = _itemStacks[INPUT_INDEX].getMaxStackSize() - size;
+
+        if (size > (_maxRequestThreshold * maxSize))
+            return 0;
+
+        return (space * 100)/maxSize;
     }
 
     private ItemStack getSmeltableItemSample()
@@ -667,7 +669,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
         @Override
         protected void handleMessage(Message msg)
         {
-            if (msg instanceof MessageWorkerAvailability)
+            if (msg instanceof MessageWorkerAvailability && timeForAvailabilityResponse())
             {
                 LOGGER.debug("Furnace " + this + " is asked for work." + msg);
 
@@ -682,7 +684,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
 
                     // Send a message back to this guy telling him that we could use more
                     MessageDeliverRequest req = new MessageDeliverRequest(TileEntityBeaconFurnace.this,
-                            availability.getSender(), msg.getCause(), 0, getSmeltableItemSample(),
+                            availability.getSender(), msg.getCause(), priority, getSmeltableItemSample(),
                             getSmeltableQuantityWanted(), INPUT_INDEX);
 
                     Broadcaster.postMessage(req, getChannel());
@@ -692,7 +694,9 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
     }
 
     private float _fuelRequestFraction = 0.5F;
-    private float _smeltableRequestFraction = 0.5F;
+
+    // Don't ask if we have more than this
+    private float _maxRequestThreshold = 0.75F;
 
     private Furnace _furnace;
     private static final Logger LOGGER = LogManager.getLogger();

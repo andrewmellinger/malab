@@ -83,7 +83,7 @@ public class DrudgeUtils
         return false;
     }
 
-    public static boolean sqDistanceXY(BlockPos pos1, BlockPos pos2, int diff)
+    public static boolean isWithinSqDist(BlockPos pos1, BlockPos pos2, int diff)
     {
         // We only use XZ.
         int xOffset = pos1.getX() - pos2.getX();
@@ -92,9 +92,18 @@ public class DrudgeUtils
         return (dist <= diff);
     }
 
+    public static int sqDistXZ(BlockPos pos1, BlockPos pos2)
+    {
+        // We only use XZ.
+        int xOffset = pos1.getX() - pos2.getX();
+        int zOffset = pos1.getZ() - pos2.getZ();
+        return (xOffset * xOffset) + (zOffset * zOffset);
+    }
+
+
     public static boolean pointInArea(BlockPos point, BlockPos center, int radius)
     {
-        return ( point.getX() < center.getX() - radius || point.getX() > center.getX() + radius ||
+        return !( point.getX() < center.getX() - radius || point.getX() > center.getX() + radius ||
                  point.getZ() < center.getZ() - radius || point.getZ() > center.getZ() + radius );
     }
 

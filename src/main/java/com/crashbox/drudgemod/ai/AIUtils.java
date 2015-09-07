@@ -54,8 +54,8 @@ public class AIUtils
                 EntityItem entityItem = (EntityItem) obj;
                 if ( entityItem.getEntityItem().isItemEqual(targetStack) )
                 {
-                    targetStack.stackSize += entityItem.getEntityItem().stackSize;
                     world.removeEntity(entityItem);
+                    targetStack.stackSize += entityItem.getEntityItem().stackSize;
                 }
             }
         }

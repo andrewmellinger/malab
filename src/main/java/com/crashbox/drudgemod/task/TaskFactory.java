@@ -28,10 +28,6 @@ public class TaskFactory
         else if (taskClass == TaskDeliver.class && message instanceof  MessageDeliverRequest)
             return new TaskDeliver(performer, (MessageDeliverRequest)message);
 
-
-
-
-
         LOGGER.error("Failed to construct task for " + message);
         return null;
     }

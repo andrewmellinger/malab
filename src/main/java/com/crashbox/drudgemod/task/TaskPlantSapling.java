@@ -21,7 +21,7 @@ public class TaskPlantSapling extends TaskBase
 {
     public TaskPlantSapling(EntityAIDrudge performer, MessagePlantSaplings message)
     {
-        super(null, message.getSender(), message.getPriority());
+        super(performer, message.getSender(), message.getPriority());
         setResolving(Resolving.RESOLVED);
     }
 
@@ -155,7 +155,7 @@ public class TaskPlantSapling extends TaskBase
     @Override
     public void debugInfo(StringBuilder builder)
     {
-        builder.append(" performer=").append(DrudgeUtils.objID(_requester));
+        super.debugInfo(builder);
     }
 
 
