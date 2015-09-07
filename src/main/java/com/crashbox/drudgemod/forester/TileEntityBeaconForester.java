@@ -88,7 +88,7 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
                     MessageHarvestRequest req = new MessageHarvestRequest(TileEntityBeaconForester.this, itemReq.getSender(),
                             msg.getCause(), 0, itemReq.getItemSample(), itemReq.getQuantity());
 
-                    LOGGER.debug("Posting request: " + req);
+                    //LOGGER.debug("Posting request: " + req);
                     Broadcaster.postMessage(req);
                 }
             }
@@ -109,7 +109,7 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
                     MessagePlantSaplings req = new MessagePlantSaplings(TileEntityBeaconForester.this,
                             availability.getSender(), msg.getCause(), 0);
 
-                    LOGGER.debug("Posting request: " + req);
+                    //LOGGER.debug("Posting request: " + req);
                     Broadcaster.postMessage(req);
                 }
             }

@@ -204,7 +204,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
             List<MessageTaskRequest> taskResponses = getAllForTask(responses, _proposedTasks.get(x));
             if (taskResponses.size() > 0)
             {
-                MessageTaskRequest opt = findBestResponseOption(taskResponses);
+                MessageTaskRequest opt = findBestResponseOption(_proposedTasks.get(x), taskResponses);
                 TaskBase newTask = _taskFactory.makeTaskFromMessage(this, (MessageTaskRequest) opt);
                 newTask.setNextTask(_proposedTasks.get(x));
                 _proposedTasks.set(x, newTask);
@@ -238,10 +238,20 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         return result;
     }
 
-    private MessageTaskRequest findBestResponseOption(List<MessageTaskRequest> messages)
+    private MessageTaskRequest findBestResponseOption(TaskBase task, List<MessageTaskRequest> messages)
     {
+        int bestValue = Integer.MIN_VALUE;
+        MessageTaskRequest bestTask = null;
+
+        for (MessageTaskRequest request : messages)
+        {
+            int value = request.getPriority() - computeDistanceCost(request.getSender().getPos(), task);
+            if (value > bestValue)
+                bestTask = request;
+        }
+
         // For now just find the first
-        return messages.get(0);
+        return bestTask;
     }
 
     private void resolveAllTasks()
