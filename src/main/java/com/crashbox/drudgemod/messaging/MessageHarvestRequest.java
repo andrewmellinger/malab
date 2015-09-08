@@ -9,10 +9,10 @@ import net.minecraft.item.ItemStack;
  */
 public class MessageHarvestRequest extends MessageTaskRequest
 {
-    public MessageHarvestRequest(IMessager sender, IMessager target, Object cause, int priority, ItemStackMatcher matcher,
+    public MessageHarvestRequest(IMessager sender, IMessager target, Object transactionID, int priority, ItemStackMatcher matcher,
             int quantity)
     {
-        super(sender, target, cause, priority, TaskHarvest.class);
+        super(sender, target, transactionID, priority, TaskHarvest.class);
         _matcher = matcher;
         _quantity = quantity;
     }

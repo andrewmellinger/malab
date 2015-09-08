@@ -86,7 +86,7 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
                 {
                     // Offer a task, at our area for the requested thing.
                     MessageHarvestRequest req = new MessageHarvestRequest(TileEntityBeaconForester.this, itemReq.getSender(),
-                            msg.getCause(), 0, itemReq.getMatcher(), itemReq.getQuantity());
+                            msg.getTransactionID(), 0, itemReq.getMatcher(), itemReq.getQuantity());
 
                     //LOGGER.debug("Posting request: " + req);
                     Broadcaster.postMessage(req);
@@ -107,7 +107,7 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
                 if (pickup != null && target != null)
                 {
                     MessagePlantSaplings req = new MessagePlantSaplings(TileEntityBeaconForester.this,
-                            availability.getSender(), msg.getCause(), 0);
+                            availability.getSender(), msg.getTransactionID(), 0);
 
                     //LOGGER.debug("Posting request: " + req);
                     Broadcaster.postMessage(req);

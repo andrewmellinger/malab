@@ -9,10 +9,10 @@ import net.minecraft.item.ItemStack;
  */
 public class MessageDeliverRequest extends MessageTaskRequest
 {
-    public MessageDeliverRequest(IMessager sender, IMessager receiver, Object cause, int priority,
+    public MessageDeliverRequest(IMessager sender, IMessager receiver, Object transactionID, int priority,
             ItemStackMatcher matcher, int quantity, int slot)
     {
-        super(sender, receiver, cause, priority, TaskDeliver.class);
+        super(sender, receiver, transactionID, priority, TaskDeliver.class);
         _matcher = matcher;
         _quantity = quantity;
         _slot = slot;

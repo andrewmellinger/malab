@@ -8,9 +8,9 @@ import net.minecraft.item.ItemStack;
  */
 public class MessageItemRequest extends  Message
 {
-    public MessageItemRequest(IMessager sender, IMessager receiver, Object cause, ItemStackMatcher matcher, int quantity)
+    public MessageItemRequest(IMessager sender, IMessager receiver, Object transactionID, ItemStackMatcher matcher, int quantity)
     {
-        super(sender, receiver, cause, 0);
+        super(sender, receiver, transactionID, 0);
         _matcher = matcher;
         _quantity = quantity;
     }

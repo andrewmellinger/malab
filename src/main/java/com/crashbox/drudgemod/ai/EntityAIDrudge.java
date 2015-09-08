@@ -116,21 +116,21 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
             if (msg instanceof MessageRequestWorkArea)
             {
                 if (_workArea != null)
-                    Broadcaster.postMessage(new MessageWorkArea(this, msg.getSender(), msg.getCause(), _workArea));
+                    Broadcaster.postMessage(new MessageWorkArea(this, msg.getSender(), msg.getTransactionID(), _workArea));
                 continue;
             }
 
             // Filter all task requests
             if (msg instanceof MessageTaskRequest && _currentTask == null)
             {
-                if (msg.getCause() == MessageWorkerAvailability.class)
+                if (msg.getTransactionID() == MessageWorkerAvailability.class)
                     _proposedTasks.add(_taskFactory.makeTaskFromMessage(this, (MessageTaskRequest) msg));
                 else
                     _responseTasks.add((MessageTaskRequest)msg);
             }
-            else if (msg.getCause() != null)
+            else if (msg.getTransactionID() != null)
             {
-                // If it has a 'cause' it is a response to something we sent before.
+                // If it has a transactionID it is a response to something we sent before.
                 _responses.add(msg);
             }
             else
@@ -227,7 +227,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         while (iterator.hasNext())
         {
             MessageTaskRequest msg =  iterator.next();
-            if (msg.getCause() == task)
+            if (msg.getTransactionID() == task)
             {
                 iterator.remove();
                 result.add(msg);
@@ -418,7 +418,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
             Message next =  iter.next();
             if (next instanceof MessageWorkArea)
             {
-                if (_workArea == null && next.getCause() == _currentTask && System.currentTimeMillis() < _requestEndMS)
+                if (_workArea == null && next.getTransactionID() == _currentTask && System.currentTimeMillis() < _requestEndMS)
                     _workAreas.add(((MessageWorkArea) next).getWorkArea());
 
                 iter.remove();

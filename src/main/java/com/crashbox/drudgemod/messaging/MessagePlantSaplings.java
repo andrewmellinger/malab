@@ -8,8 +8,8 @@ import com.crashbox.drudgemod.task.TaskPlantSapling;
  */
 public class MessagePlantSaplings extends MessageTaskRequest
 {
-    public MessagePlantSaplings(IMessager sender, IMessager target, Object cause, int priority)
+    public MessagePlantSaplings(IMessager sender, IMessager target, Object transactionID, int priority)
     {
-        super(sender, target, cause, priority, TaskPlantSapling.class);
+        super(sender, target, transactionID, priority, TaskPlantSapling.class);
     }
 }

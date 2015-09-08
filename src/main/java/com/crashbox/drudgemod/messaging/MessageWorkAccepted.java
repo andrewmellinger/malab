@@ -7,9 +7,9 @@ import com.crashbox.drudgemod.DrudgeUtils;
  */
 public class MessageWorkAccepted extends Message
 {
-    public MessageWorkAccepted(IMessager sender, IMessager target, Object cause, int priority, int delayMS)
+    public MessageWorkAccepted(IMessager sender, IMessager target, Object transactionID, int priority, int delayMS)
     {
-        super(sender, target, cause, priority);
+        super(sender, target, transactionID, priority);
         _delayMS = delayMS;
     }
 

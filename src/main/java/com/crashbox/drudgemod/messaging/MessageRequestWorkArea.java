@@ -5,8 +5,8 @@ package com.crashbox.drudgemod.messaging;
  */
 public class MessageRequestWorkArea extends Message
 {
-    public MessageRequestWorkArea(IMessager sender, IMessager target, Object cause, int priority)
+    public MessageRequestWorkArea(IMessager sender, IMessager target, Object transactionID, int priority)
     {
-        super(sender, target, cause, priority);
+        super(sender, target, transactionID, priority);
     }
 }

@@ -770,7 +770,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
 
                         // Send a message back to this guy telling him that we could use more
                         MessageDeliverRequest req = new MessageDeliverRequest(TileEntityBeaconFurnace.this,
-                                availability.getSender(), msg.getCause(), priority, getSmeltableItemMatcher(),
+                                availability.getSender(), msg.getTransactionID(), priority, getSmeltableItemMatcher(),
                                 getSmeltableQuantityWanted(), INPUT_INDEX);
 
                         Broadcaster.postMessage(req);

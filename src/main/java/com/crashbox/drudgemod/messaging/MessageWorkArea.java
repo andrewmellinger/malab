@@ -7,9 +7,9 @@ import net.minecraft.util.BlockPos;
  */
 public class MessageWorkArea extends Message
 {
-    public MessageWorkArea(IMessager sender, IMessager target, Object cause, BlockPos area)
+    public MessageWorkArea(IMessager sender, IMessager target, Object transactionID, BlockPos area)
     {
-        super(sender, target, cause, 0);
+        super(sender, target, transactionID, 0);
         _pos = new BlockPos(area);
     }
 

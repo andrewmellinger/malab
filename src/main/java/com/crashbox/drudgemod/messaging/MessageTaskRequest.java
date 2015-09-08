@@ -12,14 +12,14 @@ public class MessageTaskRequest extends Message
      * A message that wraps a request to perform a task.
      * @param sender Who is sending the request.
      * @param target Who is supposed to perform the request.  Usually a bot.
-     * @param cause
+     * @param transactionID
      * @param priority The priority of the task.
      * @param clazz The task to perform.
      */
-    public MessageTaskRequest(IMessager sender, IMessager target, Object cause, int priority,
+    public MessageTaskRequest(IMessager sender, IMessager target, Object transactionID, int priority,
             Class<? extends TaskBase> clazz)
     {
-        super(sender, target, cause, priority);
+        super(sender, target, transactionID, priority);
         _taskClass = clazz;
     }
 
