@@ -1,10 +1,9 @@
 package com.crashbox.drudgemod;
 
+import com.crashbox.drudgemod.common.ItemStackMatcher;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
@@ -30,7 +29,7 @@ public class DrudgeUtils
         }
     }
 
-    public static boolean willDrop(World world, BlockPos pos, ItemStack sample)
+    public static boolean willDrop(World world, BlockPos pos, ItemStackMatcher matcher)
     {
         IBlockState state = world.getBlockState(pos);
         Block block = state.getBlock();
@@ -42,13 +41,56 @@ public class DrudgeUtils
 
         for (ItemStack stack : block.getDrops(world, pos, state, 0))
         {
-            if (stack.isItemEqual(sample))
+            if (matcher.matches(stack))
                 return true;
         }
 
         return false;
-
     }
+
+    public static ItemStack identifyWillDrop(World world, BlockPos pos, ItemStackMatcher matcher)
+    {
+        IBlockState state = world.getBlockState(pos);
+        Block block = state.getBlock();
+
+        if (block.isAir(world, pos))
+        {
+            return null;
+        }
+
+        for (ItemStack stack : block.getDrops(world, pos, state, 0))
+        {
+            if (matcher.matches(stack))
+            {
+                ItemStack tmp = stack.copy();
+                tmp.stackSize = 0;
+                return tmp;
+            }
+        }
+
+        return null;
+    }
+
+
+
+//    public static boolean willDrop(World world, BlockPos pos, ItemStack sample)
+//    {
+//        IBlockState state = world.getBlockState(pos);
+//        Block block = state.getBlock();
+//
+//        if (block.isAir(world, pos))
+//        {
+//            return false;
+//        }
+//
+//        for (ItemStack stack : block.getDrops(world, pos, state, 0))
+//        {
+//            if (stack.isItemEqual(sample))
+//                return true;
+//        }
+//
+//        return false;
+//    }
 
     public static boolean harvestInto(World world, BlockPos pos, ItemStack stack)
     {

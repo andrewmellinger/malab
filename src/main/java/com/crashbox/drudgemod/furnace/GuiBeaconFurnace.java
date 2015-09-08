@@ -38,10 +38,8 @@ public class GuiBeaconFurnace extends GuiContainer
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
     {
         String s = _tileBeacon.getDisplayName().getUnformattedText();
-        fontRendererObj.drawString(s, xSize/2-fontRendererObj
-                .getStringWidth(s)/2, 6, 4210752);
-        fontRendererObj.drawString(_inventoryPlayer.getDisplayName()
-                .getUnformattedText(), 8, ySize - 96 + 2, 4210752);
+        fontRendererObj.drawString(s, xSize/2-fontRendererObj.getStringWidth(s)/2, 6, 4210752);
+        fontRendererObj.drawString(_inventoryPlayer.getDisplayName().getUnformattedText(), 8, ySize - 96 + 2, 4210752);
     }
 
     /**
@@ -55,19 +53,20 @@ public class GuiBeaconFurnace extends GuiContainer
         mc.getTextureManager().bindTexture(grinderGuiTextures);
         int marginHorizontal = (width - xSize) / 2;
         int marginVertical = (height - ySize) / 2;
-        drawTexturedModalRect(marginHorizontal, marginVertical, 0, 0,
-                xSize, ySize);
+        drawTexturedModalRect(marginHorizontal, marginVertical, 0, 0, xSize, ySize);
 
+        // Draw burning icon
         if(TileEntityBeaconFurnace.isBurning(_tileBeacon))
         {
             int tmp = this.updateBurnIndicator(13);
-            this.drawTexturedModalRect(marginHorizontal + 56, marginVertical + 36 + 12 - tmp, 176, 12 - tmp, 14, tmp + 1);
+//            this.drawTexturedModalRect(marginHorizontal + 56, marginVertical + 36 + 12 - tmp, 176, 12 - tmp, 14, tmp + 1);
+            this.drawTexturedModalRect(marginHorizontal + 88, marginVertical + 36 + 12 - tmp, 176, 12 - tmp, 14, tmp + 1);
         }
 
         // Draw progress indicator
         int progressLevel = getProgressLevel(24);
-        drawTexturedModalRect(marginHorizontal + 79, marginVertical + 34,
-                176, 14, progressLevel + 1, 16);
+//        drawTexturedModalRect(marginHorizontal + 79, marginVertical + 34, 176, 14, progressLevel + 1, 16);
+        drawTexturedModalRect(marginHorizontal + 111, marginVertical + 34, 176, 14, progressLevel + 1, 16);
     }
 
     private int getProgressLevel(int progressIndicatorPixelWidth)

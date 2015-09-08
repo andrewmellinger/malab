@@ -80,13 +80,13 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
                 MessageItemRequest itemReq = (MessageItemRequest)msg;
 
                 // Look around and see if we have any of these.
-                boolean hasMats = RingedSearcher.detectBlock(getWorld(), getPos(), _searchRadius, _searchHeight, itemReq
-                        .getItemSample());
+                boolean hasMats = RingedSearcher.detectBlock(getWorld(), getPos(), _searchRadius, _searchHeight,
+                        itemReq.getMatcher());
                 if (hasMats)
                 {
                     // Offer a task, at our area for the requested thing.
                     MessageHarvestRequest req = new MessageHarvestRequest(TileEntityBeaconForester.this, itemReq.getSender(),
-                            msg.getCause(), 0, itemReq.getItemSample(), itemReq.getQuantity());
+                            msg.getCause(), 0, itemReq.getMatcher(), itemReq.getQuantity());
 
                     //LOGGER.debug("Posting request: " + req);
                     Broadcaster.postMessage(req);

@@ -4,8 +4,10 @@ import com.crashbox.drudgemod.DrudgeUtils;
 import com.crashbox.drudgemod.ai.AIUtils;
 import com.crashbox.drudgemod.ai.EntityAIDrudge;
 import com.crashbox.drudgemod.ai.RingedSearcher;
+import com.crashbox.drudgemod.common.ItemStackMatcher;
 import com.crashbox.drudgemod.messaging.Message;
 import com.crashbox.drudgemod.messaging.MessageHarvestRequest;
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
@@ -25,7 +27,7 @@ public class TaskHarvest extends TaskBase
         super(performer, message.getSender(), message.getPriority());
         _radius = message.getSender().getRadius();
         _quantity = message.getQuantity();
-        _sample = message.getSample();
+        _matcher = message.getMatcher();
         setResolving(Resolving.RESOLVED);
     }
 
@@ -122,7 +124,7 @@ public class TaskHarvest extends TaskBase
         RingedSearcher searcher = new RingedSearcher(getRequester().getPos(), getRequester().getRadius(), 10);
         for (BlockPos pos : searcher)
         {
-            if (DrudgeUtils.willDrop(getWorld(), pos, _sample))
+            if (DrudgeUtils.willDrop(getWorld(), pos, _matcher))
             {
                 if (!DrudgeUtils.pointInAreas(pos, others, 1))
                     return pos;
@@ -148,7 +150,7 @@ public class TaskHarvest extends TaskBase
         {
             //debugLog(LOGGER, "Getting next harvest list");
             // Find blocks in a tree
-            _harvestList = RingedSearcher.findTree(getEntity().getEntityWorld(), getRequester().getPos(), _radius, _height, _sample);
+            _harvestList = RingedSearcher.findTree(getEntity().getEntityWorld(), getRequester().getPos(), _radius, _height, _matcher);
             if (_harvestList == null)
             {
                 // Didn't find any blocks anywhere
@@ -186,8 +188,8 @@ public class TaskHarvest extends TaskBase
             //debugLog(LOGGER, "Finished breaking, harvesting.");
             if (harvestBlock())
             {
-                if (getEntity().getHeldItem().stackSize >= getEntity().getCarryCapacity() ||
-                        getEntity().getHeldItem().stackSize >= _quantity)
+                if ( getEntity().getHeldItem().stackSize >= getEntity().getCarryCapacity() ||
+                     getEntity().getHeldItem().stackSize >= _quantity)
                 {
                     //debugLog(LOGGER, "Reached capacity.  Done");
                     _targetBlock = null;
@@ -221,15 +223,23 @@ public class TaskHarvest extends TaskBase
         ItemStack targetStack = getEntity().getHeldItem();
         if (targetStack == null)
         {
-            targetStack = _sample.copy();
-            targetStack.stackSize = 0;
+            ItemStack willDrop = DrudgeUtils.identifyWillDrop(getWorld(), _harvestBlock, _matcher);
+            getEntity().setCurrentItemOrArmor(0, willDrop);
 
-            getEntity().setCurrentItemOrArmor(0, targetStack);
+            if (willDrop == null)
+            {
+//                IBlockState state = getWorld().getBlockState(_harvestBlock);
+//                Block block = state.getBlock();
+//
+//                LOGGER.debug("Couldn't find what we'd drop: " + _matcher + " : " +
+//                        block.getDrops(getWorld(), _harvestBlock, state, 0));
+                return false;
+            }
         }
         else
         {
             // It changed or won't drop the right thing, bail.
-            if (!DrudgeUtils.willDrop(getEntity().getEntityWorld(), _harvestBlock, targetStack))
+            if (!DrudgeUtils.willDrop(getEntity().getEntityWorld(), _harvestBlock, new ItemStackMatcher(targetStack)))
                 return false;
         }
 
@@ -257,13 +267,13 @@ public class TaskHarvest extends TaskBase
         builder.append(", radius=").append(_radius);
         builder.append(", height=").append(_height);
         builder.append(", quantity=").append(_quantity);
-        builder.append(", sample=").append(_sample);
+        builder.append(", matcher=").append(_matcher);
     }
 
     private final int _radius;
     private final int _height = 10;
     private final int _quantity;
-    private final ItemStack _sample;
+    private final ItemStackMatcher _matcher;
 
     // Blocks we are breaking
     private Queue<BlockPos> _harvestList;

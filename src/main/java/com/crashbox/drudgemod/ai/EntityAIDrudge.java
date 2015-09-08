@@ -21,8 +21,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
     {
         this._entity = entity;
         Broadcaster.getInstance().subscribe(new MyListener());
-        _name = makeName();
-        _entity.setCustomNameTag(_name);
+        _entity.setCustomNameTag(makeName());
     }
 
     public EntityDrudge getEntity()
@@ -515,7 +514,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
 
     public String id()
     {
-        return _name;
+        return getEntity().getCustomNameTag();
     }
 
     @Override
@@ -555,7 +554,6 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
 
     //========================
     // PRIVATES
-    private final String _name;
     private EntityDrudge _entity;
 
     private enum State { IDLING, ELICITING, TRANSITING, TARGETING, PERFORMING }

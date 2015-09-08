@@ -1,5 +1,6 @@
 package com.crashbox.drudgemod.furnace;
 
+import com.crashbox.drudgemod.common.SampleSlot;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.*;
@@ -27,9 +28,20 @@ public class ContainerBeaconFurnace extends Container
         _sizeInventory = _tileBeacon.getSizeInventory();
 
         // Set up all our main interaction slots
-        addSlotToContainer(new Slot(_tileBeacon, 0, 56, 17));
-        addSlotToContainer(new SlotFurnaceFuel(_tileBeacon, 1, 56, 53));
-        addSlotToContainer(new SlotFurnaceOutput(inventoryPlayer.player, _tileBeacon, 2, 116, 35));
+//        addSlotToContainer(new Slot(_tileBeacon, 0, 56, 17));
+//        addSlotToContainer(new SlotFurnaceFuel(_tileBeacon, 1, 56, 53));
+//        addSlotToContainer(new SlotFurnaceOutput(inventoryPlayer.player, _tileBeacon, 2, 116, 35));
+
+
+        addSlotToContainer(new Slot(_tileBeacon, 0, 88, 17));
+        addSlotToContainer(new SlotFurnaceFuel(_tileBeacon, 1, 88, 53));
+        addSlotToContainer(new SlotFurnaceOutput(inventoryPlayer.player, _tileBeacon, 2, 148, 35));
+
+        for (int i = 0; i < 4; ++i)
+            addSlotToContainer(new SampleSlot(inventory, i + 3, 8+ i*18, 17));
+
+        for (int i = 0; i < 4; ++i)
+            addSlotToContainer(new SampleSlot(inventory, i + 7, 8+ i*18, 53));
 
         // TODO: Make reusable function
 
@@ -48,8 +60,11 @@ public class ContainerBeaconFurnace extends Container
         // add hotbar slots
         for (i = 0; i < 9; ++i)
         {
+            // TODO:  Is this really the right slot number??
             addSlotToContainer(new Slot(inventoryPlayer, i, 8 + i * 18, 142));
         }
+
+
     }
 
     @Override

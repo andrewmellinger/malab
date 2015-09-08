@@ -1,5 +1,6 @@
 package com.crashbox.drudgemod.messaging;
 
+import com.crashbox.drudgemod.common.ItemStackMatcher;
 import com.crashbox.drudgemod.task.TaskDeliver;
 import net.minecraft.item.ItemStack;
 
@@ -9,17 +10,17 @@ import net.minecraft.item.ItemStack;
 public class MessageDeliverRequest extends MessageTaskRequest
 {
     public MessageDeliverRequest(IMessager sender, IMessager receiver, Object cause, int priority,
-            ItemStack itemSample, int quantity, int slot)
+            ItemStackMatcher matcher, int quantity, int slot)
     {
         super(sender, receiver, cause, priority, TaskDeliver.class);
-        _itemSample = itemSample;
+        _matcher = matcher;
         _quantity = quantity;
         _slot = slot;
     }
 
-    public ItemStack getItemSample()
+    public ItemStackMatcher getMatcher()
     {
-        return _itemSample;
+        return _matcher;
     }
 
     public int getQuantity()
@@ -35,12 +36,12 @@ public class MessageDeliverRequest extends MessageTaskRequest
     public void debugInfo(StringBuilder builder)
     {
         super.debugInfo(builder);
-        builder.append(", itemSample=").append(_itemSample);
+        builder.append(", itemSample=").append(_matcher);
         builder.append(", quantity=").append(_quantity);
         builder.append(", slot=").append(_slot);
     }
 
-    private final ItemStack _itemSample;
+    private final ItemStackMatcher _matcher;
     private final int _quantity;
     private final int _slot;
 }

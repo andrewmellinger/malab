@@ -1,8 +1,8 @@
 package com.crashbox.drudgemod.task;
 
-import com.crashbox.drudgemod.DrudgeUtils;
 import com.crashbox.drudgemod.ai.EntityAIDrudge;
 import com.crashbox.drudgemod.beacon.TileEntityBeaconInventory;
+import com.crashbox.drudgemod.common.ItemStackMatcher;
 import com.crashbox.drudgemod.messaging.IMessager;
 import com.crashbox.drudgemod.messaging.Message;
 import com.crashbox.drudgemod.messaging.MessageDeliverRequest;
@@ -24,14 +24,14 @@ public class TaskDeliver extends TaskBase
     public TaskDeliver(EntityAIDrudge performer, MessageDeliverRequest message)
     {
         super(performer, message.getSender(), message.getPriority());
-        _itemSample = message.getItemSample();
+        _matcher = message.getMatcher();
         _quantity = message.getQuantity();
         _slot = message.getSlot();
     }
 
-    public ItemStack getItemSample()
+    public ItemStackMatcher getMatcher()
     {
-        return _itemSample;
+        return _matcher;
     }
 
     public int getQuantity()
@@ -81,7 +81,7 @@ public class TaskDeliver extends TaskBase
     public Message resolve()
     {
         // If the drudge already has the desired item, we are a go.
-        if (getEntity().getHeldItem() != null && getEntity().getHeldItem().isItemEqual(_itemSample))
+        if (getEntity().getHeldItem() != null && _matcher.matches(getEntity().getHeldItem()))
         {
             setResolving(Resolving.RESOLVED);
             return null;
@@ -89,7 +89,7 @@ public class TaskDeliver extends TaskBase
 
         // Return a message showing what we need.
         setResolving(Resolving.RESOLVING);
-        return new MessageItemRequest(getPerformer(), null, this, _itemSample, _quantity);
+        return new MessageItemRequest(getPerformer(), null, this, _matcher, _quantity);
     }
 
     @Override
@@ -110,12 +110,12 @@ public class TaskDeliver extends TaskBase
     public void debugInfo(StringBuilder builder)
     {
         super.debugInfo(builder);
-        builder.append(", itemSample=").append(_itemSample);
+        builder.append(", itemSample=").append(_matcher);
         builder.append(", slot=").append(_slot);
         builder.append(", quantity=").append(_quantity);
     }
 
-    private final ItemStack _itemSample;
+    private final ItemStackMatcher _matcher;
     private final int _slot;
     private final int _quantity;
 

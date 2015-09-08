@@ -1,5 +1,6 @@
 package com.crashbox.drudgemod.furnace;
 
+import com.crashbox.drudgemod.common.ItemStackMatcher;
 import com.crashbox.drudgemod.messaging.*;
 import com.crashbox.drudgemod.beacon.BeaconBase;
 import com.crashbox.drudgemod.beacon.TileEntityBeaconInventory;
@@ -36,6 +37,11 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
     public int FUEL_INDEX = 1;
     public int OUTPUT_INDEX = 2;
 
+    public int SMELTABLE_SAMPLE_MIN = 3;
+    public int SMELTABLE_SAMPLE_MAX = 6;
+    public int FUEL_SAMPLE_MIN = 7;
+    public int FUEL_SAMPLE_MAX = 10;
+
     // enumerate the slots
     public enum slotEnum
     {
@@ -46,7 +52,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
     private static final int[] slotsSides = new int[] { slotEnum.FUEL_SLOT.ordinal() };
 
     // All the things that we contain
-    private ItemStack[] _itemStacks = new ItemStack[3];
+    private ItemStack[] _itemStacks = new ItemStack[11];
 
     // State trackers
     private int _remainingFuelBurnTicks;
@@ -69,12 +75,26 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
     private static final String NBT_ACCUMULATED_ITEM_SMELT_TICKS = "AccumulatedSmeltTime";
     private static final String NBT_TOTAL_ITEM_SMELT_TICKS = "TotalSmeltTime";
 
+    //=============================================================================================
+    // ##### ##### #     ##### ##### #   # ##### ##### ##### #   #
+    //   #     #   #     #     #     ##  #   #     #     #    # #
+    //   #     #   #     ####  ####  # # #   #     #     #     #
+    //   #     #   #     #     #     #  ##   #     #     #     #
+    //   #   ##### ##### ##### ##### #   #   #   #####   #     #
+
     @Override
     public boolean shouldRefresh(World parWorld, BlockPos parPos,
                                  IBlockState parOldState, IBlockState parNewState)
     {
         return false;
     }
+
+    //=============================================================================================
+    // ##### ##### #   # #   # ##### #   # #####  ###  ####  #   #
+    //   #     #   ##  # #   # #     ##  #   #   #   # #   #  # #
+    //   #     #   # # #  # #  ####  # # #   #   #   # ####    #
+    //   #     #   #  ##  # #  #     #  ##   #   #   # #   #   #
+    // ##### ##### #   #   #   ##### #   #   #    ###  #   #   #
 
     @Override
     public int getSizeInventory()
@@ -143,8 +163,6 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
     @Override
     public void setInventorySlotContents(int index, ItemStack stack)
     {
-        _itemStacks[index] = stack;
-
         boolean isSameItemStackAlreadyInSlot = stack != null
                 && stack.isItemEqual(_itemStacks[index])
                 && ItemStack.areItemStackTagsEqual(stack,
@@ -168,6 +186,141 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
     }
 
     @Override
+    public int getInventoryStackLimit()
+    {
+        return 64;
+    }
+
+    @Override
+    public boolean isUseableByPlayer(EntityPlayer playerIn)
+    {
+        return worldObj.getTileEntity(pos) != this ? false :
+                playerIn.getDistanceSq(pos.getX()+0.5D, pos.getY()+0.5D,
+                        pos.getZ()+0.5D) <= 64.0D;
+    }
+
+    @Override
+    public void openInventory(EntityPlayer playerIn) {}
+
+    @Override
+    public void closeInventory(EntityPlayer playerIn) {}
+
+    @Override
+    public boolean isItemValidForSlot(int index, ItemStack stack)
+    {
+        // Supposedly this is for automation
+        if ( index == INPUT_INDEX )
+        {
+            if (_itemStacks[INPUT_INDEX] == null)
+            {
+                return FurnaceRecipes.instance().getSmeltingResult(_itemStacks[0]) != null;
+            }
+        }
+
+        if ( index == FUEL_INDEX )
+        {
+            if (_itemStacks[FUEL_INDEX].isItemEqual(stack) || TileEntityFurnace.isItemFuel(stack) )
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    public int getField(int id)
+    {
+        switch (id)
+        {
+            case FIELD_REMAINING_FUEL_BURN_TICKS:
+                return _remainingFuelBurnTicks;
+            case FIELD_ORIGINAL_FUEL_BURN_TICKS:
+                return _originalFuelBurnTicks;
+            case FIELD_ACCUMULATED_ITEM_SMELT_TICKS:
+                return _accumulatedItemSmeltTicks;
+            case FIELD_TOTAL_ITEM_SMELT_TICKS:
+//                LOGGER.debug("getField: _totalItemSmeltTicks: " + _totalItemSmeltTicks);
+                return _totalItemSmeltTicks;
+            default:
+                return 0;
+        }
+    }
+
+    @Override
+    public void setField(int id, int value)
+    {
+        switch (id)
+        {
+            case FIELD_REMAINING_FUEL_BURN_TICKS:
+                _remainingFuelBurnTicks = value;
+                break;
+            case FIELD_ORIGINAL_FUEL_BURN_TICKS:
+                _originalFuelBurnTicks = value;
+                break;
+            case FIELD_ACCUMULATED_ITEM_SMELT_TICKS:
+                _accumulatedItemSmeltTicks = value;
+                break;
+            case FIELD_TOTAL_ITEM_SMELT_TICKS:
+                _totalItemSmeltTicks = value;
+//                LOGGER.debug("setField: _totalItemSmeltTicks: " + _totalItemSmeltTicks);
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Override
+    public int getFieldCount()
+    {
+        return 4;
+    }
+
+    @Override
+    public void clear()
+    {
+        for (int i = 0; i < _itemStacks.length; ++i)
+        {
+            _itemStacks[i] = null;
+        }
+    }
+
+    //=============================================================================================
+    // #####  ###  ##### ####  ##### ####  ##### #   # #   # ##### #   # #####  ###  ####  #   #
+    //   #   #       #   #   # #     #   #   #   ##  # #   # #     ##  #   #   #   # #   #  # #
+    //   #    ###    #   #   # ####  #   #   #   # # #  # #  ####  # # #   #   #   # ####    #
+    //   #       #   #   #   # #     #   #   #   #  ##  # #  #     #  ##   #   #   # #   #   #
+    // #####  ###  ##### ####  ##### ####  ##### #   #   #   ##### #   #   #    ###  #   #   #
+
+    @Override
+    public int[] getSlotsForFace(EnumFacing side)
+    {
+        return side == EnumFacing.DOWN ? slotsBottom :
+                (side == EnumFacing.UP ? slotsTop : slotsSides);
+    }
+
+    @Override
+    public boolean canInsertItem(int index, ItemStack itemStackIn,
+            EnumFacing direction)
+    {
+        return isItemValidForSlot(index, itemStackIn);
+    }
+
+    @Override
+    public boolean canExtractItem(int parSlotIndex, ItemStack parStack,
+            EnumFacing parFacing)
+    {
+        return true;
+    }
+
+    //=============================================================================================
+    // ##### #   #  ###  ####  #     ####  #   #  ###  #   # #####  ###  ####  #     #####
+    //   #   #   # #   # #   # #     #   # ##  # #   # ## ## #     #   # #   # #     #
+    //   #   # # # #   # ####  #     #   # # # # ##### # # # ####  ##### ##### #     ####
+    //   #   ## ## #   # #   # #     #   # #  ## #   # #   # #     #   # #   # #     #
+    // ##### #   #  ###  #   # ##### ####  #   # #   # #   # ##### #   # ####  ##### #####
+
+    @Override
     public String getName()
     {
         return hasCustomName() ? _customName : "container.beaconFurnace";
@@ -183,6 +336,13 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
     {
         _customName = parCustomName;
     }
+
+    //=============================================================================================
+    // ##### ##### #     ##### ##### #   # ##### ##### ##### #   # #      ###   #### #   #  ###  ####  #     #####
+    //   #     #   #     #     #     ##  #   #     #     #    # #  #     #   # #     #  #  #   # #   # #     #
+    //   #     #   #     ####  ####  # # #   #     #     #     #   #     #   # #     ###   ##### ##### #     ####
+    //   #     #   #     #     #     #  ##   #     #     #     #   #     #   # #     #  #  #   # #   # #     #
+    //   #   ##### ##### ##### ##### #   #   #   #####   #     #   #####  ###   #### #   # #   # ####  ##### #####
 
     @Override
     public void readFromNBT(NBTTagCompound compound)
@@ -242,24 +402,19 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
         }
     }
 
-    @Override
-    public int getInventoryStackLimit()
-    {
-        return 64;
-    }
-
-    public boolean isBurning()
-    {
-        return _remainingFuelBurnTicks > 0;
-    }
-
-
     // this function indicates whether container texture should be drawn
     @SideOnly(Side.CLIENT)
     public static boolean isBurning(IInventory inventory)
     {
         return inventory.getField(0) > 0;
     }
+
+    //=============================================================================================
+    // ##### #   # ####  ####   ###  ##### ##### ####  #      ###  #   # ##### ####  #     #####  ###  ##### ####   ###  #   #
+    //   #   #   # #   # #   # #   #   #   #     #   # #     #   #  # #  #     #   # #       #   #       #   #   # #   #  # #
+    //   #   #   # ####  #   # #####   #   ####  ####  #     #####   #   ####  ####  #       #    ###    #   ##### #   #   #
+    //   #   #   # #     #   # #   #   #   #     #     #     #   #   #   #     #   # #       #       #   #   #   # #   #  # #
+    // #####  ###  #     ####  #   #   #   ##### #     ##### #   #   #   ##### #   # ##### #####  ###    #   ####   ###  #   #
 
     @Override
     public void update()
@@ -340,6 +495,14 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
         {
             markDirty();
         }
+    }
+
+
+    //=============================================================================================
+
+    public boolean isBurning()
+    {
+        return _remainingFuelBurnTicks > 0;
     }
 
     public int timeToBurnOneItem(ItemStack itemStack)
@@ -424,59 +587,17 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
     }
 
 
-    @Override
-    public boolean isUseableByPlayer(EntityPlayer playerIn)
-    {
-        return worldObj.getTileEntity(pos) != this ? false :
-                playerIn.getDistanceSq(pos.getX()+0.5D, pos.getY()+0.5D,
-                        pos.getZ()+0.5D) <= 64.0D;
-    }
-
-    @Override
-    public void openInventory(EntityPlayer playerIn) {}
-
-    @Override
-    public void closeInventory(EntityPlayer playerIn) {}
-
-    @Override
-    public boolean isItemValidForSlot(int index, ItemStack stack)
-    {
-        if ( index == INPUT_INDEX)
-        {
-            if (_itemStacks[INPUT_INDEX] == null)
-            {
-                return FurnaceRecipes.instance().getSmeltingResult(_itemStacks[0]) != null;
-            }
-            if (_itemStacks[FUEL_INDEX].isItemEqual(stack))
-            {
-                return true;
-            }
-        }
 
 
-        return index == slotEnum.INPUT_SLOT.ordinal() ? true : false;
-    }
 
-    @Override
-    public int[] getSlotsForFace(EnumFacing side)
-    {
-        return side == EnumFacing.DOWN ? slotsBottom :
-                (side == EnumFacing.UP ? slotsTop : slotsSides);
-    }
 
-    @Override
-    public boolean canInsertItem(int index, ItemStack itemStackIn,
-                                 EnumFacing direction)
-    {
-        return isItemValidForSlot(index, itemStackIn);
-    }
 
-    @Override
-    public boolean canExtractItem(int parSlotIndex, ItemStack parStack,
-                                  EnumFacing parFacing)
-    {
-        return true;
-    }
+
+
+
+
+
+
 
     @Override
     public String getGuiID()
@@ -494,62 +615,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
         return new ContainerBeaconFurnace(playerInventory, this);
     }
 
-    @Override
-    public int getField(int id)
-    {
-        switch (id)
-        {
-            case FIELD_REMAINING_FUEL_BURN_TICKS:
-                return _remainingFuelBurnTicks;
-            case FIELD_ORIGINAL_FUEL_BURN_TICKS:
-                return _originalFuelBurnTicks;
-            case FIELD_ACCUMULATED_ITEM_SMELT_TICKS:
-                return _accumulatedItemSmeltTicks;
-            case FIELD_TOTAL_ITEM_SMELT_TICKS:
-//                LOGGER.debug("getField: _totalItemSmeltTicks: " + _totalItemSmeltTicks);
-                return _totalItemSmeltTicks;
-            default:
-                return 0;
-        }
-    }
 
-    @Override
-    public void setField(int id, int value)
-    {
-        switch (id)
-        {
-            case FIELD_REMAINING_FUEL_BURN_TICKS:
-                _remainingFuelBurnTicks = value;
-                break;
-            case FIELD_ORIGINAL_FUEL_BURN_TICKS:
-                _originalFuelBurnTicks = value;
-                break;
-            case FIELD_ACCUMULATED_ITEM_SMELT_TICKS:
-                _accumulatedItemSmeltTicks = value;
-                break;
-            case FIELD_TOTAL_ITEM_SMELT_TICKS:
-                _totalItemSmeltTicks = value;
-//                LOGGER.debug("setField: _totalItemSmeltTicks: " + _totalItemSmeltTicks);
-                break;
-            default:
-                break;
-        }
-    }
-
-    @Override
-    public int getFieldCount()
-    {
-        return 4;
-    }
-
-    @Override
-    public void clear()
-    {
-        for (int i = 0; i < _itemStacks.length; ++i)
-        {
-            _itemStacks[i] = null;
-        }
-    }
 
     @Override
     public String toString()
@@ -574,8 +640,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
     {
         if (_itemStacks[INPUT_INDEX] == null)
         {
-            // We don't know what to ask for.
-            return 0;
+            return 100;
         }
 
         // We have a priority based on space
@@ -589,13 +654,25 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
         return (space * 100)/maxSize;
     }
 
-    private ItemStack getSmeltableItemSample()
+    private ItemStackMatcher getSmeltableItemMatcher()
     {
+        ItemStackMatcher matcher = new ItemStackMatcher();
+
         if (_itemStacks[0] != null)
+            matcher.add(_itemStacks[0]);
+
+        for ( int i = SMELTABLE_SAMPLE_MIN; i <= SMELTABLE_SAMPLE_MAX; ++i)
         {
-            return new ItemStack(_itemStacks[0].getItem(), 1, _itemStacks[0].getMetadata());
+            if ( _itemStacks[i] != null)
+            {
+                matcher.add(_itemStacks[i]);
+            }
         }
-        return null;
+
+        if (matcher.size() == 0)
+            return null;
+
+        return matcher;
     }
 
     /**
@@ -603,6 +680,9 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
      */
     private int getSmeltableQuantityWanted()
     {
+        if (_itemStacks[INPUT_INDEX] == null)
+            return 64;
+
         // We'll take all the free space.
         return _itemStacks[INPUT_INDEX].getMaxStackSize() - _itemStacks[INPUT_INDEX].stackSize;
     }
@@ -683,14 +763,18 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
                 if ( priority > 0 )
                 {
                     // Find smeltable
-                    LOGGER.debug("Furnace can use more smeltable: " + getSmeltableItemSample().getUnlocalizedName());
+                    ItemStackMatcher matcher = getSmeltableItemMatcher();
+                    if (matcher != null)
+                    {
+                        LOGGER.debug("Furnace can use more smeltable: " + getSmeltableItemMatcher());
 
-                    // Send a message back to this guy telling him that we could use more
-                    MessageDeliverRequest req = new MessageDeliverRequest(TileEntityBeaconFurnace.this,
-                            availability.getSender(), msg.getCause(), priority, getSmeltableItemSample(),
-                            getSmeltableQuantityWanted(), INPUT_INDEX);
+                        // Send a message back to this guy telling him that we could use more
+                        MessageDeliverRequest req = new MessageDeliverRequest(TileEntityBeaconFurnace.this,
+                                availability.getSender(), msg.getCause(), priority, getSmeltableItemMatcher(),
+                                getSmeltableQuantityWanted(), INPUT_INDEX);
 
-                    Broadcaster.postMessage(req);
+                        Broadcaster.postMessage(req);
+                    }
                 }
             }
         }

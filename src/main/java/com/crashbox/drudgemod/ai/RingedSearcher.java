@@ -1,7 +1,7 @@
 package com.crashbox.drudgemod.ai;
 
 import com.crashbox.drudgemod.DrudgeUtils;
-import net.minecraft.item.ItemStack;
+import com.crashbox.drudgemod.common.ItemStackMatcher;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 
@@ -13,12 +13,12 @@ import java.util.*;
 public class RingedSearcher  implements Iterable<BlockPos>
 {
     // UNDERSTANDS LOG METADATA
-    public static Queue<BlockPos> findTree(World world, BlockPos center, int radius, int height, ItemStack sample)
+    public static Queue<BlockPos> findTree(World world, BlockPos center, int radius, int height, ItemStackMatcher matcher)
     {
         RingedSearcher searcher = new RingedSearcher(center, radius, height);
         for (BlockPos pos : searcher)
         {
-            if (DrudgeUtils.willDrop(world, pos, sample))
+            if (DrudgeUtils.willDrop(world, pos, matcher))
             {
                 Queue<BlockPos> result = new LinkedList<BlockPos>();
 
@@ -27,7 +27,7 @@ public class RingedSearcher  implements Iterable<BlockPos>
                 for (int y = pos.getY(); y >= center.getY(); --y)
                 {
                     BlockPos tmp = new BlockPos(pos.getX(), y, pos.getZ());
-                    if (DrudgeUtils.willDrop(world, tmp, sample))
+                    if (DrudgeUtils.willDrop(world, tmp, matcher))
                     {
                         result.add(tmp);
                     }
@@ -39,17 +39,17 @@ public class RingedSearcher  implements Iterable<BlockPos>
         return null;
     }
 
-    public static boolean detectBlock(World world, BlockPos center, int radius, int height, ItemStack sample)
+    public static boolean detectBlock(World world, BlockPos center, int radius, int height, ItemStackMatcher matcher)
     {
-        return (findBlock(world, center, radius, height, sample) != null);
+        return (findBlock(world, center, radius, height, matcher) != null);
     }
 
-    public static BlockPos findBlock(World world, BlockPos center, int radius, int height, ItemStack sample)
+    public static BlockPos findBlock(World world, BlockPos center, int radius, int height, ItemStackMatcher matcher)
     {
         RingedSearcher searcher = new RingedSearcher(center, radius, height);
         for (BlockPos pos : searcher)
         {
-            if (DrudgeUtils.willDrop(world, pos, sample))
+            if (DrudgeUtils.willDrop(world, pos, matcher))
             {
                 return pos;
             }
@@ -57,7 +57,6 @@ public class RingedSearcher  implements Iterable<BlockPos>
 
         return null;
     }
-
 
     public RingedSearcher(BlockPos center, int radius, int height)
     {
