@@ -99,7 +99,8 @@ public class TaskHarvest extends TaskBase
 
         // Navigate to another block
         // TODO:  What if we can't navigate there?
-        startNavigation();
+        if (!startNavigation())
+            setState(State.FAILED);
     }
 
     @Override
