@@ -163,11 +163,17 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
     @Override
     public void setInventorySlotContents(int index, ItemStack stack)
     {
-        boolean isSameItemStackAlreadyInSlot = stack != null
-                && stack.isItemEqual(_itemStacks[index])
-                && ItemStack.areItemStackTagsEqual(stack,
-                _itemStacks[index]);
+        boolean isSameItemStackAlreadyInSlot =
+                stack != null &&
+                stack.isItemEqual(_itemStacks[index]) &&
+                ItemStack.areItemStackTagsEqual(stack, _itemStacks[index]);
         _itemStacks[index] = stack;
+
+        if (_itemStacks[index] != null)
+        {
+            if (_itemStacks[index].stackSize == 0)
+                _itemStacks[index] = null;
+        }
 
         if (stack != null && stack.stackSize > getInventoryStackLimit())
         {
@@ -580,24 +586,10 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
 
     }
 
-
     private int getItemBurnTime(ItemStack itemStack)
     {
         return TileEntityFurnace.getItemBurnTime(itemStack);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     @Override
     public String getGuiID()
@@ -656,11 +648,13 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
 
     private ItemStackMatcher getSmeltableItemMatcher()
     {
-        ItemStackMatcher matcher = new ItemStackMatcher();
-
         if (_itemStacks[0] != null)
-            matcher.add(_itemStacks[0]);
+        {
+            return new ItemStackMatcher(_itemStacks[0]);
+        }
 
+        // If we aren't consuming anything, then bring any of the samples
+        ItemStackMatcher matcher = new ItemStackMatcher();
         for ( int i = SMELTABLE_SAMPLE_MIN; i <= SMELTABLE_SAMPLE_MAX; ++i)
         {
             if ( _itemStacks[i] != null)
