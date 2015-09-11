@@ -17,6 +17,8 @@ import java.util.concurrent.LinkedTransferQueue;
  */
 public class EntityAIDrudge extends EntityAIBase implements IMessager
 {
+    public static TaskFactory TASK_FACTORY = new TaskFactory();
+
     public EntityAIDrudge(EntityDrudge entity)
     {
         this._entity = entity;
@@ -124,9 +126,9 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
             if (msg instanceof MessageTaskRequest && _currentTask == null)
             {
                 if (msg.getTransactionID() == MessageWorkerAvailability.class)
-                    _proposedTasks.add(_taskFactory.makeTaskFromMessage(this, (MessageTaskRequest) msg));
+                    _proposedTasks.add(TASK_FACTORY.makeTaskFromMessage(this, (MessageTaskRequest) msg));
                 else
-                    _responseTasks.add((MessageTaskRequest)msg);
+                    _responseTasks.add((MessageTaskRequest) msg);
             }
             else if (msg.getTransactionID() != null)
             {
@@ -151,7 +153,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         // Once in a while we want to tell people we need more
         if (System.currentTimeMillis() > _nextElicit )
         {
-            LOGGER.debug(id() + " Idle timeout over.");
+            //LOGGER.debug(id() + " Idle timeout over.");
             _nextElicit = System.currentTimeMillis() + CHECK_DELAY_MILLIS;
             _requestEndMS = System.currentTimeMillis() + REQUEST_TIMEOUT_MS;
             Broadcaster.postMessage(new MessageWorkerAvailability(_entity.worldObj, this));
@@ -200,57 +202,9 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
     {
         for (int x = 0; x < _proposedTasks.size(); ++x)
         {
-            List<MessageTaskRequest> taskResponses = getAllForTask(responses, _proposedTasks.get(x));
-            if (taskResponses.size() > 0)
-            {
-                MessageTaskRequest opt = findBestResponseOption(_proposedTasks.get(x), taskResponses);
-                TaskBase newTask = _taskFactory.makeTaskFromMessage(this, (MessageTaskRequest) opt);
-                newTask.setNextTask(_proposedTasks.get(x));
-                _proposedTasks.set(x, newTask);
-            }
-
-            if (responses.size() == 0)
-                return;
+            _proposedTasks.set(x, _proposedTasks.get(x).linkResponses(responses));
         }
-
-//        for (MessageTaskRequest response : responses)
-//        {
-//            LOGGER.debug(id() + " Unhandled response: " + response + " us: " + this);
-//        }
-    }
-
-    private List<MessageTaskRequest> getAllForTask(List<MessageTaskRequest> responses, TaskBase task)
-    {
-        List<MessageTaskRequest> result = new ArrayList<MessageTaskRequest>();
-
-        Iterator<MessageTaskRequest> iterator = responses.iterator();
-        while (iterator.hasNext())
-        {
-            MessageTaskRequest msg =  iterator.next();
-            if (msg.getTransactionID() == task)
-            {
-                iterator.remove();
-                result.add(msg);
-            }
-        }
-
-        return result;
-    }
-
-    private MessageTaskRequest findBestResponseOption(TaskBase task, List<MessageTaskRequest> messages)
-    {
-        int bestValue = Integer.MIN_VALUE;
-        MessageTaskRequest bestTask = null;
-
-        for (MessageTaskRequest request : messages)
-        {
-            int value = request.getPriority() - computeDistanceCost(request.getSender().getPos(), task);
-            if (value > bestValue)
-                bestTask = request;
-        }
-
-        // For now just find the first
-        return bestTask;
+        responses.clear();
     }
 
     private void resolveAllTasks()
@@ -275,12 +229,18 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         int bestValue = Integer.MIN_VALUE;
         TaskBase bestTask = null;
 
+        if (_proposedTasks == null)
+            return null;
+
+
+        String str = getEntity().getCustomNameTag() + ": ";
         for (TaskBase task : _proposedTasks)
         {
             // If unresolved (has pre-reqs) then skip it
             if (task.getResolving() == TaskBase.Resolving.RESOLVED)
             {
                 int value = getTaskValue(task);
+                str = str + value + ", ";
                 if (value > bestValue)
                 {
                     bestValue = value;
@@ -289,14 +249,16 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
             }
         }
 
-        // Tell everyone we are accepting work
+        LOGGER.debug("Task values: " + str);
+
+        // Now that we have accepted tell everyone how long to wait...
         TaskBase task = bestTask;
         int delay = 2000;
         BlockPos startPos = getPos();
         while (task != null)
         {
             // Five hundred millis for each block we need to walk. TODO:  Rework in entity speed.
-            delay += ( computeDistanceCost(startPos, task) * 500);
+            delay += ( Priority.computeDistanceCost(startPos, task.getRequester().getPos()) * 500);
             startPos = task.getRequester().getPos();
             Message msg = new MessageWorkAccepted(this, task.getRequester(), null, 0, delay);
             Broadcaster.postMessage(msg);
@@ -315,24 +277,17 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         // added in its inherent cost.
         BlockPos startPos = getEntity().getPosition();
         int value = task.getValue();
-        value -= computeDistanceCost(startPos, task);
+        value -= Priority.computeDistanceCost(startPos, task.getRequester().getPos());
         while (task.getNextTask() != null)
         {
             startPos = task.getRequester().getPos();
             task = task.getNextTask();
             value += task.getValue();
-            value -= computeDistanceCost(startPos, task);
+            value -= Priority.computeDistanceCost(startPos, task.getRequester().getPos());
         }
 
         return value;
     }
-
-    private int computeDistanceCost(BlockPos startPos, TaskBase task)
-    {
-        return ( (int) Math.sqrt(startPos.distanceSq(task.getRequester().getPos())) ) / 10;
-    }
-
-
 
     //=============================================================================================
     // TRANSITIONING
@@ -347,7 +302,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
             requestWorkAreas();
             return State.TARGETING;
         }
-        else if (!getEntity().getNavigator().noPath())
+        else if (getEntity().getNavigator().noPath())
         {
             LOGGER.debug(id() + " Couldn't get a path during transition, idling");
             // If we have no path, then we are done.
@@ -572,7 +527,6 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
     // For Targeting
     private BlockPos _workArea = null;
 
-    private TaskFactory _taskFactory = new TaskFactory();
 
     // Queue of messages
     private final Queue<Message> _messages = new LinkedTransferQueue<Message>();

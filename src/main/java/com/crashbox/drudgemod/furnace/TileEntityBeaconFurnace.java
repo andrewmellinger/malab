@@ -1,5 +1,6 @@
 package com.crashbox.drudgemod.furnace;
 
+import com.crashbox.drudgemod.ai.AIUtils;
 import com.crashbox.drudgemod.common.ItemStackMatcher;
 import com.crashbox.drudgemod.messaging.*;
 import com.crashbox.drudgemod.beacon.BeaconBase;
@@ -632,7 +633,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
     {
         if (_itemStacks[INPUT_INDEX] == null)
         {
-            return 100;
+            return 50;
         }
 
         // We have a priority based on space
@@ -643,7 +644,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
         if (size > (_maxRequestThreshold * maxSize))
             return 0;
 
-        return (space * 100)/maxSize;
+        return (space * 50)/maxSize;
     }
 
     private ItemStackMatcher getSmeltableItemMatcher()
@@ -710,6 +711,8 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
     }
 
 
+
+
     //---------------------------------------------------------------------------------------------
 
     @Override
@@ -749,12 +752,10 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
             if (msg instanceof MessageWorkerAvailability && timeForAvailabilityResponse())
             {
                 // LOGGER.debug("Furnace " + this + " is asked for work." + msg);
-
                 MessageWorkerAvailability availability = (MessageWorkerAvailability)msg;
-
                 int priority = smeltableNeedPriority();
 
-                if ( priority > 0 )
+                if ( priority > 0)
                 {
                     // Find smeltable
                     ItemStackMatcher matcher = getSmeltableItemMatcher();
@@ -770,6 +771,19 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
                         Broadcaster.postMessage(req);
                     }
                 }
+            }
+            else if (msg instanceof MessageStorageRequest)
+            {
+                MessageStorageRequest request = (MessageStorageRequest)msg;
+                if (_itemStacks[INPUT_INDEX] != null && _itemStacks[INPUT_INDEX].isItemEqual(request.getStack()))
+                {
+                    // Send a message back to this guy telling him that we could use more
+                    MessageDeliverRequest req = new MessageDeliverRequest(TileEntityBeaconFurnace.this,
+                            request.getSender(), msg.getTransactionID(), 0, new ItemStackMatcher(_itemStacks[INPUT_INDEX]),
+                            getSmeltableQuantityWanted(), INPUT_INDEX);
+                }
+
+                // TODO: We can take fuel too
             }
         }
     }

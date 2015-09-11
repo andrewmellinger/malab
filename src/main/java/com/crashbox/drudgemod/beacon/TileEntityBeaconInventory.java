@@ -20,6 +20,7 @@ public abstract class TileEntityBeaconInventory extends TileEntityLockable imple
         if (current == null)
         {
             setInventorySlotContents(slot, stack);
+            stack = null;
         }
         else if (current.isItemEqual(stack))
         {

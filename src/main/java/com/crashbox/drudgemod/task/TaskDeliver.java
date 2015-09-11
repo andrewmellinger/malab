@@ -3,10 +3,8 @@ package com.crashbox.drudgemod.task;
 import com.crashbox.drudgemod.ai.EntityAIDrudge;
 import com.crashbox.drudgemod.beacon.TileEntityBeaconInventory;
 import com.crashbox.drudgemod.common.ItemStackMatcher;
-import com.crashbox.drudgemod.messaging.IMessager;
-import com.crashbox.drudgemod.messaging.Message;
-import com.crashbox.drudgemod.messaging.MessageDeliverRequest;
-import com.crashbox.drudgemod.messaging.MessageItemRequest;
+import com.crashbox.drudgemod.messaging.*;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import org.apache.logging.log4j.LogManager;
@@ -86,11 +84,37 @@ public class TaskDeliver extends TaskBase
             setResolving(Resolving.RESOLVED);
             return null;
         }
+        else if (getEntity().getHeldItem() != null)
+        {
+            // If we have something else dump it.
+            // TODO:  Find a chest to put it in
+            ItemStack held = getEntity().getHeldItem();
+            getEntity().setCurrentItemOrArmor(0, null);
+            BlockPos pos = getPerformer().getPos();
+                    getEntity().getEntityWorld().spawnEntityInWorld(
+                            new EntityItem(getEntity().getEntityWorld(), pos.getX(), pos.getY(), pos.getZ(), held));
+        }
 
         // Return a message showing what we need.
         setResolving(Resolving.RESOLVING);
         return new MessageItemRequest(getPerformer(), null, this, _matcher, _quantity);
     }
+
+    @Override
+    public TaskBase linkResponses(List<MessageTaskRequest> responses)
+    {
+        List<MessageTaskRequest> taskResponses = getAllForTask(responses, this);
+        if (taskResponses.size() > 0)
+        {
+            MessageTaskRequest opt = findBestResponseOption(this, taskResponses);
+            TaskBase newTask = EntityAIDrudge.TASK_FACTORY.makeTaskFromMessage(getPerformer(), opt);
+            newTask.setNextTask(this);
+            return newTask;
+        }
+
+        return this;
+    }
+
 
     @Override
     public int getValue()

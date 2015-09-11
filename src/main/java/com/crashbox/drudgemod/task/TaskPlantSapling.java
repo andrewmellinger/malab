@@ -5,6 +5,8 @@ import com.crashbox.drudgemod.ai.AIUtils;
 import com.crashbox.drudgemod.ai.EntityAIDrudge;
 import com.crashbox.drudgemod.messaging.Message;
 import com.crashbox.drudgemod.messaging.MessagePlantSaplings;
+import com.crashbox.drudgemod.messaging.MessageStorageRequest;
+import com.crashbox.drudgemod.messaging.MessageTaskRequest;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Blocks;
@@ -70,9 +72,29 @@ public class TaskPlantSapling extends TaskBase
     @Override
     public Message resolve()
     {
-        // TODO:  If we have something in inventory find some place to put it
-        // return new MessageStorageRequest()
+        ItemStack held = getEntity().getHeldItem();
+        if (held != null)
+        {
+            return new MessageStorageRequest(getPerformer(), null, this, 0, held);
+        }
+
         return null;
+    }
+
+    @Override
+    public TaskBase linkResponses(List<MessageTaskRequest> responses)
+    {
+        // TODO:  COPY-PASTE from TaskDeliver, refactor
+        List<MessageTaskRequest> taskResponses = getAllForTask(responses, this);
+        if (taskResponses.size() > 0)
+        {
+            MessageTaskRequest opt = findBestResponseOption(this, taskResponses);
+            TaskBase newTask = EntityAIDrudge.TASK_FACTORY.makeTaskFromMessage(getPerformer(), opt);
+            newTask.setNextTask(this);
+            return newTask;
+        }
+
+        return this;
     }
 
     @Override

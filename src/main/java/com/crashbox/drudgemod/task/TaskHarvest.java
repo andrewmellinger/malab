@@ -7,6 +7,7 @@ import com.crashbox.drudgemod.ai.RingedSearcher;
 import com.crashbox.drudgemod.common.ItemStackMatcher;
 import com.crashbox.drudgemod.messaging.Message;
 import com.crashbox.drudgemod.messaging.MessageHarvestRequest;
+import com.crashbox.drudgemod.messaging.MessageTaskRequest;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
@@ -77,8 +78,8 @@ public class TaskHarvest extends TaskBase
             else
             {
                 // If we didn't get close enough, try finding again
+                debugLog(LOGGER, "NOT close enough, not breaking at: " + _targetBlock + " pos: " + getPerformer().getPos());
                 _targetBlock = null;
-                debugLog(LOGGER, "NOT Breaking at at: " + _targetBlock);
             }
         }
 
@@ -109,6 +110,12 @@ public class TaskHarvest extends TaskBase
         // TODO:  If we have something in inventory, find some place to deposit it.
         // return new MessageStorageRequest()
         return null;
+    }
+
+    @Override
+    public TaskBase linkResponses(List<MessageTaskRequest> responses)
+    {
+        return this;
     }
 
     @Override

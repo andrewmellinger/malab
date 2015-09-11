@@ -1,5 +1,6 @@
 package com.crashbox.drudgemod.ai;
 
+import com.crashbox.drudgemod.EntityDrudge;
 import com.crashbox.drudgemod.task.TaskBase;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -109,6 +110,25 @@ public class AIUtils
 
         return targetStack;
     }
+
+    /**
+     * Counts the number of Drudge entities in the specific area.
+     * @param world The world object
+     * @param center The center of the search area.
+     * @param range The range in which to search.
+     * @return Number of EntityDrudge found.
+     */
+    public static int countDrudgesInArea(World world, BlockPos center, int range)
+    {
+        int x = center.getX();
+        int y = center.getY();
+        int z = center.getZ();
+
+        AxisAlignedBB scanBlock = new AxisAlignedBB(x - range, y - 4, z - range, x + range, y + 20, z + range);
+        List entities = world.getEntitiesWithinAABB(EntityDrudge.class, scanBlock);
+        return entities.size();
+    }
+
 
     /**
      * Searches the area for items of the base item type ignoring metadata.  The first item found sets

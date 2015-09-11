@@ -3,13 +3,17 @@ package com.crashbox.drudgemod.task;
 import com.crashbox.drudgemod.DrudgeUtils;
 import com.crashbox.drudgemod.EntityDrudge;
 import com.crashbox.drudgemod.ai.EntityAIDrudge;
+import com.crashbox.drudgemod.ai.Priority;
 import com.crashbox.drudgemod.messaging.IMessager;
 import com.crashbox.drudgemod.messaging.Message;
+import com.crashbox.drudgemod.messaging.MessageTaskRequest;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -73,6 +77,10 @@ public abstract class TaskBase
     // Make sure it fixes pre-requisites
     public abstract Message resolve();
 
+    // Used to linkup responses to messages
+    public abstract TaskBase linkResponses(List<MessageTaskRequest> responses);
+
+
     // The value.  The higher the number the better.
     public abstract int getValue();
 
@@ -118,8 +126,6 @@ public abstract class TaskBase
         _state = state;
     }
 
-
-
     public World getWorld()
     {
         return _performer.getEntity().getEntityWorld();
@@ -163,6 +169,41 @@ public abstract class TaskBase
     }
 
 
+    // Utility Methods
+
+    public static List<MessageTaskRequest> getAllForTask(List<MessageTaskRequest> responses, TaskBase task)
+    {
+        List<MessageTaskRequest> result = new ArrayList<MessageTaskRequest>();
+
+        Iterator<MessageTaskRequest> iterator = responses.iterator();
+        while (iterator.hasNext())
+        {
+            MessageTaskRequest msg =  iterator.next();
+            if (msg.getTransactionID() == task)
+            {
+                iterator.remove();
+                result.add(msg);
+            }
+        }
+
+        return result;
+    }
+
+    public static MessageTaskRequest findBestResponseOption(TaskBase task, List<MessageTaskRequest> messages)
+    {
+        int bestValue = Integer.MIN_VALUE;
+        MessageTaskRequest bestTask = null;
+
+        for (MessageTaskRequest request : messages)
+        {
+            int value = request.getPriority() - Priority.computeDistanceCost(request.getSender().getPos(),
+                    task.getRequester().getPos());
+            if (value > bestValue)
+                bestTask = request;
+        }
+
+        return bestTask;
+    }
 
     public State _state = State.INPROGRESS;
 

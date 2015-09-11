@@ -56,6 +56,12 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
         return _searchRadius;
     }
 
+    public int getMaxDrudgeCount()
+    {
+        // TODO:  Scale based on area.
+        return 2;
+    }
+
     private class Forester extends BeaconBase
     {
         private Forester(World world)
@@ -82,7 +88,10 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
                 // Look around and see if we have any of these.
                 boolean hasMats = RingedSearcher.detectBlock(getWorld(), getPos(), _searchRadius, _searchHeight,
                         itemReq.getMatcher());
-                if (hasMats)
+                int drudgeCount = AIUtils.countDrudgesInArea(getWorld(), getPos(), getRadius());
+
+                // We only want to respond if we have materials and we aren't already being heavily worked
+                if (hasMats && drudgeCount < getMaxDrudgeCount())
                 {
                     // Offer a task, at our area for the requested thing.
                     MessageHarvestRequest req = new MessageHarvestRequest(TileEntityBeaconForester.this, itemReq.getSender(),
