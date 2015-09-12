@@ -3,6 +3,8 @@ package com.crashbox.drudgemod.ai;
 import com.crashbox.drudgemod.task.TaskBase;
 import com.crashbox.drudgemod.task.TaskPair;
 import net.minecraft.util.BlockPos;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 
@@ -47,16 +49,24 @@ public class Priority
     {
         int value = 0;
 
+        // Output is pos -> pos (cost) -> pos (cost) -> pos (cost) -> (total)
+
+        String str = pos.toString() + " -> ";
+
         for (TaskBase task : pair.asList())
         {
             if (task != null)
             {
-                value -= Priority.computeDistanceCost(pos, task.getCoarsePos(), speed);
-                value += task.getValue();
+                int cost = Priority.computeDistanceCost(pos, task.getCoarsePos(), speed);
+                int val = task.getValue();
+                value = value - cost + val;
                 pos = task.getCoarsePos();
+                str += pos.toString() + "(" + cost + "," + val + ") -> ";
             }
         }
 
+        str += " total:" + value;
+        LOGGER.debug(str);
         return value;
     }
 
@@ -69,4 +79,6 @@ public class Priority
     {
         return ( (int) Math.sqrt(startPos.distanceSq(endPos)) ) / 10;
     }
+
+    private static final Logger LOGGER = LogManager.getLogger();
 }

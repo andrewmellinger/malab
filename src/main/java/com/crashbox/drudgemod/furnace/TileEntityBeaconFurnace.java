@@ -709,9 +709,6 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
         return 0;
     }
 
-
-
-
     //---------------------------------------------------------------------------------------------
 
     @Override
@@ -760,13 +757,12 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
                     ItemStackMatcher matcher = getSmeltableItemMatcher();
                     if (matcher != null)
                     {
-                        LOGGER.debug("Furnace can use more smeltable: " + getSmeltableItemMatcher());
-
                         // Send a message back to this guy telling him that we could use more
                         MessageStoreRequest req = new MessageStoreRequest(TileEntityBeaconFurnace.this,
                                 availability.getSender(), msg.getTransactionID(), priority, getSmeltableItemMatcher(),
                                 getSmeltableQuantityWanted(), INPUT_INDEX);
 
+                        LOGGER.debug("Furnace posting: " + req);
                         Broadcaster.postMessage(req);
                     }
                 }

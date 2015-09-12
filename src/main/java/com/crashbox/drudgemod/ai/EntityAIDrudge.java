@@ -129,9 +129,15 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
             if (msg instanceof MessageTaskRequest && _currentPair == null)
             {
                 if (msg.getTransactionID() == MessageWorkerAvailability.class)
-                    _proposedTasks.add(makeNewTaskPair((MessageTaskRequest)msg));
+                {
+                    debugLog("Adding new task for message: " + msg);
+                    _proposedTasks.add(makeNewTaskPair((MessageTaskRequest) msg));
+                }
                 else
+                {
+                    debugLog("Adding response task: " + msg);
                     _responseTasks.add((MessageTaskRequest) msg);
+                }
             }
             else if (msg.getTransactionID() != null)
             {
@@ -190,7 +196,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         // Once in a while we want to tell people we need more
         if (System.currentTimeMillis() > _nextElicit )
         {
-            //LOGGER.debug(id() + " Idle timeout over.");
+            debugLog("Idle timeout over.");
             _nextElicit = System.currentTimeMillis() + ELICIT_DELAY_MS;
             _requestEndMS = System.currentTimeMillis() + REQUEST_TIMEOUT_MS;
             Broadcaster.postMessage(new MessageWorkerAvailability(_entity.worldObj, this));
@@ -222,13 +228,19 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         // When we hit the timeout we are done.
         if (System.currentTimeMillis() > _requestEndMS)
         {
+            debugLog("Selecting from (" + _proposedTasks.size() + ") tasks.");
             _currentPair = Priority.selectBestTaskPair(getEntity().getPosition(), _proposedTasks, getEntity().getSpeed());
             _proposedTasks.clear();
 
             if (_currentPair != null)
+            {
+                _currentPair.start();
                 sendAcceptedMessages(_currentPair);
+            }
             else
+            {
                 return State.IDLING;
+            }
 
             LOGGER.debug(id() +  "Selected task: " + _currentPair);
             tryMoveTo(_currentPair.getWorkCenter());
@@ -244,7 +256,10 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         for (TaskPair pair : _proposedTasks)
         {
             if (pair.getResolving() != Resolving.RESOLVING)
+            {
+                debugLog("linkupResponses: skipping pair, not resolving." + pair);
                 continue;
+            }
 
             if (linkupResponses(pair, responses))
             {
@@ -269,6 +284,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
 
     private boolean linkupDeliverResponses(TaskPair pair, List<MessageTaskRequest> responses)
     {
+
         BlockPos pos = getPos();
         boolean forEmpty = false;
 
@@ -305,14 +321,17 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
 
     private boolean linkupAcquireResponses(TaskPair pair, List<MessageTaskRequest> responses)
     {
+        debugLog("Linking up acquire responses.");
         BlockPos pos = getPos();
         if (pair.getEmptyInventory() != null)
             pos = pair.getEmptyInventory().getCoarsePos();
 
         List<MessageAcquireRequest> acquires = extractMessages(responses, MessageAcquireRequest.class);
+        debugLog("Have (" + acquires.size() + ") acquires ");
         if (acquires.size() > 0)
         {
             MessageAcquireRequest best = findBest(pos, acquires);
+            debugLog("Best acquire: " + best);
             if (DrudgeUtils.isNotNull(best, LOGGER))
             {
                 pair.setAcquireTask(TASK_FACTORY.makeTaskFromMessage(this, best));
@@ -364,13 +383,18 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         {
             if (pair.getResolving() == Resolving.UNRESOLVED)
             {
-                //LOGGER.debug(id() + " Resolving: " + pair);
                 // Get a new message send it out
                 Message msg = resolveTaskPair(pair);
+                debugLog("Resolving : " + pair);
                 if (msg != null)
                 {
+                    debugLog("   == With message: " + msg);
                     pair.setResolving(Resolving.RESOLVING);
                     Broadcaster.postMessage(msg);
+                }
+                else
+                {
+                    pair.setResolving(Resolving.RESOLVED);
                 }
             }
         }
@@ -445,7 +469,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         // If within 20, then issue location request and to start targeting
         if (posInAreaXY(getPos(), _currentPair.getWorkCenter(), 20))
         {
-            LOGGER.debug(id() + " Within distance, switching to performing.");
+            LOGGER.debug(id() + " Within distance, switching to targeting.");
             requestWorkAreas();
             return State.TARGETING;
         }
@@ -553,7 +577,9 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         // Keep doing the task until we run out.
         if (_currentPair != null)
         {
+            debugLog(" Update task on pair." + _currentPair);
             _currentPair.updateTask();
+            debugLog(" Updated: " + _currentPair);
 
             if (_currentPair.retarget())
             {
@@ -610,7 +636,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
 
     public String id()
     {
-        return getEntity().getCustomNameTag();
+        return getEntity().getCustomNameTag() + ":" + _state.name();
     }
 
     public void errorLog(String message)
@@ -686,7 +712,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
 
 
     // We don't want to ask for work too often.  If we don't get a response, just hang out.
-    private static final int ELICIT_DELAY_MS = 3000;
+    private static final int ELICIT_DELAY_MS = 6000;
     private long _nextElicit = 0;
 
 

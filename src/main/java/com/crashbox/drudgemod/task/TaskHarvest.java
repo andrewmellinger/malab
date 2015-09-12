@@ -35,22 +35,27 @@ public class TaskHarvest extends TaskAcquireBase
         // If we are in the process of breaking, do that.
         if (_isBreaking)
         {
-            if (!continueBreaking())
+            if (continueBreaking())
             {
-                // Have we done enough.
-                if (getEntity().isHeldInventoryFull() || getEntity().getHeldSize() >= _quantity)
-                    return true;
-
-                if (_harvestList == null || _harvestList.peek() == null)
-                {
-                    return true;
-                }
-
-                // Keep going on this tree
-                _harvestBlock = _harvestList.poll();
-                startBreaking();
                 return false;
             }
+
+            debugLog(LOGGER, "HarvestList: " + _harvestList);
+            // Have we done enough.
+            if (getEntity().isHeldInventoryFull() || getEntity().getHeldSize() >= _quantity)
+                return true;
+
+            if (_harvestList == null || _harvestList.peek() == null)
+            {
+                return true;
+            }
+
+            // Keep going on this tree
+            _harvestBlock = _harvestList.poll();
+            if (_harvestBlock == null)
+                return true;
+
+            startBreaking();
             return false;
         }
 
@@ -109,7 +114,9 @@ public class TaskHarvest extends TaskAcquireBase
             //debugLog(LOGGER, "Finished breaking, harvesting.");
             if (harvestBlock())
             {
+                // We need to find another harvest block
                 _harvestBlock = null;
+                return false;
             }
         }
         return true;
@@ -132,6 +139,7 @@ public class TaskHarvest extends TaskAcquireBase
         return (this._breakingProgress < _breakTotalNeeded);
     }
 
+    // Return true if harvested
     private boolean harvestBlock()
     {
         ItemStack targetStack = getEntity().getHeldItem();
@@ -169,6 +177,7 @@ public class TaskHarvest extends TaskAcquireBase
     public void debugInfo(StringBuilder builder)
     {
         super.debugInfo(builder);
+        builder.append(", harvestBlock=").append(_harvestBlock);
         builder.append(", radius=").append(_radius);
         builder.append(", height=").append(_height);
         builder.append(", quantity=").append(_quantity);

@@ -81,7 +81,7 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
         {
             if (msg instanceof MessageItemRequest)
             {
-                //LOGGER.debug("Forester " + this + " is asked for items." + msg);
+                debugLog("Asked for items." + msg);
 
                 MessageItemRequest itemReq = (MessageItemRequest)msg;
 
@@ -97,7 +97,7 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
                     MessageHarvestRequest req = new MessageHarvestRequest(TileEntityBeaconForester.this, itemReq.getSender(),
                             msg.getTransactionID(), 0, itemReq.getMatcher(), itemReq.getQuantity());
 
-                    //LOGGER.debug("Posting request: " + req);
+                    debugLog("Posting request: " + req);
                     Broadcaster.postMessage(req);
                 }
             }
@@ -125,11 +125,16 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
         }
     }
 
+    private void debugLog(String msg)
+    {
+        LOGGER.debug("Forester: " + msg);
+    }
+
 
     @Override
     public String toString()
     {
-        return "TileEntityBeaconForester{" +
+        return "Forester{" +
                 "_forester=" + _forester +
                 '}';
     }

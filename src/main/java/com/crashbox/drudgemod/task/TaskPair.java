@@ -133,6 +133,7 @@ public class TaskPair
                 {
                     _current = _deliverTask;
                     _stage = Stage.DELIVERING;
+                    _retarget = true;
                 }
                 else
                 {
@@ -152,13 +153,27 @@ public class TaskPair
     }
 
 
+    @Override
+    public String toString()
+    {
+        return "TaskPair{" +
+                "stage=" + _stage.name() +
+                ", resolving=" + _resolving.name() +
+                ", retarget=" + _retarget +
+                ", current=" + (_current != null) +
+                ", emptyInventory=" + (_emptyInventory != null) +
+                ", acquireTask=" + (_acquireTask != null) +
+                ", deliverTask=" + (_deliverTask != null) +
+                '}';
+    }
+
+
     private Stage _stage = Stage.EMPTYING;
     private Resolving _resolving = Resolving.UNRESOLVED;
 
     private boolean         _retarget;
 
     private TaskBase        _current;
-
 
     private TaskDeliverBase _emptyInventory;
     private TaskAcquireBase _acquireTask;

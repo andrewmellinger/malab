@@ -46,7 +46,7 @@ public class AIUtils
         int y = startPos.getY();
         int z = startPos.getZ();
 
-        AxisAlignedBB scanBlock = new AxisAlignedBB(x - range, y - range, z - range, x + range, y + range, z + range);
+        AxisAlignedBB scanBlock = new AxisAlignedBB(x - range, y - range, z - range, x + range, y + (range * 3), z + range);
         List entities = world.getEntitiesWithinAABB(EntityItem.class, scanBlock);
         for (Object obj :entities)
         {
