@@ -1,8 +1,8 @@
 package com.crashbox.drudgemod.messaging;
 
 import com.crashbox.drudgemod.common.ItemStackMatcher;
-import com.crashbox.drudgemod.task.TaskDeliver;
-import net.minecraft.item.ItemStack;
+import com.crashbox.drudgemod.task.TaskDeliverBase;
+import com.crashbox.drudgemod.task.TaskStore;
 
 /**
  * Copyright 2015 Andrew O. Mellinger
@@ -10,9 +10,9 @@ import net.minecraft.item.ItemStack;
 public class MessageDeliverRequest extends MessageTaskRequest
 {
     public MessageDeliverRequest(IMessager sender, IMessager receiver, Object transactionID, int priority,
-            ItemStackMatcher matcher, int quantity, int slot)
+            Class < ? extends TaskDeliverBase> clazz, ItemStackMatcher matcher, int quantity, int slot)
     {
-        super(sender, receiver, transactionID, priority, TaskDeliver.class);
+        super(sender, receiver, transactionID, priority, clazz);
         _matcher = matcher;
         _quantity = quantity;
         _slot = slot;
@@ -44,4 +44,5 @@ public class MessageDeliverRequest extends MessageTaskRequest
     private final ItemStackMatcher _matcher;
     private final int _quantity;
     private final int _slot;
+
 }

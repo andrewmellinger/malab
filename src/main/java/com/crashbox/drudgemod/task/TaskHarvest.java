@@ -5,10 +5,7 @@ import com.crashbox.drudgemod.ai.AIUtils;
 import com.crashbox.drudgemod.ai.EntityAIDrudge;
 import com.crashbox.drudgemod.ai.RingedSearcher;
 import com.crashbox.drudgemod.common.ItemStackMatcher;
-import com.crashbox.drudgemod.messaging.Message;
 import com.crashbox.drudgemod.messaging.MessageHarvestRequest;
-import com.crashbox.drudgemod.messaging.MessageTaskRequest;
-import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
@@ -21,101 +18,45 @@ import java.util.Queue;
 /**
  * Copyright 2015 Andrew O. Mellinger
  */
-public class TaskHarvest extends TaskBase
+public class TaskHarvest extends TaskAcquireBase
 {
     public TaskHarvest(EntityAIDrudge performer, MessageHarvestRequest message)
     {
-        super(performer, message.getSender(), message.getPriority());
+        super(performer, message.getSender(), message.getValue());
         _radius = message.getSender().getRadius();
         _quantity = message.getQuantity();
         _matcher = message.getMatcher();
-        setResolving(Resolving.RESOLVED);
     }
 
     @Override
-    public void execute()
+    public boolean execute()
     {
-        // Go to the sender.
-        tryMoveTo(getRequester().getPos());
-    }
-
-    @Override
-    public void resetTask()
-    {
-        if (findNextBlock())
-        {
-            startNavigation();
-        }
-    }
-
-    @Override
-    public void updateTask()
-    {
-        // Wait until we have no path.
-        if (!getEntity().getNavigator().noPath())
-        {
-            return;
-        }
-
+        // REMEMBER: Return true to STOP
         // If we are in the process of breaking, do that.
         if (_isBreaking)
         {
-            if (!handleBreaking())
+            if (!continueBreaking())
             {
-                setState(State.SUCCESS);
-            }
-            return;
-        }
+                // Have we done enough.
+                if (getEntity().isHeldInventoryFull() || getEntity().getHeldSize() >= _quantity)
+                    return true;
 
-        // If we have a target block, then let's see if we are close enough to start breaking
-        if (_targetBlock != null)
-        {
-            if ( DrudgeUtils.isWithinSqDist(getEntity().getPosition(), _targetBlock, 4))
-            {
+                if (_harvestList == null || _harvestList.peek() == null)
+                {
+                    return true;
+                }
+
+                // Keep going on this tree
+                _harvestBlock = _harvestList.poll();
                 startBreaking();
-                return;
+                return false;
             }
-            else
-            {
-                // If we didn't get close enough, try finding again
-                debugLog(LOGGER, "NOT close enough, not breaking at: " + _targetBlock + " pos: " + getPerformer().getPos());
-                _targetBlock = null;
-            }
+            return false;
         }
 
-        // Try to identify another block to break.
-        if (!findNextBlock())
-        {
-            if (getEntity().getHeldItem() == null)
-            {
-                debugLog(LOGGER, "Failed to find next block and empty.  Aborting");
-                setState(State.FAILED);
-            }
-            else
-            {
-                setState(State.SUCCESS);
-            }
-            return;
-        }
-
-        // Navigate to another block
-        // TODO:  What if we can't navigate there?
-        if (!startNavigation())
-            setState(State.FAILED);
-    }
-
-    @Override
-    public Message resolve()
-    {
-        // TODO:  If we have something in inventory, find some place to deposit it.
-        // return new MessageStorageRequest()
-        return null;
-    }
-
-    @Override
-    public TaskBase linkResponses(List<MessageTaskRequest> responses)
-    {
-        return this;
+        // Otherwise start breaking
+        startBreaking();
+        return false;
     }
 
     @Override
@@ -126,53 +67,25 @@ public class TaskHarvest extends TaskBase
     }
 
     @Override
-    public BlockPos selectWorkArea(List<BlockPos> others)
+    public BlockPos chooseWorkArea(List<BlockPos> others)
     {
-        // TODO:  Use better searcher
-        RingedSearcher searcher = new RingedSearcher(getRequester().getPos(), getRequester().getRadius(), 10);
-        for (BlockPos pos : searcher)
-        {
-            if (DrudgeUtils.willDrop(getWorld(), pos, _matcher))
-            {
-                if (!DrudgeUtils.pointInAreas(pos, others, 1))
-                    return pos;
-            }
-        }
-
-        return null;
-    }
-
-    //=============
-
-    private boolean findNextBlock()
-    {
-        // Find things to harvest
+        _harvestBlock = null;
         if (_harvestList != null)
-        {
-            //debugLog(LOGGER, "Getting next harvest block");
             _harvestBlock = _harvestList.poll();
-        }
 
-        // Get the next block to harvest
         if (_harvestBlock == null)
-        {
-            //debugLog(LOGGER, "Getting next harvest list");
-            // Find blocks in a tree
-            _harvestList = RingedSearcher.findTree(getEntity().getEntityWorld(), getRequester().getPos(), _radius, _height, _matcher);
-            if (_harvestList == null)
-            {
-                // Didn't find any blocks anywhere
-                debugLog(LOGGER, "Didn't find any blocks to harvest.  Done.");
-                getPerformer().updateWorkArea(null);
-                return false;
-            }
+            _harvestList = RingedSearcher.findTree(getEntity().getEntityWorld(), getRequester().getPos(), _radius,
+                    _height, _matcher, others);
 
-            // Now that we have a new list, get the next block
-            _harvestBlock = _harvestList.poll();
+        if (_harvestList == null || _harvestList.isEmpty())
+        {
+            _harvestBlock = null;
+            _harvestList = null;
+            return null;
         }
 
-        getPerformer().updateWorkArea(_harvestBlock);
-        return true;
+        _harvestBlock = _harvestList.poll();
+        return _harvestBlock;
     }
 
     private void startBreaking()
@@ -188,7 +101,7 @@ public class TaskHarvest extends TaskBase
     }
 
     /** @return True to continue harvesting */
-    private boolean handleBreaking()
+    private boolean continueBreaking()
     {
         _isBreaking = updateBreak();
         if (!_isBreaking)
@@ -196,15 +109,8 @@ public class TaskHarvest extends TaskBase
             //debugLog(LOGGER, "Finished breaking, harvesting.");
             if (harvestBlock())
             {
-                if ( getEntity().getHeldItem().stackSize >= getEntity().getCarryCapacity() ||
-                     getEntity().getHeldItem().stackSize >= _quantity)
-                {
-                    //debugLog(LOGGER, "Reached capacity.  Done");
-                    _targetBlock = null;
-                    return false;
-                }
+                _harvestBlock = null;
             }
-            _targetBlock = null;
         }
         return true;
     }
@@ -260,15 +166,6 @@ public class TaskHarvest extends TaskBase
         return true;
     }
 
-    private boolean startNavigation()
-    {
-        // At this point we have a harvest block, set a block to walk to
-        _targetBlock = new BlockPos(_harvestBlock.getX(), getRequester().getPos().getY(), _harvestBlock.getZ());
-        //debugLog(LOGGER, "Made new target block.  Moving to: " + _targetBlock);
-
-        return tryMoveTo(_targetBlock);
-    }
-
     public void debugInfo(StringBuilder builder)
     {
         super.debugInfo(builder);
@@ -278,6 +175,7 @@ public class TaskHarvest extends TaskBase
         builder.append(", matcher=").append(_matcher);
     }
 
+    // Describes the search area
     private final int _radius;
     private final int _height = 10;
     private final int _quantity;
@@ -288,7 +186,7 @@ public class TaskHarvest extends TaskBase
     private BlockPos _harvestBlock;
 
     // Spot on ground we move to.
-    private BlockPos _targetBlock;
+//    private BlockPos _targetBlock;
 
     private int _breakTotalNeeded;
     private int _breakingProgress;

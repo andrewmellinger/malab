@@ -298,43 +298,5 @@ public class AIUtils
         return null;
     }
 
-
-    public static interface BlockVisitor
-    {
-        /** @return true to keep visiting */
-        public boolean visit(BlockPos pos);
-    }
-
-    /**
-     * Visits the blocks in a cubic shell surrounding the area.
-     * @param world
-     * @param center
-     * @param start
-     * @param quantity
-     * @param filter
-     * @return
-     */
-    public static BlockPos visitBlock(World world, BlockPos center, BlockPos start, int quantity, BlockVisitor filter)
-    {
-        return null;
-    }
-
-    /**
-     * Finds trees in the area, starting at the specified block at ground level and working outward.
-     * We assume vertical blocks are trees so we work that way.
-     */
-    public static List<BlockPos> findTree(World world, BlockPos center, int radius, int height, int quantity, Block type)
-    {
-        // Search in ring at top, then work down if we find a block
-
-        int x;
-        int y;
-        int z;
-
-
-
-        return null;
-    }
-
     private static final Logger LOGGER = LogManager.getLogger();
 }

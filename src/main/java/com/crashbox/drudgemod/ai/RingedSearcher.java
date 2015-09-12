@@ -13,12 +13,13 @@ import java.util.*;
 public class RingedSearcher  implements Iterable<BlockPos>
 {
     // UNDERSTANDS LOG METADATA
-    public static Queue<BlockPos> findTree(World world, BlockPos center, int radius, int height, ItemStackMatcher matcher)
+    public static Queue<BlockPos> findTree(World world, BlockPos center, int radius, int height,
+            ItemStackMatcher matcher, List<BlockPos> exclusions)
     {
         RingedSearcher searcher = new RingedSearcher(center, radius, height);
         for (BlockPos pos : searcher)
         {
-            if (DrudgeUtils.willDrop(world, pos, matcher))
+            if (DrudgeUtils.willDrop(world, pos, matcher) && !DrudgeUtils.pointInAreas(pos, exclusions, 1))
             {
                 Queue<BlockPos> result = new LinkedList<BlockPos>();
 

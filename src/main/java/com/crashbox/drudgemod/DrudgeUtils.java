@@ -72,6 +72,17 @@ public class DrudgeUtils
     }
 
 
+    public static boolean isNotNull(Object obj, Logger logger)
+    {
+        if (obj == null)
+        {
+            logger.debug("Object is null and not expected: " + obj);
+            return false;
+        }
+        return true;
+
+    }
+
 
 //    public static boolean willDrop(World world, BlockPos pos, ItemStack sample)
 //    {

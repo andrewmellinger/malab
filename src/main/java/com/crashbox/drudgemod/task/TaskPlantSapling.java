@@ -1,6 +1,5 @@
 package com.crashbox.drudgemod.task;
 
-import com.crashbox.drudgemod.DrudgeUtils;
 import com.crashbox.drudgemod.ai.AIUtils;
 import com.crashbox.drudgemod.ai.EntityAIDrudge;
 import com.crashbox.drudgemod.messaging.Message;
@@ -13,7 +12,6 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
-import net.minecraft.world.World;
 
 import java.util.List;
 
@@ -24,77 +22,38 @@ public class TaskPlantSapling extends TaskBase
 {
     public TaskPlantSapling(EntityAIDrudge performer, MessagePlantSaplings message)
     {
-        super(performer, message.getSender(), message.getPriority());
-        setResolving(Resolving.RESOLVED);
+        super(performer, message.getSender(), message.getValue());
+//        setResolving(Resolving.RESOLVED);
     }
 
     @Override
-    public void execute()
+    public boolean execute()
     {
-        // Move to the area.
-        tryMoveTo(getRequester().getPos());
-    }
+        return false;
 
-    @Override
-    public void resetTask()
-    {
-        // TODO:  What is a reasonable restart?
-    }
-
-    @Override
-    public void updateTask()
-    {
-        // Move to sapling
-        // Pick up sapling
-        // Wait until we have no path.
-        if (!getEntity().getNavigator().noPath())
-        {
-            return;
-        }
-
-        boolean done = false;
-        switch (_goingTo)
-        {
-            case SITE:
-                done = locateSapling();
-                break;
-            case COLLECTION:
-                done = handleCollection();
-                break;
-            case PLANTING:
-                done = handlePlanting();
-        }
-
-        if (done)
-            setState(State.SUCCESS);
-    }
-
-    @Override
-    public Message resolve()
-    {
-        ItemStack held = getEntity().getHeldItem();
-        if (held != null)
-        {
-            return new MessageStorageRequest(getPerformer(), null, this, 0, held);
-        }
-
-        return null;
-    }
-
-    @Override
-    public TaskBase linkResponses(List<MessageTaskRequest> responses)
-    {
-        // TODO:  COPY-PASTE from TaskDeliver, refactor
-        List<MessageTaskRequest> taskResponses = getAllForTask(responses, this);
-        if (taskResponses.size() > 0)
-        {
-            MessageTaskRequest opt = findBestResponseOption(this, taskResponses);
-            TaskBase newTask = EntityAIDrudge.TASK_FACTORY.makeTaskFromMessage(getPerformer(), opt);
-            newTask.setNextTask(this);
-            return newTask;
-        }
-
-        return this;
+//        // Move to sapling
+//        // Pick up sapling
+//        // Wait until we have no path.
+//        if (!getEntity().getNavigator().noPath())
+//        {
+//            return;
+//        }
+//
+//        boolean done = false;
+//        switch (_goingTo)
+//        {
+//            case SITE:
+//                done = locateSapling();
+//                break;
+//            case COLLECTION:
+//                done = handleCollection();
+//                break;
+//            case PLANTING:
+//                done = handlePlanting();
+//        }
+//
+//        if (done)
+//            setState(State.SUCCESS);
     }
 
     @Override
@@ -105,80 +64,80 @@ public class TaskPlantSapling extends TaskBase
     }
 
     @Override
-    public BlockPos selectWorkArea(List<BlockPos> others)
+    public BlockPos chooseWorkArea(List<BlockPos> others)
     {
-        locateSapling();
-        if (_currentPickup != null)
-            return _currentPickup.getPosition();
-
+//        locateSapling();
+//        if (_currentPickup != null)
+//            return _currentPickup.getPosition();
+//
         return null;
     }
 
     //===================================
 
-    private boolean locateSapling()
-    {
-        // TODO: Build optimized version
-        _currentPickup  = AIUtils.findFirstEntityOfTypeOnGround(getEntity().getEntityWorld(), getRequester().getPos(),
-                getRequester().getRadius(), Item.getItemFromBlock(Blocks.sapling));
-
-        if (_currentPickup == null)
-            return true;
-        tryMoveTo(_currentPickup.getPosition());
-
-        _goingTo = GoingTo.COLLECTION;
-        return false;
-    }
-
-    private boolean handleCollection()
-    {
-        // Pick up next entry
-        ItemStack collected = AIUtils.collectEntityIntoNewStack(getWorld(), _currentPickup.getPosition(), 2, Item.getItemFromBlock(Blocks.sapling));
-        _currentPickup = null;
-
-        // If we found something in here, let's grab it, otherwise try again
-        if (collected.stackSize > 0)
-            getEntity().setCurrentItemOrArmor(0, collected);
-        else
-            return locateSapling();
-
-        // Go to next planting spot
-        _plantingTarget = AIUtils.findEmptyOrchardSquare(getWorld(), getRequester().getPos(),
-                getRequester().getRadius());
-        if (_plantingTarget == null)
-            return true;
-
-        tryMoveTo(_plantingTarget);
-        _goingTo = GoingTo.PLANTING;
-        return false;
-    }
-
-    private boolean handlePlanting()
-    {
-        ItemStack held = getEntity().getHeldItem();
-
-        // Plant
-        IBlockState state = Blocks.sapling.getStateFromMeta(held.getMetadata());
-        getWorld().setBlockState(_plantingTarget, state);
-
-        // Get next sapling
-        held.stackSize--;
-        if (held.stackSize <= 0)
-        {
-            getEntity().setCurrentItemOrArmor(0, null);
-            return locateSapling();
-        }
-
-        // Go to next planting spot
-        _plantingTarget = AIUtils.findEmptyOrchardSquare(getWorld(), getRequester().getPos(),
-                getRequester().getRadius());
-        if (_plantingTarget == null)
-            return true;
-
-        tryMoveTo(_plantingTarget);
-        _goingTo = GoingTo.PLANTING;
-        return false;
-    }
+//    private boolean locateSapling()
+//    {
+//        // TODO: Build optimized version
+//        _currentPickup  = AIUtils.findFirstEntityOfTypeOnGround(getEntity().getEntityWorld(), getRequester().getPos(),
+//                getRequester().getRadius(), Item.getItemFromBlock(Blocks.sapling));
+//
+//        if (_currentPickup == null)
+//            return true;
+//        tryMoveTo(_currentPickup.getPosition());
+//
+//        _goingTo = GoingTo.COLLECTION;
+//        return false;
+//    }
+//
+//    private boolean handleCollection()
+//    {
+//        // Pick up next entry
+//        ItemStack collected = AIUtils.collectEntityIntoNewStack(getWorld(), _currentPickup.getPosition(), 2, Item.getItemFromBlock(Blocks.sapling));
+//        _currentPickup = null;
+//
+//        // If we found something in here, let's grab it, otherwise try again
+//        if (collected.stackSize > 0)
+//            getEntity().setCurrentItemOrArmor(0, collected);
+//        else
+//            return locateSapling();
+//
+//        // Go to next planting spot
+//        _plantingTarget = AIUtils.findEmptyOrchardSquare(getWorld(), getRequester().getPos(),
+//                getRequester().getRadius());
+//        if (_plantingTarget == null)
+//            return true;
+//
+//        tryMoveTo(_plantingTarget);
+//        _goingTo = GoingTo.PLANTING;
+//        return false;
+//    }
+//
+//    private boolean handlePlanting()
+//    {
+//        ItemStack held = getEntity().getHeldItem();
+//
+//        // Plant
+//        IBlockState state = Blocks.sapling.getStateFromMeta(held.getMetadata());
+//        getWorld().setBlockState(_plantingTarget, state);
+//
+//        // Get next sapling
+//        held.stackSize--;
+//        if (held.stackSize <= 0)
+//        {
+//            getEntity().setCurrentItemOrArmor(0, null);
+//            return locateSapling();
+//        }
+//
+//        // Go to next planting spot
+//        _plantingTarget = AIUtils.findEmptyOrchardSquare(getWorld(), getRequester().getPos(),
+//                getRequester().getRadius());
+//        if (_plantingTarget == null)
+//            return true;
+//
+//        tryMoveTo(_plantingTarget);
+//        _goingTo = GoingTo.PLANTING;
+//        return false;
+//    }
 
     @Override
     public void debugInfo(StringBuilder builder)

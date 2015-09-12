@@ -1,15 +1,69 @@
 package com.crashbox.drudgemod.ai;
 
 import com.crashbox.drudgemod.task.TaskBase;
+import com.crashbox.drudgemod.task.TaskPair;
 import net.minecraft.util.BlockPos;
+
+import java.util.List;
 
 /**
  * Copyright 2015 Andrew O. Mellinger
  */
 public class Priority
 {
+    /**
+     * From a list of task pairs, select the best one based on this position.
+     * @param pos The current position.
+     * @param tasks The list of tasks.
+     * @param speed How fast the entity moves.
+     * @return The best task.
+     */
+    public static TaskPair selectBestTaskPair(BlockPos pos, List<TaskPair> tasks, double speed)
+    {
+        int bestValue = Integer.MIN_VALUE;
+        TaskPair bestTask = null;
 
+        if (tasks == null || tasks.isEmpty())
+            return null;
 
+        for (TaskPair pair : tasks)
+        {
+            // If unresolved (has pre-reqs) then skip it
+            if (pair.getResolving() == TaskPair.Resolving.RESOLVED)
+            {
+                int value = Priority.getTaskValue(pos, pair, speed);
+                if (value > bestValue)
+                {
+                    bestValue = value;
+                    bestTask = pair;
+                }
+            }
+        }
+
+        return bestTask;
+    }
+
+    public static int getTaskValue(BlockPos pos, TaskPair pair, double speed)
+    {
+        int value = 0;
+
+        for (TaskBase task : pair.asList())
+        {
+            if (task != null)
+            {
+                value -= Priority.computeDistanceCost(pos, task.getCoarsePos(), speed);
+                value += task.getValue();
+                pos = task.getCoarsePos();
+            }
+        }
+
+        return value;
+    }
+
+    public static int computeDistanceCost(BlockPos startPos, BlockPos endPos, double speed)
+    {
+        return (int) (( Math.sqrt(startPos.distanceSq(endPos)) / speed ) / 20);
+    }
 
     public static int computeDistanceCost(BlockPos startPos, BlockPos endPos)
     {

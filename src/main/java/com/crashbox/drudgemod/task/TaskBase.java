@@ -21,9 +21,6 @@ import java.util.List;
  */
 public abstract class TaskBase
 {
-    public enum Resolving { UNRESOLVED, RESOLVING, RESOLVED }
-    public enum State { INPROGRESS, SUCCESS, FAILED }
-
     /**
      * Base class for all tasks.
      * @param performer The AI performing this task
@@ -52,99 +49,56 @@ public abstract class TaskBase
         return _performer;
     }
 
+    public boolean isDone()
+    {
+        return _done;
+    }
+
     // =======================
     // TASK SPECIFICS
 
     /**
-     * Called by the entity who is doing the task when it should execute.
+     * @return The general position we move towards.
      */
-    public abstract void execute();
-
-    /**
-     * @return True if we are doing work.
-     */
-    public boolean continueExecution()
+    public BlockPos getCoarsePos()
     {
-        return _state == State.INPROGRESS;
+        return getRequester().getPos();
     }
 
-    public abstract void resetTask();
+    /**
+     * This is where the bot needs to move to do execute the work.  This is not necessarily
+     * the actual block.
+     * @param others Other people working near the requester.
+     * @return The actual work center we want to work at.
+     */
+    public abstract BlockPos chooseWorkArea(List<BlockPos> others);
 
-    public abstract void updateTask();
+    /**
+     * Make progress on the work indicated when we are done with this target block.
+     * @return True if we are done.
+     */
+    public abstract boolean execute();
 
-    //=============================================================================================
-
-    // Make sure it fixes pre-requisites
-    public abstract Message resolve();
-
-    // Used to linkup responses to messages
-    public abstract TaskBase linkResponses(List<MessageTaskRequest> responses);
-
-
-    // The value.  The higher the number the better.
+    /**
+     * @return The value of this work being performed.
+     */
     public abstract int getValue();
 
-    // The task will figure out exactly where to go
-    public abstract BlockPos selectWorkArea(List<BlockPos> others);
-
     //=============================================================================================
-
-
-    /**
-     * @return The next task for task chaining
-     */
-    public TaskBase getNextTask()
-    {
-        return _nextTask;
-    }
-
-    /**
-     * Sets the next task
-     */
-    public void setNextTask(TaskBase task)
-    {
-        _nextTask = task;
-    }
-
-    public Resolving getResolving()
-    {
-        return _resolving;
-    }
-
-    public void setResolving(Resolving resolving)
-    {
-        _resolving = resolving;
-    }
-
-    public State getState()
-    {
-        return _state;
-    }
-
-    public void setState(State state)
-    {
-        _state = state;
-    }
+    // Conveniences
 
     public World getWorld()
     {
         return _performer.getEntity().getEntityWorld();
     }
 
-    // CONVENIENCES
-
-    // Convenience method
-    public boolean tryMoveTo(BlockPos pos)
-    {
-        return getPerformer().tryMoveTo(pos);
-    }
-
+    //=============================================================================================
+    // LOGGING
 
     public void debugLog(Logger logger, String message)
     {
         logger.debug(getPerformer().id() + " " + message);
     }
-
 
     @Override
     public String toString()
@@ -164,10 +118,9 @@ public abstract class TaskBase
         builder.append("performer=").append(DrudgeUtils.objID(_requester));
         builder.append(", requester=").append(DrudgeUtils.objID(_requester));
         builder.append(", priority=").append(_priority);
-        builder.append(", nextTask=").append(DrudgeUtils.objID(_nextTask));
-        builder.append(", resolving=").append(_resolving);
     }
 
+    //=============================================================================================
 
     // Utility Methods
 
@@ -196,7 +149,7 @@ public abstract class TaskBase
 
         for (MessageTaskRequest request : messages)
         {
-            int value = request.getPriority() - Priority.computeDistanceCost(request.getSender().getPos(),
+            int value = request.getValue() - Priority.computeDistanceCost(request.getSender().getPos(),
                     task.getRequester().getPos());
             if (value > bestValue)
                 bestTask = request;
@@ -205,7 +158,12 @@ public abstract class TaskBase
         return bestTask;
     }
 
-    public State _state = State.INPROGRESS;
+
+    //=============================================================================================
+    protected void setDone(boolean done)
+    {
+        _done = done;
+    }
 
     // Who is executing the task?
     protected final EntityAIDrudge _performer;
@@ -216,10 +174,8 @@ public abstract class TaskBase
     // The priority of the task.
     protected final int _priority;
 
-    // Use for chaining
-    protected TaskBase _nextTask;
-
-    private Resolving _resolving = Resolving.UNRESOLVED;
+    // Has the task met its threshold, or run out of capability?
+    private boolean _done = false;
 
     private static final Logger LOGGER = LogManager.getLogger();
 }

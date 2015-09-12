@@ -7,34 +7,11 @@ import net.minecraft.item.ItemStack;
 /**
  * Copyright 2015 Andrew O. Mellinger
  */
-public class MessageHarvestRequest extends MessageTaskRequest
+public class MessageHarvestRequest extends MessageAcquireRequest
 {
     public MessageHarvestRequest(IMessager sender, IMessager target, Object transactionID, int priority, ItemStackMatcher matcher,
             int quantity)
     {
-        super(sender, target, transactionID, priority, TaskHarvest.class);
-        _matcher = matcher;
-        _quantity = quantity;
+        super(sender, target, transactionID, priority, TaskHarvest.class, matcher, quantity);
     }
-
-    public ItemStackMatcher getMatcher()
-    {
-        return _matcher;
-    }
-
-    public int getQuantity()
-    {
-        return _quantity;
-    }
-
-    @Override
-    public void debugInfo(StringBuilder builder)
-    {
-        super.debugInfo(builder);
-        builder.append(", sample=").append(_matcher);
-        builder.append(", quantity=").append(_quantity);
-    }
-
-    private final ItemStackMatcher _matcher;
-    private final int _quantity;
 }

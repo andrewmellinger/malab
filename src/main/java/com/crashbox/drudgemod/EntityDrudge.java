@@ -4,6 +4,9 @@ import com.crashbox.drudgemod.ai.EntityAIDrudge;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAISwimming;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -99,6 +102,33 @@ public class EntityDrudge extends EntityCreature
     {
         return _workSpeedFactor;
     }
+
+    // Inventory utils
+
+
+    public void dropHeldItem()
+    {
+        ItemStack held = getHeldItem();
+        setCurrentItemOrArmor(0, null);
+        BlockPos pos = getPosition();
+        getEntityWorld().spawnEntityInWorld(new EntityItem(getEntityWorld(), pos.getX(), pos.getY(), pos.getZ(), held));
+    }
+
+    public boolean isHeldInventoryFull()
+    {
+        ItemStack held = getHeldItem();
+        return held.stackSize >= _carryCapacity;
+    }
+
+    public int getHeldSize()
+    {
+        ItemStack held = getHeldItem();
+        if (held == null)
+            return 0;
+
+        return held.stackSize;
+    }
+
 
     // How many things we can carry.
     private int _carryCapacity = 4;

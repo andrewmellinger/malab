@@ -4,7 +4,9 @@ import com.crashbox.drudgemod.DrudgeUtils;
 import com.crashbox.drudgemod.EntityDrudge;
 import com.crashbox.drudgemod.messaging.*;
 import com.crashbox.drudgemod.task.*;
+import com.crashbox.drudgemod.task.TaskPair.Resolving;
 import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,14 +37,14 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
     public boolean shouldExecute()
     {
         updateTask();
-        return (_currentTask != null);
+        return (_currentPair != null);
     }
 
     @Override
     public void startExecuting()
     {
         // The update task loop starts it
-//        _currentTask = null;
+//        _currentPair = null;
 //        _requestEndMS = System.currentTimeMillis() + REQUEST_TIMEOUT_MS;
 //        _state = State.ELICITING;
 //        Broadcaster.postMessage(new MessageWorkerAvailability(_entity.worldObj, this), _channel);
@@ -64,6 +66,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
     public void updateTask()
     {
         processMessages();
+
         //LOGGER.debug("UpdateTask: " + _state);
         switch (_state)
         {
@@ -115,38 +118,72 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
             if (msg.getTarget() != null && msg.getTarget() != this)
                 continue;
 
-            if (msg instanceof MessageRequestWorkArea)
+            // Hand data requests.  These are generally simple status things - We could move this to the handler...
+            if (msg instanceof MessageDataRequest)
             {
-                if (_workArea != null)
-                    Broadcaster.postMessage(new MessageWorkArea(this, msg.getSender(), msg.getTransactionID(), _workArea));
+                processDataRequests((MessageDataRequest)msg);
                 continue;
             }
 
             // Filter all task requests
-            if (msg instanceof MessageTaskRequest && _currentTask == null)
+            if (msg instanceof MessageTaskRequest && _currentPair == null)
             {
                 if (msg.getTransactionID() == MessageWorkerAvailability.class)
-                    _proposedTasks.add(TASK_FACTORY.makeTaskFromMessage(this, (MessageTaskRequest) msg));
+                    _proposedTasks.add(makeNewTaskPair((MessageTaskRequest)msg));
                 else
                     _responseTasks.add((MessageTaskRequest) msg);
             }
             else if (msg.getTransactionID() != null)
             {
-                // If it has a transactionID it is a response to something we sent before.
+                // If it has a transactionID it is a response to something we sent before, but isn't a task
                 _responses.add(msg);
             }
             else
             {
-                if (_currentTask != null && msg instanceof MessageTaskRequest )
-                    LOGGER.debug(id() + " Have task, ignoring message: " + msg);
+                if (_currentPair != null && msg instanceof MessageTaskRequest )
+                    debugLog("Have task, ignoring message: " + msg);
                 else
-                    LOGGER.debug(id() + " No task ignoring message: " + msg);
+                    debugLog("No task ignoring message: " + msg);
             }
         }
     }
 
+    private void processDataRequests(MessageDataRequest msg)
+    {
+        if (msg instanceof MessageRequestWorkArea)
+        {
+            if (_workArea != null)
+                Broadcaster.postMessage(new MessageWorkArea(this, msg.getSender(), msg.getTransactionID(), _workArea));
+        }
+    }
+
+    private TaskPair makeNewTaskPair(MessageTaskRequest message)
+    {
+        TaskPair pair = new TaskPair();
+        if (message instanceof MessageAcquireRequest)
+        {
+            TaskAcquireBase task = TASK_FACTORY.makeTaskFromMessage(this, (MessageAcquireRequest) message);
+            pair.setAcquireTask(task);
+        }
+        else if (message instanceof MessageDeliverRequest)
+        {
+            TaskDeliverBase task = TASK_FACTORY.makeTaskFromMessage(this, (MessageDeliverRequest) message);
+            pair.setDeliverTask(task);
+        }
+        else
+        {
+            LOGGER.error("makeTaskPair: Don't know what to do with task request: " + message);
+        }
+
+        return pair;
+    }
+
     //=============================================================================================
-    // IDLING
+    // ##### ####  #     ##### #   #  ####
+    //   #   #   # #       #   ##  # #
+    //   #   #   # #       #   # # # #  ##
+    //   #   #   # #       #   #  ## #   #
+    // ##### ####  ##### ##### #   #  ####
 
     private State idle()
     {
@@ -154,7 +191,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         if (System.currentTimeMillis() > _nextElicit )
         {
             //LOGGER.debug(id() + " Idle timeout over.");
-            _nextElicit = System.currentTimeMillis() + CHECK_DELAY_MILLIS;
+            _nextElicit = System.currentTimeMillis() + ELICIT_DELAY_MS;
             _requestEndMS = System.currentTimeMillis() + REQUEST_TIMEOUT_MS;
             Broadcaster.postMessage(new MessageWorkerAvailability(_entity.worldObj, this));
             return State.ELICITING;
@@ -164,7 +201,11 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
 
 
     //=============================================================================================
-    // ELICITING
+    // ##### #     #####  #### ##### ##### ##### #   #  ####
+    // #     #       #   #       #     #     #   ##  # #
+    // ####  #       #   #       #     #     #   # # # #  ##
+    // #     #       #   #       #     #     #   #  ## #   #
+    // ##### ##### #####  #### #####   #   ##### #   #  ####
 
     private State elicit()
     {
@@ -181,16 +222,16 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         // When we hit the timeout we are done.
         if (System.currentTimeMillis() > _requestEndMS)
         {
-            _currentTask = selectNextTask();
+            _currentPair = Priority.selectBestTaskPair(getEntity().getPosition(), _proposedTasks, getEntity().getSpeed());
             _proposedTasks.clear();
 
-            if (_currentTask == null)
-            {
+            if (_currentPair != null)
+                sendAcceptedMessages(_currentPair);
+            else
                 return State.IDLING;
-            }
 
-            LOGGER.debug(id() +  "Selected task: " + _currentTask);
-            tryMoveTo(_currentTask.getRequester().getPos());
+            LOGGER.debug(id() +  "Selected task: " + _currentPair);
+            tryMoveTo(_currentPair.getWorkCenter());
             return State.TRANSITING;
         }
 
@@ -200,105 +241,211 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
 
     private void linkupResponses(List<MessageTaskRequest> responses)
     {
-        for (int x = 0; x < _proposedTasks.size(); ++x)
+        for (TaskPair pair : _proposedTasks)
         {
-            _proposedTasks.set(x, _proposedTasks.get(x).linkResponses(responses));
+            if (pair.getResolving() != Resolving.RESOLVING)
+                continue;
+
+            if (linkupResponses(pair, responses))
+            {
+                // Since we linked something up, take it out of resolving.
+                pair.setResolving(Resolving.UNRESOLVED);
+            }
         }
+
         responses.clear();
     }
 
+    private boolean linkupResponses(TaskPair pair, List<MessageTaskRequest> responses)
+    {
+        if (pair.getDeliverTask() == null)
+            return linkupDeliverResponses(pair, responses);
+
+        if (pair.getAcquireTask() == null)
+            return linkupAcquireResponses(pair, responses);
+
+        return false;
+    }
+
+    private boolean linkupDeliverResponses(TaskPair pair, List<MessageTaskRequest> responses)
+    {
+        BlockPos pos = getPos();
+        boolean forEmpty = false;
+
+        ItemStack held = getEntity().getHeldItem();
+        if (pair.getDeliverTask() != null && pair.getEmptyInventory() == null && !
+                pair.getDeliverTask().getMatcher().matches(held))
+        {
+            // This is for held.
+            forEmpty = true;
+        }
+        else
+        {
+            if (pair.getAcquireTask() != null)
+                pos = pair.getAcquireTask().getCoarsePos();
+        }
+
+        List<MessageDeliverRequest> delivers = extractMessages(responses, MessageDeliverRequest.class);
+        if (delivers.size() > 0)
+        {
+            MessageDeliverRequest best = findBest(pos, delivers);
+            if (DrudgeUtils.isNotNull(best, LOGGER))
+            {
+                if (forEmpty)
+                    pair.setEmptyInventory(TASK_FACTORY.makeTaskFromMessage(this, best));
+                else
+                    pair.setDeliverTask(TASK_FACTORY.makeTaskFromMessage(this, best));
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean linkupAcquireResponses(TaskPair pair, List<MessageTaskRequest> responses)
+    {
+        BlockPos pos = getPos();
+        if (pair.getEmptyInventory() != null)
+            pos = pair.getEmptyInventory().getCoarsePos();
+
+        List<MessageAcquireRequest> acquires = extractMessages(responses, MessageAcquireRequest.class);
+        if (acquires.size() > 0)
+        {
+            MessageAcquireRequest best = findBest(pos, acquires);
+            if (DrudgeUtils.isNotNull(best, LOGGER))
+            {
+                pair.setAcquireTask(TASK_FACTORY.makeTaskFromMessage(this, best));
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private <T extends MessageTaskRequest> T findBest(BlockPos pos, List<T> responses)
+    {
+        T best = null;
+        int bestValue = Integer.MIN_VALUE;
+
+        for (T msg : responses)
+        {
+            int value = Priority.computeDistanceCost(pos, msg.getSender().getPos()) + msg.getValue();
+            if (value > bestValue)
+            {
+                bestValue = value;
+                best = msg;
+            }
+        }
+        return best;
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T extends MessageTaskRequest> List<T> extractMessages(List<MessageTaskRequest> responses, Class<T> clazz)
+    {
+        List<T> result = new ArrayList<T>();
+        Iterator<MessageTaskRequest> iter = responses.iterator();
+        while (iter.hasNext())
+        {
+            MessageTaskRequest next =  iter.next();
+            if (clazz.isInstance(next))
+            {
+                result.add((T) next);
+                iter.remove();
+            }
+        }
+        return result;
+    }
+
+    //==================
+
     private void resolveAllTasks()
     {
-        for (TaskBase task : _proposedTasks)
+        for (TaskPair pair : _proposedTasks)
         {
-            if (task.getResolving() == TaskBase.Resolving.UNRESOLVED)
+            if (pair.getResolving() == Resolving.UNRESOLVED)
             {
-                //LOGGER.debug(id() + " Resolving: " + task);
+                //LOGGER.debug(id() + " Resolving: " + pair);
                 // Get a new message send it out
-                Message msg = task.resolve();
+                Message msg = resolveTaskPair(pair);
                 if (msg != null)
                 {
+                    pair.setResolving(Resolving.RESOLVING);
                     Broadcaster.postMessage(msg);
                 }
             }
         }
     }
 
-    private TaskBase selectNextTask()
+    private Message resolveTaskPair(TaskPair pair)
     {
-        int bestValue = Integer.MIN_VALUE;
-        TaskBase bestTask = null;
+        // If we have a deliver we need to make sure we have the item
+        ItemStack held = getEntity().getHeldItem();
 
-        if (_proposedTasks == null)
-            return null;
+        // First off let's see if we need to dump the thing in our hand.  We figure this out
+        // first because to compute best 'acquire' cost depends on where we are at the end
+        // of the empty inventory step.
 
-
-        String str = getEntity().getCustomNameTag() + ": ";
-        for (TaskBase task : _proposedTasks)
+        if (held != null && pair.getDeliverTask() != null && !pair.getDeliverTask().getMatcher().matches(held))
         {
-            // If unresolved (has pre-reqs) then skip it
-            if (task.getResolving() == TaskBase.Resolving.RESOLVED)
+            // We need to dump something we are holding before we can acquire
+            return new MessageStorageRequest(this, null, pair, 0, held);
+        }
+
+        // Need to deliver, do we need to acquire?
+        if (pair.getDeliverTask() != null && pair.getAcquireTask() == null)
+        {
+            if (held == null || !pair.getDeliverTask().getMatcher().matches(held))
             {
-                int value = getTaskValue(task);
-                str = str + value + ", ";
-                if (value > bestValue)
-                {
-                    bestValue = value;
-                    bestTask = task;
-                }
+                return new MessageItemRequest(this, null, pair, pair.getDeliverTask().getMatcher(),
+                        pair.getDeliverTask().getQuantity());
             }
+
+            // If we are here, held item matches...
         }
 
-        LOGGER.debug("Task values: " + str);
-
-        // Now that we have accepted tell everyone how long to wait...
-        TaskBase task = bestTask;
-        int delay = 2000;
-        BlockPos startPos = getPos();
-        while (task != null)
+        // We accepted an acquire before deliver.  So a really full chest or orchard
+        if (pair.getAcquireTask() != null && pair.getDeliverTask() == null)
         {
-            // Five hundred millis for each block we need to walk. TODO:  Rework in entity speed.
-            delay += ( Priority.computeDistanceCost(startPos, task.getRequester().getPos()) * 500);
-            startPos = task.getRequester().getPos();
-            Message msg = new MessageWorkAccepted(this, task.getRequester(), null, 0, delay);
-            Broadcaster.postMessage(msg);
-            task = task.getNextTask();
-            // Just add two seconds
-            delay += 2000;
+            return new MessageStorageRequest(this, null, pair, 0, pair.getAcquireTask().getSample());
         }
 
-        // Find highest resolved.
-        return bestTask;
+        // Everybody is good, we don't need anything
+        return null;
     }
 
-    private int getTaskValue(TaskBase task)
+    private void sendAcceptedMessages(TaskPair pair)
     {
-        // The cost is the transit time (distance) currently linear for each one
-        // added in its inherent cost.
-        BlockPos startPos = getEntity().getPosition();
-        int value = task.getValue();
-        value -= Priority.computeDistanceCost(startPos, task.getRequester().getPos());
-        while (task.getNextTask() != null)
-        {
-            startPos = task.getRequester().getPos();
-            task = task.getNextTask();
-            value += task.getValue();
-            value -= Priority.computeDistanceCost(startPos, task.getRequester().getPos());
-        }
+        int delay = 0;
+        BlockPos pos = getEntity().getPosition();
 
-        return value;
+        for (TaskBase task : pair.asList())
+        {
+            if (task != null)
+            {
+                // Five hundred millis for each block we need to walk. TODO:  Rework in entity speed.
+                delay += Priority.computeDistanceCost(pos, task.getCoarsePos()) * 500;
+                pos = task.getCoarsePos();
+                // Add two seconds to break, pickup, place, etc.
+                delay += 2000;
+                Broadcaster.postMessage(new MessageWorkAccepted(this, task.getRequester(), null, 0, delay));
+            }
+        }
     }
 
     //=============================================================================================
-    // TRANSITIONING
+    // ##### ####   ###  #   #  ###  ##### ##### #####  ###  #   # ##### #   #  ####
+    //   #   #   # #   # ##  # #       #     #     #   #   # ##  #   #   ##  # #
+    //   #   ####  ##### # # #  ###    #     #     #   #   # # # #   #   # # # #  ##
+    //   #   #   # #   # #  ##     #   #     #     #   #   # #  ##   #   #  ## #   #
+    //   #   #   # #   # #   #  ###  #####   #   #####  ###  #   # ##### #   #  ####
 
     // In this function we transition to the target site. It might be far away.
     private State transition()
     {
         // If within 20, then issue location request and to start targeting
-        if (posInAreaXY(getPos(), _currentTask.getRequester().getPos(), 20))
+        if (posInAreaXY(getPos(), _currentPair.getWorkCenter(), 20))
         {
-            LOGGER.debug(id() + " Within distance, switching to targeting.");
+            LOGGER.debug(id() + " Within distance, switching to performing.");
             requestWorkAreas();
             return State.TARGETING;
         }
@@ -314,7 +461,11 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
     }
 
     //=============================================================================================
-    // TARGETING
+    // #####  ###  ####   #### ##### ##### ##### #   #  ####
+    //   #   #   # #   # #     #       #     #   ##  # #
+    //   #   ##### ####  #  ## ####    #     #   # # # #  ##
+    //   #   #   # #   # #   # #       #     #   #  ## #   #
+    //   #   #   # #   #  #### #####   #   ##### #   #  ####
 
     private State target()
     {
@@ -324,11 +475,11 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         // After some period of time, get the task top generate a workArea based on its specifics
         if (_workArea == null && System.currentTimeMillis() > _requestEndMS)
         {
-            _workArea = _currentTask.selectWorkArea(_workAreas);
+            _workArea = _currentPair.getWorkTarget(_workAreas);
             if (_workArea == null)
             {
-                LOGGER.debug(id() + " Failed to find work area, aborting. " + _currentTask);
-                _currentTask = null;
+                LOGGER.debug(id() + " Failed to find work area, aborting. " + _currentPair);
+                _currentPair = null;
                 return State.IDLING;
             }
 
@@ -345,9 +496,9 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
             }
             else
             {
-                LOGGER.debug("Failed to move work area. Idling. Distance: " +
+                LOGGER.debug("Failed to move to work area. Idling. Distance: " +
                         DrudgeUtils.sqDistXZ(getEntity().getPosition(), _workArea));
-                _currentTask = null;
+                _currentPair = null;
                 return State.IDLING;
             }
         }
@@ -357,7 +508,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
 
     private void requestWorkAreas()
     {
-        Broadcaster.postMessage(new MessageRequestWorkArea(this, null, _currentTask, 0));
+        Broadcaster.postMessage(new MessageRequestWorkArea(this, null, _currentPair, 0));
 
         // TODO: Request work areas
         _workArea = null;
@@ -373,7 +524,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
             Message next =  iter.next();
             if (next instanceof MessageWorkArea)
             {
-                if (_workArea == null && next.getTransactionID() == _currentTask && System.currentTimeMillis() < _requestEndMS)
+                if (_workArea == null && next.getTransactionID() == _currentPair && System.currentTimeMillis() < _requestEndMS)
                     _workAreas.add(((MessageWorkArea) next).getWorkArea());
 
                 iter.remove();
@@ -391,33 +542,26 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
     }
 
     //=============================================================================================
-    // PERFORMING
+    // ####  ##### ####  #####  ###  ####  #   # ##### #   #  ####
+    // #   # #     #   # #     #   # #   # ## ##   #   ##  # #
+    // ####  ####  ####  ####  #   # ####  # # #   #   # # # #  ##
+    // #     #     #   # #     #   # #   # #   #   #   #  ## #   #
+    // #     ##### #   # #      ###  #   # #   # ##### #   #  ####
 
     private State perform()
     {
-        // Update the task
-        if (_currentTask != null)
+        // Keep doing the task until we run out.
+        if (_currentPair != null)
         {
-            _currentTask.updateTask();
-            if (_currentTask.getState() == TaskBase.State.SUCCESS)
+            _currentPair.updateTask();
+
+            if (_currentPair.retarget())
             {
-                _currentTask = _currentTask.getNextTask();
-                if (_currentTask != null)
-                {
-                    LOGGER.debug(id() + " Task complete, finding starting next: " + _currentTask);
-                    tryMoveTo(_currentTask.getRequester().getPos());
-                    _workArea = null;
-                    return State.TRANSITING;
-                }
-                else
-                {
-                    LOGGER.debug(id() + " Task complete, switching to idle");
-                    return State.IDLING;
-                }
+                requestWorkAreas();
+                return State.TARGETING;
             }
-            else if (_currentTask.getState() == TaskBase.State.FAILED)
+            else if (_currentPair.isDone())
             {
-                LOGGER.debug(id() + " Task failed, switching to idle");
                 return State.IDLING;
             }
         }
@@ -425,16 +569,13 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         return State.PERFORMING;
     }
 
-
     //=============================================================================================
-
-    private State abortTaskChain()
-    {
-        _currentTask = null;
-        return State.IDLING;
-    }
-
     //=============================================================================================
+    // #   # ##### ##### #      ###
+    // #   #   #     #   #     #
+    // #   #   #     #   #      ###
+    // #   #   #     #   #         #
+    //  ###    #   ##### #####  ###
 
     private boolean posInAreaXY(BlockPos pos, BlockPos center, int radius)
     {
@@ -472,12 +613,28 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         return getEntity().getCustomNameTag();
     }
 
+    public void errorLog(String message)
+    {
+        LOGGER.error(id() + " " + message);
+    }
+
+    public void infoLog(String message)
+    {
+        LOGGER.info(id() + " " + message);
+    }
+
+    public void debugLog(String message)
+    {
+        LOGGER.debug(id() + " " + message);
+    }
+
+
     @Override
     public String toString()
     {
         return id() +
                 "{ _state=" + _state +
-                ", _currentTask=" + _currentTask +
+                ", _currentPair=" + _currentPair +
                 ", _nextElicit=" + _nextElicit +
                 ", _requestEndMS=" + _requestEndMS +
                 ", _workArea=" + _workArea +
@@ -488,6 +645,13 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
                 '}';
     }
 
+
+    //=============================================================================================
+    // NAMING
+
+    private static String[] NAMES = { "takara", "akai", "frodo", "sam", "merry", "pippin", "gimli", "legolas", "larry", "moe", "curly", "sleepy", "grumpy", "dopey", "doc", "bashful" };
+
+    private static int NAME_INDEX = 0;
 
     private static String makeName()
     {
@@ -502,23 +666,33 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         return name;
     }
 
-    private static String[] NAMES = { "takara", "akai", "frodo", "sam", "merry", "pippin", "gimli", "legolas", "larry", "moe", "curly", "sleepy", "grumpy", "dopey", "doc", "bashful" };
 
-    private static int NAME_INDEX = 0;
+    //=============================================================================================
+    //=============================================================================================
 
-
-    //========================
     // PRIVATES
     private EntityDrudge _entity;
 
-    private enum State { IDLING, ELICITING, TRANSITING, TARGETING, PERFORMING }
+    private enum State {
+        IDLING,         // Don't currently have work.  Usually not moving.  We can do other AI ops.
+        ELICITING,      // Messaging, looking for work
+        TRANSITING,     // Coarse grained movement
+        TARGETING,      // Fine grained movement
+        PERFORMING      // Within distance of pos.
+    }
+
+    // Main state variable for the loop
     private State _state = State.IDLING;
 
-    private static final int CHECK_DELAY_MILLIS = 3000;
+
+    // We don't want to ask for work too often.  If we don't get a response, just hang out.
+    private static final int ELICIT_DELAY_MS = 3000;
+    private long _nextElicit = 0;
+
+
     private static final int DEFAULT_RANGE = 10;
     private static final double DEFAULT_SPEED = 0.5;
 
-    private long _nextElicit = 0;
 
     // Time we wait for messages.  5 ticks (250 ms) is usually good enough
     private static final long REQUEST_TIMEOUT_MS = 250;
@@ -528,15 +702,23 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
     private BlockPos _workArea = null;
 
 
+    private final List<TaskPair> _proposedTasks = new ArrayList<TaskPair>();
+
     // Queue of messages
     private final Queue<Message> _messages = new LinkedTransferQueue<Message>();
     private final List<Message> _responses = new LinkedList<Message>();
-    private final List<TaskBase> _proposedTasks = new ArrayList<TaskBase>();
     private final List<MessageTaskRequest> _responseTasks = new LinkedList<MessageTaskRequest>();
+
+
     private final List<BlockPos> _workAreas = new ArrayList<BlockPos>();
 
     // Do we have a current task we are pursuing?
-    private TaskBase _currentTask;
+    private TaskPair _currentPair;
+
+    // We have two basic actions.  Sometimes we need to empty our contents first
+    //private TaskBase _emptyContents;
+    private TaskAcquireBase _acquireTask;
+    private TaskDeliverBase _deliverTask;
 
     private static final Logger LOGGER = LogManager.getLogger();
 }

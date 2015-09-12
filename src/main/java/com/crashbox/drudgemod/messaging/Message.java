@@ -12,14 +12,14 @@ public class Message
      * @param sender Who sent the message.
      * @param target Intended recipient, null for broadcast.
      * @param transactionID Reason we sent this.  Used for linking return messages.
-     * @param priority
+     * @param value
      */
-    protected Message(IMessager sender, IMessager target, Object transactionID, int priority)
+    protected Message(IMessager sender, IMessager target, Object transactionID, int value)
     {
         _sender = sender;
         _target = target;
         _transactionID = transactionID;
-        _priority = priority;
+        _value = value;
     }
 
     public IMessager getSender()
@@ -37,9 +37,9 @@ public class Message
         return _transactionID;
     }
 
-    public int getPriority()
+    public int getValue()
     {
-        return _priority;
+        return _value;
     }
 
     @Override
@@ -60,11 +60,11 @@ public class Message
         builder.append(" sender=").append(DrudgeUtils.objID(_sender));
         builder.append(", target=").append(DrudgeUtils.objID(_target));
         builder.append(", transactionID=").append(DrudgeUtils.objID(_transactionID));
-        builder.append(", priority=").append(_priority);
+        builder.append(", priority=").append(_value);
     }
 
     private final IMessager _sender;
     private final IMessager _target;
     private final Object _transactionID;
-    private final int _priority;
+    private final int _value;
 }
