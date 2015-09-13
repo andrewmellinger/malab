@@ -66,7 +66,7 @@ public abstract class TaskBase
     }
 
     /**
-     * This is where the bot needs to move to do execute the work.  This is not necessarily
+     * This is where the bot needs to move to do executeAndIsDone the work.  This is not necessarily
      * the actual block.
      * @param others Other people working near the requester.
      * @return The actual work center we want to work at.
@@ -77,7 +77,7 @@ public abstract class TaskBase
      * Make progress on the work indicated when we are done with this target block.
      * @return True if we are done.
      */
-    public abstract boolean execute();
+    public abstract boolean executeAndIsDone();
 
     /**
      * @return The value of this work being performed.

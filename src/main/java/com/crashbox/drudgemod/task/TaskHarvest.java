@@ -29,7 +29,7 @@ public class TaskHarvest extends TaskAcquireBase
     }
 
     @Override
-    public boolean execute()
+    public boolean executeAndIsDone()
     {
         // REMEMBER: Return true to STOP
         // If we are in the process of breaking, do that.
@@ -62,7 +62,7 @@ public class TaskHarvest extends TaskAcquireBase
 
         if (_harvestBlock == null)
         {
-            debugLog(LOGGER, "Got to end of harvest execute with null harvestBlock...");
+            debugLog(LOGGER, "Got to end of harvest executeAndIsDone with null harvestBlock...");
             return true;
         }
 

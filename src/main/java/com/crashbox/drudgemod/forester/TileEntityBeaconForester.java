@@ -101,27 +101,32 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
                     Broadcaster.postMessage(req);
                 }
             }
-//            else if (msg instanceof MessageWorkerAvailability && timeForAvailabilityResponse())
-//            {
-//                //LOGGER.debug("Forester " + this + " is asked for work." + msg);
-//
-//                MessageWorkerAvailability availability = (MessageWorkerAvailability)msg;
-//
-//                EntityItem pickup = AIUtils.findFirstEntityOfTypeOnGround(getWorld(), getPos(), _searchRadius,
-//                        Item.getItemFromBlock(Blocks.sapling));
-//                BlockPos target = AIUtils.findEmptyOrchardSquare(getWorld(), getPos(), _searchRadius);
-//
-//                //LOGGER.debug("pickup=" + pickup + " , target=" + target);
-//
-//                if (pickup != null && target != null)
-//                {
-//                    MessagePlantSaplings req = new MessagePlantSaplings(TileEntityBeaconForester.this,
-//                            availability.getSender(), msg.getTransactionID(), 0);
-//
+            else if (msg instanceof MessageWorkerAvailability && timeForAvailabilityResponse())
+            {
+                //LOGGER.debug("Forester " + this + " is asked for work." + msg);
+
+                MessageWorkerAvailability availability = (MessageWorkerAvailability)msg;
+
+                EntityItem pickup = AIUtils.findFirstEntityOfTypeOnGround(getWorld(), getPos(), _searchRadius,
+                        Item.getItemFromBlock(Blocks.sapling));
+                BlockPos target = AIUtils.findEmptyOrchardSquare(getWorld(), getPos(), _searchRadius);
+
+                LOGGER.debug("pickup=" + pickup + " , target=" + target);
+                if (pickup != null && target != null)
+                {
+                    MessagePickupRequest pickupRequest = new MessagePickupRequest(TileEntityBeaconForester.this,
+                            msg.getSender(), msg.getTransactionID(), 0, 4, Item.getItemFromBlock(Blocks.sapling));
+
+                    MessagePlantSapling plantRequest = new MessagePlantSapling(TileEntityBeaconForester.this,
+                            msg.getSender(), msg.getTransactionID(), 0);
+
+                    MessageTaskPairRequest pairRequest = new MessageTaskPairRequest(TileEntityBeaconForester.this,
+                            msg.getSender(), msg.getTransactionID(), true, pickupRequest, plantRequest);
+
 //                    //LOGGER.debug("Posting request: " + req);
-//                    Broadcaster.postMessage(req);
-//                }
-//            }
+                    Broadcaster.postMessage(pairRequest);
+                }
+            }
         }
     }
 

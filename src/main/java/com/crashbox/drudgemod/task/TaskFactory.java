@@ -16,6 +16,9 @@ public class TaskFactory
         if (taskClass == TaskHarvest.class && message instanceof MessageHarvestRequest)
             return new TaskHarvest(performer, (MessageHarvestRequest)message);
 
+        if (taskClass == TaskPickup.class && message instanceof MessagePickupRequest)
+            return new TaskPickup(performer, (MessagePickupRequest)message);
+
         LOGGER.error("Failed to construct task for " + message);
         return null;
     }
@@ -26,8 +29,8 @@ public class TaskFactory
         if (taskClass == TaskStore.class && message instanceof MessageStoreRequest)
             return new TaskStore(performer, (MessageStoreRequest)message);
 
-//        else if (taskClass == TaskPlantSapling.class && message instanceof MessagePlantSaplings)
-//            return new TaskPlantSapling(performer, (MessagePlantSaplings)message);
+        else if (taskClass == TaskPlantSapling.class && message instanceof MessagePlantSapling)
+            return new TaskPlantSapling(performer, (MessagePlantSapling)message);
 
         LOGGER.error("Failed to construct task for " + message);
         return null;

@@ -44,7 +44,7 @@ public class TaskStore extends TaskDeliverBase
     }
 
     @Override
-    public boolean execute()
+    public boolean executeAndIsDone()
     {
         ItemStack current = getEntity().getHeldItem();
 

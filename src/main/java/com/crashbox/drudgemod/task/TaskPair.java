@@ -15,7 +15,7 @@ import java.util.List;
 public class TaskPair
 {
     public enum Resolving { UNRESOLVED, RESOLVING, RESOLVED }
-    public enum Stage { EMPTYING, ACQUIRING, DELIVERING, SUCCESS, FAILED}
+    public enum Stage { EMPTYING, ACQUIRING, DELIVERING, DONE}
     public enum UpdateResult { CONTINUE, RETARGET, DONE }
 
     public TaskPair(EntityAIDrudge entityAI)
@@ -63,6 +63,16 @@ public class TaskPair
         _resolving = resolving;
     }
 
+    public boolean repeat()
+    {
+        return _repeat;
+    }
+
+    public void setRepeat(boolean repeat)
+    {
+        _repeat = repeat;
+    }
+
     public Stage getStage()
     {
         return _stage;
@@ -88,13 +98,8 @@ public class TaskPair
         else
         {
             LOGGER.error("Starting task pair but didn't have any tasks!");
-            _stage = Stage.FAILED;
+            _stage = Stage.DONE;
         }
-    }
-
-    public boolean isDone()
-    {
-        return _stage == Stage.SUCCESS || _stage == Stage.FAILED;
     }
 
     public BlockPos getWorkCenter()
@@ -117,6 +122,7 @@ public class TaskPair
         }
         else
         {
+            // We have nothing and we can't acquire.  Give up.
             return null;
         }
 
@@ -133,7 +139,7 @@ public class TaskPair
         // Keep executing until is says it is done.
 
         // When done we need to move to the next thing, or we are completely done
-        if (!_current.execute())
+        if (!_current.executeAndIsDone())
             return UpdateResult.CONTINUE;
 
         // If we are here it is done.
@@ -157,8 +163,25 @@ public class TaskPair
 
             case DELIVERING:
                 LOGGER.debug(_entityAI.id() + ":  finished delivering.");
+                if (_repeat)
+                {
+                    // If we are supposed to repeat then keep delivering until we run out
+                    // or switch to reaquire until it runs out.
+                    if (_entityAI.getEntity().getHeldSize() == 0)
+                    {
+                        _stage = Stage.ACQUIRING;
+                        _current = _acquireTask;
+                    }
+
+                    return UpdateResult.RETARGET;
+                }
+
+                // Since we have no repeat, we are done.
                 _current = null;
-                _stage = Stage.SUCCESS;
+                _stage = Stage.DONE;
+
+
+
                 return UpdateResult.DONE;
         }
 
@@ -187,6 +210,7 @@ public class TaskPair
 
     // Back reference to the entityAI.
     private final EntityAIDrudge    _entityAI;
+    private boolean                 _repeat;
 
     private Stage                   _stage = Stage.EMPTYING;
     private Resolving               _resolving = Resolving.UNRESOLVED;

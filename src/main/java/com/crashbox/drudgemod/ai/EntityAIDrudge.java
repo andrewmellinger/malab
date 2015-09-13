@@ -7,6 +7,7 @@ import com.crashbox.drudgemod.task.*;
 import com.crashbox.drudgemod.task.TaskPair.Resolving;
 import com.crashbox.drudgemod.task.TaskPair.UpdateResult;
 import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import org.apache.logging.log4j.LogManager;
@@ -72,18 +73,23 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         switch (_state)
         {
             case IDLING:
+//                getEntity().setCurrentItemOrArmor(4, null);
                 _state = idle();
                 break;
             case ELICITING:
+//                getEntity().setCurrentItemOrArmor(4, new ItemStack(Items.leather_helmet));
                 _state = elicit();
                 break;
             case TRANSITING:
+//                getEntity().setCurrentItemOrArmor(4, new ItemStack(Items.iron_helmet));
                 _state = transition();
                 break;
             case TARGETING:
+//                getEntity().setCurrentItemOrArmor(4, new ItemStack(Items.golden_helmet));
                 _state = target();
                 break;
             case PERFORMING:
+//                getEntity().setCurrentItemOrArmor(4, new ItemStack(Items.diamond_helmet, 1));
                 _state = perform();
                 break;
         }
@@ -141,6 +147,14 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
                     _responseTasks.add((MessageTaskRequest) msg);
                 }
             }
+            else if (msg instanceof MessageTaskPairRequest)
+            {
+                if (msg.getTransactionID() == MessageWorkerAvailability.class)
+                {
+                    debugLog("Adding new tasks for PAIR message: " + msg);
+                    _proposedTasks.add(makeNewTaskPair((MessageTaskPairRequest) msg));
+                }
+            }
             else if (msg.getTransactionID() != null)
             {
                 // If it has a transactionID it is a response to something we sent before, but isn't a task
@@ -182,6 +196,22 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         {
             LOGGER.error("makeTaskPair: Don't know what to do with task request: " + message);
         }
+
+        return pair;
+    }
+
+    private TaskPair makeNewTaskPair(MessageTaskPairRequest message)
+    {
+        TaskPair pair = new TaskPair(this);
+
+        TaskAcquireBase taskAcquire = TASK_FACTORY.makeTaskFromMessage(this, message.getAcquireRequest());
+        pair.setAcquireTask(taskAcquire);
+
+        TaskDeliverBase taskDeliver= TASK_FACTORY.makeTaskFromMessage(this, message.getDeliverRequest());
+        pair.setDeliverTask(taskDeliver);
+
+        // Should we repeat?
+        pair.setRepeat(message.getRepeat());
 
         return pair;
     }
@@ -244,6 +274,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
                 return State.IDLING;
             }
 
+            //getEntity().spawnExplosionParticle();
             debugLog("Selected task: " + _currentPair);
             debugLog("   ==> moving to: " + _currentPair.getWorkCenter());
             tryMoveTo(_currentPair.getWorkCenter());

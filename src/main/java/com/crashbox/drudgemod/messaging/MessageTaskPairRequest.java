@@ -9,31 +9,32 @@ import com.crashbox.drudgemod.task.TaskDeliverBase;
  */
 public class MessageTaskPairRequest extends Message
 {
-    public MessageTaskPairRequest(IMessager sender, IMessager target, Object transactionID, int value,
-            Class<? extends TaskAcquireBase> acquireClass, Class<? extends TaskDeliverBase> deliverClass)
+    public MessageTaskPairRequest(IMessager sender, IMessager target, Object transactionID, boolean repeat,
+            MessageAcquireRequest acquire, MessageDeliverRequest deliver)
     {
-        super(sender, target, transactionID, value);
-        _acquireClass = acquireClass;
-        _deliverClass = deliverClass;
+        super(sender, target, transactionID, 0);
+        _repeat = repeat;
+        _acquire = acquire;
+        _deliver = deliver;
     }
 
-    public Class<? extends TaskAcquireBase>  getAcquireClass()
+    /** Should we repeat the task until acquire runs out. */
+    public boolean getRepeat()
     {
-        return _acquireClass;
+        return _repeat;
     }
 
-    public Class<? extends TaskDeliverBase> getDeliverClass()
+    public MessageAcquireRequest getAcquireRequest()
     {
-        return _deliverClass;
+        return _acquire;
     }
 
-    public void debugInfo(StringBuilder builder)
+    public MessageDeliverRequest getDeliverRequest()
     {
-        super.debugInfo(builder);
-        builder.append(", _acquire=").append(_acquireClass.getSimpleName());
-        builder.append(", _deliver=").append(_deliverClass.getSimpleName());
+        return _deliver;
     }
 
-    private final Class<? extends TaskAcquireBase> _acquireClass;
-    private final Class<? extends TaskDeliverBase> _deliverClass;
+    private final boolean _repeat;
+    private final MessageAcquireRequest _acquire;
+    private final MessageDeliverRequest _deliver;
 }
