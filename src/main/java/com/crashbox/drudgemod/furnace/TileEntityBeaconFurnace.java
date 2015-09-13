@@ -503,7 +503,6 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
         }
     }
 
-
     //=============================================================================================
 
     public boolean isBurning()
@@ -551,13 +550,17 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
         {
             ItemStack itemstack = FurnaceRecipes.instance().getSmeltingResult(_itemStacks[INPUT_INDEX]);
 
-            // Automatically refuel.  Bascially, this is form charcoal
+            // Automatically refuel if we take the same item
             if (_itemStacks[FUEL_INDEX] != null &&
                     _itemStacks[FUEL_INDEX].stackSize < 48 &&
                     _itemStacks[FUEL_INDEX].isItemEqual(itemstack))
             {
                 // In case we have multiple outputs
                 _itemStacks[FUEL_INDEX].stackSize += itemstack.stackSize;
+            }
+            else if (_itemStacks[FUEL_INDEX] == null && fuelSampleContains(itemstack)                    )
+            {
+                _itemStacks[FUEL_INDEX] = itemstack.copy();
             }
             else if (_itemStacks[OUTPUT_INDEX] == null)
             {
@@ -687,6 +690,17 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
     {
         return _itemStacks[FUEL_INDEX];
     }
+
+    private boolean fuelSampleContains(ItemStack stack)
+    {
+        for (int i = FUEL_SAMPLE_MIN; i <= FUEL_SAMPLE_MAX; ++i)
+        {
+            if (_itemStacks[i] != null && _itemStacks[i].isItemEqual(stack))
+                return true;
+        }
+        return false;
+    }
+
 
     //---------------------------
 
