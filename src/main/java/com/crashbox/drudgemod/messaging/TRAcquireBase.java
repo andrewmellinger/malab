@@ -6,9 +6,9 @@ import com.crashbox.drudgemod.task.TaskBase;
 /**
  * Copyright 2015 Andrew O. Mellinger
  */
-public class MessageAcquireRequest extends MessageTaskRequest
+public class TRAcquireBase extends MessageTaskRequest
 {
-    public MessageAcquireRequest(IMessager sender, IMessager target, Object transactionID, int priority,
+    public TRAcquireBase(IMessager sender, IMessager target, Object transactionID, int priority,
             Class<? extends TaskBase> clazz, ItemStackMatcher matcher,
             int quantity)
     {

@@ -5,9 +5,7 @@ import com.crashbox.drudgemod.EntityDrudge;
 import com.crashbox.drudgemod.messaging.*;
 import com.crashbox.drudgemod.task.*;
 import com.crashbox.drudgemod.task.TaskPair.Resolving;
-import com.crashbox.drudgemod.task.TaskPair.UpdateResult;
 import net.minecraft.entity.ai.EntityAIBase;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import org.apache.logging.log4j.LogManager;
@@ -182,14 +180,14 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
     private TaskPair makeNewTaskPair(MessageTaskRequest message)
     {
         TaskPair pair = new TaskPair(this);
-        if (message instanceof MessageAcquireRequest)
+        if (message instanceof TRAcquireBase)
         {
-            TaskAcquireBase task = TASK_FACTORY.makeTaskFromMessage(this, (MessageAcquireRequest) message);
+            TaskAcquireBase task = TASK_FACTORY.makeTaskFromMessage(this, (TRAcquireBase) message);
             pair.setAcquireTask(task);
         }
-        else if (message instanceof MessageDeliverRequest)
+        else if (message instanceof TRDeliverBase)
         {
-            TaskDeliverBase task = TASK_FACTORY.makeTaskFromMessage(this, (MessageDeliverRequest) message);
+            TaskDeliverBase task = TASK_FACTORY.makeTaskFromMessage(this, (TRDeliverBase) message);
             pair.setDeliverTask(task);
         }
         else
@@ -335,10 +333,10 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
                 pos = pair.getAcquireTask().getCoarsePos();
         }
 
-        List<MessageDeliverRequest> delivers = extractMessages(responses, MessageDeliverRequest.class);
+        List<TRDeliverBase> delivers = extractMessages(responses, TRDeliverBase.class);
         if (delivers.size() > 0)
         {
-            MessageDeliverRequest best = findBest(pos, delivers);
+            TRDeliverBase best = findBest(pos, delivers);
             if (DrudgeUtils.isNotNull(best, LOGGER))
             {
                 if (forEmpty)
@@ -360,11 +358,11 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         if (pair.getEmptyInventory() != null)
             pos = pair.getEmptyInventory().getCoarsePos();
 
-        List<MessageAcquireRequest> acquires = extractMessages(responses, MessageAcquireRequest.class);
+        List<TRAcquireBase> acquires = extractMessages(responses, TRAcquireBase.class);
         debugLog("Have (" + acquires.size() + ") acquires ");
         if (acquires.size() > 0)
         {
-            MessageAcquireRequest best = findBest(pos, acquires);
+            TRAcquireBase best = findBest(pos, acquires);
             debugLog("Best acquire: " + best);
             if (DrudgeUtils.isNotNull(best, LOGGER))
             {
@@ -446,7 +444,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         if (held != null && pair.getDeliverTask() != null && !pair.getDeliverTask().getMatcher().matches(held))
         {
             // We need to dump something we are holding before we can acquire
-            return new MessageStorageRequest(this, null, pair, 0, held);
+            return new MessageIsStorageAvailable(this, null, pair, 0, held);
         }
 
         // Need to deliver, do we need to acquire?
@@ -464,7 +462,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         // We accepted an acquire before deliver.  So a really full chest or orchard
         if (pair.getAcquireTask() != null && pair.getDeliverTask() == null)
         {
-            return new MessageStorageRequest(this, null, pair, 0, pair.getAcquireTask().getSample());
+            return new MessageIsStorageAvailable(this, null, pair, 0, pair.getAcquireTask().getSample());
         }
 
         // Everybody is good, we don't need anything

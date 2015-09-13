@@ -5,10 +5,10 @@ import net.minecraft.item.ItemStack;
 /**
  * Copyright 2015 Andrew O. Mellinger
  */
-public class MessageStorageRequest extends Message
+public class MessageIsStorageAvailable extends Message
 {
     // Used to request a place to store this item
-    public MessageStorageRequest(IMessager sender, IMessager target, Object transactionID, int priority,
+    public MessageIsStorageAvailable(IMessager sender, IMessager target, Object transactionID, int priority,
             ItemStack stack)
     {
         super(sender, target, transactionID, priority);

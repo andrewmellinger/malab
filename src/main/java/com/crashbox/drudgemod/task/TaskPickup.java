@@ -2,7 +2,7 @@ package com.crashbox.drudgemod.task;
 
 import com.crashbox.drudgemod.ai.AIUtils;
 import com.crashbox.drudgemod.ai.EntityAIDrudge;
-import com.crashbox.drudgemod.messaging.MessagePickupRequest;
+import com.crashbox.drudgemod.messaging.TRPickup;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class TaskPickup extends TaskAcquireBase
 {
-    public TaskPickup(EntityAIDrudge performer, MessagePickupRequest message)
+    public TaskPickup(EntityAIDrudge performer, TRPickup message)
     {
         super(performer, message.getSender(), message.getValue());
         _item = message.getItem();

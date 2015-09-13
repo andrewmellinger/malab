@@ -5,7 +5,7 @@ import com.crashbox.drudgemod.ai.AIUtils;
 import com.crashbox.drudgemod.ai.EntityAIDrudge;
 import com.crashbox.drudgemod.ai.RingedSearcher;
 import com.crashbox.drudgemod.common.ItemStackMatcher;
-import com.crashbox.drudgemod.messaging.MessageHarvestRequest;
+import com.crashbox.drudgemod.messaging.TRHarvest;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
@@ -20,7 +20,7 @@ import java.util.Queue;
  */
 public class TaskHarvest extends TaskAcquireBase
 {
-    public TaskHarvest(EntityAIDrudge performer, MessageHarvestRequest message)
+    public TaskHarvest(EntityAIDrudge performer, TRHarvest message)
     {
         super(performer, message.getSender(), message.getValue());
         _radius = message.getSender().getRadius();

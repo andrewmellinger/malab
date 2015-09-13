@@ -94,7 +94,7 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
                 if (hasMats && drudgeCount < getMaxDrudgeCount())
                 {
                     // Offer a task, at our area for the requested thing.
-                    MessageHarvestRequest req = new MessageHarvestRequest(TileEntityBeaconForester.this, itemReq.getSender(),
+                    TRHarvest req = new TRHarvest(TileEntityBeaconForester.this, itemReq.getSender(),
                             msg.getTransactionID(), 0, itemReq.getMatcher(), itemReq.getQuantity());
 
                     debugLog("Posting request: " + req);
@@ -114,10 +114,10 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
                 LOGGER.debug("pickup=" + pickup + " , target=" + target);
                 if (pickup != null && target != null)
                 {
-                    MessagePickupRequest pickupRequest = new MessagePickupRequest(TileEntityBeaconForester.this,
+                    TRPickup pickupRequest = new TRPickup(TileEntityBeaconForester.this,
                             msg.getSender(), msg.getTransactionID(), 0, 4, Item.getItemFromBlock(Blocks.sapling));
 
-                    MessagePlantSapling plantRequest = new MessagePlantSapling(TileEntityBeaconForester.this,
+                    TRPlantSapling plantRequest = new TRPlantSapling(TileEntityBeaconForester.this,
                             msg.getSender(), msg.getTransactionID(), 0);
 
                     MessageTaskPairRequest pairRequest = new MessageTaskPairRequest(TileEntityBeaconForester.this,

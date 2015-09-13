@@ -758,7 +758,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
                     if (matcher != null)
                     {
                         // Send a message back to this guy telling him that we could use more
-                        MessageStoreRequest req = new MessageStoreRequest(TileEntityBeaconFurnace.this,
+                        TRStore req = new TRStore(TileEntityBeaconFurnace.this,
                                 availability.getSender(), msg.getTransactionID(), priority, getSmeltableItemMatcher(),
                                 getSmeltableQuantityWanted(), INPUT_INDEX);
 
@@ -767,13 +767,13 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
                     }
                 }
             }
-            else if (msg instanceof MessageStorageRequest)
+            else if (msg instanceof MessageIsStorageAvailable)
             {
-                MessageStorageRequest request = (MessageStorageRequest)msg;
+                MessageIsStorageAvailable request = (MessageIsStorageAvailable)msg;
                 if (_itemStacks[INPUT_INDEX] != null && _itemStacks[INPUT_INDEX].isItemEqual(request.getStack()))
                 {
                     // Send a message back to this guy telling him that we could use more
-                    MessageStoreRequest req = new MessageStoreRequest(TileEntityBeaconFurnace.this,
+                    TRStore req = new TRStore(TileEntityBeaconFurnace.this,
                             request.getSender(), msg.getTransactionID(), 0, new ItemStackMatcher(_itemStacks[INPUT_INDEX]),
                             getSmeltableQuantityWanted(), INPUT_INDEX);
                 }

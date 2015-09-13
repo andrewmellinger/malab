@@ -2,7 +2,7 @@ package com.crashbox.drudgemod.task;
 
 import com.crashbox.drudgemod.ai.AIUtils;
 import com.crashbox.drudgemod.ai.EntityAIDrudge;
-import com.crashbox.drudgemod.messaging.MessagePlantSapling;
+import com.crashbox.drudgemod.messaging.TRPlantSapling;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class TaskPlantSapling extends TaskDeliverBase
 {
-    public TaskPlantSapling(EntityAIDrudge performer, MessagePlantSapling message)
+    public TaskPlantSapling(EntityAIDrudge performer, TRPlantSapling message)
     {
         super(performer, message.getSender(), message.getValue());
     }

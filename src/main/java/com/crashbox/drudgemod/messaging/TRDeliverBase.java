@@ -6,10 +6,10 @@ import com.crashbox.drudgemod.task.TaskDeliverBase;
 /**
  * Copyright 2015 Andrew O. Mellinger
  */
-public class MessageDeliverRequest extends MessageTaskRequest
+public class TRDeliverBase extends MessageTaskRequest
 {
-    public MessageDeliverRequest(IMessager sender, IMessager receiver, Object transactionID, int priority,
-            Class < ? extends TaskDeliverBase> clazz, ItemStackMatcher matcher, int quantity)
+    public TRDeliverBase(IMessager sender, IMessager receiver, Object transactionID, int priority,
+            Class<? extends TaskDeliverBase> clazz, ItemStackMatcher matcher, int quantity)
     {
         super(sender, receiver, transactionID, priority, clazz);
         _matcher = matcher;

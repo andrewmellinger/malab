@@ -1,16 +1,14 @@
 package com.crashbox.drudgemod.messaging;
 
-import com.crashbox.drudgemod.common.ItemStackMatcher;
-import com.crashbox.drudgemod.task.TaskBase;
 import com.crashbox.drudgemod.task.TaskPickup;
 import net.minecraft.item.Item;
 
 /**
  * Copyright 2015 Andrew O. Mellinger
  */
-public class MessagePickupRequest extends MessageAcquireRequest
+public class TRPickup extends TRAcquireBase
 {
-    public MessagePickupRequest(IMessager sender, IMessager target, Object transactionID, int priority,
+    public TRPickup(IMessager sender, IMessager target, Object transactionID, int priority,
             int quantity, Item item)
     {
         super(sender, target, transactionID, priority, TaskPickup.class, null, quantity);

@@ -10,27 +10,27 @@ import org.apache.logging.log4j.Logger;
  */
 public class TaskFactory
 {
-    public TaskAcquireBase makeTaskFromMessage(EntityAIDrudge performer, MessageAcquireRequest message)
+    public TaskAcquireBase makeTaskFromMessage(EntityAIDrudge performer, TRAcquireBase message)
     {
         Class<? extends TaskBase> taskClass = message.getTaskClass();
-        if (taskClass == TaskHarvest.class && message instanceof MessageHarvestRequest)
-            return new TaskHarvest(performer, (MessageHarvestRequest)message);
+        if (taskClass == TaskHarvest.class && message instanceof TRHarvest)
+            return new TaskHarvest(performer, (TRHarvest)message);
 
-        if (taskClass == TaskPickup.class && message instanceof MessagePickupRequest)
-            return new TaskPickup(performer, (MessagePickupRequest)message);
+        if (taskClass == TaskPickup.class && message instanceof TRPickup)
+            return new TaskPickup(performer, (TRPickup)message);
 
         LOGGER.error("Failed to construct task for " + message);
         return null;
     }
 
-    public TaskDeliverBase makeTaskFromMessage(EntityAIDrudge performer, MessageDeliverRequest message)
+    public TaskDeliverBase makeTaskFromMessage(EntityAIDrudge performer, TRDeliverBase message)
     {
         Class<? extends TaskBase> taskClass = message.getTaskClass();
-        if (taskClass == TaskStore.class && message instanceof MessageStoreRequest)
-            return new TaskStore(performer, (MessageStoreRequest)message);
+        if (taskClass == TaskStore.class && message instanceof TRStore)
+            return new TaskStore(performer, (TRStore)message);
 
-        else if (taskClass == TaskPlantSapling.class && message instanceof MessagePlantSapling)
-            return new TaskPlantSapling(performer, (MessagePlantSapling)message);
+        else if (taskClass == TaskPlantSapling.class && message instanceof TRPlantSapling)
+            return new TaskPlantSapling(performer, (TRPlantSapling)message);
 
         LOGGER.error("Failed to construct task for " + message);
         return null;

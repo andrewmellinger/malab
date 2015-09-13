@@ -1,16 +1,12 @@
 package com.crashbox.drudgemod.messaging;
 
-import com.crashbox.drudgemod.DrudgeUtils;
-import com.crashbox.drudgemod.task.TaskAcquireBase;
-import com.crashbox.drudgemod.task.TaskDeliverBase;
-
 /**
  * Copyright 2015 Andrew O. Mellinger
  */
 public class MessageTaskPairRequest extends Message
 {
     public MessageTaskPairRequest(IMessager sender, IMessager target, Object transactionID, boolean repeat,
-            MessageAcquireRequest acquire, MessageDeliverRequest deliver)
+            TRAcquireBase acquire, TRDeliverBase deliver)
     {
         super(sender, target, transactionID, 0);
         _repeat = repeat;
@@ -24,17 +20,17 @@ public class MessageTaskPairRequest extends Message
         return _repeat;
     }
 
-    public MessageAcquireRequest getAcquireRequest()
+    public TRAcquireBase getAcquireRequest()
     {
         return _acquire;
     }
 
-    public MessageDeliverRequest getDeliverRequest()
+    public TRDeliverBase getDeliverRequest()
     {
         return _deliver;
     }
 
     private final boolean _repeat;
-    private final MessageAcquireRequest _acquire;
-    private final MessageDeliverRequest _deliver;
+    private final TRAcquireBase _acquire;
+    private final TRDeliverBase _deliver;
 }

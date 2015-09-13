@@ -18,7 +18,7 @@ import java.util.List;
  */
 public class TaskStore extends TaskDeliverBase
 {
-    public TaskStore(EntityAIDrudge performer, MessageStoreRequest message)
+    public TaskStore(EntityAIDrudge performer, TRStore message)
     {
         super(performer, message.getSender(), message.getValue());
         _matcher = message.getMatcher();
