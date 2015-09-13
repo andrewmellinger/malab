@@ -5,6 +5,7 @@ import com.crashbox.drudgemod.EntityDrudge;
 import com.crashbox.drudgemod.messaging.*;
 import com.crashbox.drudgemod.task.*;
 import com.crashbox.drudgemod.task.TaskPair.Resolving;
+import com.crashbox.drudgemod.task.TaskPair.UpdateResult;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
@@ -37,7 +38,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
     public boolean shouldExecute()
     {
         updateTask();
-        return (_currentPair != null);
+        return (_state != State.IDLING);
     }
 
     @Override
@@ -59,7 +60,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
     @Override
     public void resetTask()
     {
-        startExecuting();
+        reset();
     }
 
     @Override
@@ -118,7 +119,8 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
             if (msg.getTarget() != null && msg.getTarget() != this)
                 continue;
 
-            // Hand data requests.  These are generally simple status things - We could move this to the handler...
+            // Hand data requests.  These are generally simple status things -
+            // TODO: Move this to the listener so it doesn't have to wait for the AI loop.
             if (msg instanceof MessageDataRequest)
             {
                 processDataRequests((MessageDataRequest)msg);
@@ -243,6 +245,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
             }
 
             debugLog("Selected task: " + _currentPair);
+            debugLog("   ==> moving to: " + _currentPair.getWorkCenter());
             tryMoveTo(_currentPair.getWorkCenter());
             return State.TRANSITING;
         }
@@ -577,22 +580,33 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         // Keep doing the task until we run out.
         if (_currentPair != null)
         {
-            _currentPair.updateTask();
-
-            if (_currentPair.retarget())
+            switch (_currentPair.updateTask())
             {
-                debugLog(" Retargeting");
-                requestWorkAreas();
-                return State.TARGETING;
-            }
-            else if (_currentPair.isDone())
-            {
-                debugLog(" Switching to idle.");
-                return State.IDLING;
+                case CONTINUE:
+                    // Nothing special.
+                    return State.PERFORMING;
+                case RETARGET:
+                    debugLog(" Retargeting");
+                    requestWorkAreas();
+                    return State.TARGETING;
+                case DONE:
+                    debugLog(" Switching to idle.");
+                    return State.IDLING;
             }
         }
 
-        return State.PERFORMING;
+        return State.IDLING;
+    }
+
+
+    private void reset()
+    {
+        _state = State.IDLING;
+        _currentPair = null;
+        _workArea = null;
+        _proposedTasks.clear();
+        _responses.clear();
+        _nextElicit = System.currentTimeMillis() + ELICIT_DELAY_MS;
     }
 
     //=============================================================================================
@@ -734,7 +748,6 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
     private final Queue<Message> _messages = new LinkedTransferQueue<Message>();
     private final List<Message> _responses = new LinkedList<Message>();
     private final List<MessageTaskRequest> _responseTasks = new LinkedList<MessageTaskRequest>();
-
 
     private final List<BlockPos> _workAreas = new ArrayList<BlockPos>();
 

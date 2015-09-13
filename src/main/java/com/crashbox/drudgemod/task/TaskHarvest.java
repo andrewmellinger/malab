@@ -97,7 +97,10 @@ public class TaskHarvest extends TaskAcquireBase
         }
 
         _harvestBlock = _harvestList.poll();
-        return _harvestBlock;
+
+        // We want them to move to a place which is correct X,Z but with ground Y.
+
+        return new BlockPos(_harvestBlock.getX(), getRequester().getPos().getY(), _harvestBlock.getZ());
     }
 
     private void startBreaking()
@@ -161,11 +164,15 @@ public class TaskHarvest extends TaskAcquireBase
                 return false;
         }
 
+        LOGGER.debug("Quantity BEFORE harvest " + targetStack.stackSize);
+
         ///// BREAK
         getEntity().getEntityWorld().destroyBlock(_harvestBlock, true);
 
         ///// PICKUP
         AIUtils.collectEntityIntoStack(getEntity().getEntityWorld(), _harvestBlock, 3, targetStack);
+
+        LOGGER.debug("Quantity AFTER harvest " + targetStack.stackSize);
 
         if (getEntity().getHeldItem() == null && targetStack.stackSize > 0)
             getEntity().setCurrentItemOrArmor(0, targetStack);

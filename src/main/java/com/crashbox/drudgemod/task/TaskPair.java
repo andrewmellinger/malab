@@ -16,7 +16,7 @@ public class TaskPair
 {
     public enum Resolving { UNRESOLVED, RESOLVING, RESOLVED }
     public enum Stage { EMPTYING, ACQUIRING, DELIVERING, SUCCESS, FAILED}
-
+    public enum UpdateResult { CONTINUE, RETARGET, DONE }
 
     public TaskPair(EntityAIDrudge entityAI)
     {
@@ -92,12 +92,6 @@ public class TaskPair
         }
     }
 
-    public boolean retarget()
-    {
-        return _retarget;
-    }
-
-
     public boolean isDone()
     {
         return _stage == Stage.SUCCESS || _stage == Stage.FAILED;
@@ -110,7 +104,18 @@ public class TaskPair
 
     public BlockPos getWorkTarget(List<BlockPos> exclusions)
     {
-        _retarget = false;
+        BlockPos workArea = _current.chooseWorkArea(exclusions);
+
+        if (workArea != null)
+            return workArea;
+
+        // If we have no work area, we might need to move on.
+        if (_stage == Stage.ACQUIRING)
+        {
+            _stage = Stage.DELIVERING;
+            _current = _deliverTask;
+        }
+
         return _current.chooseWorkArea(exclusions);
     }
 
@@ -119,13 +124,13 @@ public class TaskPair
         return new TaskBase[] { _emptyInventory, _acquireTask, _deliverTask };
     }
 
-    public void updateTask()
+    public UpdateResult updateTask()
     {
         // Keep executing until is says it is done.
 
         // When done we need to move to the next thing, or we are completely done
         if (!_current.execute())
-            return;
+            return UpdateResult.CONTINUE;
 
         // If we are here it is done.
         switch (_stage)
@@ -134,7 +139,8 @@ public class TaskPair
                 _current = _acquireTask;
                 _stage = Stage.ACQUIRING;
                 LOGGER.debug(_entityAI.id() + ":  finished acquiring.");
-                break;
+                return UpdateResult.RETARGET;
+
             case ACQUIRING:
                 // If we have enough stuff, then we are good
                 if (acquiredEnough())
@@ -142,19 +148,17 @@ public class TaskPair
                     LOGGER.debug(_entityAI.id() + ":  acquiredEnough.");
                     _current = _deliverTask;
                     _stage = Stage.DELIVERING;
-                    _retarget = true;
                 }
-                else
-                {
-                    LOGGER.debug(_entityAI.id() + ":  retargeting.");
-                    _retarget = true;
-                }
-                break;
+                return UpdateResult.RETARGET;
+
             case DELIVERING:
                 LOGGER.debug(_entityAI.id() + ":  finished delivering.");
                 _current = null;
                 _stage = Stage.SUCCESS;
+                return UpdateResult.DONE;
         }
+
+        return UpdateResult.CONTINUE;
     }
 
     private boolean acquiredEnough()
@@ -163,14 +167,12 @@ public class TaskPair
                _entityAI.getEntity().getHeldSize() >= _deliverTask.getQuantity();
     }
 
-
     @Override
     public String toString()
     {
         return "TaskPair{" +
                 "stage=" + _stage.name() +
                 ", resolving=" + _resolving.name() +
-                ", retarget=" + _retarget +
                 ", current=" + (_current != null) +
                 ", emptyInventory=" + (_emptyInventory != null) +
                 ", acquireTask=" + (_acquireTask != null) +
@@ -184,8 +186,6 @@ public class TaskPair
 
     private Stage                   _stage = Stage.EMPTYING;
     private Resolving               _resolving = Resolving.UNRESOLVED;
-
-    private boolean                 _retarget;
 
     private TaskBase                _current;
 
