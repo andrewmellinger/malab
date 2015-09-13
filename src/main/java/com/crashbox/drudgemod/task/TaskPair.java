@@ -1,5 +1,6 @@
 package com.crashbox.drudgemod.task;
 
+import com.crashbox.drudgemod.ai.EntityAIDrudge;
 import net.minecraft.util.BlockPos;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,6 +16,12 @@ public class TaskPair
 {
     public enum Resolving { UNRESOLVED, RESOLVING, RESOLVED }
     public enum Stage { EMPTYING, ACQUIRING, DELIVERING, SUCCESS, FAILED}
+
+
+    public TaskPair(EntityAIDrudge entityAI)
+    {
+        _entityAI = entityAI;
+    }
 
     public TaskDeliverBase getEmptyInventory()
     {
@@ -87,7 +94,7 @@ public class TaskPair
 
     public boolean retarget()
     {
-        return false;
+        return _retarget;
     }
 
 
@@ -126,22 +133,25 @@ public class TaskPair
             case EMPTYING:
                 _current = _acquireTask;
                 _stage = Stage.ACQUIRING;
+                LOGGER.debug(_entityAI.id() + ":  finished acquiring.");
                 break;
             case ACQUIRING:
                 // If we have enough stuff, then we are good
                 if (acquiredEnough())
                 {
+                    LOGGER.debug(_entityAI.id() + ":  acquiredEnough.");
                     _current = _deliverTask;
                     _stage = Stage.DELIVERING;
                     _retarget = true;
                 }
                 else
                 {
+                    LOGGER.debug(_entityAI.id() + ":  retargeting.");
                     _retarget = true;
                 }
-
                 break;
             case DELIVERING:
+                LOGGER.debug(_entityAI.id() + ":  finished delivering.");
                 _current = null;
                 _stage = Stage.SUCCESS;
         }
@@ -149,7 +159,8 @@ public class TaskPair
 
     private boolean acquiredEnough()
     {
-        return true;
+        return _entityAI.getEntity().isHeldInventoryFull() ||
+               _entityAI.getEntity().getHeldSize() >= _deliverTask.getQuantity();
     }
 
 
@@ -168,16 +179,19 @@ public class TaskPair
     }
 
 
-    private Stage _stage = Stage.EMPTYING;
-    private Resolving _resolving = Resolving.UNRESOLVED;
+    // Back reference to the entityAI.
+    private final EntityAIDrudge    _entityAI;
 
-    private boolean         _retarget;
+    private Stage                   _stage = Stage.EMPTYING;
+    private Resolving               _resolving = Resolving.UNRESOLVED;
 
-    private TaskBase        _current;
+    private boolean                 _retarget;
 
-    private TaskDeliverBase _emptyInventory;
-    private TaskAcquireBase _acquireTask;
-    private TaskDeliverBase _deliverTask;
+    private TaskBase                _current;
+
+    private TaskDeliverBase         _emptyInventory;
+    private TaskAcquireBase         _acquireTask;
+    private TaskDeliverBase         _deliverTask;
 
 
     private static final Logger LOGGER = LogManager.getLogger();

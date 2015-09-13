@@ -165,7 +165,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
 
     private TaskPair makeNewTaskPair(MessageTaskRequest message)
     {
-        TaskPair pair = new TaskPair();
+        TaskPair pair = new TaskPair(this);
         if (message instanceof MessageAcquireRequest)
         {
             TaskAcquireBase task = TASK_FACTORY.makeTaskFromMessage(this, (MessageAcquireRequest) message);
@@ -242,7 +242,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
                 return State.IDLING;
             }
 
-            LOGGER.debug(id() +  "Selected task: " + _currentPair);
+            debugLog("Selected task: " + _currentPair);
             tryMoveTo(_currentPair.getWorkCenter());
             return State.TRANSITING;
         }
@@ -577,17 +577,17 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         // Keep doing the task until we run out.
         if (_currentPair != null)
         {
-            debugLog(" Update task on pair." + _currentPair);
             _currentPair.updateTask();
-            debugLog(" Updated: " + _currentPair);
 
             if (_currentPair.retarget())
             {
+                debugLog(" Retargeting");
                 requestWorkAreas();
                 return State.TARGETING;
             }
             else if (_currentPair.isDone())
             {
+                debugLog(" Switching to idle.");
                 return State.IDLING;
             }
         }

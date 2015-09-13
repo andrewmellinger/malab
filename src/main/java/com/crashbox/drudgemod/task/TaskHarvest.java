@@ -59,6 +59,13 @@ public class TaskHarvest extends TaskAcquireBase
             return false;
         }
 
+
+        if (_harvestBlock == null)
+        {
+            debugLog(LOGGER, "Got to end of harvest execute with null harvestBlock...");
+            return true;
+        }
+
         // Otherwise start breaking
         startBreaking();
         return false;
@@ -145,18 +152,7 @@ public class TaskHarvest extends TaskAcquireBase
         ItemStack targetStack = getEntity().getHeldItem();
         if (targetStack == null)
         {
-            ItemStack willDrop = DrudgeUtils.identifyWillDrop(getWorld(), _harvestBlock, _matcher);
-            getEntity().setCurrentItemOrArmor(0, willDrop);
-
-            if (willDrop == null)
-            {
-//                IBlockState state = getWorld().getBlockState(_harvestBlock);
-//                Block block = state.getBlock();
-//
-//                LOGGER.debug("Couldn't find what we'd drop: " + _matcher + " : " +
-//                        block.getDrops(getWorld(), _harvestBlock, state, 0));
-                return false;
-            }
+            targetStack = DrudgeUtils.identifyWillDrop(getWorld(), _harvestBlock, _matcher);
         }
         else
         {
@@ -170,6 +166,9 @@ public class TaskHarvest extends TaskAcquireBase
 
         ///// PICKUP
         AIUtils.collectEntityIntoStack(getEntity().getEntityWorld(), _harvestBlock, 3, targetStack);
+
+        if (getEntity().getHeldItem() == null && targetStack.stackSize > 0)
+            getEntity().setCurrentItemOrArmor(0, targetStack);
 
         return true;
     }
