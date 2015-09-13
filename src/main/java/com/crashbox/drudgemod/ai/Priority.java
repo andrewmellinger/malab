@@ -50,8 +50,7 @@ public class Priority
         int value = 0;
 
         // Output is pos -> pos (cost) -> pos (cost) -> pos (cost) -> (total)
-
-        String str = pos.toString() + " -> ";
+        //String str = pos.toString() + " -> ";
 
         for (TaskBase task : pair.asList())
         {
@@ -61,12 +60,12 @@ public class Priority
                 int val = task.getValue();
                 value = value - cost + val;
                 pos = task.getCoarsePos();
-                str += pos.toString() + "(" + cost + "," + val + ") -> ";
+                //str += pos.toString() + "(" + cost + "," + val + ") -> ";
             }
         }
 
-        str += " total:" + value;
-        LOGGER.debug(str);
+        //str += " total:" + value;
+        //LOGGER.debug(str);
         return value;
     }
 

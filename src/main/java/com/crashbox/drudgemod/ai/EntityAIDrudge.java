@@ -357,17 +357,17 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
 
     private boolean linkupAcquireResponses(TaskPair pair, List<MessageTaskRequest> responses)
     {
-        debugLog("Linking up acquire responses.");
+        //debugLog("Linking up acquire responses.");
         BlockPos pos = getPos();
         if (pair.getEmptyInventory() != null)
             pos = pair.getEmptyInventory().getCoarsePos();
 
         List<TRAcquireBase> acquires = extractMessages(responses, TRAcquireBase.class);
-        debugLog("Have (" + acquires.size() + ") acquires ");
+        //debugLog("Have (" + acquires.size() + ") acquires ");
         if (acquires.size() > 0)
         {
             TRAcquireBase best = findBest(pos, acquires);
-            debugLog("Best acquire: " + best);
+            //debugLog("Best acquire: " + best);
             if (DrudgeUtils.isNotNull(best, LOGGER))
             {
                 pair.setAcquireTask(TASK_FACTORY.makeTaskFromMessage(this, best));
@@ -438,13 +438,15 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
 
     private Message resolveTaskPair(TaskPair pair)
     {
+        if (pair == null)
+            throw new IllegalArgumentException("Pair must never be null");
+
         // If we have a deliver we need to make sure we have the item
         ItemStack held = getEntity().getHeldItem();
 
         // First off let's see if we need to dump the thing in our hand.  We figure this out
         // first because to compute best 'acquire' cost depends on where we are at the end
         // of the empty inventory step.
-
         if (held != null && pair.getDeliverTask() != null && !pair.getDeliverTask().getMatcher().matches(held))
         {
             // We need to dump something we are holding before we can acquire

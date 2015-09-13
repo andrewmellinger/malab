@@ -12,6 +12,8 @@ public class TRDeliverBase extends MessageTaskRequest
             Class<? extends TaskDeliverBase> clazz, ItemStackMatcher matcher, int quantity)
     {
         super(sender, receiver, transactionID, priority, clazz);
+        if (matcher == null)
+            throw new IllegalArgumentException("Matcher must not be null.");
         _matcher = matcher;
         _quantity = quantity;
     }

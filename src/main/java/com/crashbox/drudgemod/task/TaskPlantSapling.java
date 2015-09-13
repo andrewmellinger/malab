@@ -18,6 +18,7 @@ public class TaskPlantSapling extends TaskDeliverBase
     public TaskPlantSapling(EntityAIDrudge performer, TRPlantSapling message)
     {
         super(performer, message.getSender(), message.getValue());
+        _matcher = message.getMatcher();
     }
 
     @Override
@@ -59,10 +60,9 @@ public class TaskPlantSapling extends TaskDeliverBase
     public void debugInfo(StringBuilder builder)
     {
         super.debugInfo(builder);
+        builder.append(", platingTarget=").append(_plantingTarget);
     }
 
     private BlockPos _plantingTarget;
 
-    // State management
-    private enum GoingTo { SITE, COLLECTION, PLANTING}
 }

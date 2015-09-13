@@ -1,5 +1,6 @@
 package com.crashbox.drudgemod.messaging;
 
+import com.crashbox.drudgemod.common.ItemTypeMatcher;
 import com.crashbox.drudgemod.task.TaskPickup;
 import net.minecraft.item.Item;
 
@@ -11,7 +12,7 @@ public class TRPickup extends TRAcquireBase
     public TRPickup(IMessager sender, IMessager target, Object transactionID, int priority,
             int quantity, Item item)
     {
-        super(sender, target, transactionID, priority, TaskPickup.class, null, quantity);
+        super(sender, target, transactionID, priority, TaskPickup.class, new ItemTypeMatcher(item), quantity);
         _item = item;
     }
 
