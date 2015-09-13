@@ -6,6 +6,7 @@ import com.crashbox.drudgemod.messaging.*;
 import com.crashbox.drudgemod.task.*;
 import com.crashbox.drudgemod.task.TaskPair.Resolving;
 import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import org.apache.logging.log4j.LogManager;
@@ -71,23 +72,26 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         switch (_state)
         {
             case IDLING:
-//                getEntity().setCurrentItemOrArmor(4, null);
+                getEntity().setCurrentItemOrArmor(1, null);
+                getEntity().setCurrentItemOrArmor(2, null);
+                getEntity().setCurrentItemOrArmor(3, null);
+                getEntity().setCurrentItemOrArmor(4, null);
                 _state = idle();
                 break;
             case ELICITING:
-//                getEntity().setCurrentItemOrArmor(4, new ItemStack(Items.leather_helmet));
+                getEntity().setCurrentItemOrArmor(3, new ItemStack(Items.leather_chestplate));
                 _state = elicit();
                 break;
             case TRANSITING:
-//                getEntity().setCurrentItemOrArmor(4, new ItemStack(Items.iron_helmet));
+                getEntity().setCurrentItemOrArmor(3, new ItemStack(Items.iron_chestplate));
                 _state = transition();
                 break;
             case TARGETING:
-//                getEntity().setCurrentItemOrArmor(4, new ItemStack(Items.golden_helmet));
+                getEntity().setCurrentItemOrArmor(3, new ItemStack(Items.golden_chestplate));
                 _state = target();
                 break;
             case PERFORMING:
-//                getEntity().setCurrentItemOrArmor(4, new ItemStack(Items.diamond_helmet, 1));
+                getEntity().setCurrentItemOrArmor(3, new ItemStack(Items.diamond_chestplate));
                 _state = perform();
                 break;
         }
