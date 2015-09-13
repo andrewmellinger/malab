@@ -109,11 +109,15 @@ public class TaskPair
         if (workArea != null)
             return workArea;
 
-        // If we have no work area, we might need to move on.
-        if (_stage == Stage.ACQUIRING)
+        // If we have no work area but we have something to deliver, let's just do that.
+        if (_stage == Stage.ACQUIRING && _entityAI.getEntity().getHeldSize() > 0)
         {
             _stage = Stage.DELIVERING;
             _current = _deliverTask;
+        }
+        else
+        {
+            return null;
         }
 
         return _current.chooseWorkArea(exclusions);

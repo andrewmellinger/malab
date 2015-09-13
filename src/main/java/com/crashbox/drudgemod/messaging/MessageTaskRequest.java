@@ -31,7 +31,7 @@ public class MessageTaskRequest extends Message
     public void debugInfo(StringBuilder builder)
     {
         super.debugInfo(builder);
-        builder.append(", _taskClass=").append(DrudgeUtils.objID(_taskClass));
+        builder.append(", _taskClass=").append(_taskClass.getSimpleName());
     }
 
     private final Class<? extends TaskBase> _taskClass;
