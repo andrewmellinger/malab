@@ -127,6 +127,23 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
                     Broadcaster.postMessage(pairRequest);
                 }
             }
+            else if (msg instanceof MessageIsStorageAvailable)
+            {
+                //LOGGER.debug("Forester " + this + " is asked for work." + msg);
+
+                MessageIsStorageAvailable storage = (MessageIsStorageAvailable)msg;
+                BlockPos target = AIUtils.findEmptyOrchardSquare(getWorld(), getPos(), _searchRadius);
+
+                //LOGGER.debug("target=" + target);
+                if (target != null)
+                {
+                    TRPlantSapling plantRequest = new TRPlantSapling(TileEntityBeaconForester.this,
+                            msg.getSender(), msg.getTransactionID(), 0);
+
+//                    //LOGGER.debug("Posting request: " + req);
+                    Broadcaster.postMessage(plantRequest);
+                }
+            }
         }
     }
 

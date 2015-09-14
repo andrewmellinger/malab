@@ -51,7 +51,7 @@ public class TaskPlantSapling extends TaskDeliverBase
     public int getValue()
     {
         // SWAG
-        return _priority - 10;
+        return _value - 10;
     }
 
     //===================================

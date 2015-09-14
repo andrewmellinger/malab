@@ -1,6 +1,7 @@
 package com.crashbox.drudgemod.furnace;
 
 import com.crashbox.drudgemod.DrudgeMain;
+import com.crashbox.drudgemod.DrudgeUtils;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
@@ -11,6 +12,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -40,7 +42,9 @@ public class BlockBeaconFurnace extends BlockContainer
     {
         super(Material.iron);
         setUnlocalizedName(DrudgeMain.MODID + "_" + NAME);
-        setCreativeTab(CreativeTabs.tabRedstone);
+
+        if (!lit)
+            setCreativeTab(CreativeTabs.tabRedstone);
 
         _isLit = lit;
 
@@ -90,14 +94,16 @@ public class BlockBeaconFurnace extends BlockContainer
     @Override
     public void breakBlock(World inWorld, BlockPos inPos, IBlockState inBlockState)
     {
+        LOGGER.debug("#################### BREAK BLOCK " + inPos + " - " + inBlockState);
+        DrudgeUtils.showStack();
         if (hasTileEntity(inBlockState))
         {
             TileEntity entity = inWorld.getTileEntity(inPos);
             if (entity instanceof TileEntityBeaconFurnace)
             {
-//                InventoryHelper.dropInventoryItems(worldIn, pos,
-//                        (TileEntityGrinder)tileentity);
-//                worldIn.updateComparatorOutputLevel(pos, this);
+                InventoryHelper.dropInventoryItems(inWorld, inPos,
+                        (TileEntityBeaconFurnace) entity);
+                inWorld.updateComparatorOutputLevel(inPos, this);
                 ((TileEntityBeaconFurnace)entity).blockBroken();
             }
         }

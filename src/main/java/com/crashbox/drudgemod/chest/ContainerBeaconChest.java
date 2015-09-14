@@ -14,7 +14,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class ContainerBeaconChest extends Container
 {
-    private final IInventory _tileBeacon;
+    private final IInventory _tileInventory;
     private final int _sizeInventory;
     private int[] _trackedFields = { 0,0,0,0};
 
@@ -23,21 +23,22 @@ public class ContainerBeaconChest extends Container
         // DEBUG
         LOGGER.debug("Constructed!!");
 
-        _tileBeacon = inventory;
-        _sizeInventory = _tileBeacon.getSizeInventory();
+        _tileInventory = inventory;
+        _sizeInventory = _tileInventory.getSizeInventory();
 
-        // Set up all our main interaction slots
-        addSlotToContainer(new Slot(_tileBeacon, 0, 56, 17));
-        addSlotToContainer(new SlotFurnaceFuel(_tileBeacon, 1, 56, 53));
-        addSlotToContainer(new SlotFurnaceOutput(inventoryPlayer.player, _tileBeacon, 2, 116, 35));
-
-        // TODO: Make reusable function
+        // Add our inventory
+        for (int i = 0; i < 3; ++i)
+        {
+            for (int j = 0; j < 9; ++j)
+            {
+                addSlotToContainer(new Slot(_tileInventory, j+i*9, 8+j*18, 15+i*18));
+            }
+        }
 
         // add player inventory slots
         // note that the slot numbers are within the player inventory so can
         // be same as the tile entity inventory
-        int i;
-        for (i = 0; i < 3; ++i)
+        for (int i = 0; i < 3; ++i)
         {
             for (int j = 0; j < 9; ++j)
             {
@@ -46,7 +47,7 @@ public class ContainerBeaconChest extends Container
         }
 
         // add hotbar slots
-        for (i = 0; i < 9; ++i)
+        for (int i = 0; i < 9; ++i)
         {
             addSlotToContainer(new Slot(inventoryPlayer, i, 8 + i * 18, 142));
         }
@@ -56,7 +57,7 @@ public class ContainerBeaconChest extends Container
     public void addCraftingToCrafters(ICrafting listener)
     {
         super.addCraftingToCrafters(listener);
-        listener.func_175173_a(this, _tileBeacon);
+        listener.func_175173_a(this, _tileInventory);
     }
 
     /**
@@ -75,7 +76,7 @@ public class ContainerBeaconChest extends Container
             // send all fields to each crafter
             for (int n = 0; n < _trackedFields.length; ++n)
             {
-                int tmp = _tileBeacon.getField(n);
+                int tmp = _tileInventory.getField(n);
                 if (_trackedFields[n] != tmp)
                 {
                     icrafting.sendProgressBarUpdate(this, n, tmp);
@@ -86,7 +87,7 @@ public class ContainerBeaconChest extends Container
         // cache state for next time
         for (int n = 0; n < _trackedFields.length; ++n)
         {
-            _trackedFields[n] = _tileBeacon.getField(n);
+            _trackedFields[n] = _tileInventory.getField(n);
         }
     }
 
@@ -94,13 +95,13 @@ public class ContainerBeaconChest extends Container
     @SideOnly(Side.CLIENT)
     public void updateProgressBar(int id, int data)
     {
-        _tileBeacon.setField(id, data);
+        _tileInventory.setField(id, data);
     }
 
     @Override
     public boolean canInteractWith(EntityPlayer playerIn)
     {
-        return _tileBeacon.isUseableByPlayer(playerIn);
+        return _tileInventory.isUseableByPlayer(playerIn);
     }
 
     @Override

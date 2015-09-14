@@ -1,5 +1,6 @@
 package com.crashbox.drudgemod.ai;
 
+import com.crashbox.drudgemod.DrudgeUtils;
 import com.crashbox.drudgemod.task.TaskBase;
 import com.crashbox.drudgemod.task.TaskPair;
 import net.minecraft.util.BlockPos;
@@ -40,6 +41,11 @@ public class Priority
                     bestTask = pair;
                 }
             }
+            else
+            {
+                LOGGER.debug("Not computing because unresolved: " + pair);
+            }
+
         }
 
         return bestTask;
@@ -50,7 +56,9 @@ public class Priority
         int value = 0;
 
         // Output is pos -> pos (cost) -> pos (cost) -> pos (cost) -> (total)
-        //String str = pos.toString() + " -> ";
+        String str = DrudgeUtils.getSimpleName(pair.getAcquireTask()) + "." +
+                DrudgeUtils.getSimpleName(pair.getDeliverTask()) + " = " +
+                pos.toString() + " -> ";
 
         for (TaskBase task : pair.asList())
         {
@@ -60,12 +68,12 @@ public class Priority
                 int val = task.getValue();
                 value = value - cost + val;
                 pos = task.getCoarsePos();
-                //str += pos.toString() + "(" + cost + "," + val + ") -> ";
+                str += pos.toString() + "(" + cost + "," + val + ") -> ";
             }
         }
 
-        //str += " total:" + value;
-        //LOGGER.debug(str);
+        str += " total:" + value;
+        LOGGER.debug(str);
         return value;
     }
 

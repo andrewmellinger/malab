@@ -83,6 +83,14 @@ public class DrudgeUtils
 
     }
 
+    public static String getSimpleName(Object o)
+    {
+        if (o == null)
+            return null;
+
+        return o.getClass().getSimpleName();
+    }
+
 
 //    public static boolean willDrop(World world, BlockPos pos, ItemStack sample)
 //    {

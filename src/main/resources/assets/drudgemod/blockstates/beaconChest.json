@@ -1,0 +1,11 @@
+{
+  "variants":
+  {
+    "normal": { "model": "drudgemod:beaconChest" },
+    "facing=up": { "model": "drudgemod:beaconChest" },
+    "facing=east": { "model": "drudgemod:beaconChest" },
+    "facing=south": { "model": "drudgemod:beaconChest", "y": 90 },
+    "facing=west": { "model": "drudgemod:beaconChest", "y": 180 },
+    "facing=north": { "model": "drudgemod:beaconChest", "y": 270 }
+  }
+}

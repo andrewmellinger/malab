@@ -1,8 +1,10 @@
 package com.crashbox.drudgemod.chest;
 
 import com.crashbox.drudgemod.beacon.BeaconBase;
-import com.crashbox.drudgemod.messaging.IMessager;
-import com.crashbox.drudgemod.messaging.Message;
+import com.crashbox.drudgemod.common.AnyItemMatcher;
+import com.crashbox.drudgemod.common.ItemStackMatcher;
+import com.crashbox.drudgemod.forester.TileEntityBeaconForester;
+import com.crashbox.drudgemod.messaging.*;
 import com.crashbox.drudgemod.beacon.TileEntityBeaconInventory;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -14,8 +16,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -113,12 +113,6 @@ public class TileEntityBeaconChest extends TileEntityBeaconInventory implements 
     {
         _itemStacks[index] = stack;
 
-        boolean isSameItemStackAlreadyInSlot = stack != null
-                && stack.isItemEqual(_itemStacks[index])
-                && ItemStack.areItemStackTagsEqual(stack,
-                _itemStacks[index]);
-        _itemStacks[index] = stack;
-
         if (stack != null && stack.stackSize > getInventoryStackLimit())
         {
             stack.stackSize = getInventoryStackLimit();
@@ -192,32 +186,24 @@ public class TileEntityBeaconChest extends TileEntityBeaconInventory implements 
         }
     }
 
-
-
     @Override
     public int getInventoryStackLimit()
     {
         return 64;
     }
 
-    // this function indicates whether container texture should be drawn
-    @SideOnly(Side.CLIENT)
-    public static boolean isBurning(IInventory inventory)
-    {
-        return inventory.getField(0) > 0;
-    }
-
     @Override
     public void update()
     {
+        if (_chest != null)
+            _chest.update();
     }
 
     @Override
     public boolean isUseableByPlayer(EntityPlayer playerIn)
     {
-        return worldObj.getTileEntity(pos) != this ? false :
-                playerIn.getDistanceSq(pos.getX()+0.5D, pos.getY()+0.5D,
-                        pos.getZ()+0.5D) <= 64.0D;
+        return worldObj.getTileEntity(pos) == this && playerIn
+                .getDistanceSq(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D) <= 64.0D;
     }
 
     @Override
@@ -310,16 +296,13 @@ public class TileEntityBeaconChest extends TileEntityBeaconInventory implements 
     //---------------------------------------------------------------------------------------------
     public void blockBroken()
     {
-
+        //_chest.terminate();
     }
-
-
-
 
     @Override
     public void setWorldObj(World worldIn)
     {
-        LOGGER.debug("setWorldObj: " + worldIn);
+        LOGGER.debug("TileEntityBeaconChest setWorldObj: " + worldIn);
         super.setWorldObj(worldIn);
         if (worldIn != null && !worldIn.isRemote)
         {
@@ -333,7 +316,7 @@ public class TileEntityBeaconChest extends TileEntityBeaconInventory implements 
         }
     }
 
-    // TaskMaster Chest
+    //---------------------------------------------------------------------------------------------
     private class Chest extends BeaconBase
     {
         Chest(World world)
@@ -350,9 +333,56 @@ public class TileEntityBeaconChest extends TileEntityBeaconInventory implements 
         @Override
         protected void handleMessage(Message msg)
         {
-//            if (msg instanceof MessageWorkerAvailability)
-//            {
-//            }
+            if (msg instanceof MessageIsStorageAvailable)
+            {
+                MessageIsStorageAvailable request = (MessageIsStorageAvailable)msg;
+
+                // First look for existing
+                for (int slotNum = 0; slotNum < _itemStacks.length; ++slotNum)
+                {
+                    if (_itemStacks[slotNum] != null && _itemStacks[slotNum].isItemEqual(request.getStack()))
+                    {
+                        TRStore req = new TRStore(TileEntityBeaconChest.this, request.getSender(),
+                                msg.getTransactionID(), 0, new ItemStackMatcher(_itemStacks[slotNum]),
+                                _itemStacks[slotNum].getMaxStackSize() - _itemStacks[slotNum].stackSize, slotNum);
+
+                        LOGGER.debug("Posting: " + req);
+                        Broadcaster.postMessage(req);
+                    }
+                }
+
+                // Do we have an empty one?
+                for ( ItemStack stack : _itemStacks)
+                {
+                    if (stack != null)
+                    {
+                        TRStore req = new TRStore(TileEntityBeaconChest.this, request.getSender(),
+                                msg.getTransactionID(), 0, new AnyItemMatcher(), 64, -1);
+
+                        LOGGER.debug("Posting: " + req);
+                        Broadcaster.postMessage(req);
+                    }
+                }
+            }
+            else if (msg instanceof MessageItemRequest)
+            {
+                LOGGER.debug("Chest is getting item request: " + msg);
+
+                MessageItemRequest request = (MessageItemRequest)msg;
+
+                for (ItemStack stack : _itemStacks)
+                {
+                    if (stack != null && request.getMatcher().matches(stack))
+                    {
+                        TRGetFromInventory req = new TRGetFromInventory(TileEntityBeaconChest.this,
+                                msg.getSender(), msg.getTransactionID(), 0, request.getMatcher(),
+                                request.getQuantity());
+
+                        LOGGER.debug("Chest advertising it has item");
+                        Broadcaster.postMessage(req);
+                    }
+                }
+            }
         }
     }
 

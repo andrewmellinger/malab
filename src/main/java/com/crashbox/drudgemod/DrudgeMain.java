@@ -1,5 +1,7 @@
 package com.crashbox.drudgemod;
 
+import com.crashbox.drudgemod.chest.BlockBeaconChest;
+import com.crashbox.drudgemod.chest.TileEntityBeaconChest;
 import com.crashbox.drudgemod.furnace.BlockBeaconFurnace;
 import com.crashbox.drudgemod.furnace.TileEntityBeaconFurnace;
 import com.crashbox.drudgemod.forester.BlockBeaconForester;
@@ -119,9 +121,14 @@ public class DrudgeMain
         GameRegistry.registerBlock(BLOCK_BEACON_FORESTER, BlockBeaconForester.NAME);
         GameRegistry.registerTileEntity(TileEntityBeaconForester.class, TileEntityBeaconForester.NAME);
 
-        BLOCK_BEACON_WORKBENCH = new BlockBeaconWorkbench();
-        GameRegistry.registerBlock(BLOCK_BEACON_WORKBENCH, BlockBeaconWorkbench.NAME);
-        GameRegistry.registerTileEntity(TileEntityBeaconWorkbench.class, TileEntityBeaconWorkbench.NAME);
+//        BLOCK_BEACON_WORKBENCH = new BlockBeaconWorkbench();
+//        GameRegistry.registerBlock(BLOCK_BEACON_WORKBENCH, BlockBeaconWorkbench.NAME);
+//        GameRegistry.registerTileEntity(TileEntityBeaconWorkbench.class, TileEntityBeaconWorkbench.NAME);
+
+        BLOCK_BEACON_CHEST = new BlockBeaconChest();
+        GameRegistry.registerBlock(BLOCK_BEACON_CHEST, BlockBeaconChest.NAME);
+        GameRegistry.registerTileEntity(TileEntityBeaconChest.class, TileEntityBeaconChest.NAME);
+
     }
 
 

@@ -17,9 +17,9 @@ import org.apache.logging.log4j.Logger;
 @SideOnly(Side.CLIENT)
 public class GuiBeaconChest extends GuiContainer
 {
-    private static final ResourceLocation grinderGuiTextures =
-            new ResourceLocation(DrudgeMain.MODID
-                    +":textures/gui/container/beaconChest.png");
+    private static final ResourceLocation guiTexture =
+            new ResourceLocation(DrudgeMain.MODID +":textures/gui/container/beaconChest.png");
+
     private final InventoryPlayer _inventoryPlayer;
     private final IInventory _tileBeacon;
 
@@ -52,49 +52,19 @@ public class GuiBeaconChest extends GuiContainer
                                                    int mouseX, int mouseY)
     {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        mc.getTextureManager().bindTexture(grinderGuiTextures);
+        mc.getTextureManager().bindTexture(guiTexture);
         int marginHorizontal = (width - xSize) / 2;
         int marginVertical = (height - ySize) / 2;
-        drawTexturedModalRect(marginHorizontal, marginVertical, 0, 0,
-                xSize, ySize);
-
-        if(TileEntityBeaconChest.isBurning(_tileBeacon))
-        {
-            int tmp = this.updateBurnIndicator(13);
-            this.drawTexturedModalRect(marginHorizontal + 56, marginVertical + 36 + 12 - tmp, 176, 12 - tmp, 14, tmp + 1);
-        }
-
-        // Draw progress indicator
-        int progressLevel = getProgressLevel(24);
-        drawTexturedModalRect(marginHorizontal + 79, marginVertical + 34,
-                176, 14, progressLevel + 1, 16);
+        drawTexturedModalRect(marginHorizontal, marginVertical, 0, 0, xSize, ySize);
     }
 
-    private int getProgressLevel(int progressIndicatorPixelWidth)
-    {
-        int ticksGrindingItemSoFar = _tileBeacon.getField(2);
-        int ticksPerItem = _tileBeacon.getField(3);
-        return ticksPerItem != 0 && ticksGrindingItemSoFar != 0 ?
-                ticksGrindingItemSoFar*progressIndicatorPixelWidth/ticksPerItem
-                : 0;
-    }
-
-    private int updateBurnIndicator(int burnRemain) {
-        int originalBurnTime = _tileBeacon.getField(1);
-        if(originalBurnTime == 0)
-        {
-            originalBurnTime = 200;
-        }
-
-        return _tileBeacon.getField(0) * burnRemain / originalBurnTime;
-    }
 
     @Override
     public String toString()
     {
         return "GuiBeaconChest{" +
-                "_inventoryPlayer=" + _inventoryPlayer +
-                ", _tileBeacon=" + _tileBeacon +
+                "inventoryPlayer=" + _inventoryPlayer +
+                ", tileBeacon=" + _tileBeacon +
                 '}';
     }
 

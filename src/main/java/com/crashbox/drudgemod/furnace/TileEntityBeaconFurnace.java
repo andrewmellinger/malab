@@ -742,7 +742,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
         }
     }
 
-    // This is responsible for all message handling
+    //---------------------------------------------------------------------------------------------
     private class Furnace extends BeaconBase
     {
         Furnace(World world)
@@ -790,10 +790,12 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
                     TRStore req = new TRStore(TileEntityBeaconFurnace.this,
                             request.getSender(), msg.getTransactionID(), 0, new ItemStackMatcher(_itemStacks[INPUT_INDEX]),
                             getSmeltableQuantityWanted(), INPUT_INDEX);
-                }
 
-                // TODO: We can take fuel too
+                    Broadcaster.postMessage(req);
+                }
             }
+
+            // TODO: We can take fuel too
         }
     }
 

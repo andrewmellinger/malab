@@ -1,5 +1,6 @@
 package com.crashbox.drudgemod.task;
 
+import com.crashbox.drudgemod.DrudgeUtils;
 import com.crashbox.drudgemod.ai.EntityAIDrudge;
 import net.minecraft.util.BlockPos;
 import org.apache.logging.log4j.LogManager;
@@ -197,13 +198,13 @@ public class TaskPair
     @Override
     public String toString()
     {
-        return "TaskPair{" +
+        return DrudgeUtils.objID(this) + "{" +
                 "stage=" + _stage.name() +
                 ", resolving=" + _resolving.name() +
                 ", current=" + (_current != null) +
-                ", emptyInventory=" + (_emptyInventory != null) +
-                ", acquireTask=" + (_acquireTask != null) +
-                ", deliverTask=" + (_deliverTask != null) +
+                ", emptyInventory=" + DrudgeUtils.getSimpleName(_emptyInventory) +
+                ", acquireTask=" + DrudgeUtils.getSimpleName(_acquireTask) +
+                ", deliverTask=" + DrudgeUtils.getSimpleName(_deliverTask) +
                 '}';
     }
 

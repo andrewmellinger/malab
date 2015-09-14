@@ -1,5 +1,6 @@
 package com.crashbox.drudgemod;
 
+import com.crashbox.drudgemod.chest.BlockBeaconChest;
 import com.crashbox.drudgemod.furnace.BlockBeaconFurnace;
 import com.crashbox.drudgemod.forester.BlockBeaconForester;
 import com.crashbox.drudgemod.workbench.BlockBeaconWorkbench;
@@ -55,6 +56,11 @@ public class ClientProxy extends CommonProxy
                 Item.getItemFromBlock(DrudgeMain.BLOCK_BEACON_WORKBENCH),
                 0,
                 new ModelResourceLocation(DrudgeMain.MODID + ":" + BlockBeaconWorkbench.NAME, "inventory"));
+
+        renderItem.getItemModelMesher().register(
+                Item.getItemFromBlock(DrudgeMain.BLOCK_BEACON_CHEST),
+                0,
+                new ModelResourceLocation(DrudgeMain.MODID + ":" + BlockBeaconChest.NAME, "inventory"));
     }
 
     @Override

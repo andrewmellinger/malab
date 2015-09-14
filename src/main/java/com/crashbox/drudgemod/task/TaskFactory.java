@@ -19,6 +19,9 @@ public class TaskFactory
         if (taskClass == TaskPickup.class && message instanceof TRPickup)
             return new TaskPickup(performer, (TRPickup)message);
 
+        if (taskClass == TaskGetFromInventory.class && message instanceof TRGetFromInventory)
+            return new TaskGetFromInventory(performer, (TRGetFromInventory)message);
+
         LOGGER.error("Failed to construct task for " + message);
         return null;
     }

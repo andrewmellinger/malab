@@ -1,5 +1,8 @@
 package com.crashbox.drudgemod;
 
+import com.crashbox.drudgemod.chest.ContainerBeaconChest;
+import com.crashbox.drudgemod.chest.GuiBeaconChest;
+import com.crashbox.drudgemod.chest.TileEntityBeaconChest;
 import com.crashbox.drudgemod.furnace.ContainerBeaconFurnace;
 import com.crashbox.drudgemod.furnace.GuiBeaconFurnace;
 import com.crashbox.drudgemod.workbench.ContainerBeaconWorkbench;
@@ -37,6 +40,9 @@ public class GuiHandlerDrudge implements IGuiHandler
         if (ID == DrudgeMain.GUI_ENUM.WORKBENCH.ordinal())
             return new ContainerBeaconWorkbench(player.inventory, (TileEntityBeaconWorkbench)tileEntity);
 
+        if (ID == DrudgeMain.GUI_ENUM.CHEST.ordinal())
+            return new ContainerBeaconChest(player.inventory, (TileEntityBeaconChest)tileEntity);
+
         return null;
     }
 
@@ -54,6 +60,9 @@ public class GuiHandlerDrudge implements IGuiHandler
 
         if (ID == DrudgeMain.GUI_ENUM.WORKBENCH.ordinal())
             return new GuiBeaconWorkbench( player.inventory, (TileEntityBeaconWorkbench)tileEntity);
+
+        if (ID == DrudgeMain.GUI_ENUM.CHEST.ordinal())
+            return new GuiBeaconChest( player.inventory, (TileEntityBeaconChest)tileEntity);
 
         return null;
     }

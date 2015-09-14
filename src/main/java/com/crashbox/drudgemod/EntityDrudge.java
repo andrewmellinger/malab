@@ -117,6 +117,9 @@ public class EntityDrudge extends EntityCreature
     public boolean isHeldInventoryFull()
     {
         ItemStack held = getHeldItem();
+        if (held == null)
+            return false;
+
         return held.stackSize >= _carryCapacity;
     }
 

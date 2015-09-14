@@ -67,7 +67,7 @@ public class TaskStore extends TaskDeliverBase
     public int getValue()
     {
         // No additional cost beyond delivery
-        return _priority;
+        return _value;
     }
 
 

@@ -293,10 +293,11 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         {
             if (pair.getResolving() != Resolving.RESOLVING)
             {
-                debugLog("linkupResponses: skipping pair, not resolving." + pair);
+                debugLog("linkupResponses: skipping pair, not RESOLVING. " + pair);
                 continue;
             }
 
+            debugLog("linkupResponses to => " + pair);
             if (linkupResponses(pair, responses))
             {
                 // Since we linked something up, take it out of resolving.
@@ -320,36 +321,42 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
 
     private boolean linkupDeliverResponses(TaskPair pair, List<MessageTaskRequest> responses)
     {
-
         BlockPos pos = getPos();
-        boolean forEmpty = false;
+        boolean emptyingOperation = false;
+
+        List<TRDeliverBase> delivers = extractMessages(pair, responses, TRDeliverBase.class);
+        if (delivers.size() == 0)
+            return false;
+
+        debugLog("Found deliver tasks: " + delivers.size());
 
         ItemStack held = getEntity().getHeldItem();
-        if (pair.getDeliverTask() != null && pair.getEmptyInventory() == null && !
-                pair.getDeliverTask().getMatcher().matches(held))
+        if (pair.getDeliverTask() != null && pair.getEmptyInventory() == null &&
+                !pair.getDeliverTask().getMatcher().matches(held))
         {
-            // This is for held.
-            forEmpty = true;
+            debugLog("Emptying operation");
+            emptyingOperation = true;
         }
         else
         {
+            // If not an empty, we don't need two deliver tasks.
+            if (pair.getDeliverTask() != null)
+                return false;
+
             if (pair.getAcquireTask() != null)
                 pos = pair.getAcquireTask().getCoarsePos();
         }
 
-        List<TRDeliverBase> delivers = extractMessages(responses, TRDeliverBase.class);
-        if (delivers.size() > 0)
+        // Now, find the best one based on what we are going to do with it
+        TRDeliverBase best = findBest(pos, delivers);
+        if (DrudgeUtils.isNotNull(best, LOGGER))
         {
-            TRDeliverBase best = findBest(pos, delivers);
-            if (DrudgeUtils.isNotNull(best, LOGGER))
-            {
-                if (forEmpty)
-                    pair.setEmptyInventory(TASK_FACTORY.makeTaskFromMessage(this, best));
-                else
-                    pair.setDeliverTask(TASK_FACTORY.makeTaskFromMessage(this, best));
+            if (emptyingOperation)
+                pair.setEmptyInventory(TASK_FACTORY.makeTaskFromMessage(this, best));
+            else
+                pair.setDeliverTask(TASK_FACTORY.makeTaskFromMessage(this, best));
 
-                return true;
-            }
+            return true;
         }
 
         return false;
@@ -362,7 +369,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         if (pair.getEmptyInventory() != null)
             pos = pair.getEmptyInventory().getCoarsePos();
 
-        List<TRAcquireBase> acquires = extractMessages(responses, TRAcquireBase.class);
+        List<TRAcquireBase> acquires = extractMessages(pair, responses, TRAcquireBase.class);
         //debugLog("Have (" + acquires.size() + ") acquires ");
         if (acquires.size() > 0)
         {
@@ -395,14 +402,15 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
     }
 
     @SuppressWarnings("unchecked")
-    private <T extends MessageTaskRequest> List<T> extractMessages(List<MessageTaskRequest> responses, Class<T> clazz)
+    private <T extends MessageTaskRequest> List<T> extractMessages(Object transactionID,
+            List<MessageTaskRequest> responses, Class<T> clazz)
     {
         List<T> result = new ArrayList<T>();
         Iterator<MessageTaskRequest> iter = responses.iterator();
         while (iter.hasNext())
         {
             MessageTaskRequest next =  iter.next();
-            if (clazz.isInstance(next))
+            if (clazz.isInstance(next) && next.getTransactionID() == transactionID)
             {
                 result.add((T) next);
                 iter.remove();

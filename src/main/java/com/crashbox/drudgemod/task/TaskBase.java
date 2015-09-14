@@ -5,7 +5,6 @@ import com.crashbox.drudgemod.EntityDrudge;
 import com.crashbox.drudgemod.ai.EntityAIDrudge;
 import com.crashbox.drudgemod.ai.Priority;
 import com.crashbox.drudgemod.messaging.IMessager;
-import com.crashbox.drudgemod.messaging.Message;
 import com.crashbox.drudgemod.messaging.MessageTaskRequest;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
@@ -25,13 +24,13 @@ public abstract class TaskBase
      * Base class for all tasks.
      * @param performer The AI performing this task
      * @param requester This is the requester of the task.
-     * @param priority The priority of the task.
+     * @param value The priority of the task.
      */
-    protected TaskBase(EntityAIDrudge performer, IMessager requester, int priority)
+    protected TaskBase(EntityAIDrudge performer, IMessager requester, int value)
     {
         _performer = performer;
         _requester = requester;
-        _priority = priority;
+        _value = value;
     }
 
     public IMessager getRequester()
@@ -49,9 +48,12 @@ public abstract class TaskBase
         return _performer;
     }
 
-    public boolean isDone()
+    /**
+     * @return The value of this work being performed.
+     */
+    public int getValue()
     {
-        return _done;
+        return _value;
     }
 
     // =======================
@@ -79,10 +81,6 @@ public abstract class TaskBase
      */
     public abstract boolean executeAndIsDone();
 
-    /**
-     * @return The value of this work being performed.
-     */
-    public abstract int getValue();
 
     //=============================================================================================
     // Conveniences
@@ -117,7 +115,7 @@ public abstract class TaskBase
     {
         builder.append("performer=").append(DrudgeUtils.objID(_requester));
         builder.append(", requester=").append(DrudgeUtils.objID(_requester));
-        builder.append(", priority=").append(_priority);
+        builder.append(", value=").append(_value);
     }
 
     //=============================================================================================
@@ -172,7 +170,7 @@ public abstract class TaskBase
     protected final IMessager _requester;
 
     // The priority of the task.
-    protected final int _priority;
+    protected final int _value;
 
     // Has the task met its threshold, or run out of capability?
     private boolean _done = false;
