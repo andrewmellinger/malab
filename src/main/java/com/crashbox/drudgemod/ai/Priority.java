@@ -79,7 +79,7 @@ public class Priority
 
     public static int computeDistanceCost(BlockPos startPos, BlockPos endPos, double speed)
     {
-        return (int) (( Math.sqrt(startPos.distanceSq(endPos)) / speed ) / 20);
+        return (int) (( Math.sqrt(startPos.distanceSq(endPos)) / speed ) / 40);
     }
 
     public static int computeDistanceCost(BlockPos startPos, BlockPos endPos)

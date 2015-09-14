@@ -10,6 +10,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -60,9 +61,9 @@ public class BlockBeaconChest extends BlockContainer
             TileEntity entity = inWorld.getTileEntity(inPos);
             if (entity instanceof TileEntityBeaconChest)
             {
-//                InventoryHelper.dropInventoryItems(worldIn, pos,
-//                        (TileEntityGrinder)tileentity);
-//                worldIn.updateComparatorOutputLevel(pos, this);
+                InventoryHelper.dropInventoryItems(inWorld, inPos,
+                        (TileEntityBeaconChest) entity);
+                inWorld.updateComparatorOutputLevel(inPos, this);
                 ((TileEntityBeaconChest)entity).blockBroken();
             }
         }
