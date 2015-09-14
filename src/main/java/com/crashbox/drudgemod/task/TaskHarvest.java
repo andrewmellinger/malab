@@ -22,16 +22,14 @@ public class TaskHarvest extends TaskAcquireBase
 {
     public TaskHarvest(EntityAIDrudge performer, TRHarvest message)
     {
-        super(performer, message.getSender(), message.getValue());
+        super(performer, message.getSender(), message.getValue(), message.getMatcher());
         _radius = message.getSender().getRadius();
-        _quantity = message.getQuantity();
-        _matcher = message.getMatcher();
+        _quantity = message.getQuantity() == -1 ? performer.getEntity().getCarryCapacity() : message.getQuantity();
     }
 
     @Override
     public boolean executeAndIsDone()
     {
-        // REMEMBER: Return true to STOP
         // If we are in the process of breaking, do that.
         if (_isBreaking)
         {
@@ -183,14 +181,12 @@ public class TaskHarvest extends TaskAcquireBase
         builder.append(", radius=").append(_radius);
         builder.append(", height=").append(_height);
         builder.append(", quantity=").append(_quantity);
-        builder.append(", matcher=").append(_matcher);
     }
 
     // Describes the search area
     private final int _radius;
     private final int _height = 10;
     private final int _quantity;
-    private final ItemStackMatcher _matcher;
 
     // Blocks we are breaking
     private Queue<BlockPos> _harvestList;

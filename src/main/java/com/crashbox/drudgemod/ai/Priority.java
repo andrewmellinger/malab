@@ -45,7 +45,6 @@ public class Priority
             {
                 LOGGER.debug("Not computing because unresolved: " + pair);
             }
-
         }
 
         return bestTask;

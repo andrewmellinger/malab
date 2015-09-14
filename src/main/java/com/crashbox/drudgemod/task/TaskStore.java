@@ -70,7 +70,6 @@ public class TaskStore extends TaskDeliverBase
         return _value;
     }
 
-
     @Override
     public void debugInfo(StringBuilder builder)
     {

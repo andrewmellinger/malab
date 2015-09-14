@@ -58,8 +58,8 @@ public abstract class BeaconBase
                 continue;
             }
 
-            // Let them handle it
-            handleMessage(msg);
+            if (msg.getTarget() == null || msg.getTarget() == getSender())
+                handleMessage(msg);
         }
     }
 

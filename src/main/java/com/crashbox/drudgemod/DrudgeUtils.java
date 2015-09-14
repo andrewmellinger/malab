@@ -71,6 +71,20 @@ public class DrudgeUtils
         return null;
     }
 
+    public static ItemStack mergeStacks(ItemStack target, ItemStack toAdd)
+    {
+        int xfer = target.getMaxStackSize() - target.stackSize;
+        if (xfer > toAdd.stackSize)
+            xfer = toAdd.stackSize;
+
+        target.stackSize += xfer;
+        toAdd.stackSize -= xfer;
+
+        if (toAdd.stackSize > 0)
+            return toAdd;
+
+        return null;
+    }
 
     public static boolean isNotNull(Object obj, Logger logger)
     {

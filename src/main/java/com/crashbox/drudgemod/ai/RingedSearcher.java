@@ -2,6 +2,7 @@ package com.crashbox.drudgemod.ai;
 
 import com.crashbox.drudgemod.DrudgeUtils;
 import com.crashbox.drudgemod.common.ItemStackMatcher;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 
@@ -54,6 +55,20 @@ public class RingedSearcher  implements Iterable<BlockPos>
             {
                 return pos;
             }
+        }
+
+        return null;
+    }
+
+    public static ItemStack findFirstItemDrop(World world, BlockPos center, int radius, int height,
+            ItemStackMatcher matcher)
+    {
+        RingedSearcher searcher = new RingedSearcher(center, radius, height);
+        for (BlockPos pos : searcher)
+        {
+            ItemStack stack = DrudgeUtils.identifyWillDrop(world, pos, matcher);
+            if (stack != null)
+                return stack;
         }
 
         return null;

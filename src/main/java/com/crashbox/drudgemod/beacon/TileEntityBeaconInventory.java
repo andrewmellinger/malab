@@ -1,11 +1,15 @@
 package com.crashbox.drudgemod.beacon;
 
+import com.crashbox.drudgemod.DrudgeUtils;
 import com.crashbox.drudgemod.common.ItemStackMatcher;
 import com.crashbox.drudgemod.messaging.IMessager;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.gui.IUpdatePlayerListBox;
 import net.minecraft.tileentity.TileEntityLockable;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 /**
  * Copyright 2015 Andrew O. Mellinger
@@ -15,6 +19,14 @@ public abstract class TileEntityBeaconInventory extends TileEntityLockable imple
 {
     public ItemStack mergeIntoSlot(ItemStack stack, int slot)
     {
+        LOGGER.debug("mergeIntoSlot: " + slot);
+        if (slot == -1)
+        {
+            stack = mergeIntoBestSlot(stack);
+            LOGGER.debug("mergeIntoBestSlot returned: " + stack);
+            return stack;
+        }
+
         ItemStack current = getStackInSlot(slot);
 
         // We might have been told to put things into a slot that might have become empty
@@ -41,6 +53,37 @@ public abstract class TileEntityBeaconInventory extends TileEntityLockable imple
 
         return stack;
     }
+
+    public ItemStack mergeIntoBestSlot(ItemStack stack)
+    {
+        // Find similar one
+        for (int i = 0; i < getSizeInventory(); ++i)
+        {
+            ItemStack current = getStackInSlot(i);
+            if (current != null && current.isItemEqual(stack))
+            {
+                DrudgeUtils.mergeStacks(current, stack);
+                if (stack.stackSize == 0)
+                    return null;
+            }
+        }
+
+        // If we are here we have some left.   Put in an empty one
+        for (int i = 0; i < getSizeInventory(); ++i)
+        {
+            ItemStack current = getStackInSlot(i);
+            if (current == null)
+            {
+                // This uses the rest
+                setInventorySlotContents(i, stack.copy());
+                stack.stackSize = 0;
+                return null;
+            }
+        }
+
+        return stack;
+    }
+
 
     public ItemStack extractItems(ItemStackMatcher matcher, int wanted)
     {
@@ -80,4 +123,7 @@ public abstract class TileEntityBeaconInventory extends TileEntityLockable imple
         return returnStack;
     }
 
+    private static final Logger LOGGER = LogManager.getLogger();
 }
+
+

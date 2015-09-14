@@ -1,5 +1,6 @@
 package com.crashbox.drudgemod.messaging;
 
+import com.crashbox.drudgemod.common.ItemStackMatcher;
 import net.minecraft.item.ItemStack;
 
 /**
@@ -9,16 +10,23 @@ public class MessageIsStorageAvailable extends Message
 {
     // Used to request a place to store this item
     public MessageIsStorageAvailable(IMessager sender, IMessager target, Object transactionID, int priority,
-            ItemStack stack)
+            ItemStackMatcher matcher)
     {
         super(sender, target, transactionID, priority);
-        _stack = stack;
+        _matcher = matcher;
     }
 
-    public ItemStack getStack()
+    public ItemStackMatcher getMatcher()
     {
-        return _stack;
+        return _matcher;
     }
 
-    private final ItemStack _stack;
+    @Override
+    public void debugInfo(StringBuilder builder)
+    {
+        super.debugInfo(builder);
+        builder.append(", stack=").append(_matcher);
+    }
+
+    private final ItemStackMatcher _matcher;
 }

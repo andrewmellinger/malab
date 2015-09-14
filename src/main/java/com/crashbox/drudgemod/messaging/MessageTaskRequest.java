@@ -13,13 +13,13 @@ public class MessageTaskRequest extends Message
      * @param sender Who is sending the request.
      * @param target Who is supposed to perform the request.  Usually a bot.
      * @param transactionID
-     * @param priority The priority of the task.
+     * @param value The priority of the task.
      * @param clazz The task to perform.
      */
-    public MessageTaskRequest(IMessager sender, IMessager target, Object transactionID, int priority,
+    public MessageTaskRequest(IMessager sender, IMessager target, Object transactionID, int value,
             Class<? extends TaskBase> clazz)
     {
-        super(sender, target, transactionID, priority);
+        super(sender, target, transactionID, value);
         _taskClass = clazz;
     }
 

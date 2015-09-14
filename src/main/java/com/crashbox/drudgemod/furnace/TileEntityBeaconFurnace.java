@@ -586,7 +586,6 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
                 _itemStacks[INPUT_INDEX] = null;
             }
         }
-
     }
 
     private int getItemBurnTime(ItemStack itemStack)
@@ -610,8 +609,6 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
         return new ContainerBeaconFurnace(playerInventory, this);
     }
 
-
-
     @Override
     public String toString()
     {
@@ -622,7 +619,6 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
                 ", _totalItemSmeltTicks=" + _totalItemSmeltTicks +
                 '}';
     }
-
 
     //---------------------------------------------------------------------------------------------
 
@@ -784,7 +780,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
             else if (msg instanceof MessageIsStorageAvailable)
             {
                 MessageIsStorageAvailable request = (MessageIsStorageAvailable)msg;
-                if (_itemStacks[INPUT_INDEX] != null && _itemStacks[INPUT_INDEX].isItemEqual(request.getStack()))
+                if (_itemStacks[INPUT_INDEX] != null && request.getMatcher().matches(_itemStacks[INPUT_INDEX]))
                 {
                     // Send a message back to this guy telling him that we could use more
                     TRStore req = new TRStore(TileEntityBeaconFurnace.this,

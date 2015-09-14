@@ -17,7 +17,7 @@ public class TaskPickup extends TaskAcquireBase
 {
     public TaskPickup(EntityAIDrudge performer, TRPickup message)
     {
-        super(performer, message.getSender(), message.getValue());
+        super(performer, message.getSender(), message.getValue(), message.getMatcher());
         _item = message.getItem();
     }
 

@@ -8,14 +8,15 @@ import com.crashbox.drudgemod.task.TaskDeliverBase;
  */
 public class TRDeliverBase extends MessageTaskRequest
 {
-    public TRDeliverBase(IMessager sender, IMessager receiver, Object transactionID, int priority,
+    public TRDeliverBase(IMessager sender, IMessager receiver, Object transactionID, int value,
             Class<? extends TaskDeliverBase> clazz, ItemStackMatcher matcher, int quantity)
     {
-        super(sender, receiver, transactionID, priority, clazz);
-        if (matcher == null)
-            throw new IllegalArgumentException("Matcher must not be null.");
+        super(sender, receiver, transactionID, value, clazz);
         _matcher = matcher;
         _quantity = quantity;
+
+        if (matcher == null)
+            throw new IllegalArgumentException("Matcher must not be null.");
     }
 
     public ItemStackMatcher getMatcher()
@@ -27,7 +28,6 @@ public class TRDeliverBase extends MessageTaskRequest
     {
         return _quantity;
     }
-
 
     public void debugInfo(StringBuilder builder)
     {

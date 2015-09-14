@@ -1,6 +1,7 @@
 package com.crashbox.drudgemod.messaging;
 
 import com.crashbox.drudgemod.common.ItemStackMatcher;
+import com.crashbox.drudgemod.task.TaskAcquireBase;
 import com.crashbox.drudgemod.task.TaskBase;
 
 /**
@@ -8,13 +9,15 @@ import com.crashbox.drudgemod.task.TaskBase;
  */
 public class TRAcquireBase extends MessageTaskRequest
 {
-    public TRAcquireBase(IMessager sender, IMessager target, Object transactionID, int priority,
-            Class<? extends TaskBase> clazz, ItemStackMatcher matcher,
-            int quantity)
+    public TRAcquireBase(IMessager sender, IMessager target, Object transactionID, int value,
+            Class<? extends TaskAcquireBase> clazz, ItemStackMatcher matcher, int quantity)
     {
-        super(sender, target, transactionID, priority, clazz);
+        super(sender, target, transactionID, value, clazz);
         _matcher = matcher;
         _quantity = quantity;
+
+        if (matcher == null)
+            throw new IllegalArgumentException("Matcher must not be null.");
     }
 
     public ItemStackMatcher getMatcher()

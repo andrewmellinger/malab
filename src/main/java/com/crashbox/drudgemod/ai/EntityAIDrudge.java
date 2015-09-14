@@ -2,6 +2,7 @@ package com.crashbox.drudgemod.ai;
 
 import com.crashbox.drudgemod.DrudgeUtils;
 import com.crashbox.drudgemod.EntityDrudge;
+import com.crashbox.drudgemod.common.ItemStackMatcher;
 import com.crashbox.drudgemod.messaging.*;
 import com.crashbox.drudgemod.task.*;
 import com.crashbox.drudgemod.task.TaskPair.Resolving;
@@ -458,7 +459,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         if (held != null && pair.getDeliverTask() != null && !pair.getDeliverTask().getMatcher().matches(held))
         {
             // We need to dump something we are holding before we can acquire
-            return new MessageIsStorageAvailable(this, null, pair, 0, held);
+            return new MessageIsStorageAvailable(this, null, pair, 0, new ItemStackMatcher(held));
         }
 
         // Need to deliver, do we need to acquire?
@@ -476,7 +477,7 @@ public class EntityAIDrudge extends EntityAIBase implements IMessager
         // We accepted an acquire before deliver.  So a really full chest or orchard
         if (pair.getAcquireTask() != null && pair.getDeliverTask() == null)
         {
-            return new MessageIsStorageAvailable(this, null, pair, 0, pair.getAcquireTask().getSample());
+            return new MessageIsStorageAvailable(this, null, pair, 0, pair.getAcquireTask().getMatcher());
         }
 
         // Everybody is good, we don't need anything

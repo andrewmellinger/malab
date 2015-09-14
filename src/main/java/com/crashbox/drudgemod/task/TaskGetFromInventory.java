@@ -19,8 +19,7 @@ public class TaskGetFromInventory extends TaskAcquireBase
 {
     public TaskGetFromInventory(EntityAIDrudge performer, TRGetFromInventory message)
     {
-        super(performer, message.getSender(), message.getValue());
-        _matcher = message.getMatcher();
+        super(performer, message.getSender(), message.getValue(), message.getMatcher());
 
         int quantity = message.getQuantity();
         if (quantity > getPerformer().getEntity().getCarryCapacity())
@@ -70,7 +69,6 @@ public class TaskGetFromInventory extends TaskAcquireBase
         builder.append(", quantity=").append(_quantity);
     }
 
-    private final ItemStackMatcher _matcher;
     private final int _quantity;
     private BlockPos _workArea;
 

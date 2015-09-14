@@ -103,11 +103,22 @@ public class TaskPair
         }
     }
 
+    /**
+     * This gets the general work area, usually the location of a beacon.
+     * @return The general area of work.
+     */
     public BlockPos getWorkCenter()
     {
         return _current.getCoarsePos();
     }
 
+    /**
+     * Returns the next work available work target.  Note, this will/may change
+     * each time it is called.  If it returns null, then no more work locations
+     * are available.
+     * @param exclusions Work areas to skip.
+     * @return A position of a block in which to work on or null for none.
+     */
     public BlockPos getWorkTarget(List<BlockPos> exclusions)
     {
         BlockPos workArea = _current.chooseWorkArea(exclusions);
@@ -130,15 +141,13 @@ public class TaskPair
         return _current.chooseWorkArea(exclusions);
     }
 
-    public TaskBase[] asList()
-    {
-        return new TaskBase[] { _emptyInventory, _acquireTask, _deliverTask };
-    }
-
+    /**
+     * Calls the current task to progress.  Returns a value describing the state
+     * of the pair.
+     * @return Enum describing what else to do.
+     */
     public UpdateResult updateTask()
     {
-        // Keep executing until is says it is done.
-
         // When done we need to move to the next thing, or we are completely done
         if (!_current.executeAndIsDone())
             return UpdateResult.CONTINUE;
@@ -181,14 +190,23 @@ public class TaskPair
                 _current = null;
                 _stage = Stage.DONE;
 
-
-
                 return UpdateResult.DONE;
         }
 
         return UpdateResult.CONTINUE;
     }
 
+    /**
+     * @return All the tasks in an order easy to iterate.
+     */
+    public TaskBase[] asList()
+    {
+        return new TaskBase[] { _emptyInventory, _acquireTask, _deliverTask };
+    }
+
+    /**
+     * @return True if entity is done collecting.
+     */
     private boolean acquiredEnough()
     {
         return _entityAI.getEntity().isHeldInventoryFull() ||

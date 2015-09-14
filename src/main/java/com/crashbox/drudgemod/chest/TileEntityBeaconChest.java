@@ -1,9 +1,7 @@
 package com.crashbox.drudgemod.chest;
 
 import com.crashbox.drudgemod.beacon.BeaconBase;
-import com.crashbox.drudgemod.common.AnyItemMatcher;
 import com.crashbox.drudgemod.common.ItemStackMatcher;
-import com.crashbox.drudgemod.forester.TileEntityBeaconForester;
 import com.crashbox.drudgemod.messaging.*;
 import com.crashbox.drudgemod.beacon.TileEntityBeaconInventory;
 import net.minecraft.block.state.IBlockState;
@@ -333,34 +331,42 @@ public class TileEntityBeaconChest extends TileEntityBeaconInventory implements 
         @Override
         protected void handleMessage(Message msg)
         {
+            LOGGER.debug(msg);
             if (msg instanceof MessageIsStorageAvailable)
             {
+                LOGGER.debug("MessageIsStorageAvailable");
                 MessageIsStorageAvailable request = (MessageIsStorageAvailable)msg;
 
                 // First look for existing
+                LOGGER.debug("Looking for existing");
                 for (int slotNum = 0; slotNum < _itemStacks.length; ++slotNum)
                 {
-                    if (_itemStacks[slotNum] != null && _itemStacks[slotNum].isItemEqual(request.getStack()))
+                    if (_itemStacks[slotNum] != null && request.getMatcher().matches(_itemStacks[slotNum]))
                     {
+//                        TRStore req = new TRStore(TileEntityBeaconChest.this, request.getSender(),
+//                                msg.getTransactionID(), 0, new ItemStackMatcher(_itemStacks[slotNum]),
+//                                _itemStacks[slotNum].getMaxStackSize() - _itemStacks[slotNum].stackSize, slotNum);
                         TRStore req = new TRStore(TileEntityBeaconChest.this, request.getSender(),
-                                msg.getTransactionID(), 0, new ItemStackMatcher(_itemStacks[slotNum]),
-                                _itemStacks[slotNum].getMaxStackSize() - _itemStacks[slotNum].stackSize, slotNum);
+                                msg.getTransactionID(), 0, request.getMatcher(), 64, -1);
 
                         LOGGER.debug("Posting: " + req);
                         Broadcaster.postMessage(req);
+                        return;
                     }
                 }
 
                 // Do we have an empty one?
+                LOGGER.debug("Looking for empty slot");
                 for ( ItemStack stack : _itemStacks)
                 {
-                    if (stack != null)
+                    if (stack == null)
                     {
                         TRStore req = new TRStore(TileEntityBeaconChest.this, request.getSender(),
-                                msg.getTransactionID(), 0, new AnyItemMatcher(), 64, -1);
+                                msg.getTransactionID(), 0, request.getMatcher(), 64, -1);
 
                         LOGGER.debug("Posting: " + req);
                         Broadcaster.postMessage(req);
+                        return;
                     }
                 }
             }
