@@ -9,23 +9,13 @@ import com.crashbox.drudgemod.task.TaskStore;
 public class TRStore extends TRDeliverBase
 {
     public TRStore(IMessager sender, IMessager receiver, Object transactionID, int priority,
-            ItemStackMatcher matcher, int quantity, int slot)
+            ItemStackMatcher matcher, int quantity)
     {
         super(sender, receiver, transactionID, priority, TaskStore.class, matcher, quantity);
-        _slot = slot;
-    }
-
-    public int getSlot()
-    {
-        return _slot;
     }
 
     public void debugInfo(StringBuilder builder)
     {
         super.debugInfo(builder);
-        builder.append(", slot=").append(_slot);
     }
-
-
-    private final int _slot;
 }

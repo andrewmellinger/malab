@@ -71,19 +71,20 @@ public class DrudgeUtils
         return null;
     }
 
-    public static ItemStack mergeStacks(ItemStack target, ItemStack toAdd)
+    /**
+     * Puts the contents of the second on into the first one (target)
+     * @param target The stack to add content too.
+     * @param toAdd The stack to take content from.  May end up with zero size.
+     */
+    public static void mergeStacks(ItemStack target, ItemStack toAdd)
     {
         int xfer = target.getMaxStackSize() - target.stackSize;
         if (xfer > toAdd.stackSize)
             xfer = toAdd.stackSize;
 
+        LOGGER.debug("XFER Size: " + xfer);
         target.stackSize += xfer;
         toAdd.stackSize -= xfer;
-
-        if (toAdd.stackSize > 0)
-            return toAdd;
-
-        return null;
     }
 
     public static boolean isNotNull(Object obj, Logger logger)
@@ -94,7 +95,6 @@ public class DrudgeUtils
             return false;
         }
         return true;
-
     }
 
     public static String getSimpleName(Object o)

@@ -37,8 +37,8 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
     public int FUEL_INDEX = 1;
     public int OUTPUT_INDEX = 2;
 
-    public int SMELTABLE_SAMPLE_MIN = 3;
-    public int SMELTABLE_SAMPLE_MAX = 6;
+    public int INPUT_SAMPLE_MIN = 3;
+    public int INPUT_SAMPLE_MAX = 6;
     public int FUEL_SAMPLE_MIN = 7;
     public int FUEL_SAMPLE_MAX = 10;
 
@@ -87,6 +87,23 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
                                  IBlockState parOldState, IBlockState parNewState)
     {
         return false;
+    }
+
+    @Override
+    public void setWorldObj(World worldIn)
+    {
+        LOGGER.debug("setWorldObj: " + worldIn);
+        super.setWorldObj(worldIn);
+        if (worldIn != null && !worldIn.isRemote)
+        {
+            _furnace = new Furnace(worldIn);
+        }
+        else
+        {
+            if (_furnace != null)
+                _furnace.terminate();
+            _furnace = null;
+        }
     }
 
     //=============================================================================================
@@ -214,21 +231,22 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
     @Override
     public boolean isItemValidForSlot(int index, ItemStack stack)
     {
+        // We don't put things in output or automation
+
         // Supposedly this is for automation
         if ( index == INPUT_INDEX )
         {
-            if (_itemStacks[INPUT_INDEX] == null)
-            {
-                return FurnaceRecipes.instance().getSmeltingResult(_itemStacks[0]) != null;
-            }
+            if (_itemStacks[INPUT_INDEX] != null)
+                return _itemStacks[INPUT_INDEX].isItemEqual(stack);
+            else
+                return FurnaceRecipes.instance().getSmeltingResult(stack) != null;
         }
-
-        if ( index == FUEL_INDEX )
+        else if ( index == FUEL_INDEX )
         {
-            if (_itemStacks[FUEL_INDEX].isItemEqual(stack) || TileEntityFurnace.isItemFuel(stack) )
-            {
-                return true;
-            }
+            if ( _itemStacks[FUEL_INDEX] != null)
+                return _itemStacks[FUEL_INDEX].isItemEqual(stack);
+            else
+                TileEntityFurnace.isItemFuel(stack);
         }
 
         return false;
@@ -504,6 +522,42 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
     }
 
     //=============================================================================================
+    // ##### ##### #   # ##### ##### ####   ###   #### ##### #####  ###  #   #  ###  ####  ##### #####  #### #####
+    //   #     #   ##  #   #   #     #   # #   # #       #     #   #   # ##  # #   # #   #     # #     #       #
+    //   #     #   # # #   #   ####  ####  ##### #       #     #   #   # # # # #   # #####     # ####  #       #
+    //   #     #   #  ##   #   #     #   # #   # #       #     #   #   # #  ## #   # #   # #   # #     #       #
+    // ##### ##### #   #   #   ##### #   # #   #  ####   #   #####  ###  #   #  ###  ####   ###  #####  ####   #
+
+    @Override
+    public String getGuiID()
+    {
+        return "drudge:beaconFurnace";
+    }
+
+    @Override
+    public Container createContainer(InventoryPlayer playerInventory,
+            EntityPlayer playerIn)
+    {
+        // DEBUG
+        // Don't know when this is called.  I think the GuiHandler does all the construction
+        LOGGER.error("createContainer()");
+        return new ContainerBeaconFurnace(playerInventory, this);
+    }
+
+    //=============================================================================================
+    // ##### #   # #####  ###   ###   ###   #### ##### ####
+    //   #   ## ## #     #     #     #   # #     #     #   #
+    //   #   # # # ####   ###   ###  ##### #  ## ####  ####
+    //   #   #   # #         #     # #   # #   # #     #   #
+    // ##### #   # #####  ###   ###  #   #  #### ##### #   #
+
+    @Override
+    public int getRadius()
+    {
+        return 0;
+    }
+
+    //=============================================================================================
 
     public boolean isBurning()
     {
@@ -593,33 +647,6 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
         return TileEntityFurnace.getItemBurnTime(itemStack);
     }
 
-    @Override
-    public String getGuiID()
-    {
-        return "drudge:beaconFurnace";
-    }
-
-    @Override
-    public Container createContainer(InventoryPlayer playerInventory,
-            EntityPlayer playerIn)
-    {
-        // DEBUG
-        // Don't know when this is called.  I think the GuiHandler does all the construction
-        LOGGER.error("createContainer()");
-        return new ContainerBeaconFurnace(playerInventory, this);
-    }
-
-    @Override
-    public String toString()
-    {
-        return "TileEntityBeacon{" +
-                "_remainingFuelBurnTicks=" + _remainingFuelBurnTicks +
-                ", _originalFuelBurnTicks" + _originalFuelBurnTicks +
-                ", _accumulatedItemSmeltTicks=" + _accumulatedItemSmeltTicks +
-                ", _totalItemSmeltTicks=" + _totalItemSmeltTicks +
-                '}';
-    }
-
     //---------------------------------------------------------------------------------------------
 
     private ItemStack getSmeltable()
@@ -654,7 +681,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
 
         // If we aren't consuming anything, then bring any of the samples
         ItemStackMatcher matcher = new ItemStackMatcher();
-        for ( int i = SMELTABLE_SAMPLE_MIN; i <= SMELTABLE_SAMPLE_MAX; ++i)
+        for ( int i = INPUT_SAMPLE_MIN; i <= INPUT_SAMPLE_MAX; ++i)
         {
             if ( _itemStacks[i] != null)
             {
@@ -710,33 +737,6 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
         _furnace.terminate();
     }
 
-    //---------------------------------------------------------------------------------------------
-    // IMessager
-
-    @Override
-    public int getRadius()
-    {
-        return 0;
-    }
-
-    //---------------------------------------------------------------------------------------------
-
-    @Override
-    public void setWorldObj(World worldIn)
-    {
-        LOGGER.debug("setWorldObj: " + worldIn);
-        super.setWorldObj(worldIn);
-        if (worldIn != null && !worldIn.isRemote)
-        {
-            _furnace = new Furnace(worldIn);
-        }
-        else
-        {
-            if (_furnace != null)
-                _furnace.terminate();
-            _furnace = null;
-        }
-    }
 
     //---------------------------------------------------------------------------------------------
     private class Furnace extends BeaconBase
@@ -770,7 +770,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
                         // Send a message back to this guy telling him that we could use more
                         TRStore req = new TRStore(TileEntityBeaconFurnace.this,
                                 availability.getSender(), msg.getTransactionID(), priority, getSmeltableItemMatcher(),
-                                getSmeltableQuantityWanted(), INPUT_INDEX);
+                                getSmeltableQuantityWanted());
 
                         LOGGER.debug("Furnace posting: " + req);
                         Broadcaster.postMessage(req);
@@ -785,7 +785,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
                     // Send a message back to this guy telling him that we could use more
                     TRStore req = new TRStore(TileEntityBeaconFurnace.this,
                             request.getSender(), msg.getTransactionID(), 0, new ItemStackMatcher(_itemStacks[INPUT_INDEX]),
-                            getSmeltableQuantityWanted(), INPUT_INDEX);
+                            getSmeltableQuantityWanted());
 
                     Broadcaster.postMessage(req);
                 }
@@ -793,6 +793,19 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
 
             // TODO: We can take fuel too
         }
+    }
+
+    //---------------------------------------------------------------------------------------------
+
+    @Override
+    public String toString()
+    {
+        return "TileEntityBeacon{" +
+                "_remainingFuelBurnTicks=" + _remainingFuelBurnTicks +
+                ", _originalFuelBurnTicks" + _originalFuelBurnTicks +
+                ", _accumulatedItemSmeltTicks=" + _accumulatedItemSmeltTicks +
+                ", _totalItemSmeltTicks=" + _totalItemSmeltTicks +
+                '}';
     }
 
     private float _fuelRequestFraction = 0.5F;

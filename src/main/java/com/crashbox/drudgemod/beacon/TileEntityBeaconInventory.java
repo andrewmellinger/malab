@@ -17,68 +17,80 @@ import org.apache.logging.log4j.Logger;
 public abstract class TileEntityBeaconInventory extends TileEntityLockable implements IUpdatePlayerListBox, IInventory,
         IMessager
 {
-    public ItemStack mergeIntoSlot(ItemStack stack, int slot)
-    {
-        LOGGER.debug("mergeIntoSlot: " + slot);
-        if (slot == -1)
-        {
-            stack = mergeIntoBestSlot(stack);
-            LOGGER.debug("mergeIntoBestSlot returned: " + stack);
-            return stack;
-        }
-
-        ItemStack current = getStackInSlot(slot);
-
-        // We might have been told to put things into a slot that might have become empty
-        if (current == null)
-        {
-            setInventorySlotContents(slot, stack);
-            stack = null;
-        }
-        else if (current.isItemEqual(stack))
-        {
-            int freeSpace = current.getMaxStackSize() - current.stackSize;
-            if (freeSpace > stack.stackSize)
-            {
-                current.stackSize += stack.stackSize;
-                stack = null;
-            }
-            else
-            {
-                // Not enough room
-                current.stackSize += freeSpace;
-                stack.stackSize -= freeSpace;
-            }
-        }
-
-        return stack;
-    }
-
+//    public ItemStack mergeIntoSlot(ItemStack stack, int slot)
+//    {
+//        LOGGER.debug("mergeIntoSlot: " + slot);
+//        if (slot == -1)
+//        {
+//            stack = mergeIntoBestSlot(stack);
+//            LOGGER.debug("mergeIntoBestSlot returned: " + stack);
+//            return stack;
+//        }
+//
+//        ItemStack current = getStackInSlot(slot);
+//
+//        // We might have been told to put things into a slot that might have become empty
+//        if (current == null)
+//        {
+//            setInventorySlotContents(slot, stack);
+//            stack = null;
+//        }
+//        else if (current.isItemEqual(stack))
+//        {
+//            int freeSpace = current.getMaxStackSize() - current.stackSize;
+//            if (freeSpace > stack.stackSize)
+//            {
+//                current.stackSize += stack.stackSize;
+//                stack = null;
+//            }
+//            else
+//            {
+//                // Not enough room
+//                current.stackSize += freeSpace;
+//                stack.stackSize -= freeSpace;
+//            }
+//        }
+//
+//        return stack;
+//    }
+//
+    /**
+     * Puts the contents of the stack into the inventory.
+     * @param stack The contents to put in.
+     * @return The remainder or null.
+     */
     public ItemStack mergeIntoBestSlot(ItemStack stack)
     {
-        // Find similar one
+        // First try to fill loaded slots, then go back
+        // and put rest into empty.
+        int firstEmpty = -1;
         for (int i = 0; i < getSizeInventory(); ++i)
         {
-            ItemStack current = getStackInSlot(i);
-            if (current != null && current.isItemEqual(stack))
+            if (isItemValidForSlot(i, stack))
             {
-                DrudgeUtils.mergeStacks(current, stack);
-                if (stack.stackSize == 0)
-                    return null;
+                ItemStack current = getStackInSlot(i);
+                if ( current == null)
+                {
+                    if (firstEmpty == -1)
+                    {
+                        firstEmpty = i;
+                    }
+                }
+                else
+                {
+                    DrudgeUtils.mergeStacks(current, stack);
+                    if (stack.stackSize == 0)
+                    {
+                        return null;
+                    }
+                }
             }
         }
 
-        // If we are here we have some left.   Put in an empty one
-        for (int i = 0; i < getSizeInventory(); ++i)
+        if (firstEmpty != -1)
         {
-            ItemStack current = getStackInSlot(i);
-            if (current == null)
-            {
-                // This uses the rest
-                setInventorySlotContents(i, stack.copy());
-                stack.stackSize = 0;
-                return null;
-            }
+            setInventorySlotContents(firstEmpty, stack.copy());
+            return null;
         }
 
         return stack;

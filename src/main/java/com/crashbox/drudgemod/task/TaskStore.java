@@ -23,7 +23,6 @@ public class TaskStore extends TaskDeliverBase
         super(performer, message.getSender(), message.getValue());
         _matcher = message.getMatcher();
         _quantity = message.getQuantity();
-        _slot = message.getSlot();
     }
 
     public ItemStackMatcher getMatcher()
@@ -51,7 +50,7 @@ public class TaskStore extends TaskDeliverBase
         IMessager requester = getRequester();
         if (requester instanceof TileEntityBeaconInventory)
         {
-            current = ((TileEntityBeaconInventory) requester).mergeIntoSlot(current, _slot);
+            current = ((TileEntityBeaconInventory) requester).mergeIntoBestSlot(current);
             getEntity().setCurrentItemOrArmor(0, current);
         }
         else
@@ -75,12 +74,10 @@ public class TaskStore extends TaskDeliverBase
     {
         super.debugInfo(builder);
         builder.append(", itemSample=").append(_matcher);
-        builder.append(", slot=").append(_slot);
         builder.append(", quantity=").append(_quantity);
     }
 
     private final ItemStackMatcher _matcher;
-    private final int _slot;
     private final int _quantity;
 
     private static final Logger LOGGER = LogManager.getLogger();
