@@ -201,6 +201,83 @@ public class DrudgeUtils
         return obj.getClass().getSimpleName() + "@" + Integer.toHexString(obj.hashCode());
     }
 
+    /**
+     * Finds the point on the radius edge where we'll intersect if we travel in a
+     * straight line.
+     * @param center Center of target area.
+     * @param radius Radius of target area.
+     * @param start Our starting (or current) location.
+     * @return Most likely intersect.
+     */
+    public static BlockPos findIntersect(BlockPos center, int radius, BlockPos start)
+    {
+        // NOTE: Slope Z over X.
+//        LOGGER.debug("Center: " + center);
+//        LOGGER.debug("Start:  " + start);
+
+        // Avoid divide by zero on the slope compute
+        if ( start.getX() == center.getX())
+        {
+            return handleTopBottom(center, radius, start);
+        }
+
+//        LOGGER.debug("ZDiff: " + (start.getZ() - center.getZ()));
+//        LOGGER.debug("XDiff: " + (start.getX() - center.getX()));
+
+        // Make x diff abs, then sign tells us top or bottom
+        double slope = (Math.abs(start.getZ() - center.getZ()) * 1.0F) /
+                       (Math.abs(start.getX() - center.getX()) * 1.0F) ;
+
+//        LOGGER.debug("Slope: " + slope);
+
+        if (slope > 1)
+            return handleTopBottom(center, radius, start);
+        else
+            return handleLeftRight(center, radius, start);
+    }
+
+    private static BlockPos handleLeftRight(BlockPos center, int radius, BlockPos start)
+    {
+        double frac = radius / Math.abs((start.getX() - center.getX()) * 1.0F);
+        int z = center.getZ() + (int) (frac * (start.getZ() - center.getZ()));
+        int x = 0;
+
+        // Left or right
+        if (start.getX() - center.getX() > 0)
+        {
+            // Right
+            x = center.getX() + radius;
+        }
+        else
+        {
+            // Left
+            x = center.getX() - radius;
+        }
+        return new BlockPos(x, center.getY(), z);
+    }
+
+    private static BlockPos handleTopBottom(BlockPos center, int radius, BlockPos start)
+    {
+        double frac = radius / Math.abs((start.getZ() - center.getZ()) * 1.0F);
+        int z = 0;
+        int x = center.getX() + (int) (frac * (start.getX() - center.getX()));
+
+        if (start.getZ() - center.getZ() > 0)
+        {
+            // Bottom
+            z = center.getZ() + radius;
+        }
+        else
+        {
+            // Top
+            z = center.getZ() - radius;
+        }
+        return new BlockPos(x, center.getY(), z);
+    }
+
+
+
+
 
     private static final Logger LOGGER = LogManager.getLogger();
 }
