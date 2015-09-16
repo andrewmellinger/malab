@@ -1,0 +1,12 @@
+tile.vassal_beaconFurnace.name=Beacon Furnace (tile)
+item.vassal_beaconFurnace.name=Beacon Furnace (item)
+container.beaconFurnace=BeaconFurnace
+tile.vassal_beaconForester.name=Beacon Forester (tile)
+item.vassal_beaconForester.name=Beacon Forester (item)
+container.beaconForester=BeaconForester
+tile.vassal_beaconWorkbench.name=Beacon Workbench (tile)
+item.vassal_beaconWorkbench.name=Beacon Workbench (item)
+container.beaconWorkbench=BeaconWorkbench
+tile.vassal_beaconChest.name=Beacon Chest (tile)
+item.vassal_beaconChest.name=Beacon Chest (item)
+container.beaconChest=BeaconChest

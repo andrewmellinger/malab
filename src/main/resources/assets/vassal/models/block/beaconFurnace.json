@@ -1,0 +1,8 @@
+{
+  "parent": "block/cube_bottom_top",
+  "textures": {
+    "top": "vassal:blocks/beaconFurnace_top_off",
+    "side": "vassal:blocks/beaconFurnace_side_off",
+    "bottom": "vassal:blocks/beaconFurnace_bottom"
+  }
+}

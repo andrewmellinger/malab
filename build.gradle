@@ -18,8 +18,8 @@ buildscript {
 apply plugin: 'forge'
 
 version = "1.0"
-group= "com.crashbox.drudge" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "drudge-1.8"
+group= "com.crashbox.vassal" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = "vassal-1.8"
 
 minecraft {
     version = "1.8-11.14.1.1334"

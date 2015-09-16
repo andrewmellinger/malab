@@ -1,0 +1,11 @@
+{
+  "variants":
+  {
+    "normal": { "model": "vassal:beaconFurnace" },
+    "facing=up": { "model": "vassal:beaconFurnace" },
+    "facing=east": { "model": "vassal:beaconFurnace" },
+    "facing=south": { "model": "vassal:beaconFurnace", "y": 90 },
+    "facing=west": { "model": "vassal:beaconFurnace", "y": 180 },
+    "facing=north": { "model": "vassal:beaconFurnace", "y": 270 }
+  }
+}
