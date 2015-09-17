@@ -311,7 +311,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
 
     private boolean linkupResponses(TaskPair pair, List<MessageTaskRequest> responses)
     {
-        if (pair.getDeliverTask() == null)
+        if (pair.getDeliverTask() == null || pair.getEmptyInventory() == null)
             return linkupDeliverResponses(pair, responses);
 
         if (pair.getAcquireTask() == null)
@@ -456,9 +456,11 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         // First off let's see if we need to dump the thing in our hand.  We figure this out
         // first because to compute best 'acquire' cost depends on where we are at the end
         // of the empty inventory step.
-        if (held != null && pair.getDeliverTask() != null && !pair.getDeliverTask().getMatcher().matches(held))
+        if (held != null && pair.getEmptyInventory() != null && pair.getDeliverTask() != null
+                && !pair.getDeliverTask().getMatcher().matches(held))
         {
             // We need to dump something we are holding before we can acquire
+            debugLog("+++++++++++++++++++++++++++++++++++++");
             return new MessageIsStorageAvailable(this, null, pair, 0, new ItemStackMatcher(held));
         }
 
@@ -567,7 +569,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
             }
             else
             {
-                LOGGER.debug("Failed to move to work area. Idling. Distance: " +
+                LOGGER.debug("Failed to move to work area. IDLING. Distance: " +
                         VassalUtils.sqDistXZ(getEntity().getPosition(), _workArea));
                 _currentPair = null;
                 return State.IDLING;
