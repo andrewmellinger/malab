@@ -85,6 +85,7 @@ public class RingedSearcher  implements Iterable<BlockPos>
     public Iterator<BlockPos> iterator()
     {
         return new RingedIterator();
+//        return new RingedIterator2(null);
     }
 
     public class RingedIterator implements Iterator<BlockPos>
@@ -180,6 +181,141 @@ public class RingedSearcher  implements Iterable<BlockPos>
         private int _z, _minZ, _maxZ;
         private int _currentRadius = 0;
     }
+
+
+    private enum DIR { EAST, SOUTH, WEST, NORTH }
+
+    /**
+     * This searcher looks in rings from the center out, then looks at the next layer.
+     * So like a tree, concentric circles, then down.
+     */
+    public class RingedIterator2 implements Iterator<BlockPos>
+    {
+        public RingedIterator2(List<BlockPos> exclusions)
+        {
+            _currentRadius = 1;
+            _x = _center.getX() - _currentRadius;
+            _y = _center.getY() + _height;
+            _z = _center.getZ() - _currentRadius;
+            _exclusions = exclusions;
+        }
+
+        @Override
+        public boolean hasNext()
+        {
+            return (_x != _center.getX() - _radius ||
+                    _z != _center.getZ() - _radius ||
+                    _y != _center.getY() - 1);
+        }
+
+        @Override
+        public BlockPos next()
+        {
+            BlockPos result = new BlockPos(_x, _y, _z);
+
+            // We need to repeat until we get a good block
+            nextBlock();
+
+            while (!isValid() && hasNext())
+                nextBlock();
+
+            return result;
+        }
+
+        private void nextBlock()
+        {
+            switch (_dir)
+            {
+                case EAST:
+                    if (_x == _center.getX() + _currentRadius)
+                    {
+                        _z += 1;
+                        _dir = DIR.SOUTH;
+                    }
+                    else
+                    {
+                        _x += 1;
+                    }
+                    break;
+                case SOUTH:
+                    if (_z == _center.getZ() + _currentRadius)
+                    {
+                        _x -= 1;
+                        _dir = DIR.WEST;
+                    }
+                    else
+                    {
+                        _z += 1;
+                    }
+                    break;
+                case WEST:
+                    if (_x == _center.getX() - _currentRadius)
+                    {
+                        _z -= 1;
+                        _dir = DIR.NORTH;
+                    }
+                    else
+                    {
+                        _x -= 1;
+                    }
+                    break;
+                case NORTH:
+                    if (_z == _center.getZ() - _currentRadius)
+                    {
+                        _x += 1;
+                        _dir = DIR.EAST;
+                    }
+                    else
+                    {
+                        _z -= 1;
+                    }
+                    break;
+            }
+
+            // If we are at start corner do next ring, or move up.
+            if (_x == _center.getX() - _currentRadius &&
+                _z == _center.getZ() - _currentRadius)
+            {
+                if (_currentRadius == _radius)
+                {
+                    _currentRadius = 1;
+                    _y -= 1;
+                    _x = _center.getX() - _currentRadius;
+                    _z = _center.getZ() - _currentRadius;
+                }
+                else
+                {
+                    _currentRadius += 1;
+                    System.out.println("Current radius: " + _currentRadius);
+                    _x = _center.getX() - _currentRadius;
+                    _z = _center.getZ() - _currentRadius;
+                }
+            }
+        }
+
+        private boolean isValid()
+        {
+            if (_exclusions == null)
+                return true;
+
+            return !VassalUtils.pointInAreas(new BlockPos(_x, _y, _z), _exclusions, 1);
+        }
+
+
+        @Override
+        public void remove()
+        {
+            // We do nothing
+        }
+
+        private int _x;
+        private int _y;
+        private int _z;
+        private DIR _dir = DIR.EAST;
+        private int _currentRadius;
+        private List<BlockPos> _exclusions;
+    }
+
 
     private final BlockPos _center;
     private final int _radius;
