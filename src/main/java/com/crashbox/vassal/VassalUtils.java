@@ -25,7 +25,10 @@ public class VassalUtils
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            for (StackTraceElement elem : e.getStackTrace())
+            {
+                LOGGER.debug(elem);
+            }
         }
     }
 

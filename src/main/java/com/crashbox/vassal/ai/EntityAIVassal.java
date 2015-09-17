@@ -73,10 +73,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         switch (_state)
         {
             case IDLING:
-                getEntity().setCurrentItemOrArmor(1, null);
-                getEntity().setCurrentItemOrArmor(2, null);
                 getEntity().setCurrentItemOrArmor(3, null);
-                getEntity().setCurrentItemOrArmor(4, null);
                 _state = idle();
                 break;
             case ELICITING:
@@ -137,11 +134,17 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
             }
 
             // Filter all task requests
+            ItemStack held = getEntity().getHeldItem();
             if (msg instanceof MessageTaskRequest && _currentPair == null)
             {
                 if (msg.getTransactionID() == MessageWorkerAvailability.class)
                 {
                     debugLog("Adding new task for message: " + msg);
+                    _proposedTasks.add(makeNewTaskPair((MessageTaskRequest) msg));
+                }
+                else if (msg instanceof TRStore && held != null && msg.getTransactionID() == held.getItem())
+                {
+                    debugLog("Adding new task TRStore : " + msg);
                     _proposedTasks.add(makeNewTaskPair((MessageTaskRequest) msg));
                 }
                 else
@@ -234,7 +237,13 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
             debugLog("Idle timeout over.");
             _nextElicit = System.currentTimeMillis() + ELICIT_DELAY_MS;
             _requestEndMS = System.currentTimeMillis() + REQUEST_TIMEOUT_MS;
-            Broadcaster.postMessage(new MessageWorkerAvailability(_entity.worldObj, this));
+
+            ItemStack held = getEntity().getHeldItem();
+            if (held != null)
+                Broadcaster.postMessage(new MessageIsStorageAvailable(this, null, held.getItem(), 0, new ItemStackMatcher(held)));
+            else
+                Broadcaster.postMessage(new MessageWorkerAvailability(_entity.worldObj, this));
+
             return State.ELICITING;
         }
         return State.IDLING;
@@ -311,7 +320,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
 
     private boolean linkupResponses(TaskPair pair, List<MessageTaskRequest> responses)
     {
-        if (pair.getDeliverTask() == null || pair.getEmptyInventory() == null)
+        if (pair.getDeliverTask() == null)
             return linkupDeliverResponses(pair, responses);
 
         if (pair.getAcquireTask() == null)
@@ -323,7 +332,6 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
     private boolean linkupDeliverResponses(TaskPair pair, List<MessageTaskRequest> responses)
     {
         BlockPos pos = getPos();
-        boolean emptyingOperation = false;
 
         List<TRDeliverBase> delivers = extractMessages(pair, responses, TRDeliverBase.class);
         if (delivers.size() == 0)
@@ -331,31 +339,18 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
 
         debugLog("Found deliver tasks: " + delivers.size());
 
-        ItemStack held = getEntity().getHeldItem();
-        if (pair.getDeliverTask() != null && pair.getEmptyInventory() == null &&
-                !pair.getDeliverTask().getMatcher().matches(held))
-        {
-            debugLog("Emptying operation");
-            emptyingOperation = true;
-        }
-        else
-        {
-            // If not an empty, we don't need two deliver tasks.
-            if (pair.getDeliverTask() != null)
-                return false;
+        // If not an empty, we don't need two deliver tasks.
+        if (pair.getDeliverTask() != null)
+            return false;
 
-            if (pair.getAcquireTask() != null)
-                pos = pair.getAcquireTask().getCoarsePos();
-        }
+        if (pair.getAcquireTask() != null)
+            pos = pair.getAcquireTask().getCoarsePos();
 
         // Now, find the best one based on what we are going to do with it
         TRDeliverBase best = findBest(pos, delivers);
         if (VassalUtils.isNotNull(best, LOGGER))
         {
-            if (emptyingOperation)
-                pair.setEmptyInventory(TASK_FACTORY.makeTaskFromMessage(this, best));
-            else
-                pair.setDeliverTask(TASK_FACTORY.makeTaskFromMessage(this, best));
+            pair.setDeliverTask(TASK_FACTORY.makeTaskFromMessage(this, best));
 
             return true;
         }
@@ -367,8 +362,6 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
     {
         //debugLog("Linking up acquire responses.");
         BlockPos pos = getPos();
-        if (pair.getEmptyInventory() != null)
-            pos = pair.getEmptyInventory().getCoarsePos();
 
         List<TRAcquireBase> acquires = extractMessages(pair, responses, TRAcquireBase.class);
         //debugLog("Have (" + acquires.size() + ") acquires ");
@@ -453,27 +446,15 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         // If we have a deliver we need to make sure we have the item
         ItemStack held = getEntity().getHeldItem();
 
-        // First off let's see if we need to dump the thing in our hand.  We figure this out
-        // first because to compute best 'acquire' cost depends on where we are at the end
-        // of the empty inventory step.
-        if (held != null && pair.getEmptyInventory() != null && pair.getDeliverTask() != null
-                && !pair.getDeliverTask().getMatcher().matches(held))
-        {
-            // We need to dump something we are holding before we can acquire
-            debugLog("+++++++++++++++++++++++++++++++++++++");
-            return new MessageIsStorageAvailable(this, null, pair, 0, new ItemStackMatcher(held));
-        }
-
         // Need to deliver, do we need to acquire?
         if (pair.getDeliverTask() != null && pair.getAcquireTask() == null)
         {
+            // If we are holding the right thing, just deliver it
             if (held == null || !pair.getDeliverTask().getMatcher().matches(held))
             {
                 return new MessageItemRequest(this, null, pair, pair.getDeliverTask().getMatcher(),
                         pair.getDeliverTask().getQuantity());
             }
-
-            // If we are here, held item matches...
         }
 
         // We accepted an acquire before deliver.  So a really full chest or orchard

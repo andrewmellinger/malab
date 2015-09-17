@@ -61,7 +61,7 @@ public class BlockBeaconFurnace extends BlockContainer
     {
         IBlockState iblockstate = worldIn.getBlockState(pos);
         TileEntity tileentity = worldIn.getTileEntity(pos);
-        //keepInventory = true;
+        keepInventory = true;
 
         if (active)
         {
@@ -74,7 +74,7 @@ public class BlockBeaconFurnace extends BlockContainer
             worldIn.setBlockState(pos, VassalMain.BLOCK_BEACON_FURNACE.getDefaultState());
         }
 
-        //keepInventory = false;
+        keepInventory = false;
 
         if (tileentity != null)
         {
@@ -93,9 +93,7 @@ public class BlockBeaconFurnace extends BlockContainer
     @Override
     public void breakBlock(World inWorld, BlockPos inPos, IBlockState inBlockState)
     {
-        LOGGER.debug("#################### BREAK BLOCK " + inPos + " - " + inBlockState);
-        VassalUtils.showStack();
-        if (hasTileEntity(inBlockState))
+        if (!keepInventory)
         {
             TileEntity entity = inWorld.getTileEntity(inPos);
             if (entity instanceof TileEntityBeaconFurnace)
@@ -103,7 +101,7 @@ public class BlockBeaconFurnace extends BlockContainer
                 InventoryHelper.dropInventoryItems(inWorld, inPos,
                         (TileEntityBeaconFurnace) entity);
                 inWorld.updateComparatorOutputLevel(inPos, this);
-                ((TileEntityBeaconFurnace)entity).blockBroken();
+                ((TileEntityBeaconFurnace) entity).blockBroken();
             }
         }
 
@@ -320,5 +318,6 @@ public class BlockBeaconFurnace extends BlockContainer
 //    }
 
     private final boolean _isLit;
+    private static boolean keepInventory = false;
     private static final Logger LOGGER = LogManager.getLogger();
 }

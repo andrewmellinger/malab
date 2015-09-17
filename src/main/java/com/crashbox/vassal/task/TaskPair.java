@@ -24,16 +24,6 @@ public class TaskPair
         _entityAI = entityAI;
     }
 
-    public TaskDeliverBase getEmptyInventory()
-    {
-        return _emptyInventory;
-    }
-
-    public void setEmptyInventory(TaskDeliverBase emptyInventory)
-    {
-        _emptyInventory = emptyInventory;
-    }
-
     public TaskAcquireBase getAcquireTask()
     {
         return _acquireTask;
@@ -81,12 +71,7 @@ public class TaskPair
 
     public void start()
     {
-        if (_emptyInventory != null)
-        {
-            _current = _emptyInventory;
-            _stage = Stage.EMPTYING;
-        }
-        else if (_acquireTask != null)
+        if (_acquireTask != null)
         {
             _current = _acquireTask;
             _stage = Stage.ACQUIRING;
@@ -201,7 +186,7 @@ public class TaskPair
      */
     public TaskBase[] asList()
     {
-        return new TaskBase[] { _emptyInventory, _acquireTask, _deliverTask };
+        return new TaskBase[] { _acquireTask, _deliverTask };
     }
 
     /**
@@ -220,7 +205,6 @@ public class TaskPair
                 "stage=" + _stage.name() +
                 ", resolving=" + _resolving.name() +
                 ", current=" + (_current != null) +
-                ", emptyInventory=" + VassalUtils.getSimpleName(_emptyInventory) +
                 ", acquireTask=" + VassalUtils.getSimpleName(_acquireTask) +
                 ", deliverTask=" + VassalUtils.getSimpleName(_deliverTask) +
                 '}';
@@ -236,10 +220,8 @@ public class TaskPair
 
     private TaskBase                _current;
 
-    private TaskDeliverBase         _emptyInventory;
     private TaskAcquireBase         _acquireTask;
     private TaskDeliverBase         _deliverTask;
-
 
     private static final Logger LOGGER = LogManager.getLogger();
 }
