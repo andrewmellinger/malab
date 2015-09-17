@@ -1,10 +1,12 @@
 package com.crashbox.vassal.entity;
 
+import com.crashbox.vassal.VassalMain;
 import com.crashbox.vassal.ai.EntityAIVassal;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAISwimming;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
@@ -75,16 +77,10 @@ public class EntityVassal extends EntityCreature
 
         // We wander slower than we normally move
         //tasks.addTask(priority++, new EntityAIWander(this, 0.2D, 10));
-
-        tasks.addTask(priority++, new EntityAIVassal(this));
+        _vassalAI = new EntityAIVassal(this);
+        tasks.addTask(priority++, _vassalAI);
 
         //targetTasks.addTask(0, new EntityAIHurtByTargetHerdAnimal(this, true));
-    }
-
-    protected void clearAITasks()
-    {
-        tasks.taskEntries.clear();
-        targetTasks.taskEntries.clear();
     }
 
     /**
@@ -103,8 +99,15 @@ public class EntityVassal extends EntityCreature
         return _workSpeedFactor;
     }
 
-    // Inventory utils
+    //=============================================================================================
 
+    public void resume()
+    {
+        _vassalAI.resume();
+    }
+
+    // Inventory utils
+    //=============================================================================================
 
     public void dropHeldItem()
     {
@@ -132,6 +135,36 @@ public class EntityVassal extends EntityCreature
         return held.stackSize;
     }
 
+    //=============================================================================================
+
+    protected void clearAITasks()
+    {
+        tasks.taskEntries.clear();
+        targetTasks.taskEntries.clear();
+    }
+
+    @Override
+    protected boolean interact(EntityPlayer player)
+    {
+        _vassalAI.cancelAndPause();
+        player.openGui(VassalMain.instance,
+                VassalMain.GUI_ENUM.VASSAL.ordinal(),
+                getEntityWorld(),
+                getEntityId(),
+                0,
+                0);
+
+//        if (!this.worldObj.isRemote && (this.riddenByEntity == null ||
+//                this.riddenByEntity == playerEntity) && this.isTame())
+//        {
+//            this.horseChest.setCustomName(this.getName());
+//            playerEntity.displayGUIHorse(this, this.horseChest);
+//        }
+
+        return true;
+    }
+
+    //=============================================================================================
 
     // How many things we can carry.
     private int _carryCapacity = 4;
@@ -139,6 +172,8 @@ public class EntityVassal extends EntityCreature
     // Multiplier on mining speed, a percentage.  Base vassal is 1.0;  Lower faster.
     private float _workSpeedFactor = 1.0F;
 
+    // We use this alot
+    private EntityAIVassal _vassalAI;
 
     private static final Logger LOGGER = LogManager.getLogger();
 }

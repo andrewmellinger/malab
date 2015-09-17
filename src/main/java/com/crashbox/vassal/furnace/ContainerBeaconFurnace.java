@@ -39,8 +39,6 @@ public class ContainerBeaconFurnace extends Container
         for (int i = 0; i < 4; ++i)
             addSlotToContainer(new SampleFuelSlot(inventory, i + 7, 8+ i*18, 53));
 
-        // TODO: Make reusable function
-
         // add player inventory slots
         // note that the slot numbers are within the player inventory so can
         // be same as the tile entity inventory

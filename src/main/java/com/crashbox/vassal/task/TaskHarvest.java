@@ -120,12 +120,10 @@ public class TaskHarvest extends TaskAcquireBase
         if (!_isBreaking)
         {
             //debugLog(LOGGER, "Finished breaking, harvesting.");
-            if (harvestBlock())
-            {
-                // We need to find another harvest block
-                _harvestBlock = null;
-                return false;
-            }
+            harvestBlock();
+            // We need to find another harvest block
+            _harvestBlock = null;
+            return false;
         }
         return true;
     }
@@ -154,6 +152,8 @@ public class TaskHarvest extends TaskAcquireBase
         if (targetStack == null)
         {
             targetStack = VassalUtils.identifyWillDrop(getWorld(), _harvestBlock, _matcher);
+            if (targetStack == null)
+                return false;
         }
         else
         {

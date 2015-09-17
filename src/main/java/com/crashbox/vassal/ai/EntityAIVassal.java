@@ -61,13 +61,24 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
     @Override
     public void resetTask()
     {
-        reset();
+        cancel();
     }
 
     @Override
     public void updateTask()
     {
+        // Process messages should handle data requests
         processMessages();
+
+        if (_paused)
+        {
+            if ((System.currentTimeMillis() / 1000) > _pausedMessageSecs)
+            {
+                LOGGER.debug("----- PAUSED -----");
+                _pausedMessageSecs = (System.currentTimeMillis() / 1000);
+            }
+            return;
+        }
 
         //LOGGER.debug("UpdateTask: " + _state);
         switch (_state)
@@ -94,6 +105,8 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
                 break;
         }
     }
+
+    private long _pausedMessageSecs = 0;
 
     // ================
     // IMessager
@@ -586,15 +599,6 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         }
     }
 
-    /**
-     * Used by tasks to update the work area once we are working.
-     * @param pos The new work area.
-     */
-    public void updateWorkArea(BlockPos pos)
-    {
-        _workArea = pos;
-    }
-
     //=============================================================================================
     // ####  ##### ####  #####  ###  ####  #   # ##### #   #  ####
     // #   # #     #   # #     #   # #   # ## ##   #   ##  # #
@@ -625,8 +629,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         return State.IDLING;
     }
 
-
-    private void reset()
+    private void cancel()
     {
         _state = State.IDLING;
         _currentPair = null;
@@ -634,6 +637,23 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         _proposedTasks.clear();
         _responses.clear();
         _nextElicit = System.currentTimeMillis() + ELICIT_DELAY_MS;
+        getEntity().getNavigator().clearPathEntity();
+    }
+
+    //=============================================================================================
+    //=============================================================================================
+
+    public void cancelAndPause()
+    {
+        debugLog("---------------------->>>>>>> PAUSING <<<<<<<<<<<<<<<<<<<----------------");
+        _paused = true;
+        cancel();
+    }
+
+    public void resume()
+    {
+        _nextElicit = System.currentTimeMillis() + ELICIT_DELAY_MS;
+        _paused = false;
     }
 
     //=============================================================================================
@@ -750,6 +770,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
 
     // Main state variable for the loop
     private State _state = State.IDLING;
+    private boolean _paused = false;
 
 
     // We don't want to ask for work too often.  If we don't get a response, just hang out.

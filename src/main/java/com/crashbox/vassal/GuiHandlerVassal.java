@@ -3,11 +3,16 @@ package com.crashbox.vassal;
 import com.crashbox.vassal.chest.ContainerBeaconChest;
 import com.crashbox.vassal.chest.GuiBeaconChest;
 import com.crashbox.vassal.chest.TileEntityBeaconChest;
+import com.crashbox.vassal.entity.ContainerEntityVassal;
+import com.crashbox.vassal.entity.EntityVassal;
+import com.crashbox.vassal.entity.GuiEntityVassal;
+import com.crashbox.vassal.entity.InventoryEntityVassal;
 import com.crashbox.vassal.furnace.ContainerBeaconFurnace;
 import com.crashbox.vassal.furnace.GuiBeaconFurnace;
 import com.crashbox.vassal.workbench.ContainerBeaconWorkbench;
 import com.crashbox.vassal.workbench.GuiBeaconWorkbench;
 import com.crashbox.vassal.workbench.TileEntityBeaconWorkbench;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.tileentity.TileEntity;
@@ -29,6 +34,16 @@ public class GuiHandlerVassal implements IGuiHandler
     public Object getServerGuiElement(int ID, EntityPlayer player,
                                       World world, int x, int y, int z)
     {
+        if (ID == VassalMain.GUI_ENUM.VASSAL.ordinal())
+        {
+            Entity entity = world.getEntityByID(x);
+            if (entity instanceof EntityVassal)
+            {
+                InventoryEntityVassal inventory = new InventoryEntityVassal((EntityVassal) entity);
+                return new ContainerEntityVassal(player.inventory, (EntityVassal)entity, inventory);
+            }
+        }
+
         TileEntity tileEntity = world.getTileEntity(new BlockPos(x, y, z));
 
         if (tileEntity == null)
@@ -50,6 +65,16 @@ public class GuiHandlerVassal implements IGuiHandler
     public Object getClientGuiElement(int ID, EntityPlayer player,
                                       World world, int x, int y, int z)
     {
+        if (ID == VassalMain.GUI_ENUM.VASSAL.ordinal())
+        {
+            Entity entity = world.getEntityByID(x);
+            if (entity instanceof EntityVassal)
+            {
+                InventoryEntityVassal inventory = new InventoryEntityVassal((EntityVassal) entity);
+                return new GuiEntityVassal(player.inventory, (EntityVassal)entity, inventory);
+            }
+        }
+
         TileEntity tileEntity = world.getTileEntity(new BlockPos(x, y, z));
 
         if (tileEntity == null)
