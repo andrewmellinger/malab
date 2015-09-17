@@ -1,7 +1,7 @@
 package com.crashbox.vassal.task;
 
 import com.crashbox.vassal.VassalUtils;
-import com.crashbox.vassal.EntityVassal;
+import com.crashbox.vassal.entity.EntityVassal;
 import com.crashbox.vassal.ai.EntityAIVassal;
 import com.crashbox.vassal.ai.Priority;
 import com.crashbox.vassal.messaging.IMessager;

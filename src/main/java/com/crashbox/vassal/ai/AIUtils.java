@@ -1,6 +1,6 @@
 package com.crashbox.vassal.ai;
 
-import com.crashbox.vassal.EntityVassal;
+import com.crashbox.vassal.entity.EntityVassal;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;

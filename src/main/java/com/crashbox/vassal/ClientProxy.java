@@ -1,6 +1,7 @@
 package com.crashbox.vassal;
 
 import com.crashbox.vassal.chest.BlockBeaconChest;
+import com.crashbox.vassal.entity.EntityVassal;
 import com.crashbox.vassal.furnace.BlockBeaconFurnace;
 import com.crashbox.vassal.forester.BlockBeaconForester;
 import com.crashbox.vassal.workbench.BlockBeaconWorkbench;

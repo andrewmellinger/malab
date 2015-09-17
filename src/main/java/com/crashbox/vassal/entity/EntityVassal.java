@@ -1,4 +1,4 @@
-package com.crashbox.vassal;
+package com.crashbox.vassal.entity;
 
 import com.crashbox.vassal.ai.EntityAIVassal;
 import net.minecraft.entity.EntityCreature;
