@@ -54,7 +54,7 @@ public class VassalMain
     public static Item ITEM_MINESHAFT_GRENADE;
 
     // This allows us to us one gui handler for many things
-    public enum GUI_ENUM { VASSAL, FURNACE, WORKBENCH, CHEST }
+    public static enum GUI_ENUM { VASSAL, FURNACE, WORKBENCH, CHEST }
 
     // These are the blocks and items we load that other parts need to use.
     //public static ItemThrowableTorch ITEM_THROWABLE_TORCH;

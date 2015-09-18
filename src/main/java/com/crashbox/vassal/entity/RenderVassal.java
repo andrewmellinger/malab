@@ -13,6 +13,7 @@ public class RenderVassal extends RenderBiped
 {
 
     private static final ResourceLocation vassalTexture = new ResourceLocation("vassal:textures/entity/vassal.png");
+    private static final ResourceLocation specialTexture = new ResourceLocation("vassal:textures/entity/vassal_working.png");
 
     public RenderVassal(RenderManager p_i46153_1_, ModelBiped p_i46153_2_, float p_i46153_3_)
     {
@@ -26,6 +27,24 @@ public class RenderVassal extends RenderBiped
     @Override
     protected ResourceLocation getEntityTexture(Entity entity)
     {
-        return vassalTexture;
+        return _resourceLocation;
     }
+
+    public static enum VASSAL_TEXTURE { NORMAL, WORKING}
+
+    public void setTexture(VASSAL_TEXTURE texture)
+    {
+        switch (texture)
+        {
+            case NORMAL:
+                _resourceLocation = vassalTexture;
+                break;
+            case WORKING:
+                _resourceLocation = specialTexture;
+                break;
+        }
+    }
+
+    private ResourceLocation _resourceLocation = vassalTexture;
+
 }

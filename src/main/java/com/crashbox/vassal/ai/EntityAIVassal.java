@@ -3,11 +3,13 @@ package com.crashbox.vassal.ai;
 import com.crashbox.vassal.VassalUtils;
 import com.crashbox.vassal.entity.EntityVassal;
 import com.crashbox.vassal.common.ItemStackMatcher;
+import com.crashbox.vassal.entity.RenderVassal;
 import com.crashbox.vassal.messaging.*;
 import com.crashbox.vassal.task.*;
 import com.crashbox.vassal.task.TaskPair.Resolving;
+import com.crashbox.vassal.entity.RenderVassal.VASSAL_TEXTURE;
+
 import net.minecraft.entity.ai.EntityAIBase;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import org.apache.logging.log4j.LogManager;
@@ -85,22 +87,27 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         {
             case IDLING:
                 getEntity().setCurrentItemOrArmor(3, null);
+                _renderVassal.setTexture(VASSAL_TEXTURE.NORMAL);
                 _state = idle();
                 break;
             case ELICITING:
-                getEntity().setCurrentItemOrArmor(3, new ItemStack(Items.leather_chestplate));
+                //getEntity().setCurrentItemOrArmor(3, new ItemStack(Items.leather_chestplate));
+                _renderVassal.setTexture(VASSAL_TEXTURE.NORMAL);
                 _state = elicit();
                 break;
             case TRANSITING:
-                getEntity().setCurrentItemOrArmor(3, new ItemStack(Items.iron_chestplate));
+                //getEntity().setCurrentItemOrArmor(3, new ItemStack(Items.iron_chestplate));
+                _renderVassal.setTexture(VASSAL_TEXTURE.NORMAL);
                 _state = transition();
                 break;
             case TARGETING:
-                getEntity().setCurrentItemOrArmor(3, new ItemStack(Items.golden_chestplate));
+                //getEntity().setCurrentItemOrArmor(3, new ItemStack(Items.golden_chestplate));
+                _renderVassal.setTexture(VASSAL_TEXTURE.WORKING);
                 _state = target();
                 break;
             case PERFORMING:
-                getEntity().setCurrentItemOrArmor(3, new ItemStack(Items.diamond_chestplate));
+                //getEntity().setCurrentItemOrArmor(3, new ItemStack(Items.diamond_chestplate));
+                _renderVassal.setTexture(VASSAL_TEXTURE.NORMAL);
                 _state = perform();
                 break;
         }
@@ -684,6 +691,13 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
 
     //=============================================================================================
 
+    public static void setRenderVassal(RenderVassal render)
+    {
+        _renderVassal = render;
+    }
+
+    //=============================================================================================
+
     class MyListener implements IListener
     {
         @Override
@@ -773,15 +787,12 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
     private State _state = State.IDLING;
     private boolean _paused = false;
 
-
     // We don't want to ask for work too often.  If we don't get a response, just hang out.
     private static final int ELICIT_DELAY_MS = 6000;
     private long _nextElicit = 0;
 
-
     private static final int DEFAULT_RANGE = 10;
     private static final double DEFAULT_SPEED = 0.5;
-
 
     // Time we wait for messages.  5 ticks (250 ms) is usually good enough
     private static final long REQUEST_TIMEOUT_MS = 250;
@@ -789,7 +800,6 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
 
     // For Targeting
     private BlockPos _workArea = null;
-
 
     private final List<TaskPair> _proposedTasks = new ArrayList<TaskPair>();
 
@@ -803,10 +813,10 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
     // Do we have a current task we are pursuing?
     private TaskPair _currentPair;
 
-    // We have two basic actions.  Sometimes we need to empty our contents first
-    //private TaskBase _emptyContents;
-    private TaskAcquireBase _acquireTask;
-    private TaskDeliverBase _deliverTask;
+    // Visual things
+    private static RenderVassal _renderVassal;
+
+
 
     private static final Logger LOGGER = LogManager.getLogger();
 }

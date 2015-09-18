@@ -1,5 +1,6 @@
 package com.crashbox.vassal;
 
+import com.crashbox.vassal.ai.EntityAIVassal;
 import com.crashbox.vassal.chest.BlockBeaconChest;
 import com.crashbox.vassal.entity.EntityVassal;
 import com.crashbox.vassal.entity.RenderVassal;
@@ -41,8 +42,9 @@ public class ClientProxy extends CommonProxy
         RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
 
         // VASSAL
-        RenderingRegistry.registerEntityRenderingHandler(EntityVassal.class,
-                new RenderVassal(renderManager, new ModelZombie(), 0.5F));
+        RenderVassal renderer = new RenderVassal(renderManager, new ModelZombie(), 0.5F);
+        EntityAIVassal.setRenderVassal(renderer);
+        RenderingRegistry.registerEntityRenderingHandler(EntityVassal.class, renderer);
 
         // BLOCKS
         renderItem.getItemModelMesher().register(
