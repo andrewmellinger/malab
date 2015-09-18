@@ -43,7 +43,7 @@ public class TaskStore extends TaskDeliverBase
     }
 
     @Override
-    public boolean executeAndIsDone()
+    public UpdateResult executeAndIsDone()
     {
         ItemStack current = getEntity().getHeldItem();
 
@@ -59,7 +59,7 @@ public class TaskStore extends TaskDeliverBase
             LOGGER.warn("Could not deliver item to target. It isn't an inventory: " + getRequester());
         }
 
-        return true;
+        return UpdateResult.DONE;
     }
 
     @Override

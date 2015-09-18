@@ -30,7 +30,7 @@ public class TaskPlantSapling extends TaskDeliverBase
     }
 
     @Override
-    public boolean executeAndIsDone()
+    public UpdateResult executeAndIsDone()
     {
         // Plant
         ItemStack held = getEntity().getHeldItem();
@@ -42,9 +42,10 @@ public class TaskPlantSapling extends TaskDeliverBase
         if (held.stackSize <= 0)
         {
             getEntity().setCurrentItemOrArmor(0, null);
+            return UpdateResult.DONE;
         }
 
-        return true;
+        return UpdateResult.RETARGET;
     }
 
     @Override

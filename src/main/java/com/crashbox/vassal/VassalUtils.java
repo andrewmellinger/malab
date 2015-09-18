@@ -279,6 +279,60 @@ public class VassalUtils
     }
 
 
+    //=============================================================================================
+    // ####  #####  ####  #### ##### #   #  ####
+    // #   #   #   #     #       #   ##  # #
+    // #   #   #   #  ## #  ##   #   # # # #  ##
+    // #   #   #   #   # #   #   #   #  ## #   #
+    // ####  #####  ####  #### ##### #   #  ####
+
+
+    public static void digColumn(World world, BlockPos pos, int radius, int minY)
+    {
+        int x = pos.getX();
+        int y = pos.getY();
+        int z = pos.getZ();
+
+        // This is the center.  Dig out a 3x3
+        while (y > minY)
+        {
+            for (int tmpX = x - radius; tmpX <= x + radius; ++tmpX)
+            {
+                for (int tmpZ = z - radius; tmpZ <= z + radius; ++tmpZ)
+                {
+                    world.destroyBlock(new BlockPos(tmpX, y, tmpZ), true);
+                }
+            }
+            --y;
+        }
+    }
+
+    public static void spiralStairs(World world, BlockPos pos, int minY)
+    {
+        int x = pos.getX();
+        int y = pos.getY();
+        int z = pos.getZ();
+
+        IBlockState state = Blocks.cobblestone.getDefaultState();
+
+        int[] xOffset = { 0, 1, 1, 1, 0, -1, -1, -1 };
+        int[] zOffset = { -1, -1, 0, 1, 1, 1, 0, -1 };
+
+        outerLoop:
+        while (y > minY)
+        {
+            for (int i = 0; i < xOffset.length; ++i)
+            {
+                int tmpX = x + xOffset[i];
+                int tmpZ = z + zOffset[i];
+                --y;
+                if (y == minY)
+                    break outerLoop;
+                world.setBlockState(new BlockPos(tmpX, y, tmpZ), state);
+            }
+        }
+
+    }
 
 
 

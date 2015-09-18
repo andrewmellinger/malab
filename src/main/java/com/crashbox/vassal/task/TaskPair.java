@@ -2,6 +2,7 @@ package com.crashbox.vassal.task;
 
 import com.crashbox.vassal.VassalUtils;
 import com.crashbox.vassal.ai.EntityAIVassal;
+import com.crashbox.vassal.task.TaskBase.UpdateResult;
 import net.minecraft.util.BlockPos;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -17,7 +18,6 @@ public class TaskPair
 {
     public enum Resolving { UNRESOLVED, RESOLVING, RESOLVED }
     public enum Stage { EMPTYING, ACQUIRING, DELIVERING, DONE}
-    public enum UpdateResult { CONTINUE, RETARGET, DONE }
 
     public TaskPair(EntityAIVassal entityAI)
     {
@@ -134,8 +134,12 @@ public class TaskPair
     public UpdateResult updateTask()
     {
         // When done we need to move to the next thing, or we are completely done
-        if (!_current.executeAndIsDone())
-            return UpdateResult.CONTINUE;
+        UpdateResult result = _current.executeAndIsDone();
+        if (result == UpdateResult.CONTINUE ||
+                result == UpdateResult.RETARGET )
+        {
+            return result;
+        }
 
         // If we are here it is done.
         switch (_stage)

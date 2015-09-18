@@ -7,8 +7,13 @@ import com.crashbox.vassal.furnace.BlockBeaconFurnace;
 import com.crashbox.vassal.furnace.TileEntityBeaconFurnace;
 import com.crashbox.vassal.forester.BlockBeaconForester;
 import com.crashbox.vassal.forester.TileEntityBeaconForester;
+import com.crashbox.vassal.grenades.EntityDiggerGrenade;
+import com.crashbox.vassal.grenades.EntityMineshaftGrenade;
+import com.crashbox.vassal.grenades.ItemDiggerGrenade;
+import com.crashbox.vassal.grenades.ItemMineshaftGrenade;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -45,6 +50,9 @@ public class VassalMain
     public static Block BLOCK_BEACON_WORKBENCH;
     public static Block BLOCK_BEACON_CHEST;
 
+    public static Item ITEM_DIGGER_GRENADE;
+    public static Item ITEM_MINESHAFT_GRENADE;
+
     // This allows us to us one gui handler for many things
     public enum GUI_ENUM { VASSAL, FURNACE, WORKBENCH, CHEST }
 
@@ -68,20 +76,13 @@ public class VassalMain
     @EventHandler
     public void init(FMLInitializationEvent event)
     {
-        // Add entities
-        int entityID = 0;
-//        EntityRegistry.registerModEntity(EntityThrowableTorch.class, "Throwable Torch",
-//                ++entityID, ModMain.instance, 80, 10, true);
-
-//        GameRegistry.addRecipe(new ItemStack(ITEM_THROWABLE_TORCH),
-//                "T",
-//                "S",
-//                'T', Blocks.torch,
-//                'S', Items.slime_ball
-//        );
-
         // summon with: /summon vassal.Vassal
         registerModEntityWithEgg(EntityVassal.class, "Vassal", 0x3F5505, 0x4E6414);
+
+        EntityRegistry.registerModEntity(EntityDiggerGrenade.class, "Digger Grenade",
+                ++modEntityID, VassalMain.instance, 80, 10, true);
+        EntityRegistry.registerModEntity(EntityMineshaftGrenade.class, "Mineshaft Grenade",
+                ++modEntityID, VassalMain.instance, 80, 10, true);
 
         NetworkRegistry.INSTANCE.registerGuiHandler(VassalMain.instance,
                 new GuiHandlerVassal());
@@ -107,7 +108,6 @@ public class VassalMain
     // PRIVATES
     private void preInitBlockAndItems()
     {
-        // TOO: in the future move this to the client proxy
         BLOCK_BEACON_FURNACE = new BlockBeaconFurnace(false);
         GameRegistry.registerBlock(BLOCK_BEACON_FURNACE, BlockBeaconFurnace.NAME);
         GameRegistry.registerTileEntity(TileEntityBeaconFurnace.class, TileEntityBeaconFurnace.NAME);
@@ -127,6 +127,14 @@ public class VassalMain
         BLOCK_BEACON_CHEST = new BlockBeaconChest();
         GameRegistry.registerBlock(BLOCK_BEACON_CHEST, BlockBeaconChest.NAME);
         GameRegistry.registerTileEntity(TileEntityBeaconChest.class, TileEntityBeaconChest.NAME);
+
+        // ITEMS
+
+        ITEM_DIGGER_GRENADE = new ItemDiggerGrenade();
+        GameRegistry.registerItem(ITEM_DIGGER_GRENADE, ItemDiggerGrenade.NAME);
+
+        ITEM_MINESHAFT_GRENADE = new ItemMineshaftGrenade();
+        GameRegistry.registerItem(ITEM_MINESHAFT_GRENADE, ItemMineshaftGrenade.NAME);
 
     }
 

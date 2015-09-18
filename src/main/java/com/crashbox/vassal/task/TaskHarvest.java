@@ -28,45 +28,45 @@ public class TaskHarvest extends TaskAcquireBase
     }
 
     @Override
-    public boolean executeAndIsDone()
+    public UpdateResult executeAndIsDone()
     {
         // If we are in the process of breaking, do that.
         if (_isBreaking)
         {
             if (continueBreaking())
             {
-                return false;
+                return UpdateResult.CONTINUE;
             }
 
             //debugLog(LOGGER, "HarvestList: " + _harvestList);
             // Have we done enough.
             if (getEntity().isHeldInventoryFull() || getEntity().getHeldSize() >= _quantity)
-                return true;
+                return UpdateResult.DONE;
 
             if (_harvestList == null || _harvestList.peek() == null)
             {
-                return true;
+                return UpdateResult.DONE;
             }
 
             // Keep going on this tree
             _harvestBlock = _harvestList.poll();
             if (_harvestBlock == null)
-                return true;
+                return UpdateResult.DONE;
 
             startBreaking();
-            return false;
+            return UpdateResult.CONTINUE;
         }
 
 
         if (_harvestBlock == null)
         {
             debugLog(LOGGER, "Got to end of harvest executeAndIsDone with null harvestBlock...");
-            return true;
+            return UpdateResult.DONE;
         }
 
         // Otherwise start breaking
         startBreaking();
-        return false;
+        return UpdateResult.CONTINUE;
     }
 
     @Override

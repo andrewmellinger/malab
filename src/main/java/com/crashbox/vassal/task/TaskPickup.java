@@ -34,18 +34,18 @@ public class TaskPickup extends TaskAcquireBase
     }
 
     @Override
-    public boolean executeAndIsDone()
+    public UpdateResult executeAndIsDone()
     {
         EntityItem eItem = AIUtils.findFirstEntityOfTypeOnGround(getEntity().getEntityWorld(), getEntity()
                 .getPosition(), 2, _item);
 
         if (eItem == null)
-            return true;
+            return UpdateResult.DONE;
 
         ItemStack collected = AIUtils.collectEntityIntoNewStack(getWorld(), eItem.getPosition(), 2, _item);
         getEntity().setCurrentItemOrArmor(0, collected);
 
-        return true;
+        return UpdateResult.DONE;
     }
 
     @Override

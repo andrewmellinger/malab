@@ -2,13 +2,19 @@ package com.crashbox.vassal;
 
 import com.crashbox.vassal.chest.BlockBeaconChest;
 import com.crashbox.vassal.entity.EntityVassal;
+import com.crashbox.vassal.entity.RenderVassal;
 import com.crashbox.vassal.furnace.BlockBeaconFurnace;
 import com.crashbox.vassal.forester.BlockBeaconForester;
+import com.crashbox.vassal.grenades.EntityDiggerGrenade;
+import com.crashbox.vassal.grenades.EntityMineshaftGrenade;
+import com.crashbox.vassal.grenades.ItemDiggerGrenade;
+import com.crashbox.vassal.grenades.ItemMineshaftGrenade;
 import com.crashbox.vassal.workbench.BlockBeaconWorkbench;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelZombie;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.entity.RenderSnowball;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
@@ -32,17 +38,13 @@ public class ClientProxy extends CommonProxy
     {
         // Add renderers.
         RenderManager renderManager = Minecraft.getMinecraft().getRenderManager();
-        RenderingRegistry.registerEntityRenderingHandler(EntityVassal.class,
-                new RenderVassal(renderManager, new ModelZombie(), 0.5F));
-//        RenderingRegistry.registerEntityRenderingHandler(EntityVassal.class,
-//                new RenderVassal(renderManager));
-
         RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
 
-//        RenderingRegistry.registerEntityRenderingHandler(EntityThrowableTorch.class,
-//                new RenderSnowball(renderManager, ThrowableTorchMod.ITEM_THROWABLE_TORCH, renderItem));
+        // VASSAL
+        RenderingRegistry.registerEntityRenderingHandler(EntityVassal.class,
+                new RenderVassal(renderManager, new ModelZombie(), 0.5F));
 
-        // TODO: Explore this - what is meta
+        // BLOCKS
         renderItem.getItemModelMesher().register(
                 Item.getItemFromBlock(VassalMain.BLOCK_BEACON_FURNACE),
                 0,
@@ -62,6 +64,22 @@ public class ClientProxy extends CommonProxy
                 Item.getItemFromBlock(VassalMain.BLOCK_BEACON_CHEST),
                 0,
                 new ModelResourceLocation(VassalMain.MODID + ":" + BlockBeaconChest.NAME, "inventory"));
+
+        // ITEMS
+        renderItem.getItemModelMesher().register(VassalMain.ITEM_DIGGER_GRENADE, 0,
+                new ModelResourceLocation(VassalMain.MODID + ":" + ItemDiggerGrenade.NAME, "inventory"));
+
+        RenderingRegistry.registerEntityRenderingHandler(EntityDiggerGrenade.class,
+                new RenderSnowball(renderManager, VassalMain.ITEM_DIGGER_GRENADE, renderItem));
+
+        //---
+        renderItem.getItemModelMesher().register(VassalMain.ITEM_MINESHAFT_GRENADE, 0,
+                new ModelResourceLocation(VassalMain.MODID + ":" + ItemMineshaftGrenade.NAME, "inventory"));
+
+        RenderingRegistry.registerEntityRenderingHandler(EntityMineshaftGrenade.class,
+                new RenderSnowball(renderManager, VassalMain.ITEM_MINESHAFT_GRENADE, renderItem));
+
+
     }
 
     @Override

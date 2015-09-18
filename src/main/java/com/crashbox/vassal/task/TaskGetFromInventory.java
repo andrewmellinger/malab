@@ -36,7 +36,7 @@ public class TaskGetFromInventory extends TaskAcquireBase
     }
 
     @Override
-    public boolean executeAndIsDone()
+    public UpdateResult executeAndIsDone()
     {
         _workArea = null;
 
@@ -51,7 +51,7 @@ public class TaskGetFromInventory extends TaskAcquireBase
             debugLog(LOGGER, "Extracted: " + extracted);
         }
 
-        return true;
+        return UpdateResult.DONE;
     }
 
     @Override

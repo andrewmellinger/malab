@@ -1,4 +1,4 @@
-package com.crashbox.vassal;
+package com.crashbox.vassal.entity;
 
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.renderer.entity.*;

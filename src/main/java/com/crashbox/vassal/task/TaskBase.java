@@ -20,6 +20,8 @@ import java.util.List;
  */
 public abstract class TaskBase
 {
+    public enum UpdateResult { CONTINUE, RETARGET, DONE }
+
     /**
      * Base class for all tasks.
      * @param performer The AI performing this task
@@ -79,7 +81,7 @@ public abstract class TaskBase
      * Make progress on the work indicated when we are done with this target block.
      * @return True if we are done.
      */
-    public abstract boolean executeAndIsDone();
+    public abstract UpdateResult executeAndIsDone();
 
 
     //=============================================================================================
@@ -176,4 +178,5 @@ public abstract class TaskBase
     private boolean _done = false;
 
     private static final Logger LOGGER = LogManager.getLogger();
+
 }
