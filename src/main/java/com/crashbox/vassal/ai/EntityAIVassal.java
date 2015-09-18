@@ -155,9 +155,10 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
                     debugLog("Adding new task for message: " + msg);
                     _proposedTasks.add(makeNewTaskPair((MessageTaskRequest) msg));
                 }
-                else if (msg instanceof TRStore && held != null && msg.getTransactionID() == held.getItem())
+//                else if (msg instanceof TRStore && held != null && msg.getTransactionID() == held.getItem())
+                else if (msg instanceof TRDeliverBase && held != null && msg.getTransactionID() == held.getItem())
                 {
-                    debugLog("Adding new task TRStore : " + msg);
+                    debugLog("Adding new Deliver task : " + msg);
                     _proposedTasks.add(makeNewTaskPair((MessageTaskRequest) msg));
                 }
                 else
@@ -316,11 +317,11 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         {
             if (pair.getResolving() != Resolving.RESOLVING)
             {
-                debugLog("linkupResponses: skipping pair, not RESOLVING. " + pair);
+                //debugLog("linkupResponses: skipping pair, not RESOLVING. " + pair);
                 continue;
             }
 
-            debugLog("linkupResponses to => " + pair);
+            //debugLog("linkupResponses to => " + pair);
             if (linkupResponses(pair, responses))
             {
                 // Since we linked something up, take it out of resolving.
@@ -350,7 +351,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         if (delivers.size() == 0)
             return false;
 
-        debugLog("Found deliver tasks: " + delivers.size());
+        //debugLog("Found deliver tasks: " + delivers.size());
 
         // If not an empty, we don't need two deliver tasks.
         if (pair.getDeliverTask() != null)

@@ -1,5 +1,6 @@
 package com.crashbox.vassal.common;
 
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 import java.util.ArrayList;
@@ -37,6 +38,19 @@ public class ItemStackMatcher
         }
         return false;
     }
+
+    public boolean matches(Item item)
+    {
+        for (ItemStack sample : _samples)
+        {
+            if (sample.getItem().equals(item))
+                return true;
+        }
+        return false;
+    }
+
+
+
 
     public int size()
     {

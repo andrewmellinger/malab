@@ -176,13 +176,12 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
     {
         //LOGGER.debug("Forester " + this + " is asked for work." + msg);
 
-        MessageIsStorageAvailable storage = (MessageIsStorageAvailable)msg;
-
         // We only want saplings.
-        LOGGER.debug(storage);
-        if (!isSapling(storage.getMatcher()))
+        LOGGER.debug("Forester storing: " + msg);
+        if (!isSapling(msg.getMatcher()))
         {
-            return;
+            LOGGER.debug("NOT A SAPLING");
+           return;
         }
 
         BlockPos target = AIUtils.findEmptyOrchardSquare(getWorld(), getPos(), _searchRadius);
@@ -191,9 +190,9 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
         if (target != null)
         {
             TRPlantSapling plantRequest = new TRPlantSapling(TileEntityBeaconForester.this,
-                    msg.getSender(), msg.getTransactionID(), 0);
+                    msg.getSender(), msg.getTransactionID(), 50);
 
-//                    //LOGGER.debug("Posting request: " + req);
+            LOGGER.debug("Posting PLANTING: " + plantRequest);
             Broadcaster.postMessage(plantRequest);
         }
     }
@@ -202,10 +201,12 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
     {
         //List<ItemStack> stacks = OreDictionary.getOres("log");
 
-        Item log1 = Item.getItemFromBlock(Blocks.log);
-        Item log2 = Item.getItemFromBlock(Blocks.log2);
+        Item sapling = Item.getItemFromBlock(Blocks.sapling);
 
-        return matcher.matches(new ItemStack(log1)) || matcher.matches(new ItemStack(log2));
+        LOGGER.debug(matcher);
+        LOGGER.debug(sapling);
+
+        return matcher.matches(sapling);
     }
 
 
