@@ -49,7 +49,13 @@ public class Broadcaster
      */
     public void broadcastSync(Message message)
     {
-        for (IListener tmp : _listeners)
+        List<IListener> listeners;
+        synchronized (_lock)
+        {
+            listeners = new ArrayList<IListener>(_listeners);
+        }
+
+        for (IListener tmp : listeners)
         {
             tmp.handleMessage(message);
         }

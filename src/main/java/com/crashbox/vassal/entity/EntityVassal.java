@@ -57,13 +57,17 @@ public class EntityVassal extends EntityCreature
 //        return true;
 //    }
 
+    @Override
+    protected boolean canDespawn()
+    {
+        return false;
+    }
 
     @Override
-    protected void onDeathUpdate()
+    protected void despawnEntity()
     {
-        super.onDeathUpdate();
-
-        LOGGER.debug(getCustomNameTag() + " !!!!!!!!!!!!! Entity died.");
+//        LOGGER.debug(getCustomNameTag() + " Someone called despawn entity!!!");
+//        super.despawnEntity();
     }
 
     protected void setupAI()
