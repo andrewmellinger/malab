@@ -29,12 +29,10 @@ public class EntityDiggerGrenade extends EntityThrowable
             // Place a single torch if we didn't hit an entity
             if (mop.entityHit == null)
             {
-                VassalUtils.digColumn(worldObj, mop.getBlockPos(), 1, 10);
+                VassalUtils.digColumn(worldObj, mop.getBlockPos(), 1, 10, false);
             }
 
             setDead();
         }
     }
-
-
 }

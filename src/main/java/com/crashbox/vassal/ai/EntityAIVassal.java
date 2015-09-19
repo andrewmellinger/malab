@@ -91,22 +91,18 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
                 _state = idle();
                 break;
             case ELICITING:
-                //getEntity().setCurrentItemOrArmor(3, new ItemStack(Items.leather_chestplate));
                 _renderVassal.setTexture(VASSAL_TEXTURE.NORMAL);
                 _state = elicit();
                 break;
             case TRANSITING:
-                //getEntity().setCurrentItemOrArmor(3, new ItemStack(Items.iron_chestplate));
                 _renderVassal.setTexture(VASSAL_TEXTURE.NORMAL);
                 _state = transition();
                 break;
             case TARGETING:
-                //getEntity().setCurrentItemOrArmor(3, new ItemStack(Items.golden_chestplate));
                 _renderVassal.setTexture(VASSAL_TEXTURE.WORKING);
                 _state = target();
                 break;
             case PERFORMING:
-                //getEntity().setCurrentItemOrArmor(3, new ItemStack(Items.diamond_chestplate));
                 _renderVassal.setTexture(VASSAL_TEXTURE.NORMAL);
                 _state = perform();
                 break;

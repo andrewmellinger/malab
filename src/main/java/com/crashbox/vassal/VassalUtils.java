@@ -1,7 +1,10 @@
 package com.crashbox.vassal;
 
 import com.crashbox.vassal.common.ItemStackMatcher;
+import com.crashbox.vassal.util.MutablePos;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockSlab;
+import net.minecraft.block.BlockStoneSlab;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
@@ -287,7 +290,7 @@ public class VassalUtils
     // ####  #####  ####  #### ##### #   #  ####
 
 
-    public static void digColumn(World world, BlockPos pos, int radius, int minY)
+    public static void digColumn(World world, BlockPos pos, int radius, int minY, boolean drop)
     {
         int x = pos.getX();
         int y = pos.getY();
@@ -300,7 +303,7 @@ public class VassalUtils
             {
                 for (int tmpZ = z - radius; tmpZ <= z + radius; ++tmpZ)
                 {
-                    world.destroyBlock(new BlockPos(tmpX, y, tmpZ), true);
+                    world.destroyBlock(new BlockPos(tmpX, y, tmpZ), drop);
                 }
             }
             --y;
@@ -331,9 +334,215 @@ public class VassalUtils
                 world.setBlockState(new BlockPos(tmpX, y, tmpZ), state);
             }
         }
-
     }
 
+    /**
+     * Puts dual slab stairs in a 7x7 area.  Corner platforms at top, positions 3 & 5 at half.
+     * @param world The world.
+     * @param pos Center
+     * @param minY How low to go.
+     */
+
+    public static void bigSpiralStairs(World world, BlockPos pos, int minY)
+    {
+        IBlockState topState = Blocks.stone_slab.getDefaultState().
+                withProperty(BlockStoneSlab.VARIANT, BlockStoneSlab.EnumType.COBBLESTONE).
+                withProperty(BlockStoneSlab.HALF, BlockSlab.EnumBlockHalf.TOP);
+
+        IBlockState bottomState = Blocks.stone_slab.getDefaultState().
+                withProperty(BlockStoneSlab.VARIANT, BlockStoneSlab.EnumType.COBBLESTONE).
+                withProperty(BlockStoneSlab.HALF, BlockSlab.EnumBlockHalf.BOTTOM);
+
+        int y = pos.getY();
+        BlockWalker walker = new BlockWalker(new BlockPos(pos.getX() - 3, pos.getY(), pos.getZ() - 3), false);
+        while (y > minY)
+        {
+            // Make pad
+            fill(world, walker.getRow(0, 1), topState);
+            walker.forward();
+            fill(world, walker.getRow(0, 1), topState);
+
+            // Make descent
+            for (int i = 0; i < 3; ++i)
+            {
+                walker.forward();
+                y = walker.downHalf();
+                if (y <= minY)
+                    return;
+
+                fill(world, walker.getRow(0, 1), walker.isDown() ? bottomState : topState);
+            }
+
+            // Get down off stair
+            walker.forward();
+            y = walker.downHalf();
+
+            // Move to corner for next pad
+            walker.forward();
+
+            // Turn and do next section
+            walker.turnRight();
+        }
+    }
+
+    private static void fill(World world, BlockPos[] blocks, IBlockState state)
+    {
+        for (BlockPos pos : blocks)
+        {
+            world.setBlockState(pos, state);
+        }
+    }
+
+
+    //=============================================================================================
+
+    // Default order is clockwise
+    public static enum WALKER_FACING { EAST, SOUTH, WEST, NORTH }
+    public static class BlockWalker
+    {
+        public BlockWalker(BlockPos current, boolean down)
+        {
+            _current = new MutablePos(current.getX(), current.getY(), current.getZ());
+            _down = down;
+        }
+
+        public BlockPos getPos()
+        {
+            return _current.makeBlockPos();
+        }
+
+        public void forward()
+        {
+            CLOCKWISE[_direction].forward(_current);
+        }
+
+        public void turnLeft()
+        {
+            _direction -= 1;
+            if (_direction == -1)
+                _direction = 3;
+        }
+
+        public void turnRight()
+        {
+            _direction += 1;
+            if (_direction == 4)
+                _direction = 0;
+        }
+
+        public int down()
+        {
+            _current._y -= 1;
+            return _current._y;
+        }
+
+        public int downHalf()
+        {
+            if (_down)
+                _current._y -= 1;
+            _down = !_down;
+            return _current._y;
+        }
+
+        public boolean isDown()
+        {
+            return _down;
+        }
+
+        /**
+         * Gets a slab of blocks based on our current direction, extending the specified
+         * number to the left and right.  They will all be at the same height
+         * @param left Number of blocks to the left.
+         * @param right Number of blocks to the right.
+         * @return List of blocks.
+         */
+        public BlockPos[] getRow(int left, int right)
+        {
+            BlockPos[] result = new BlockPos[left + 1 + right];
+
+            int idx = 0;
+            for (int i = left; i > 0; --i)
+            {
+                result[i] = CLOCKWISE[_direction].left(_current, i);
+                ++idx;
+            }
+
+            result[idx] = _current.makeBlockPos();
+            ++idx;
+
+            for (int i = 1; i <= right; ++i)
+            {
+                result[i] = CLOCKWISE[_direction].right(_current, i);
+                ++idx;
+            }
+
+            return result;
+        }
+
+        private int _direction = 0;
+        private MutablePos _current;
+        private boolean _down;
+    }
+
+    public static Incrementer[] CLOCKWISE = { new IncrementerEast(),
+                                              new IncrementerSouth(),
+                                              new IncrementerWest(),
+                                              new IncrementerNorth() };
+
+    public static abstract class Incrementer
+    {
+        public abstract void forward(MutablePos pos);
+        public abstract BlockPos left(MutablePos pos, int offset);
+        public abstract BlockPos right(MutablePos pos, int offset);
+    }
+
+    public static class IncrementerEast extends Incrementer
+    {
+        @Override
+        public void forward(MutablePos pos)                { pos._x += 1; }
+
+        @Override
+        public BlockPos left(MutablePos pos, int offset)   { return pos.makeOffset( 0, 0, offset * -1 ); }
+
+        @Override
+        public BlockPos right(MutablePos pos, int offset)  { return pos.makeOffset( 0, 0, offset ); }
+    }
+
+    public static class IncrementerSouth extends Incrementer
+    {
+        @Override
+        public void forward(MutablePos pos)                { pos._z += 1; }
+
+        @Override
+        public BlockPos left(MutablePos pos, int offset)   { return pos.makeOffset( offset, 0, 0 ); }
+
+        @Override
+        public BlockPos right(MutablePos pos, int offset)  { return pos.makeOffset( offset * -1, 0, 0 ); }
+    }
+
+    public static class IncrementerWest extends Incrementer
+    {
+        @Override
+        public void forward(MutablePos pos)                { pos._x -= 1; }
+
+        @Override
+        public BlockPos left(MutablePos pos, int offset)   { return pos.makeOffset( 0, 0, offset ); }
+
+        @Override
+        public BlockPos right(MutablePos pos, int offset)  { return pos.makeOffset( 0, 0, offset * -1 ); }
+    }
+
+    public static class IncrementerNorth extends Incrementer
+    {
+        @Override
+        public void forward(MutablePos pos)                { pos._z -= 1; }
+
+        @Override
+        public BlockPos left(MutablePos pos, int offset)   { return pos.makeOffset( offset * -1, 0, 0 ); }
+
+        @Override
+        public BlockPos right(MutablePos pos, int offset)  { return pos.makeOffset( offset, 0, 0 ); }
+    }
 
 
     private static final Logger LOGGER = LogManager.getLogger();

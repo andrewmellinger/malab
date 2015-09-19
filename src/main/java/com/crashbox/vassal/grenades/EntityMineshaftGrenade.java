@@ -29,8 +29,10 @@ public class EntityMineshaftGrenade extends EntityThrowable
             // Place a single torch if we didn't hit an entity
             if (mop.entityHit == null)
             {
-                VassalUtils.digColumn(worldObj, mop.getBlockPos(), 1, 10);
-                VassalUtils.spiralStairs(worldObj, mop.getBlockPos(), 10);
+//                VassalUtils.digColumn(worldObj, mop.getBlockPos(), 1, 10, false);
+//                VassalUtils.spiralStairs(worldObj, mop.getBlockPos(), 10);
+                VassalUtils.digColumn(worldObj, mop.getBlockPos(), 3, 10, false);
+                VassalUtils.bigSpiralStairs(worldObj, mop.getBlockPos(), 10);
             }
 
             setDead();
