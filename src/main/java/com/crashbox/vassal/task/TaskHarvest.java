@@ -120,14 +120,13 @@ public class TaskHarvest extends TaskAcquireBase
         if (!_isBreaking)
         {
             //debugLog(LOGGER, "Finished breaking, harvesting.");
-            harvestBlock();
+            VassalUtils.harvestBlock(getWorld(), getEntity(), _harvestBlock, _matcher);
             // We need to find another harvest block
             _harvestBlock = null;
             return false;
         }
         return true;
     }
-
 
     /** @return True to keep processing. */
     private boolean updateBreak()
@@ -143,35 +142,6 @@ public class TaskHarvest extends TaskAcquireBase
         }
 
         return (this._breakingProgress < _breakTotalNeeded);
-    }
-
-    // Return true if harvested
-    private boolean harvestBlock()
-    {
-        ItemStack targetStack = getEntity().getHeldItem();
-        if (targetStack == null)
-        {
-            targetStack = VassalUtils.identifyWillDrop(getWorld(), _harvestBlock, _matcher);
-            if (targetStack == null)
-                return false;
-        }
-        else
-        {
-            // It changed or won't drop the right thing, bail.
-            if (!VassalUtils.willDrop(getEntity().getEntityWorld(), _harvestBlock, new ItemStackMatcher(targetStack)))
-                return false;
-        }
-
-        ///// BREAK
-        getEntity().getEntityWorld().destroyBlock(_harvestBlock, true);
-
-        ///// PICKUP
-        AIUtils.collectEntityIntoStack(getEntity().getEntityWorld(), _harvestBlock, 3, targetStack);
-
-        if (getEntity().getHeldItem() == null && targetStack.stackSize > 0)
-            getEntity().setCurrentItemOrArmor(0, targetStack);
-
-        return true;
     }
 
     public void debugInfo(StringBuilder builder)

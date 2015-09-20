@@ -1,7 +1,9 @@
 package com.crashbox.vassal;
 
+import com.crashbox.vassal.ai.AIUtils;
 import com.crashbox.vassal.common.ItemStackMatcher;
-import com.crashbox.vassal.util.MutablePos;
+import com.crashbox.vassal.entity.EntityVassal;
+import com.crashbox.vassal.util.BlockWalker;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockSlab;
 import net.minecraft.block.BlockStoneSlab;
@@ -20,6 +22,8 @@ import java.util.List;
  */
 public class VassalUtils
 {
+    public static enum COMPASS { EAST, SOUTH, WEST, NORTH }
+
     public static void showStack()
     {
         try
@@ -111,25 +115,35 @@ public class VassalUtils
         return o.getClass().getSimpleName();
     }
 
+    // Return true if harvested
+    public static boolean harvestBlock(World world, EntityVassal entity, BlockPos harvestBlock,
+            ItemStackMatcher matcher)
+    {
+        ItemStack targetStack = entity.getHeldItem();
+        if (targetStack == null)
+        {
+            targetStack = VassalUtils.identifyWillDrop(world, harvestBlock, matcher);
+            if (targetStack == null)
+                return false;
+        }
+        else
+        {
+            // It changed or won't drop the right thing, bail.
+            if (!VassalUtils.willDrop(entity.getEntityWorld(), harvestBlock, new ItemStackMatcher(targetStack)))
+                return false;
+        }
 
-//    public static boolean willDrop(World world, BlockPos pos, ItemStack sample)
-//    {
-//        IBlockState state = world.getBlockState(pos);
-//        Block block = state.getBlock();
-//
-//        if (block.isAir(world, pos))
-//        {
-//            return false;
-//        }
-//
-//        for (ItemStack stack : block.getDrops(world, pos, state, 0))
-//        {
-//            if (stack.isItemEqual(sample))
-//                return true;
-//        }
-//
-//        return false;
-//    }
+        ///// BREAK
+        world.destroyBlock(harvestBlock, true);
+
+        ///// PICKUP
+        AIUtils.collectEntityIntoStack(entity.getEntityWorld(), harvestBlock, 3, targetStack);
+
+        if (entity.getHeldItem() == null && targetStack.stackSize > 0)
+            entity.setCurrentItemOrArmor(0, targetStack);
+
+        return true;
+    }
 
     public static boolean harvestInto(World world, BlockPos pos, ItemStack stack)
     {
@@ -198,7 +212,6 @@ public class VassalUtils
         return false;
     }
 
-
     public static String objID(Object obj)
     {
         if (obj == null)
@@ -206,6 +219,20 @@ public class VassalUtils
 
         return obj.getClass().getSimpleName() + "@" + Integer.toHexString(obj.hashCode());
     }
+
+    //=============================================================================================
+
+    public static BlockPos[] getCorners(BlockPos start, int radius)
+    {
+        return new BlockPos[] {
+                new BlockPos(start.getX() - radius, start.getY(), start.getZ() - radius),
+                new BlockPos(start.getX() + radius, start.getY(), start.getZ() - radius),
+                new BlockPos(start.getX() + radius, start.getY(), start.getZ() + radius),
+                new BlockPos(start.getX() - radius, start.getY(), start.getZ() + radius)
+            };
+    }
+
+    //=============================================================================================
 
     /**
      * Finds the point on the radius edge where we'll intersect if we travel in a
@@ -393,157 +420,59 @@ public class VassalUtils
         }
     }
 
-
     //=============================================================================================
 
-    // Default order is clockwise
-    public static enum WALKER_FACING { EAST, SOUTH, WEST, NORTH }
-    public static class BlockWalker
+    /**
+     * For a clockwise traveller, looks at the current relative position and returns the
+     * direction of the traveller.
+     * @param center The center of the area.
+     * @param pos The position to test for
+     * @return Direction
+     */
+    public static COMPASS findClockwiseDir(BlockPos center, BlockPos pos)
     {
-        public BlockWalker(BlockPos current, boolean down)
-        {
-            _current = new MutablePos(current.getX(), current.getY(), current.getZ());
-            _down = down;
-        }
-
-        public BlockPos getPos()
-        {
-            return _current.makeBlockPos();
-        }
-
-        public void forward()
-        {
-            CLOCKWISE[_direction].forward(_current);
-        }
-
-        public void turnLeft()
-        {
-            _direction -= 1;
-            if (_direction == -1)
-                _direction = 3;
-        }
-
-        public void turnRight()
-        {
-            _direction += 1;
-            if (_direction == 4)
-                _direction = 0;
-        }
-
-        public int down()
-        {
-            _current._y -= 1;
-            return _current._y;
-        }
-
-        public int downHalf()
-        {
-            if (_down)
-                _current._y -= 1;
-            _down = !_down;
-            return _current._y;
-        }
-
-        public boolean isDown()
-        {
-            return _down;
-        }
-
-        /**
-         * Gets a slab of blocks based on our current direction, extending the specified
-         * number to the left and right.  They will all be at the same height
-         * @param left Number of blocks to the left.
-         * @param right Number of blocks to the right.
-         * @return List of blocks.
-         */
-        public BlockPos[] getRow(int left, int right)
-        {
-            BlockPos[] result = new BlockPos[left + 1 + right];
-
-            int idx = 0;
-            for (int i = left; i > 0; --i)
-            {
-                result[i] = CLOCKWISE[_direction].left(_current, i);
-                ++idx;
-            }
-
-            result[idx] = _current.makeBlockPos();
-            ++idx;
-
-            for (int i = 1; i <= right; ++i)
-            {
-                result[i] = CLOCKWISE[_direction].right(_current, i);
-                ++idx;
-            }
-
-            return result;
-        }
-
-        private int _direction = 0;
-        private MutablePos _current;
-        private boolean _down;
+        // SIDE:             EAST           SOUTH         WEST           NORTH
+        COMPASS[] mapping = {COMPASS.SOUTH, COMPASS.WEST, COMPASS.NORTH, COMPASS.EAST };
+        return mapping[determineCompassDirection(center, pos).ordinal()];
     }
 
-    public static Incrementer[] CLOCKWISE = { new IncrementerEast(),
-                                              new IncrementerSouth(),
-                                              new IncrementerWest(),
-                                              new IncrementerNorth() };
-
-    public static abstract class Incrementer
+    /**
+     * Determines the basic heading.
+     * @param center The center to look for.
+     * @param pos The current position.
+     * @return The compass direction.
+     */
+    public static COMPASS determineCompassDirection(BlockPos center, BlockPos pos)
     {
-        public abstract void forward(MutablePos pos);
-        public abstract BlockPos left(MutablePos pos, int offset);
-        public abstract BlockPos right(MutablePos pos, int offset);
+        // Look at slop and x/y
+        // -/- | +/-
+        // ----+-----
+        // -/+ | +/+
+
+        // \  >1   /
+        //  \  |  /
+        //   \ | /
+        // <1  *  < 1
+        //   / | \
+        //  /  |  \
+        // /  >1   \
+
+        // Slope is dZ/dX
+
+        int deltaX = pos.getX() - center.getX();
+        int deltaZ = pos.getZ() - center.getZ();
+
+        // If we have no delta X, we are above or below.
+        if (deltaX == 0)
+            return (deltaZ > 0) ? COMPASS.SOUTH : COMPASS.NORTH;
+
+        // Use slope
+        double slope = Math.abs(deltaZ * 1.0D) / Math.abs(deltaX * 1.0D);
+        if (slope > 0)
+            return (deltaZ > 0) ? COMPASS.SOUTH : COMPASS.NORTH;
+        else
+            return (deltaX > 0) ? COMPASS.EAST : COMPASS.WEST;
     }
-
-    public static class IncrementerEast extends Incrementer
-    {
-        @Override
-        public void forward(MutablePos pos)                { pos._x += 1; }
-
-        @Override
-        public BlockPos left(MutablePos pos, int offset)   { return pos.makeOffset( 0, 0, offset * -1 ); }
-
-        @Override
-        public BlockPos right(MutablePos pos, int offset)  { return pos.makeOffset( 0, 0, offset ); }
-    }
-
-    public static class IncrementerSouth extends Incrementer
-    {
-        @Override
-        public void forward(MutablePos pos)                { pos._z += 1; }
-
-        @Override
-        public BlockPos left(MutablePos pos, int offset)   { return pos.makeOffset( offset, 0, 0 ); }
-
-        @Override
-        public BlockPos right(MutablePos pos, int offset)  { return pos.makeOffset( offset * -1, 0, 0 ); }
-    }
-
-    public static class IncrementerWest extends Incrementer
-    {
-        @Override
-        public void forward(MutablePos pos)                { pos._x -= 1; }
-
-        @Override
-        public BlockPos left(MutablePos pos, int offset)   { return pos.makeOffset( 0, 0, offset ); }
-
-        @Override
-        public BlockPos right(MutablePos pos, int offset)  { return pos.makeOffset( 0, 0, offset * -1 ); }
-    }
-
-    public static class IncrementerNorth extends Incrementer
-    {
-        @Override
-        public void forward(MutablePos pos)                { pos._z -= 1; }
-
-        @Override
-        public BlockPos left(MutablePos pos, int offset)   { return pos.makeOffset( offset * -1, 0, 0 ); }
-
-        @Override
-        public BlockPos right(MutablePos pos, int offset)  { return pos.makeOffset( offset, 0, 0 ); }
-    }
-
 
     private static final Logger LOGGER = LogManager.getLogger();
 }

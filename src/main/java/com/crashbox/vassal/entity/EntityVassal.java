@@ -2,6 +2,8 @@ package com.crashbox.vassal.entity;
 
 import com.crashbox.vassal.VassalMain;
 import com.crashbox.vassal.ai.EntityAIVassal;
+import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAISwimming;
@@ -137,6 +139,25 @@ public class EntityVassal extends EntityCreature
             return 0;
 
         return held.stackSize;
+    }
+
+    public void placeHeldBlock(World world, BlockPos target)
+    {
+        // Make sure the block is air
+        if (!world.isAirBlock(target))
+            return;
+
+        ItemStack held = getHeldItem();
+        if (held == null || held.stackSize == 0)
+            return;
+
+        Block block = Block.getBlockFromItem(held.getItem());
+        IBlockState state = block.getStateFromMeta(held.getMetadata());
+        world.setBlockState(target, state);
+
+        held.stackSize -= 1;
+        if (held.stackSize == 0)
+            setCurrentItemOrArmor(0, null);
     }
 
     //=============================================================================================

@@ -1,5 +1,7 @@
 package com.crashbox.vassal.ai;
 
+import com.crashbox.vassal.VassalUtils;
+import com.crashbox.vassal.common.ItemStackMatcher;
 import com.crashbox.vassal.entity.EntityVassal;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -38,6 +40,37 @@ public class AIUtils
         }
         return null;
     }
+
+    public static BlockPos firstDropOccurrence(World world, BlockPos center, int radius,
+            ItemStackMatcher matcher)
+    {
+        BlockPos start = new BlockPos(center.getX() - radius, center.getY(), center.getZ() - radius);
+        BlockPos end = new BlockPos(center.getX() + radius, center.getY() - 1, center.getZ() + radius);
+        return firstDropOccurrence(world, start, end, matcher);
+    }
+
+    public static BlockPos firstDropOccurrence(World world, BlockPos startPos, BlockPos endPos,
+            ItemStackMatcher matcher)
+    {
+        int deltaX = startPos.getX() < endPos.getX() ? 1 : -1;
+        int deltaY = startPos.getY() < endPos.getY() ? 1 : -1;
+        int deltaZ = startPos.getZ() < endPos.getZ() ? 1 : -1;
+
+        for ( int y = startPos.getY(); y != endPos.getY(); y += deltaY)
+        {
+            for ( int x = startPos.getX(); x != endPos.getX(); x += deltaX)
+            {
+                for ( int z = startPos.getZ(); z != endPos.getZ(); x += deltaZ)
+                {
+                    BlockPos target = new BlockPos(x, y, z);
+                    if (VassalUtils.willDrop(world, target, matcher))
+                        return target;
+                }
+            }
+        }
+        return null;
+    }
+
 
     public static void collectEntityIntoStack(World world, BlockPos startPos, int range, ItemStack targetStack )
     {
@@ -296,6 +329,14 @@ public class AIUtils
 
         return null;
     }
+
+
+
+
+
+
+
+
 
     private static final Logger LOGGER = LogManager.getLogger();
 }

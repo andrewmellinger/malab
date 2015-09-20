@@ -185,6 +185,7 @@
         <w>inprogress</w>
         <w>messager</w>
         <w>retarget</w>
+        <w>traverser</w>
       </words>
     </dictionary>
   </component>
