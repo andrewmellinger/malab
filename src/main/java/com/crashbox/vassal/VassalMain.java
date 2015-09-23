@@ -15,6 +15,7 @@ import com.crashbox.vassal.quarry.BlockBeaconQuarry;
 import com.crashbox.vassal.quarry.TileEntityBeaconQuarry;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.Mod;
@@ -98,6 +99,14 @@ public class VassalMain
     {
         // Handle interaction with other mods, complete your setup based on this.
         proxy.postInit(event);
+
+//        LOGGER.debug("****************************************************");
+//        ItemStack stack = new ItemStack(Blocks.cobblestone);
+//        LOGGER.debug("IronPick on cobblestone: " + Items.iron_pickaxe.getDigSpeed(stack,
+//                Blocks.cobblestone.getDefaultState()));
+//        LOGGER.debug("StonePick on cobblestone: " + Items.stone_pickaxe.getDigSpeed(stack,
+//                Blocks.cobblestone.getDefaultState()));
+//        LOGGER.debug("Cobblestone hardness: " + Blocks.cobblestone.getBlockHardness(null, null));
     }
 
     public void registerModEntityWithEgg(Class parEntityClass, String parEntityName,

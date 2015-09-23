@@ -11,9 +11,7 @@ import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * Copyright 2015 Andrew O. Mellinger
@@ -73,8 +71,6 @@ public class StairBuilder
             {
                 if (!isInExclusions(pos))
                     return pos;
-//                else
-//                    LOGGER.debug("In exclusion list");
             }
         }
         return null;
