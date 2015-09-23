@@ -72,7 +72,7 @@ public abstract class TaskHarvest extends TaskAcquireBase
                 return UpdateResult.DONE;
             }
 
-            // Keep going on this tree
+            // Keep going on this activity
             _harvestBlock = _harvestList.poll();
             if (_harvestBlock == null)
                 return UpdateResult.DONE;
@@ -80,7 +80,6 @@ public abstract class TaskHarvest extends TaskAcquireBase
             startBreaking();
             return UpdateResult.CONTINUE;
         }
-
 
         if (_harvestBlock == null)
         {
@@ -127,6 +126,8 @@ public abstract class TaskHarvest extends TaskAcquireBase
         {
             //debugLog(LOGGER, "Finished breaking, harvesting.");
             VassalUtils.harvestBlockIntoHeld(getWorld(), getEntity(), _harvestBlock, getMatcher());
+            // This is kinda a hack...
+            onBlockBroken(_harvestBlock);
             // We need to find another harvest block
             _harvestBlock = null;
             return false;
@@ -149,6 +150,14 @@ public abstract class TaskHarvest extends TaskAcquireBase
 
         return (this._breakingProgress < _breakTotalNeeded);
     }
+
+    // Place for subclass to inject logic
+    protected void onBlockBroken(BlockPos pos)
+    {
+
+    }
+
+    //====
 
     public void debugInfo(StringBuilder builder)
     {

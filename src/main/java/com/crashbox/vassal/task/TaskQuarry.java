@@ -36,6 +36,15 @@ public class TaskQuarry extends TaskHarvest
         return list;
     }
 
+    @Override
+    protected void onBlockBroken(BlockPos pos)
+    {
+        // If the one below is there, try to place inventory
+        BlockPos downOne = pos.down();
+        if (getWorld().isAirBlock(downOne))
+            getEntity().placeHeldBlock(getWorld(), downOne);
+    }
+
     private final StairBuilder _builder;
 
     private static final Logger LOGGER = LogManager.getLogger();

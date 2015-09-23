@@ -131,6 +131,7 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
         }
 
         // If we are here we need a worker to move us down one.
+
     }
 
 //    private BlockPos findQuarryCandidate()
