@@ -503,6 +503,26 @@ public class VassalUtils
         return (xOffset * xOffset) + (zOffset * zOffset);
     }
 
+    public static BlockPos getBlockBeside(BlockPos start, BlockPos target)
+    {
+        return new BlockPos( target.getX() + comp(start.getX(), target.getX()),
+                             target.getY(),
+                             target.getZ() + comp(start.getZ(), target.getZ()));
+    }
+
+    public static int comp(int start, int end)
+    {
+        int x = 0;
+
+        int xDelta = start - end;
+        if (xDelta > 0)
+            x = 1;
+        else if (xDelta < 1)
+            x = -1;
+
+        return x;
+    }
+
 
     public static boolean pointInArea(BlockPos point, BlockPos center, int radius)
     {

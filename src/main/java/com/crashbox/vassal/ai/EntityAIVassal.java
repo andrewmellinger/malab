@@ -677,13 +677,26 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
     // Convenience method
     public boolean tryMoveTo(BlockPos pos)
     {
-        return getEntity().getNavigator().tryMoveToXYZ(pos.getX(), pos.getY(), pos.getZ(), getEntity().getSpeed());
+        // If we are 2 blocks away, we are good enough
+        if (inProximity(pos))
+        {
+            //debugLog("Close enough!  Not moving.");
+            return true;
+        }
+
+        // Computa position towards us but not on the block, so we aren't actually standing on the thing.
+        BlockPos target = VassalUtils.getBlockBeside(getPos(), pos);
+        //debugLog("Ta:rgeting  Nearby: " + pos + " to: " + target);
+
+        return getEntity().getNavigator().tryMoveToXYZ(target.getX(), target.getY(), target.getZ(), getEntity().getSpeed());
     }
 
     public boolean inProximity(BlockPos pos)
     {
-        return VassalUtils.isWithinSqDist(getEntity().getPosition(), pos, 9);
+        return VassalUtils.isWithinSqDist(getEntity().getPosition(), pos, PROXIMITY);
     }
+
+    private final int PROXIMITY = 9;
 
     //=============================================================================================
 
