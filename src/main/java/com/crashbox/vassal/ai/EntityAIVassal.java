@@ -251,7 +251,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         // Once in a while we want to tell people we need more
         if (System.currentTimeMillis() > _nextElicit )
         {
-            debugLog("Idle timeout over.");
+            //debugLog("Idle timeout over.");
             _nextElicit = System.currentTimeMillis() + ELICIT_DELAY_MS;
             _requestEndMS = System.currentTimeMillis() + REQUEST_TIMEOUT_MS;
 

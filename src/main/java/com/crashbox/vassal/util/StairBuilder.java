@@ -115,12 +115,23 @@ public class StairBuilder
         }
 
         // Try up one
+        BlockPos[] corners = VassalUtils.getCorners(BlockUtils.up(start), radius);
+        for (int i = 0; i < 4; ++i)
+        {
+            if (world.getBlockState(corners[i]).equals(top))
+            {
+                // Since we found one above, let's make one down.
+                return corners[ (i + 1) % 4].down(2);
+            }
+        }
+
         for (BlockPos pos : VassalUtils.getCorners(new BlockPos(start.getX(), start.getY() + 1,
                 start.getZ()), radius))
         {
             if (world.getBlockState(pos).equals(top))
             {
                 LOGGER.debug("Landing above: " + pos);
+                // We need to find the next one.
                 return pos;
             }
         }

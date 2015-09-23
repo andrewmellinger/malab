@@ -114,7 +114,10 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
             TRHarvest quarry = new TRHarvest(this, msg.getSender(), msg.getTransactionID(), 0,
                     TaskQuarry.class, ItemStackMatcher.getQuarryMatcher(), 1);
             Broadcaster.postMessage(quarry);
+            return;
         }
+
+        // If we are here we need a worker to move us down one.
     }
 
 //    private BlockPos findQuarryCandidate()

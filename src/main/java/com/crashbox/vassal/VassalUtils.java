@@ -550,13 +550,13 @@ public class VassalUtils
 
     //=============================================================================================
 
-    public static BlockPos[] getCorners(BlockPos start, int radius)
+    public static BlockPos[] getCorners(BlockPos center, int radius)
     {
         return new BlockPos[] {
-                new BlockPos(start.getX() - radius, start.getY(), start.getZ() - radius),
-                new BlockPos(start.getX() + radius, start.getY(), start.getZ() - radius),
-                new BlockPos(start.getX() + radius, start.getY(), start.getZ() + radius),
-                new BlockPos(start.getX() - radius, start.getY(), start.getZ() + radius)
+                new BlockPos(center.getX() - radius, center.getY(), center.getZ() - radius),
+                new BlockPos(center.getX() + radius, center.getY(), center.getZ() - radius),
+                new BlockPos(center.getX() + radius, center.getY(), center.getZ() + radius),
+                new BlockPos(center.getX() - radius, center.getY(), center.getZ() + radius)
             };
     }
 
@@ -725,7 +725,7 @@ public class VassalUtils
                 if (y <= minY)
                     return;
 
-                fill(world, walker.getRow(0, 1), walker.isDown() ? bottomState : topState);
+                fill(world, walker.getRow(0, 1), walker.isHalf() ? bottomState : topState);
             }
 
             // Get down off stair
@@ -761,7 +761,8 @@ public class VassalUtils
     {
         // SIDE:             EAST           SOUTH         WEST           NORTH
         COMPASS[] mapping = {COMPASS.SOUTH, COMPASS.WEST, COMPASS.NORTH, COMPASS.EAST };
-        return mapping[determineCompassDirection(center, pos).ordinal()];
+        int tmp = determineCompassDirection(center, pos).ordinal();
+        return mapping[tmp];
     }
 
     /**
@@ -796,7 +797,7 @@ public class VassalUtils
 
         // Use slope
         double slope = Math.abs(deltaZ * 1.0D) / Math.abs(deltaX * 1.0D);
-        if (slope > 0)
+        if (slope > 1)
             return (deltaZ > 0) ? COMPASS.SOUTH : COMPASS.NORTH;
         else
             return (deltaX > 0) ? COMPASS.EAST : COMPASS.WEST;

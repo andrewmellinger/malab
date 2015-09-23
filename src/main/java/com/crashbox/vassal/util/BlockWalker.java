@@ -8,6 +8,11 @@ import com.crashbox.vassal.VassalUtils.COMPASS;
  */
 public class BlockWalker
 {
+    public BlockWalker(BlockPos current)
+    {
+        this(current, false);
+    }
+
     public BlockWalker(BlockPos current, boolean down)
     {
         _current = new MutablePos(current.getX(), current.getY(), current.getZ());
@@ -45,6 +50,12 @@ public class BlockWalker
             _direction = 0;
     }
 
+    public int up()
+    {
+        _current._y += 1;
+        return _current._y;
+    }
+
     public int down()
     {
         _current._y -= 1;
@@ -59,9 +70,24 @@ public class BlockWalker
         return _current._y;
     }
 
-    public boolean isDown()
+    public boolean isHalf()
     {
         return _down;
+    }
+
+    public int getX()
+    {
+        return _current._x;
+    }
+
+    public int getY()
+    {
+        return _current._y;
+    }
+
+    public int getZ()
+    {
+        return _current._z;
     }
 
     /**
@@ -154,10 +180,6 @@ public class BlockWalker
         @Override
         public BlockPos right(MutablePos pos, int offset)  { return pos.makeOffset( offset, 0, 0 ); }
     }
-
-
-
-
 
     private int _direction = 0;
     private MutablePos _current;
