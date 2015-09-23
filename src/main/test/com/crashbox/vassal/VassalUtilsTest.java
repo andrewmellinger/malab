@@ -3,7 +3,7 @@ package com.crashbox.vassal;
 import net.minecraft.util.BlockPos;
 import org.junit.Test;
 
-public class DrudgeUtilsTest
+public class VassalUtilsTest
 {
 
     @Test
@@ -36,6 +36,14 @@ public class DrudgeUtilsTest
 
         System.out.println(VassalUtils.findIntersect(center, 3, new BlockPos(0, 0, 4)));
         System.out.println(VassalUtils.findIntersect(center, 3, new BlockPos(10, 0, 4)));
+    }
 
+
+    @Test
+    public void testFirstDropOccurrence()
+    {
+//        BlockPos start = new BlockPos(10, 63, 45);
+//        BlockPos end = new BlockPos(14, 59, 49);
+//        VassalUtils.firstDropOccurrence(null, start, end, null);
     }
 }

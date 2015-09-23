@@ -1,10 +1,12 @@
 package com.crashbox.vassal.forester;
 
+import com.crashbox.vassal.VassalUtils;
 import com.crashbox.vassal.ai.*;
 import com.crashbox.vassal.beacon.BeaconBase;
 import com.crashbox.vassal.common.ItemStackMatcher;
 import com.crashbox.vassal.common.ItemTypeMatcher;
 import com.crashbox.vassal.messaging.*;
+import com.crashbox.vassal.task.TaskHarvestTree;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
@@ -106,14 +108,14 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
         // Look around and see if we have any of these.
         boolean hasMats = RingedSearcher.detectBlock(getWorld(), getPos(), _searchRadius, _searchHeight,
                 itemReq.getMatcher());
-        int vassalCount = AIUtils.countVassalsInArea(getWorld(), getPos(), getRadius());
+        int vassalCount = VassalUtils.countVassalsInArea(getWorld(), getPos(), getRadius());
 
         // We only want to respond if we have materials and we aren't already being heavily worked
         if (hasMats && vassalCount < getMaxVassalCount())
         {
             // Offer a task, at our area for the requested thing.
             TRHarvest req = new TRHarvest(TileEntityBeaconForester.this, itemReq.getSender(),
-                    msg.getTransactionID(), 10, itemReq.getMatcher(), itemReq.getQuantity());
+                    msg.getTransactionID(), 10, TaskHarvestTree.class, itemReq.getMatcher(), itemReq.getQuantity());
 
             debugLog("Posting request: " + req);
             Broadcaster.postMessage(req);
@@ -128,9 +130,9 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
 
         //=====================
 
-        EntityItem pickup = AIUtils.findFirstEntityOfTypeOnGround(getWorld(), getPos(), _searchRadius,
+        EntityItem pickup = VassalUtils.findFirstEntityOfTypeOnGround(getWorld(), getPos(), _searchRadius,
                 Item.getItemFromBlock(Blocks.sapling));
-        BlockPos target = AIUtils.findEmptyOrchardSquare(getWorld(), getPos(), _searchRadius);
+        BlockPos target = VassalUtils.findEmptyOrchardSquare(getWorld(), getPos(), _searchRadius);
 
         LOGGER.debug("pickup=" + pickup + " , target=" + target);
         if (pickup != null && target != null)
@@ -165,7 +167,7 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
         {
             // Offer a task, at our area for the requested thing.
             TRHarvest req = new TRHarvest(TileEntityBeaconForester.this, availability.getSender(),
-                    msg.getTransactionID(), 10, new ItemStackMatcher(sample), -1);
+                    msg.getTransactionID(), 10, TaskHarvestTree.class, new ItemStackMatcher(sample), -1);
 
             debugLog("Posting request: " + req);
             Broadcaster.postMessage(req);
@@ -184,7 +186,7 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
            return;
         }
 
-        BlockPos target = AIUtils.findEmptyOrchardSquare(getWorld(), getPos(), _searchRadius);
+        BlockPos target = VassalUtils.findEmptyOrchardSquare(getWorld(), getPos(), _searchRadius);
 
         //LOGGER.debug("target=" + target);
         if (target != null)

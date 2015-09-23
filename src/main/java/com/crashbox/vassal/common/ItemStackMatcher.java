@@ -1,5 +1,7 @@
 package com.crashbox.vassal.common;
 
+import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
@@ -11,11 +13,43 @@ import java.util.List;
  */
 public class ItemStackMatcher
 {
+    public static ItemStackMatcher getQuarryMatcher()
+    {
+        if (QUARRY_MATCHER != null)
+            return QUARRY_MATCHER;
+
+        //  TODO:  Load from config?
+        ItemStackMatcher matcher = new ItemStackMatcher();
+        matcher.add(new ItemStack(Item.getItemFromBlock(Blocks.cobblestone)));
+        matcher.add(new ItemStack(Item.getItemFromBlock(Blocks.gravel)));
+        matcher.add(new ItemStack(Item.getItemFromBlock(Blocks.coal_ore)));
+
+        // TODO:  Add granite
+
+        QUARRY_MATCHER = matcher;
+
+        return QUARRY_MATCHER;
+    }
+
+    // ===================
+
+    public ItemStackMatcher()
+    {
+    }
+
     public ItemStackMatcher(ItemStack... samples)
     {
         for (ItemStack sample : samples)
         {
             add(sample);
+        }
+    }
+
+    public ItemStackMatcher(Block... blocks)
+    {
+        for (Block block : blocks)
+        {
+            add(block);
         }
     }
 
@@ -29,6 +63,14 @@ public class ItemStackMatcher
         }
     }
 
+    public void add(Block sample)
+    {
+        if (sample != null)
+        {
+            _samples.add(new ItemStack(sample, 0));
+        }
+    }
+
     public boolean matches(ItemStack stack)
     {
         for (ItemStack sample : _samples)
@@ -39,6 +81,16 @@ public class ItemStackMatcher
         return false;
     }
 
+    public boolean matches(Block block)
+    {
+        return matches(new ItemStack(block));
+    }
+
+    /**
+     * Matches IGNORING metadata
+     * @param item The plain item
+     * @return True if the item is in one of the stacks ignoring metadata
+     */
     public boolean matches(Item item)
     {
         for (ItemStack sample : _samples)
@@ -48,9 +100,6 @@ public class ItemStackMatcher
         }
         return false;
     }
-
-
-
 
     public int size()
     {
@@ -65,6 +114,10 @@ public class ItemStackMatcher
                 '}';
     }
 
-
     private final List<ItemStack> _samples = new ArrayList<ItemStack>();
+
+
+    // ===========
+    private static ItemStackMatcher QUARRY_MATCHER;
+
 }

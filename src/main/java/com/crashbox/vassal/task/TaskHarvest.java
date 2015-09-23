@@ -1,13 +1,10 @@
 package com.crashbox.vassal.task;
 
 import com.crashbox.vassal.VassalUtils;
-import com.crashbox.vassal.ai.AIUtils;
 import com.crashbox.vassal.ai.EntityAIVassal;
 import com.crashbox.vassal.ai.RingedSearcher;
-import com.crashbox.vassal.common.ItemStackMatcher;
 import com.crashbox.vassal.messaging.TRHarvest;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,7 +15,7 @@ import java.util.Queue;
 /**
  * Copyright 2015 Andrew O. Mellinger
  */
-public class TaskHarvest extends TaskAcquireBase
+public abstract class TaskHarvest extends TaskAcquireBase
 {
     public TaskHarvest(EntityAIVassal performer, TRHarvest message)
     {
@@ -84,8 +81,7 @@ public class TaskHarvest extends TaskAcquireBase
             _harvestBlock = _harvestList.poll();
 
         if (_harvestBlock == null)
-            _harvestList = RingedSearcher.findTree(getEntity().getEntityWorld(), getRequester().getPos(), _radius,
-                    _height, _matcher, others);
+            _harvestList = findHarvestList(others);
 
         if (_harvestList == null || _harvestList.isEmpty())
         {
@@ -96,10 +92,22 @@ public class TaskHarvest extends TaskAcquireBase
 
         _harvestBlock = _harvestList.poll();
 
-        // We want them to move to a place which is correct X,Z but with ground Y.
+        // By now we should have one because it shouldn't contain null...
+        if (_harvestBlock == null)
+            return null;
 
+        // We want them to move to a place which is correct X,Z but with ground Y.
         return new BlockPos(_harvestBlock.getX(), getRequester().getPos().getY(), _harvestBlock.getZ());
     }
+
+
+    // This adds the specific algorithm that find trees, or blocks of stone
+    // or whatever
+    protected abstract Queue<BlockPos> findHarvestList(List<BlockPos> others);
+//    _harvestList = RingedSearcher.findTree(getEntity().getEntityWorld(), getRequester().getPos(), _radius,
+//    _height, _matcher, others);
+
+
 
     private void startBreaking()
     {
@@ -120,7 +128,7 @@ public class TaskHarvest extends TaskAcquireBase
         if (!_isBreaking)
         {
             //debugLog(LOGGER, "Finished breaking, harvesting.");
-            VassalUtils.harvestBlock(getWorld(), getEntity(), _harvestBlock, _matcher);
+            VassalUtils.harvestBlockIntoHeld(getWorld(), getEntity(), _harvestBlock, _matcher);
             // We need to find another harvest block
             _harvestBlock = null;
             return false;
@@ -154,16 +162,13 @@ public class TaskHarvest extends TaskAcquireBase
     }
 
     // Describes the search area
-    private final int _radius;
-    private final int _height = 10;
-    private final int _quantity;
+    protected final int _radius;
+    protected final int _height = 10;
+    protected final int _quantity;
 
     // Blocks we are breaking
     private Queue<BlockPos> _harvestList;
     private BlockPos _harvestBlock;
-
-    // Spot on ground we move to.
-//    private BlockPos _targetBlock;
 
     private int _breakTotalNeeded;
     private int _breakingProgress;

@@ -18,7 +18,7 @@ public class SlabTraverser implements Iterable<BlockPos>
     @Override
     public Iterator<BlockPos> iterator()
     {
-        return null;
+        return new SlabIterator();
     }
 
     private class SlabIterator implements Iterator<BlockPos>
@@ -32,21 +32,22 @@ public class SlabTraverser implements Iterable<BlockPos>
         @Override
         public boolean hasNext()
         {
-            return _x != _center.getX() + _radius && _z != _center.getZ() + _radius;
+            return  _z != _center.getZ() + _radius + 1;
         }
 
         @Override
         public BlockPos next()
         {
             BlockPos result = new BlockPos(_x, _center.getY(), _z);
-            if (_x == _center.getX() + _radius)
+            _x += _xDelta;
+
+            // If we are beyond end, switch direction and go back one,
+            if (_x > _center.getX() + _radius ||
+                _x < _center.getX() - _radius)
             {
-                _x = _center.getX() - _radius;
+                _xDelta *= -1;
+                _x += _xDelta;
                 _z += 1;
-            }
-            else
-            {
-                _x += 1;
             }
 
             return result;
@@ -55,11 +56,13 @@ public class SlabTraverser implements Iterable<BlockPos>
         @Override
         public void remove()
         {
-
+            // Not supported
         }
 
         private int _x;
+        private int _xDelta = 1;
         private int _z;
+
     }
 
 

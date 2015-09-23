@@ -10,6 +10,7 @@ import com.crashbox.vassal.grenades.EntityDiggerGrenade;
 import com.crashbox.vassal.grenades.EntityMineshaftGrenade;
 import com.crashbox.vassal.grenades.ItemDiggerGrenade;
 import com.crashbox.vassal.grenades.ItemMineshaftGrenade;
+import com.crashbox.vassal.quarry.BlockBeaconQuarry;
 import com.crashbox.vassal.workbench.BlockBeaconWorkbench;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelZombie;
@@ -67,6 +68,11 @@ public class ClientProxy extends CommonProxy
                 0,
                 new ModelResourceLocation(VassalMain.MODID + ":" + BlockBeaconChest.NAME, "inventory"));
 
+        renderItem.getItemModelMesher().register(
+                Item.getItemFromBlock(VassalMain.BLOCK_BEACON_QUARRY),
+                0,
+                new ModelResourceLocation(VassalMain.MODID + ":" + BlockBeaconQuarry.NAME, "inventory"));
+
         // ITEMS
         renderItem.getItemModelMesher().register(VassalMain.ITEM_DIGGER_GRENADE, 0,
                 new ModelResourceLocation(VassalMain.MODID + ":" + ItemDiggerGrenade.NAME, "inventory"));
@@ -80,8 +86,6 @@ public class ClientProxy extends CommonProxy
 
         RenderingRegistry.registerEntityRenderingHandler(EntityMineshaftGrenade.class,
                 new RenderSnowball(renderManager, VassalMain.ITEM_MINESHAFT_GRENADE, renderItem));
-
-
     }
 
     @Override

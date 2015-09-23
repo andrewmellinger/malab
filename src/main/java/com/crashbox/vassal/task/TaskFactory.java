@@ -13,8 +13,11 @@ public class TaskFactory
     public TaskAcquireBase makeTaskFromMessage(EntityAIVassal performer, TRAcquireBase message)
     {
         Class<? extends TaskBase> taskClass = message.getTaskClass();
-        if (taskClass == TaskHarvest.class && message instanceof TRHarvest)
-            return new TaskHarvest(performer, (TRHarvest)message);
+        if (taskClass == TaskHarvestTree.class && message instanceof TRHarvest)
+            return new TaskHarvestTree(performer, (TRHarvest)message);
+
+        if (taskClass == TaskQuarry.class && message instanceof TRHarvest)
+            return new TaskQuarry(performer, (TRHarvest)message);
 
         if (taskClass == TaskPickup.class && message instanceof TRPickup)
             return new TaskPickup(performer, (TRPickup)message);
@@ -34,6 +37,10 @@ public class TaskFactory
 
         else if (taskClass == TaskPlantSapling.class && message instanceof TRPlantSapling)
             return new TaskPlantSapling(performer, (TRPlantSapling)message);
+
+        else if (taskClass == TaskMakeBigStair.class && message instanceof TRMakeBigStair)
+            return new TaskMakeBigStair(performer, (TRMakeBigStair) message);
+
 
         LOGGER.error("Failed to construct task for " + message);
         return null;

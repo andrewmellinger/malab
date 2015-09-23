@@ -1,6 +1,6 @@
 package com.crashbox.vassal.task;
 
-import com.crashbox.vassal.ai.AIUtils;
+import com.crashbox.vassal.VassalUtils;
 import com.crashbox.vassal.ai.EntityAIVassal;
 import com.crashbox.vassal.messaging.TRPickup;
 import net.minecraft.entity.item.EntityItem;
@@ -24,7 +24,7 @@ public class TaskPickup extends TaskAcquireBase
     @Override
     public BlockPos chooseWorkArea(List<BlockPos> others)
     {
-        EntityItem eItem = AIUtils.findFirstEntityOfTypeOnGround(getEntity().getEntityWorld(), getRequester().getPos(),
+        EntityItem eItem = VassalUtils.findFirstEntityOfTypeOnGround(getEntity().getEntityWorld(), getRequester().getPos(),
                 getRequester().getRadius(), _item);
 
         if (eItem != null)
@@ -36,13 +36,13 @@ public class TaskPickup extends TaskAcquireBase
     @Override
     public UpdateResult executeAndIsDone()
     {
-        EntityItem eItem = AIUtils.findFirstEntityOfTypeOnGround(getEntity().getEntityWorld(), getEntity()
+        EntityItem eItem = VassalUtils.findFirstEntityOfTypeOnGround(getEntity().getEntityWorld(), getEntity()
                 .getPosition(), 2, _item);
 
         if (eItem == null)
             return UpdateResult.DONE;
 
-        ItemStack collected = AIUtils.collectEntityIntoNewStack(getWorld(), eItem.getPosition(), 2, _item);
+        ItemStack collected = VassalUtils.collectEntityIntoNewStack(getWorld(), eItem.getPosition(), 2, _item);
         getEntity().setCurrentItemOrArmor(0, collected);
 
         return UpdateResult.DONE;

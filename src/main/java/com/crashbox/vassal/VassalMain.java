@@ -11,6 +11,8 @@ import com.crashbox.vassal.grenades.EntityDiggerGrenade;
 import com.crashbox.vassal.grenades.EntityMineshaftGrenade;
 import com.crashbox.vassal.grenades.ItemDiggerGrenade;
 import com.crashbox.vassal.grenades.ItemMineshaftGrenade;
+import com.crashbox.vassal.quarry.BlockBeaconQuarry;
+import com.crashbox.vassal.quarry.TileEntityBeaconQuarry;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
@@ -49,6 +51,7 @@ public class VassalMain
     public static Block BLOCK_BEACON_FORESTER;
     public static Block BLOCK_BEACON_WORKBENCH;
     public static Block BLOCK_BEACON_CHEST;
+    public static Block BLOCK_BEACON_QUARRY;
 
     public static Item ITEM_DIGGER_GRENADE;
     public static Item ITEM_MINESHAFT_GRENADE;
@@ -127,6 +130,10 @@ public class VassalMain
         BLOCK_BEACON_CHEST = new BlockBeaconChest();
         GameRegistry.registerBlock(BLOCK_BEACON_CHEST, BlockBeaconChest.NAME);
         GameRegistry.registerTileEntity(TileEntityBeaconChest.class, TileEntityBeaconChest.NAME);
+
+        BLOCK_BEACON_QUARRY = new BlockBeaconQuarry();
+        GameRegistry.registerBlock(BLOCK_BEACON_QUARRY, BlockBeaconQuarry.NAME);
+        GameRegistry.registerTileEntity(TileEntityBeaconQuarry.class, TileEntityBeaconQuarry.NAME);
 
         // ITEMS
 

@@ -172,14 +172,25 @@
   <component name="ProjectCodeStyleSettingsManager">
     <option name="PER_PROJECT_SETTINGS">
       <value>
+        <option name="FIELD_NAME_PREFIX" value="_" />
         <XML>
           <option name="XML_LEGACY_SETTINGS_IMPORTED" value="true" />
         </XML>
+        <codeStyleSettings language="JAVA">
+          <option name="BRACE_STYLE" value="2" />
+          <option name="CLASS_BRACE_STYLE" value="2" />
+          <option name="METHOD_BRACE_STYLE" value="2" />
+        </codeStyleSettings>
       </value>
     </option>
-    <option name="PREFERRED_PROJECT_CODE_STYLE" value="Default (1)" />
+    <option name="USE_PER_PROJECT_SETTINGS" value="true" />
   </component>
   <component name="ProjectDictionaryState">
+    <dictionary name="aomellinger">
+      <words>
+        <w>mellinger</w>
+      </words>
+    </dictionary>
     <dictionary name="andrew">
       <words>
         <w>inprogress</w>
@@ -194,7 +205,7 @@
       <module fileurl="file://$PROJECT_DIR$/drudge.iml" filepath="$PROJECT_DIR$/drudge.iml" />
     </modules>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.7" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" default="false" assert-keyword="true" jdk-15="true" project-jdk-name="1.7" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
   <component name="SvnBranchConfigurationManager">
@@ -202,46 +213,5 @@
   </component>
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
-  </component>
-  <component name="masterDetails">
-    <states>
-      <state key="ArtifactsStructureConfigurable.UI">
-        <UIState>
-          <splitter-proportions>
-            <SplitterProportionsDataImpl />
-          </splitter-proportions>
-          <settings />
-        </UIState>
-      </state>
-      <state key="Copyright.UI">
-        <UIState>
-          <splitter-proportions>
-            <SplitterProportionsDataImpl />
-          </splitter-proportions>
-        </UIState>
-      </state>
-      <state key="ProjectJDKs.UI">
-        <UIState>
-          <splitter-proportions>
-            <SplitterProportionsDataImpl>
-              <option name="proportions">
-                <list>
-                  <option value="0.2" />
-                </list>
-              </option>
-            </SplitterProportionsDataImpl>
-          </splitter-proportions>
-          <last-edited>1.6</last-edited>
-        </UIState>
-      </state>
-      <state key="ScopeChooserConfigurable.UI">
-        <UIState>
-          <splitter-proportions>
-            <SplitterProportionsDataImpl />
-          </splitter-proportions>
-          <settings />
-        </UIState>
-      </state>
-    </states>
   </component>
 </project>
