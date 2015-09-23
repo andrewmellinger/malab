@@ -46,7 +46,7 @@ public class TaskGetFromInventory extends TaskAcquireBase
         if (entity instanceof TileEntityBeaconInventory)
         {
             debugLog(LOGGER, "Extracting from TileEntityBeaconInventory ");
-            ItemStack extracted = ((TileEntityBeaconInventory) entity).extractItems(_matcher, _quantity);
+            ItemStack extracted = ((TileEntityBeaconInventory) entity).extractItems(getMatcher(), _quantity);
             getEntity().setCurrentItemOrArmor(0, extracted);
             debugLog(LOGGER, "Extracted: " + extracted);
         }
@@ -64,7 +64,6 @@ public class TaskGetFromInventory extends TaskAcquireBase
     public void debugInfo(StringBuilder builder)
     {
         super.debugInfo(builder);
-        builder.append(", matcher=").append(_matcher);
         builder.append(", quantity=").append(_quantity);
     }
 

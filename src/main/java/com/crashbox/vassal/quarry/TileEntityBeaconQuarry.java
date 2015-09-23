@@ -107,10 +107,6 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
             Broadcaster.postMessage(makeStair);
             return;
         }
-        else
-        {
-
-        }
 
         // If we have something that will drop, call him over
         if (builder.findFirstQuarryable(ItemStackMatcher.getQuarryMatcher()) != null)

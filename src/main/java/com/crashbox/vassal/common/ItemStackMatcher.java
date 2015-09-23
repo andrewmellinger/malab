@@ -2,6 +2,7 @@ package com.crashbox.vassal.common;
 
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
@@ -21,8 +22,10 @@ public class ItemStackMatcher
         //  TODO:  Load from config?
         ItemStackMatcher matcher = new ItemStackMatcher();
         matcher.add(new ItemStack(Item.getItemFromBlock(Blocks.cobblestone)));
-        matcher.add(new ItemStack(Item.getItemFromBlock(Blocks.gravel)));
-        matcher.add(new ItemStack(Item.getItemFromBlock(Blocks.coal_ore)));
+        //matcher.add(new ItemStack(Item.getItemFromBlock(Blocks.gravel)));
+        matcher.add(Items.flint);
+        matcher.add(Items.coal);
+
 
         // TODO:  Add granite
 
@@ -70,6 +73,15 @@ public class ItemStackMatcher
             _samples.add(new ItemStack(sample, 0));
         }
     }
+
+    public void add(Item sample)
+    {
+        if (sample != null)
+        {
+            _samples.add(new ItemStack(sample, 0));
+        }
+    }
+
 
     public boolean matches(ItemStack stack)
     {

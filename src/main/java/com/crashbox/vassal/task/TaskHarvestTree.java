@@ -22,6 +22,6 @@ public class TaskHarvestTree extends TaskHarvest
     protected Queue<BlockPos> findHarvestList(List<BlockPos> others)
     {
         return RingedSearcher.findTree(getEntity().getEntityWorld(), getRequester().getPos(), _radius,
-                _height, _matcher, others);
+                _height, getMatcher(), others);
     }
 }

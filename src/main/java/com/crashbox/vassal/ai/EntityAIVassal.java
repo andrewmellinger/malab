@@ -693,10 +693,9 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
 
     public boolean inProximity(BlockPos pos)
     {
-        return VassalUtils.isWithinSqDist(getEntity().getPosition(), pos, PROXIMITY);
+        return VassalUtils.isWithinSqDist(getEntity().getPosition(), pos, PROXIMITY_SQ);
     }
 
-    private final int PROXIMITY = 9;
 
     //=============================================================================================
 
@@ -825,7 +824,6 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
     // Visual things
     private static RenderVassal _renderVassal;
 
-
-
+    private static final int PROXIMITY_SQ = 9;
     private static final Logger LOGGER = LogManager.getLogger();
 }

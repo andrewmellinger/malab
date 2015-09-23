@@ -3,6 +3,7 @@ package com.crashbox.vassal.task;
 import com.crashbox.vassal.ai.EntityAIVassal;
 import com.crashbox.vassal.common.ItemStackMatcher;
 import com.crashbox.vassal.messaging.IMessager;
+import net.minecraft.item.ItemStack;
 
 /**
  * Copyright 2015 Andrew O. Mellinger
@@ -17,6 +18,10 @@ public abstract class TaskAcquireBase extends TaskBase
 
     public ItemStackMatcher getMatcher()
     {
+        ItemStack held = getPerformer().getEntity().getHeldItem();
+        if (held != null)
+            return new ItemStackMatcher(held);
+        // We should
         return _matcher;
     }
 
@@ -26,5 +31,5 @@ public abstract class TaskAcquireBase extends TaskBase
         builder.append(", matcher=").append(_matcher);
     }
 
-    protected final ItemStackMatcher _matcher;
+    private final ItemStackMatcher _matcher;
 }

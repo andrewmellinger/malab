@@ -100,13 +100,11 @@ public abstract class TaskHarvest extends TaskAcquireBase
         return new BlockPos(_harvestBlock.getX(), getRequester().getPos().getY(), _harvestBlock.getZ());
     }
 
-
     // This adds the specific algorithm that find trees, or blocks of stone
     // or whatever
     protected abstract Queue<BlockPos> findHarvestList(List<BlockPos> others);
 //    _harvestList = RingedSearcher.findTree(getEntity().getEntityWorld(), getRequester().getPos(), _radius,
 //    _height, _matcher, others);
-
 
 
     private void startBreaking()
@@ -128,7 +126,7 @@ public abstract class TaskHarvest extends TaskAcquireBase
         if (!_isBreaking)
         {
             //debugLog(LOGGER, "Finished breaking, harvesting.");
-            VassalUtils.harvestBlockIntoHeld(getWorld(), getEntity(), _harvestBlock, _matcher);
+            VassalUtils.harvestBlockIntoHeld(getWorld(), getEntity(), _harvestBlock, getMatcher());
             // We need to find another harvest block
             _harvestBlock = null;
             return false;
