@@ -1,14 +1,17 @@
 package com.crashbox.vassal.util;
 
 import com.crashbox.vassal.VassalUtils;
+import com.crashbox.vassal.common.AnyItemMatcher;
 import com.crashbox.vassal.common.ItemStackMatcher;
 import net.minecraft.block.BlockSlab;
 import net.minecraft.block.BlockStoneSlab;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemTool;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
+import scala.xml.dtd.ANY;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,19 +62,34 @@ public class StairBuilder
         return _nextState;
     }
 
-    public BlockPos findFirstQuarryable(ItemStackMatcher matcher)
+    /**
+     * Finds the first quarryable block that matches in the area.
+     * @param matcher The matcher for the item we are looking for.
+     * @param tool The tool we are using.
+     * @return True for any.
+     */
+    public BlockPos findFirstQuarryable(ItemStackMatcher matcher, ItemTool tool)
     {
         //LOGGER.debug("findFirstQuarrayble: " + matcher);
         BlockPos levelBelow = new BlockPos(_center.getX(), _center.getY() - 1, _center.getZ());
         SlabTraverser traverser = new SlabTraverser(levelBelow, _radius);
         for (BlockPos pos : traverser)
         {
-            //LOGGER.debug("findFirstQuarrayble: " + pos);
-            if (VassalUtils.willDrop(_world, pos, matcher))
-            {
-                if (!isInExclusions(pos))
-                    return pos;
-            }
+            // Should we skip it?
+            if (isInExclusions(pos))
+                continue;
+
+            // Can we break it?
+
+            if (!tool.canHarvestBlock(_world.getBlockState(pos).getBlock()))
+                continue;
+
+            // Will it give us what we want?
+            if (!(matcher instanceof AnyItemMatcher) && !VassalUtils.willDrop(_world, pos, matcher))
+                continue;
+
+            // We are go for launch!
+            return pos;
         }
         return null;
     }

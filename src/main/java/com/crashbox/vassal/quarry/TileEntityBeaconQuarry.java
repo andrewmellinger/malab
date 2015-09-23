@@ -1,10 +1,15 @@
 package com.crashbox.vassal.quarry;
 
+import com.crashbox.vassal.ai.EntityAIVassal;
 import com.crashbox.vassal.beacon.BeaconBase;
+import com.crashbox.vassal.common.AnyItemMatcher;
 import com.crashbox.vassal.common.ItemStackMatcher;
 import com.crashbox.vassal.messaging.*;
 import com.crashbox.vassal.task.TaskQuarry;
 import com.crashbox.vassal.util.StairBuilder;
+import net.minecraft.init.Items;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemTool;
 import net.minecraft.server.gui.IUpdatePlayerListBox;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
@@ -109,10 +114,18 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
         }
 
         // If we have something that will drop, call him over
-        if (builder.findFirstQuarryable(ItemStackMatcher.getQuarryMatcher()) != null)
+        ItemTool tool = (ItemTool)Items.stone_pickaxe;
+        if (msg.getSender() instanceof EntityAIVassal)
+        {
+            Item item = ((EntityAIVassal)msg.getSender()).getEntity().getCurrentPickAxe().getItem();
+            if (item instanceof ItemTool)
+                tool = (ItemTool)item;
+        }
+
+        if (builder.findFirstQuarryable(new AnyItemMatcher(), tool) != null)
         {
             TRHarvest quarry = new TRHarvest(this, msg.getSender(), msg.getTransactionID(), 0,
-                    TaskQuarry.class, ItemStackMatcher.getQuarryMatcher(), 1);
+                    TaskQuarry.class, new AnyItemMatcher(), 1);
             Broadcaster.postMessage(quarry);
             return;
         }

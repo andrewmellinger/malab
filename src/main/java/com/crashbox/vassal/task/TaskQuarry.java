@@ -3,6 +3,8 @@ package com.crashbox.vassal.task;
 import com.crashbox.vassal.ai.EntityAIVassal;
 import com.crashbox.vassal.messaging.TRHarvest;
 import com.crashbox.vassal.util.StairBuilder;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemTool;
 import net.minecraft.util.BlockPos;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,8 +21,6 @@ public class TaskQuarry extends TaskHarvest
     public TaskQuarry(EntityAIVassal performer, TRHarvest message)
     {
         super(performer, message);
-
-
         _builder = new StairBuilder(getWorld(), getRequester().getPos(), getRequester().getRadius());
     }
 
@@ -28,7 +28,7 @@ public class TaskQuarry extends TaskHarvest
     protected Queue<BlockPos> findHarvestList(List<BlockPos> others)
     {
         Queue<BlockPos> list = new LinkedList<BlockPos>();
-        BlockPos pos = _builder.findFirstQuarryable(getMatcher());
+        BlockPos pos = _builder.findFirstQuarryable(getMatcher(), (ItemTool) Items.stone_pickaxe);
         if (pos != null)
             list.add(pos);
         else

@@ -9,7 +9,9 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAISwimming;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemTool;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
@@ -159,6 +161,22 @@ public class EntityVassal extends EntityCreature
         if (held.stackSize == 0)
             setCurrentItemOrArmor(0, null);
     }
+
+    public ItemStack getCurrentPickAxe()
+    {
+        return new ItemStack(Items.stone_pickaxe);
+    }
+
+    public ItemStack getCurrentAxe()
+    {
+        return new ItemStack(Items.stone_axe);
+    }
+
+    public ItemStack getCurrentShovel()
+    {
+        return new ItemStack(Items.stone_shovel);
+    }
+
 
     //=============================================================================================
 

@@ -26,7 +26,6 @@ public class ItemStackMatcher
         matcher.add(Items.flint);
         matcher.add(Items.coal);
 
-
         // TODO:  Add granite
 
         QUARRY_MATCHER = matcher;
@@ -82,7 +81,6 @@ public class ItemStackMatcher
         }
     }
 
-
     public boolean matches(ItemStack stack)
     {
         for (ItemStack sample : _samples)
@@ -91,11 +89,6 @@ public class ItemStackMatcher
                 return true;
         }
         return false;
-    }
-
-    public boolean matches(Block block)
-    {
-        return matches(new ItemStack(block));
     }
 
     /**

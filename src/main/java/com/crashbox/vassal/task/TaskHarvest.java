@@ -25,6 +25,33 @@ public abstract class TaskHarvest extends TaskAcquireBase
     }
 
     @Override
+    public BlockPos chooseWorkArea(List<BlockPos> others)
+    {
+        _harvestBlock = null;
+        if (_harvestList != null)
+            _harvestBlock = _harvestList.poll();
+
+        if (_harvestBlock == null)
+            _harvestList = findHarvestList(others);
+
+        if (_harvestList == null || _harvestList.isEmpty())
+        {
+            _harvestBlock = null;
+            _harvestList = null;
+            return null;
+        }
+
+        _harvestBlock = _harvestList.poll();
+
+        // By now we should have one because it shouldn't contain null...
+        if (_harvestBlock == null)
+            return null;
+
+        // We want them to move to a place which is correct X,Z but with ground Y.
+        return new BlockPos(_harvestBlock.getX(), getRequester().getPos().getY(), _harvestBlock.getZ());
+    }
+
+    @Override
     public UpdateResult executeAndIsDone()
     {
         // If we are in the process of breaking, do that.
@@ -73,35 +100,8 @@ public abstract class TaskHarvest extends TaskAcquireBase
         return _value - 10;
     }
 
-    @Override
-    public BlockPos chooseWorkArea(List<BlockPos> others)
-    {
-        _harvestBlock = null;
-        if (_harvestList != null)
-            _harvestBlock = _harvestList.poll();
 
-        if (_harvestBlock == null)
-            _harvestList = findHarvestList(others);
-
-        if (_harvestList == null || _harvestList.isEmpty())
-        {
-            _harvestBlock = null;
-            _harvestList = null;
-            return null;
-        }
-
-        _harvestBlock = _harvestList.poll();
-
-        // By now we should have one because it shouldn't contain null...
-        if (_harvestBlock == null)
-            return null;
-
-        // We want them to move to a place which is correct X,Z but with ground Y.
-        return new BlockPos(_harvestBlock.getX(), getRequester().getPos().getY(), _harvestBlock.getZ());
-    }
-
-    // This adds the specific algorithm that find trees, or blocks of stone
-    // or whatever
+    // This adds the specific algorithm that find trees, or blocks of stone,or whatever
     protected abstract Queue<BlockPos> findHarvestList(List<BlockPos> others);
 //    _harvestList = RingedSearcher.findTree(getEntity().getEntityWorld(), getRequester().getPos(), _radius,
 //    _height, _matcher, others);
