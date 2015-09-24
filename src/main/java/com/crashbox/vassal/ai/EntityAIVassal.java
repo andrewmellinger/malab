@@ -555,6 +555,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
             }
 
             LOGGER.debug(id() + " Determining work area and redirecting: " + _workArea + " currently at: " + getPos());
+            _workAreaAttempt = 0;
             tryMoveTo(_workArea);
         }
 
@@ -567,10 +568,19 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
             }
             else
             {
-                LOGGER.debug("Failed to move to work area. IDLING. Distance: " +
-                        VassalUtils.sqDistXZ(getEntity().getPosition(), _workArea));
-                _currentPair = null;
-                return State.IDLING;
+                if (_workAreaAttempt == 3)
+                {
+                    LOGGER.debug("Failed to move to work area. IDLING. Distance: " +
+                            VassalUtils.sqDistXZ(getEntity().getPosition(), _workArea));
+                    _currentPair = null;
+                    return State.IDLING;
+                }
+                else
+                {
+                    LOGGER.debug("Failed to move to work area. TRYING AGAIN.");
+                    _workAreaAttempt++;
+                    tryMoveTo(_workArea);
+                }
             }
         }
 
@@ -808,6 +818,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
 
     // For Targeting
     private BlockPos _workArea = null;
+    private int _workAreaAttempt;
 
     private final List<TaskPair> _proposedTasks = new ArrayList<TaskPair>();
 
@@ -824,6 +835,6 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
     // Visual things
     private static RenderVassal _renderVassal;
 
-    private static final int PROXIMITY_SQ = 9;
+    private static final int PROXIMITY_SQ = 11;
     private static final Logger LOGGER = LogManager.getLogger();
 }

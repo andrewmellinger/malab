@@ -9,9 +9,10 @@ import java.util.Iterator;
  */
 public class SlabTraverser implements Iterable<BlockPos>
 {
-    public SlabTraverser(BlockPos center, int radius)
+    public SlabTraverser(BlockPos center, BlockPos startingCorner, int radius)
     {
         _center = center;
+        _starting = startingCorner;
         _radius = radius;
     }
 
@@ -25,14 +26,17 @@ public class SlabTraverser implements Iterable<BlockPos>
     {
         SlabIterator()
         {
-            _x = _center.getX() - _radius;
-            _z = _center.getZ() - _radius;
+            _x = _starting.getX();
+            _z = _starting.getZ();
+            _xDelta = _starting.getX() > _center.getX() ? -1 : 1;
+            _zDelta = _starting.getZ() > _center.getZ() ? -1 : 1;
+            _zFinal = _center.getZ() + (( _radius + 1 ) * _zDelta);
         }
 
         @Override
         public boolean hasNext()
         {
-            return  _z != _center.getZ() + _radius + 1;
+            return  _z != _zFinal;
         }
 
         @Override
@@ -47,7 +51,7 @@ public class SlabTraverser implements Iterable<BlockPos>
             {
                 _xDelta *= -1;
                 _x += _xDelta;
-                _z += 1;
+                _z += _zDelta;
             }
 
             return result;
@@ -60,12 +64,14 @@ public class SlabTraverser implements Iterable<BlockPos>
         }
 
         private int _x;
-        private int _xDelta = 1;
+        private int _xDelta;
         private int _z;
+        private final int _zDelta;
+        private final int _zFinal;
 
     }
 
-
     private final BlockPos _center;
+    private final BlockPos _starting;
     private final int _radius;
 }

@@ -560,6 +560,18 @@ public class VassalUtils
             };
     }
 
+    public static BlockPos nextCornerClockwise(BlockPos center, BlockPos corner)
+    {
+        BlockPos[] corners = getCorners(center, Math.abs(corner.getX() - center.getX()));
+        for (int i = 0; i < 4; ++i)
+        {
+            if (corners[i].equals(corner))
+                return corners[ (i + 1) %  4];
+        }
+
+        throw new RuntimeException("Couldn't find corner.");
+    }
+
     //=============================================================================================
 
     /**

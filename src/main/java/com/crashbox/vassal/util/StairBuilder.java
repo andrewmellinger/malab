@@ -33,6 +33,7 @@ public class StairBuilder
         _center = center;
         _radius = radius;
         _landing = findLanding(world, center, radius);
+        _digCorner = getDigCorner();
         _slabList = makeSlabList();
     }
 
@@ -71,7 +72,7 @@ public class StairBuilder
     public BlockPos findFirstQuarryable(ItemStackMatcher matcher, ItemTool tool)
     {
         //LOGGER.debug("findFirstQuarrayble: " + matcher);
-        SlabTraverser traverser = new SlabTraverser(_center.down(), _radius);
+        SlabTraverser traverser = new SlabTraverser(_center.down(), _digCorner, _radius);
         for (BlockPos pos : traverser)
         {
             // Should we skip it?
@@ -155,6 +156,13 @@ public class StairBuilder
         return landing;
     }
 
+    private BlockPos getDigCorner()
+    {
+        BlockPos center = _center.down();
+        BlockPos corner = new BlockPos(_landing.getX(), center.getY(), _landing.getZ());
+        return VassalUtils.nextCornerClockwise(center, corner);
+    }
+
     private List<ProtoBlock> makeSlabList()
     {
         VassalUtils.COMPASS dir = VassalUtils.findClockwiseDir(_center, _landing);
@@ -233,6 +241,7 @@ public class StairBuilder
     private BlockPos _center;
     private int _radius;
     private BlockPos _landing;
+    private BlockPos _digCorner;
 
     private List<ProtoBlock> _slabList = new ArrayList<ProtoBlock>();
 
