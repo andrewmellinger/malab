@@ -25,6 +25,9 @@ public class TaskFactory
         if (taskClass == TaskGetFromInventory.class && message instanceof TRGetFromInventory)
             return new TaskGetFromInventory(performer, (TRGetFromInventory)message);
 
+        if (taskClass == TaskHarvestBlock.class && message instanceof TRHarvestBlock)
+            return new TaskHarvestBlock(performer, (TRHarvestBlock)message);
+
         LOGGER.error("Failed to construct task for " + message);
         return null;
     }
@@ -35,12 +38,14 @@ public class TaskFactory
         if (taskClass == TaskStore.class && message instanceof TRStore)
             return new TaskStore(performer, (TRStore)message);
 
-        else if (taskClass == TaskPlantSapling.class && message instanceof TRPlantSapling)
+        if (taskClass == TaskPlantSapling.class && message instanceof TRPlantSapling)
             return new TaskPlantSapling(performer, (TRPlantSapling)message);
 
-        else if (taskClass == TaskMakeBigStair.class && message instanceof TRMakeBigStair)
+        if (taskClass == TaskMakeBigStair.class && message instanceof TRMakeBigStair)
             return new TaskMakeBigStair(performer, (TRMakeBigStair) message);
 
+        if (taskClass == TaskPlaceBlock.class && message instanceof TRPlaceBlock)
+            return new TaskPlaceBlock(performer, (TRPlaceBlock)message);
 
         LOGGER.error("Failed to construct task for " + message);
         return null;

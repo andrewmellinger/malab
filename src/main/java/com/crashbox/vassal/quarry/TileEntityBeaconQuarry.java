@@ -1,10 +1,12 @@
 package com.crashbox.vassal.quarry;
 
+import com.crashbox.vassal.VassalMain;
 import com.crashbox.vassal.ai.EntityAIVassal;
 import com.crashbox.vassal.beacon.BeaconBase;
 import com.crashbox.vassal.common.AnyItemMatcher;
 import com.crashbox.vassal.common.ItemStackMatcher;
 import com.crashbox.vassal.messaging.*;
+import com.crashbox.vassal.task.TaskHarvest;
 import com.crashbox.vassal.task.TaskQuarry;
 import com.crashbox.vassal.util.StairBuilder;
 import net.minecraft.init.Items;
@@ -131,7 +133,15 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
         }
 
         // If we are here we need a worker to move us down one.
+        TRHarvestBlock harvest = new TRHarvestBlock(this, msg.getSender(), msg.getTransactionID(),
+                10, new ItemStackMatcher(VassalMain.BLOCK_BEACON_QUARRY), getPos());
 
+        TRPlaceBlock place = new TRPlaceBlock(this, msg.getSender(), msg.getTransactionID(),
+                10, getPos().down());
+
+        MessageTaskPairRequest pair = new MessageTaskPairRequest(this, msg.getSender(), msg.getTransactionID(),
+                false, harvest, place);
+        Broadcaster.postMessage(pair);
     }
 
 //    private BlockPos findQuarryCandidate()

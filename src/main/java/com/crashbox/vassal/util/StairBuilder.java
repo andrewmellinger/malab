@@ -71,16 +71,15 @@ public class StairBuilder
     public BlockPos findFirstQuarryable(ItemStackMatcher matcher, ItemTool tool)
     {
         //LOGGER.debug("findFirstQuarrayble: " + matcher);
-        BlockPos levelBelow = new BlockPos(_center.getX(), _center.getY() - 1, _center.getZ());
-        SlabTraverser traverser = new SlabTraverser(levelBelow, _radius);
+        SlabTraverser traverser = new SlabTraverser(_center.down(), _radius);
         for (BlockPos pos : traverser)
         {
             // Should we skip it?
             if (isInExclusions(pos))
                 continue;
 
+            //LOGGER.debug("Not in exclusion list: " + pos);
             // Can we break it?
-
             if (!tool.canHarvestBlock(_world.getBlockState(pos).getBlock()))
                 continue;
 
@@ -159,6 +158,7 @@ public class StairBuilder
     private List<ProtoBlock> makeSlabList()
     {
         VassalUtils.COMPASS dir = VassalUtils.findClockwiseDir(_center, _landing);
+        LOGGER.debug("From landing stairs go: " + dir + " landing: "+ _landing);
         List<ProtoBlock> result = new ArrayList<ProtoBlock>();
 
         // If the landing is the same level, then one below is stairs
@@ -221,6 +221,12 @@ public class StairBuilder
             }
         }
         return false;
+    }
+
+    private void dumpExclusionList()
+    {
+        for (ProtoBlock proto : _slabList)
+            LOGGER.debug("+++++++>>>>>>>>>>" +proto.getPos());
     }
 
     private World _world;

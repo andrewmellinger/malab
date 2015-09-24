@@ -759,21 +759,7 @@ public class VassalUtils
      */
     public static COMPASS findClockwiseDir(BlockPos center, BlockPos pos)
     {
-        // SIDE:             EAST           SOUTH         WEST           NORTH
-        COMPASS[] mapping = {COMPASS.SOUTH, COMPASS.WEST, COMPASS.NORTH, COMPASS.EAST };
-        int tmp = determineCompassDirection(center, pos).ordinal();
-        return mapping[tmp];
-    }
-
-    /**
-     * Determines the basic heading.
-     * @param center The center to look for.
-     * @param pos The current position.
-     * @return The compass direction.
-     */
-    public static COMPASS determineCompassDirection(BlockPos center, BlockPos pos)
-    {
-        // Look at slop and x/y
+        // Look at slope and x/y
         // -/- | +/-
         // ----+-----
         // -/+ | +/+
@@ -790,17 +776,25 @@ public class VassalUtils
 
         int deltaX = pos.getX() - center.getX();
         int deltaZ = pos.getZ() - center.getZ();
+//        LOGGER.debug("deltaX=" + deltaX + ", deltaZ:" + deltaZ);
 
-        // If we have no delta X, we are above or below.
+        // If we are on the axis, then we do the right thing
+        if ( deltaX == deltaZ)
+            return (deltaX > 0) ? COMPASS.WEST : COMPASS.EAST;
+        else if (deltaX == deltaZ * -1)
+            return (deltaX > 0) ? COMPASS.SOUTH : COMPASS.NORTH;
+
+        // If we have no delta X, we are above or below.   Slope computations are bad(tm)
         if (deltaX == 0)
-            return (deltaZ > 0) ? COMPASS.SOUTH : COMPASS.NORTH;
+            return (deltaZ > 0) ? COMPASS.WEST : COMPASS.EAST;
 
         // Use slope
         double slope = Math.abs(deltaZ * 1.0D) / Math.abs(deltaX * 1.0D);
+//        LOGGER.debug("slope=" + slope);
         if (slope > 1)
-            return (deltaZ > 0) ? COMPASS.SOUTH : COMPASS.NORTH;
+            return (deltaZ > 0) ? COMPASS.WEST : COMPASS.EAST;
         else
-            return (deltaX > 0) ? COMPASS.EAST : COMPASS.WEST;
+            return (deltaX > 0) ? COMPASS.SOUTH : COMPASS.NORTH;
     }
 
     private static final Logger LOGGER = LogManager.getLogger();

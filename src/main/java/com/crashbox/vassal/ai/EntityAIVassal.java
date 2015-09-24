@@ -680,14 +680,14 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         // If we are 2 blocks away, we are good enough
         if (inProximity(pos))
         {
-            //debugLog("Close enough!  Not moving.");
+            debugLog("Close enough!  Not moving.");
             return true;
         }
 
         // Computa position towards us but not on the block, so we aren't actually standing on the thing.
         BlockPos target = VassalUtils.getBlockBeside(getPos(), pos);
-        //debugLog("Ta:rgeting  Nearby: " + pos + " to: " + target);
-
+        debugLog("Targeting  Nearby: " + pos + " to: " + target);
+        //target = pos;
         return getEntity().getNavigator().tryMoveToXYZ(target.getX(), target.getY(), target.getZ(), getEntity().getSpeed());
     }
 

@@ -1,5 +1,6 @@
 package com.crashbox.vassal;
 
+import com.crashbox.vassal.util.BlockWalker;
 import net.minecraft.util.BlockPos;
 import org.junit.Test;
 
@@ -46,4 +47,23 @@ public class VassalUtilsTest
 //        BlockPos end = new BlockPos(14, 59, 49);
 //        VassalUtils.firstDropOccurrence(null, start, end, null);
     }
+
+    @Test
+    public void testFindClockwiseDirection()
+    {
+        // Walk around a block
+        BlockPos center = new BlockPos(12,0,52);
+        BlockWalker walker = new BlockWalker(new BlockPos(10,0,50),false, VassalUtils.COMPASS.EAST);
+        for (int side = 0; side < 4; ++side)
+        {
+            for (int i = 0; i < 4; ++i)
+            {
+                walker.forward();
+                System.out.println(VassalUtils.findClockwiseDir(center, walker.getPos()));
+            }
+            walker.turnRight();
+        }
+    }
+
+
 }
