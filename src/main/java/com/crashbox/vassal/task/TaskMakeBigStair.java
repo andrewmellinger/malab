@@ -4,9 +4,8 @@ import com.crashbox.vassal.VassalUtils;
 import com.crashbox.vassal.ai.EntityAIVassal;
 import com.crashbox.vassal.common.ItemStackMatcher;
 import com.crashbox.vassal.messaging.TRMakeBigStair;
-import com.crashbox.vassal.quarry.TileEntityBeaconQuarry;
+import com.crashbox.vassal.task.ITask.UpdateResult;
 import com.crashbox.vassal.util.StairBuilder;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import org.apache.logging.log4j.LogManager;
@@ -30,7 +29,7 @@ public class TaskMakeBigStair extends TaskDeliverBase
     }
 
     @Override
-    public BlockPos chooseWorkArea(List<BlockPos> others)
+    public BlockPos getWorkTarget(List<BlockPos> others)
     {
         // If we can't find any needed stair block  then we are done.
         if (!_builder.findNextStair())

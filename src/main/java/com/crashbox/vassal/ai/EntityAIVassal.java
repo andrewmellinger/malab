@@ -6,7 +6,6 @@ import com.crashbox.vassal.common.ItemStackMatcher;
 import com.crashbox.vassal.entity.RenderVassal;
 import com.crashbox.vassal.messaging.*;
 import com.crashbox.vassal.task.*;
-import com.crashbox.vassal.task.TaskPair.Resolving;
 import com.crashbox.vassal.entity.RenderVassal.VASSAL_TEXTURE;
 
 import net.minecraft.entity.ai.EntityAIBase;
@@ -47,11 +46,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
     @Override
     public void startExecuting()
     {
-        // The update task loop starts it
-//        _currentPair = null;
-//        _requestEndMS = System.currentTimeMillis() + REQUEST_TIMEOUT_MS;
-//        _state = State.ELICITING;
-//        Broadcaster.postMessage(new MessageWorkerAvailability(_entity.worldObj, this), _channel);
+        // Nothing to do as we were idling in shouldExecute
     }
 
     @Override
@@ -151,18 +146,18 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
 
             // Filter all task requests
             ItemStack held = getEntity().getHeldItem();
-            if (msg instanceof MessageTaskRequest && _currentPair == null)
+            if (msg instanceof MessageTaskRequest && _currentTask == null)
             {
                 if (msg.getTransactionID() == MessageWorkerAvailability.class)
                 {
                     debugLog("Adding new task for message: " + msg);
-                    _proposedTasks.add(makeNewTaskPair((MessageTaskRequest) msg));
+                    _proposedTasks.add(makeNewTask((MessageTaskRequest) msg));
                 }
 //                else if (msg instanceof TRStore && held != null && msg.getTransactionID() == held.getItem())
                 else if (msg instanceof TRDeliverBase && held != null && msg.getTransactionID() == held.getItem())
                 {
                     debugLog("Adding new Deliver task : " + msg);
-                    _proposedTasks.add(makeNewTaskPair((MessageTaskRequest) msg));
+                    _proposedTasks.add(makeNewTask((MessageTaskRequest) msg));
                 }
                 else
                 {
@@ -175,7 +170,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
                 if (msg.getTransactionID() == MessageWorkerAvailability.class)
                 {
                     debugLog("Adding new tasks for PAIR message: " + msg);
-                    _proposedTasks.add(makeNewTaskPair((MessageTaskPairRequest) msg));
+                    _proposedTasks.add(makeNewTask((MessageTaskPairRequest) msg));
                 }
             }
             else if (msg.getTransactionID() != null)
@@ -185,7 +180,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
             }
             else
             {
-                if (_currentPair != null && msg instanceof MessageTaskRequest )
+                if (_currentTask != null && msg instanceof MessageTaskRequest )
                     debugLog("Have task, ignoring message: " + msg);
                 else
                     debugLog("No task ignoring message: " + msg);
@@ -202,7 +197,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         }
     }
 
-    private TaskPair makeNewTaskPair(MessageTaskRequest message)
+    private ITask makeNewTask(MessageTaskRequest message)
     {
         TaskPair pair = new TaskPair(this);
         if (message instanceof TRAcquireBase)
@@ -223,7 +218,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         return pair;
     }
 
-    private TaskPair makeNewTaskPair(MessageTaskPairRequest message)
+    private ITask makeNewTask(MessageTaskPairRequest message)
     {
         TaskPair pair = new TaskPair(this);
 
@@ -277,7 +272,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
     private State elicit()
     {
         // If we have some tasks to link, then let's do that
-        linkupResponses(_responseTasks);
+        linkupResponses();
 
         // Try to resolve to the issue back messages
         resolveAllTasks();
@@ -290,13 +285,13 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         if (System.currentTimeMillis() > _requestEndMS)
         {
             debugLog("Selecting from (" + _proposedTasks.size() + ") tasks.");
-            _currentPair = Priority.selectBestTaskPair(getEntity().getPosition(), _proposedTasks, getEntity().getSpeed());
+            _currentTask = Priority.selectBestTask(getEntity().getPosition(), _proposedTasks, getEntity().getSpeed());
             _proposedTasks.clear();
 
-            if (_currentPair != null)
+            if (_currentTask != null)
             {
-                _currentPair.start();
-                sendAcceptedMessages(_currentPair);
+                _currentTask.sendAcceptMessages();
+                _currentTask.start();
             }
             else
             {
@@ -304,9 +299,9 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
             }
 
             //getEntity().spawnExplosionParticle();
-            debugLog("Selected task: " + _currentPair);
-            debugLog("   ==> moving to: " + _currentPair.getWorkCenter());
-            tryMoveTo(_currentPair.getWorkCenter());
+            debugLog("Selected task: " + _currentTask);
+            debugLog("   ==> moving to: " + _currentTask.getWorkCenter());
+            tryMoveTo(_currentTask.getWorkCenter());
             return State.TRANSITING;
         }
 
@@ -314,116 +309,28 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         return State.ELICITING;
     }
 
-    private void linkupResponses(List<MessageTaskRequest> responses)
+    private void linkupResponses()
     {
-        for (TaskPair pair : _proposedTasks)
+        for (ITask task : _proposedTasks)
         {
-            if (pair.getResolving() != Resolving.RESOLVING)
-            {
-                //debugLog("linkupResponses: skipping pair, not RESOLVING. " + pair);
-                continue;
-            }
-
-            //debugLog("linkupResponses to => " + pair);
-            if (linkupResponses(pair, responses))
-            {
-                // Since we linked something up, take it out of resolving.
-                pair.setResolving(Resolving.UNRESOLVED);
-            }
+            // Extract any messages for this task
+            List<MessageTaskRequest> responses = extractResponsesToID(task);
+            task.linkupResponses(responses);
         }
 
-        responses.clear();
+        _responseTasks.clear();
     }
 
-    private boolean linkupResponses(TaskPair pair, List<MessageTaskRequest> responses)
+    private List<MessageTaskRequest> extractResponsesToID(Object id)
     {
-        if (pair.getDeliverTask() == null)
-            return linkupDeliverResponses(pair, responses);
-
-        if (pair.getAcquireTask() == null)
-            return linkupAcquireResponses(pair, responses);
-
-        return false;
-    }
-
-    private boolean linkupDeliverResponses(TaskPair pair, List<MessageTaskRequest> responses)
-    {
-        BlockPos pos = getPos();
-
-        List<TRDeliverBase> delivers = extractMessages(pair, responses, TRDeliverBase.class);
-        if (delivers.size() == 0)
-            return false;
-
-        //debugLog("Found deliver tasks: " + delivers.size());
-
-        // If not an empty, we don't need two deliver tasks.
-        if (pair.getDeliverTask() != null)
-            return false;
-
-        if (pair.getAcquireTask() != null)
-            pos = pair.getAcquireTask().getCoarsePos();
-
-        // Now, find the best one based on what we are going to do with it
-        TRDeliverBase best = findBest(pos, delivers);
-        if (VassalUtils.isNotNull(best, LOGGER))
-        {
-            pair.setDeliverTask(TASK_FACTORY.makeTaskFromMessage(this, best));
-
-            return true;
-        }
-
-        return false;
-    }
-
-    private boolean linkupAcquireResponses(TaskPair pair, List<MessageTaskRequest> responses)
-    {
-        //debugLog("Linking up acquire responses.");
-        BlockPos pos = getPos();
-
-        List<TRAcquireBase> acquires = extractMessages(pair, responses, TRAcquireBase.class);
-        //debugLog("Have (" + acquires.size() + ") acquires ");
-        if (acquires.size() > 0)
-        {
-            TRAcquireBase best = findBest(pos, acquires);
-            //debugLog("Best acquire: " + best);
-            if (VassalUtils.isNotNull(best, LOGGER))
-            {
-                pair.setAcquireTask(TASK_FACTORY.makeTaskFromMessage(this, best));
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private <T extends MessageTaskRequest> T findBest(BlockPos pos, List<T> responses)
-    {
-        T best = null;
-        int bestValue = Integer.MIN_VALUE;
-
-        for (T msg : responses)
-        {
-            int value = Priority.computeDistanceCost(pos, msg.getSender().getPos()) + msg.getValue();
-            if (value > bestValue)
-            {
-                bestValue = value;
-                best = msg;
-            }
-        }
-        return best;
-    }
-
-    @SuppressWarnings("unchecked")
-    private <T extends MessageTaskRequest> List<T> extractMessages(Object transactionID,
-            List<MessageTaskRequest> responses, Class<T> clazz)
-    {
-        List<T> result = new ArrayList<T>();
-        Iterator<MessageTaskRequest> iter = responses.iterator();
+        List<MessageTaskRequest> result = new ArrayList<MessageTaskRequest>();
+        Iterator<MessageTaskRequest> iter = _responseTasks.iterator();
         while (iter.hasNext())
         {
             MessageTaskRequest next =  iter.next();
-            if (clazz.isInstance(next) && next.getTransactionID() == transactionID)
+            if (next.getTransactionID() == id)
             {
-                result.add((T) next);
+                result.add(next);
                 iter.remove();
             }
         }
@@ -434,74 +341,12 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
 
     private void resolveAllTasks()
     {
-        for (TaskPair pair : _proposedTasks)
+        for (ITask task : _proposedTasks)
         {
-            if (pair.getResolving() == Resolving.UNRESOLVED)
-            {
-                // Get a new message send it out
-                Message msg = resolveTaskPair(pair);
-                debugLog("Resolving : " + pair);
-                if (msg != null)
-                {
-                    debugLog("   == With message: " + msg);
-                    pair.setResolving(Resolving.RESOLVING);
-                    Broadcaster.postMessage(msg);
-                }
-                else
-                {
-                    pair.setResolving(Resolving.RESOLVED);
-                }
-            }
+            task.resolve();
         }
     }
 
-    private Message resolveTaskPair(TaskPair pair)
-    {
-        if (pair == null)
-            throw new IllegalArgumentException("Pair must never be null");
-
-        // If we have a deliver we need to make sure we have the item
-        ItemStack held = getEntity().getHeldItem();
-
-        // Need to deliver, do we need to acquire?
-        if (pair.getDeliverTask() != null && pair.getAcquireTask() == null)
-        {
-            // If we are holding the right thing, just deliver it
-            if (held == null || !pair.getDeliverTask().getMatcher().matches(held))
-            {
-                return new MessageItemRequest(this, null, pair, pair.getDeliverTask().getMatcher(),
-                        pair.getDeliverTask().getQuantity());
-            }
-        }
-
-        // We accepted an acquire before deliver.  So a really full chest or orchard
-        if (pair.getAcquireTask() != null && pair.getDeliverTask() == null)
-        {
-            return new MessageIsStorageAvailable(this, null, pair, 0, pair.getAcquireTask().getMatcher());
-        }
-
-        // Everybody is good, we don't need anything
-        return null;
-    }
-
-    private void sendAcceptedMessages(TaskPair pair)
-    {
-        int delay = 0;
-        BlockPos pos = getEntity().getPosition();
-
-        for (TaskBase task : pair.asList())
-        {
-            if (task != null)
-            {
-                // Five hundred millis for each block we need to walk. TODO:  Rework in entity speed.
-                delay += Priority.computeDistanceCost(pos, task.getCoarsePos()) * 500;
-                pos = task.getCoarsePos();
-                // Add two seconds to break, pickup, place, etc.
-                delay += 2000;
-                Broadcaster.postMessage(new MessageWorkAccepted(this, task.getRequester(), null, 0, delay));
-            }
-        }
-    }
 
     //=============================================================================================
     // ##### ####   ###  #   #  ###  ##### ##### #####  ###  #   # ##### #   #  ####
@@ -514,7 +359,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
     private State transition()
     {
         // If within 20, then issue location request and to start targeting
-        if (posInAreaXY(getPos(), _currentPair.getWorkCenter(), 20))
+        if (posInAreaXY(getPos(), _currentTask.getWorkCenter(), 20))
         {
             LOGGER.debug(id() + " Within distance, switching to targeting.");
             requestWorkAreas();
@@ -546,11 +391,11 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         // After some period of time, get the task top generate a workArea based on its specifics
         if (_workArea == null && System.currentTimeMillis() > _requestEndMS)
         {
-            _workArea = _currentPair.getWorkTarget(_workAreas);
+            _workArea = _currentTask.getWorkTarget(_workAreas);
             if (_workArea == null)
             {
-                LOGGER.debug(id() + " Failed to find work area, aborting. " + _currentPair);
-                _currentPair = null;
+                LOGGER.debug(id() + " Failed to find work area, aborting. " + _currentTask);
+                _currentTask = null;
                 return State.IDLING;
             }
 
@@ -572,7 +417,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
                 {
                     LOGGER.debug("Failed to move to work area. IDLING. Distance: " +
                             VassalUtils.sqDistXZ(getEntity().getPosition(), _workArea));
-                    _currentPair = null;
+                    _currentTask = null;
                     return State.IDLING;
                 }
                 else
@@ -589,7 +434,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
 
     private void requestWorkAreas()
     {
-        Broadcaster.postMessage(new MessageRequestWorkArea(this, null, _currentPair, 0));
+        Broadcaster.postMessage(new MessageRequestWorkArea(this, null, _currentTask, 0));
 
         // TODO: Request work areas
         _workArea = null;
@@ -605,7 +450,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
             Message next =  iter.next();
             if (next instanceof MessageWorkArea)
             {
-                if (_workArea == null && next.getTransactionID() == _currentPair && System.currentTimeMillis() < _requestEndMS)
+                if (_workArea == null && next.getTransactionID() == _currentTask && System.currentTimeMillis() < _requestEndMS)
                     _workAreas.add(((MessageWorkArea) next).getWorkArea());
 
                 iter.remove();
@@ -623,9 +468,9 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
     private State perform()
     {
         // Keep doing the task until we run out.
-        if (_currentPair != null)
+        if (_currentTask != null)
         {
-            switch (_currentPair.updateTask())
+            switch (_currentTask.updateTask())
             {
                 case CONTINUE:
                     // Nothing special.
@@ -646,7 +491,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
     private void cancel()
     {
         _state = State.IDLING;
-        _currentPair = null;
+        _currentTask = null;
         _workArea = null;
         _proposedTasks.clear();
         _responses.clear();
@@ -754,7 +599,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
     {
         return id() +
                 "{ _state=" + _state +
-                ", _currentPair=" + _currentPair +
+                ", _currentTask=" + _currentTask +
                 ", _nextElicit=" + _nextElicit +
                 ", _requestEndMS=" + _requestEndMS +
                 ", _workArea=" + _workArea +
@@ -820,7 +665,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
     private BlockPos _workArea = null;
     private int _workAreaAttempt;
 
-    private final List<TaskPair> _proposedTasks = new ArrayList<TaskPair>();
+    private final List<ITask> _proposedTasks = new ArrayList<ITask>();
 
     // Queue of messages
     private final Queue<Message> _messages = new LinkedTransferQueue<Message>();
@@ -830,7 +675,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
     private final List<BlockPos> _workAreas = new ArrayList<BlockPos>();
 
     // Do we have a current task we are pursuing?
-    private TaskPair _currentPair;
+    private ITask _currentTask;
 
     // Visual things
     private static RenderVassal _renderVassal;

@@ -4,6 +4,7 @@ import com.crashbox.vassal.ai.EntityAIVassal;
 import com.crashbox.vassal.beacon.TileEntityBeaconInventory;
 import com.crashbox.vassal.common.ItemStackMatcher;
 import com.crashbox.vassal.messaging.*;
+import com.crashbox.vassal.task.ITask.UpdateResult;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import org.apache.logging.log4j.LogManager;
@@ -18,30 +19,6 @@ import java.util.List;
  */
 public class TaskStore extends TaskDeliverBase
 {
-    public TaskStore(EntityAIVassal performer, TRStore message)
-    {
-        super(performer, message.getSender(), message.getValue());
-        _matcher = message.getMatcher();
-        _quantity = message.getQuantity();
-    }
-
-    public ItemStackMatcher getMatcher()
-    {
-        return _matcher;
-    }
-
-    public int getQuantity()
-    {
-        return _quantity;
-    }
-
-    @Override
-    public BlockPos chooseWorkArea(List<BlockPos> others)
-    {
-        // We just work here.
-        return getRequester().getPos();
-    }
-
     @Override
     public UpdateResult executeAndIsDone()
     {
@@ -60,6 +37,30 @@ public class TaskStore extends TaskDeliverBase
         }
 
         return UpdateResult.DONE;
+    }
+
+    public TaskStore(EntityAIVassal performer, TRStore message)
+    {
+        super(performer, message.getSender(), message.getValue());
+        _matcher = message.getMatcher();
+        _quantity = message.getQuantity();
+    }
+
+    public ItemStackMatcher getMatcher()
+    {
+        return _matcher;
+    }
+
+    public int getQuantity()
+    {
+        return _quantity;
+    }
+
+    @Override
+    public BlockPos getWorkTarget(List<BlockPos> others)
+    {
+        // We just work here.
+        return getRequester().getPos();
     }
 
     @Override

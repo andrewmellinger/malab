@@ -1,8 +1,8 @@
 package com.crashbox.vassal.task;
 
 import com.crashbox.vassal.ai.EntityAIVassal;
-import com.crashbox.vassal.messaging.IMessager;
 import com.crashbox.vassal.messaging.TRPlaceBlock;
+import com.crashbox.vassal.task.ITask.UpdateResult;
 import net.minecraft.util.BlockPos;
 
 import java.util.List;
@@ -19,7 +19,7 @@ public class TaskPlaceBlock extends TaskDeliverBase
     }
 
     @Override
-    public BlockPos chooseWorkArea(List<BlockPos> others)
+    public BlockPos getWorkTarget(List<BlockPos> others)
     {
         if (getWorld().isAirBlock(_pos))
             return _pos;

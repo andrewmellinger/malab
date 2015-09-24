@@ -4,6 +4,7 @@ import com.crashbox.vassal.VassalUtils;
 import com.crashbox.vassal.ai.EntityAIVassal;
 import com.crashbox.vassal.ai.RingedSearcher;
 import com.crashbox.vassal.messaging.TRHarvest;
+import com.crashbox.vassal.task.ITask.UpdateResult;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.BlockPos;
 import org.apache.logging.log4j.LogManager;
@@ -25,7 +26,7 @@ public abstract class TaskHarvest extends TaskAcquireBase
     }
 
     @Override
-    public BlockPos chooseWorkArea(List<BlockPos> others)
+    public BlockPos getWorkTarget(List<BlockPos> others)
     {
         _harvestBlock = null;
         if (_harvestList != null)

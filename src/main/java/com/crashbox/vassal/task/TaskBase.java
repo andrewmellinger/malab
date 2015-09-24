@@ -6,6 +6,7 @@ import com.crashbox.vassal.ai.EntityAIVassal;
 import com.crashbox.vassal.ai.Priority;
 import com.crashbox.vassal.messaging.IMessager;
 import com.crashbox.vassal.messaging.MessageTaskRequest;
+import com.crashbox.vassal.task.ITask.UpdateResult;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
@@ -20,8 +21,6 @@ import java.util.List;
  */
 public abstract class TaskBase
 {
-    public enum UpdateResult { CONTINUE, RETARGET, DONE }
-
     /**
      * Base class for all tasks.
      * @param performer The AI performing this task
@@ -64,7 +63,7 @@ public abstract class TaskBase
     /**
      * @return The general position we move towards.
      */
-    public BlockPos getCoarsePos()
+    public BlockPos getWorkCenter()
     {
         return getRequester().getPos();
     }
@@ -75,7 +74,7 @@ public abstract class TaskBase
      * @param others Other people working near the requester.
      * @return The actual work center we want to work at.
      */
-    public abstract BlockPos chooseWorkArea(List<BlockPos> others);
+    public abstract BlockPos getWorkTarget(List<BlockPos> others);
 
     /**
      * Make progress on the work indicated when we are done with this target block.

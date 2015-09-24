@@ -3,6 +3,7 @@ package com.crashbox.vassal.task;
 import com.crashbox.vassal.ai.EntityAIVassal;
 import com.crashbox.vassal.beacon.TileEntityBeaconInventory;
 import com.crashbox.vassal.messaging.TRGetFromInventory;
+import com.crashbox.vassal.task.ITask.UpdateResult;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
@@ -29,7 +30,7 @@ public class TaskGetFromInventory extends TaskAcquireBase
     }
 
     @Override
-    public BlockPos chooseWorkArea(List<BlockPos> others)
+    public BlockPos getWorkTarget(List<BlockPos> others)
     {
         // We only do this once.
         return _workArea;

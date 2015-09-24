@@ -1,6 +1,7 @@
 package com.crashbox.vassal.ai;
 
 import com.crashbox.vassal.VassalUtils;
+import com.crashbox.vassal.task.ITask;
 import com.crashbox.vassal.task.TaskBase;
 import com.crashbox.vassal.task.TaskPair;
 import net.minecraft.util.BlockPos;
@@ -21,59 +22,33 @@ public class Priority
      * @param speed How fast the entity moves.
      * @return The best task.
      */
-    public static TaskPair selectBestTaskPair(BlockPos pos, List<TaskPair> tasks, double speed)
+    public static ITask selectBestTask(BlockPos pos, List<ITask> tasks, double speed)
     {
         int bestValue = Integer.MIN_VALUE;
-        TaskPair bestTask = null;
+        ITask bestTask = null;
 
         if (tasks == null || tasks.isEmpty())
             return null;
 
-        for (TaskPair pair : tasks)
+        for (ITask task : tasks)
         {
             // If unresolved (has pre-reqs) then skip it
-            if (pair.getResolving() == TaskPair.Resolving.RESOLVED)
+            if (task.resolve())
             {
-                int value = Priority.getTaskValue(pos, pair, speed);
+                int value = task.getValue(speed);
                 if (value > bestValue)
                 {
                     bestValue = value;
-                    bestTask = pair;
+                    bestTask = task;
                 }
             }
             else
             {
-                LOGGER.debug("Not computing because unresolved: " + pair);
+                LOGGER.debug("Not computing because unresolved: " + task);
             }
         }
 
         return bestTask;
-    }
-
-    public static int getTaskValue(BlockPos pos, TaskPair pair, double speed)
-    {
-        int value = 0;
-
-        // Output is pos -> pos (cost) -> pos (cost) -> pos (cost) -> (total)
-        String str = VassalUtils.getSimpleName(pair.getAcquireTask()) + "." +
-                VassalUtils.getSimpleName(pair.getDeliverTask()) + " = " +
-                pos.toString() + " -> ";
-
-        for (TaskBase task : pair.asList())
-        {
-            if (task != null)
-            {
-                int cost = Priority.computeDistanceCost(pos, task.getCoarsePos(), speed);
-                int val = task.getValue();
-                value = value - cost + val;
-                pos = task.getCoarsePos();
-                str += pos.toString() + "(" + cost + "," + val + ") -> ";
-            }
-        }
-
-        str += " total:" + value;
-        LOGGER.debug(str);
-        return value;
     }
 
     public static int computeDistanceCost(BlockPos startPos, BlockPos endPos, double speed)

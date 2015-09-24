@@ -3,6 +3,7 @@ package com.crashbox.vassal.task;
 import com.crashbox.vassal.VassalUtils;
 import com.crashbox.vassal.ai.EntityAIVassal;
 import com.crashbox.vassal.messaging.TRPlantSapling;
+import com.crashbox.vassal.task.ITask.UpdateResult;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
@@ -22,7 +23,7 @@ public class TaskPlantSapling extends TaskDeliverBase
     }
 
     @Override
-    public BlockPos chooseWorkArea(List<BlockPos> others)
+    public BlockPos getWorkTarget(List<BlockPos> others)
     {
         _plantingTarget = VassalUtils.findEmptyOrchardSquare(getWorld(), getRequester().getPos(),
                 getRequester().getRadius());

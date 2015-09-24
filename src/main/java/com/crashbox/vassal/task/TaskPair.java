@@ -2,7 +2,9 @@ package com.crashbox.vassal.task;
 
 import com.crashbox.vassal.VassalUtils;
 import com.crashbox.vassal.ai.EntityAIVassal;
-import com.crashbox.vassal.task.TaskBase.UpdateResult;
+import com.crashbox.vassal.ai.Priority;
+import com.crashbox.vassal.messaging.*;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,9 +16,8 @@ import java.util.List;
  *
  * This is a simple object to track the tasks that make up a set.
  */
-public class TaskPair
+public class TaskPair implements ITask
 {
-    public enum Resolving { UNRESOLVED, RESOLVING, RESOLVED }
     public enum Stage { EMPTYING, ACQUIRING, DELIVERING, DONE}
 
     public TaskPair(EntityAIVassal entityAI)
@@ -44,6 +45,7 @@ public class TaskPair
         _deliverTask = deliverTask;
     }
 
+    //====
     public Resolving getResolving()
     {
         return _resolving;
@@ -54,19 +56,94 @@ public class TaskPair
         _resolving = resolving;
     }
 
-    public boolean repeat()
-    {
-        return _repeat;
-    }
-
     public void setRepeat(boolean repeat)
     {
         _repeat = repeat;
     }
 
-    public Stage getStage()
+
+    public boolean resolve()
     {
-        return _stage;
+        if (getResolving() == Resolving.RESOLVED)
+            return true;
+
+        // If we have a deliver we need to make sure we have the item
+        ItemStack held = _entityAI.getEntity().getHeldItem();
+
+        // Need to deliver, do we need to acquire?
+        if (getDeliverTask() != null && getAcquireTask() == null)
+        {
+            // If we are holding the right thing, just deliver it
+            if (held == null || !getDeliverTask().getMatcher().matches(held))
+            {
+                Broadcaster.postMessage(new MessageItemRequest(_entityAI, null, this, getDeliverTask().getMatcher(),
+                        getDeliverTask().getQuantity()));
+                setResolving(Resolving.RESOLVING);
+                return false;
+            }
+        }
+
+        // We accepted an acquire before deliver.  So a really full chest or orchard
+        if (getAcquireTask() != null && getDeliverTask() == null)
+        {
+            Broadcaster.postMessage(new MessageIsStorageAvailable(_entityAI, null, this, 0, getAcquireTask().getMatcher()));
+            setResolving(Resolving.RESOLVING);
+            return false;
+        }
+
+        // Everybody is good, we don't need anything
+        setResolving(Resolving.RESOLVED);
+        return true;
+    }
+
+    @Override
+    public void linkupResponses(List<MessageTaskRequest> responses)
+    {
+        if (getDeliverTask() == null)
+            linkupDeliverResponses(responses);
+
+        if (getAcquireTask() == null)
+            linkupAcquireResponses(responses);
+    }
+
+
+
+    public int getValue(double speed)
+    {
+        TaskBase[] tasks = { _acquireTask, _deliverTask};
+        BlockPos pos = _entityAI.getPos();
+        int value = 0;
+        for (TaskBase task : tasks)
+        {
+            if (task != null)
+            {
+                int cost = Priority.computeDistanceCost(pos, task.getWorkCenter(), speed);
+                int val = task.getValue();
+                value = value - cost + val;
+                pos = task.getWorkCenter();
+            }
+        }
+        return value;
+    }
+
+    public void sendAcceptMessages()
+    {
+        int delay = 0;
+        BlockPos pos = _entityAI.getPos();
+
+        TaskBase[] tasks = { _acquireTask, _deliverTask};
+        for (TaskBase task : tasks)
+        {
+            if (task != null)
+            {
+                // Five hundred millis for each block we need to walk. TODO:  Rework in entity speed.
+                delay += Priority.computeDistanceCost(pos, task.getWorkCenter()) * 500;
+                pos = task.getWorkCenter();
+                // Add two seconds to break, pickup, place, etc.
+                delay += 2000;
+                Broadcaster.postMessage(new MessageWorkAccepted(_entityAI, task.getRequester(), null, 0, delay));
+            }
+        }
     }
 
     public void start()
@@ -94,7 +171,7 @@ public class TaskPair
      */
     public BlockPos getWorkCenter()
     {
-        return _current.getCoarsePos();
+        return _current.getWorkCenter();
     }
 
     /**
@@ -106,7 +183,7 @@ public class TaskPair
      */
     public BlockPos getWorkTarget(List<BlockPos> exclusions)
     {
-        BlockPos workArea = _current.chooseWorkArea(exclusions);
+        BlockPos workArea = _current.getWorkTarget(exclusions);
 
         if (workArea != null)
             return workArea;
@@ -123,7 +200,7 @@ public class TaskPair
             return null;
         }
 
-        return _current.chooseWorkArea(exclusions);
+        return _current.getWorkTarget(exclusions);
     }
 
     /**
@@ -188,6 +265,7 @@ public class TaskPair
     /**
      * @return All the tasks in an order easy to iterate.
      */
+    @Deprecated
     public TaskBase[] asList()
     {
         return new TaskBase[] { _acquireTask, _deliverTask };
@@ -201,6 +279,75 @@ public class TaskPair
         return _entityAI.getEntity().isHeldInventoryFull() ||
                _entityAI.getEntity().getHeldSize() >= _deliverTask.getQuantity();
     }
+
+    private boolean linkupDeliverResponses(List<MessageTaskRequest> responses)
+    {
+        BlockPos pos = _entityAI.getPos();
+
+        List<TRDeliverBase> delivers = MessageUtils.extractMessages(this, responses, TRDeliverBase.class);
+        if (delivers.size() == 0)
+            return false;
+
+        //debugLog("Found deliver tasks: " + delivers.size());
+
+        // If not an empty, we don't need two deliver tasks.
+        if (getDeliverTask() != null)
+            return false;
+
+        if (getAcquireTask() != null)
+            pos = getAcquireTask().getWorkCenter();
+
+        // Now, find the best one based on what we are going to do with it
+        TRDeliverBase best = findBest(pos, delivers);
+        if (VassalUtils.isNotNull(best, LOGGER))
+        {
+            setDeliverTask(EntityAIVassal.TASK_FACTORY.makeTaskFromMessage(_entityAI, best));
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private boolean linkupAcquireResponses(List<MessageTaskRequest> responses)
+    {
+        //debugLog("Linking up acquire responses.");
+        BlockPos pos = _entityAI.getPos();
+
+        List<TRAcquireBase> acquires = MessageUtils.extractMessages(this, responses, TRAcquireBase.class);
+        //debugLog("Have (" + acquires.size() + ") acquires ");
+        if (acquires.size() > 0)
+        {
+            TRAcquireBase best = findBest(pos, acquires);
+            //debugLog("Best acquire: " + best);
+            if (VassalUtils.isNotNull(best, LOGGER))
+            {
+                setAcquireTask(EntityAIVassal.TASK_FACTORY.makeTaskFromMessage(_entityAI, best));
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private <T extends MessageTaskRequest> T findBest(BlockPos pos, List<T> responses)
+    {
+        T best = null;
+        int bestValue = Integer.MIN_VALUE;
+
+        for (T msg : responses)
+        {
+            int value = Priority.computeDistanceCost(pos, msg.getSender().getPos()) + msg.getValue();
+            if (value > bestValue)
+            {
+                bestValue = value;
+                best = msg;
+            }
+        }
+        return best;
+    }
+
+
+
 
     @Override
     public String toString()

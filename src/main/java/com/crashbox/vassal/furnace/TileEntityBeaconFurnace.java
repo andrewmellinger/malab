@@ -776,6 +776,9 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
                         Broadcaster.postMessage(req);
                     }
                 }
+
+                // Try emptying output
+
             }
             else if (msg instanceof MessageIsStorageAvailable)
             {
@@ -790,6 +793,8 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
                     Broadcaster.postMessage(req);
                 }
             }
+//            else if (msg instanceof MessageItemRequest)
+
 
             // TODO: We can take fuel too
         }
