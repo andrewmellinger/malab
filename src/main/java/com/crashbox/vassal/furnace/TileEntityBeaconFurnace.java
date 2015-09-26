@@ -239,14 +239,14 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
             if (_itemStacks[INPUT_INDEX] != null)
                 return _itemStacks[INPUT_INDEX].isItemEqual(stack);
             else
-                return FurnaceRecipes.instance().getSmeltingResult(stack) != null;
+                return inputSampleContains(stack);
         }
         else if ( index == FUEL_INDEX )
         {
             if ( _itemStacks[FUEL_INDEX] != null)
                 return _itemStacks[FUEL_INDEX].isItemEqual(stack);
             else
-                return TileEntityFurnace.isItemFuel(stack);
+                return fuelSampleContains(stack);
         }
 
         return false;
@@ -673,7 +673,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
     {
         if (_itemStacks[INPUT_INDEX] == null)
         {
-            return 20;
+            return 100;
         }
 
         // We have a priority based on space
@@ -685,6 +685,16 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
             return 0;
 
         return (space * 50)/maxSize;
+    }
+
+    private boolean inputSampleContains(ItemStack stack)
+    {
+        for (int i = INPUT_SAMPLE_MIN; i <= INPUT_SAMPLE_MAX; ++i)
+        {
+            if (_itemStacks[i] != null && _itemStacks[i].isItemEqual(stack))
+                return true;
+        }
+        return false;
     }
 
     private ItemStackMatcher getSmeltableItemMatcher()
@@ -732,7 +742,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
         // If we have less than 8, then ask for some
         ItemStack fuelStack = getFuel();
         if (fuelStack == null)
-            return 50;
+            return 100;
 
         int current = fuelStack.stackSize;
         if (current > 8)
@@ -858,7 +868,20 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
                 checkInputAccepts(request, INPUT_INDEX, INPUT_SAMPLE_MIN, INPUT_SAMPLE_MAX);
                 checkInputAccepts(request, FUEL_INDEX, FUEL_SAMPLE_MIN, FUEL_SAMPLE_MAX);
             }
+            else if (msg instanceof MessageItemRequest)
+            {
+                MessageItemRequest req = (MessageItemRequest)msg;
+                if (_itemStacks[OUTPUT_INDEX] != null && req.getMatcher().matches(_itemStacks[OUTPUT_INDEX]))
+                {
+                    int qty = req.getQuantity();
+                    if (qty > _itemStacks[OUTPUT_INDEX].stackSize)
+                        qty = _itemStacks[OUTPUT_INDEX].stackSize;
 
+                    TRGetFromInventory newReq = new TRGetFromInventory(TileEntityBeaconFurnace.this,
+                            msg.getSender(), msg.getTransactionID(), 0, req.getMatcher(), qty);
+                    Broadcaster.postMessage(newReq);
+                }
+            }
 
         }
     }
