@@ -533,7 +533,9 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
     public boolean tryMoveTo(BlockPos pos)
     {
         // If we are 2 blocks away, we are good enough
-        if (inProximity(pos))
+
+        //if (inProximity(pos))
+        if (VassalUtils.isWithinSqDist(getEntity().getPosition(), pos, 4))
         {
             debugLog("Close enough!  Not moving.");
             return true;

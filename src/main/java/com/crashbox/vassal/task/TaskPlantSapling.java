@@ -35,6 +35,9 @@ public class TaskPlantSapling extends TaskDeliverBase
     {
         // Plant
         ItemStack held = getEntity().getHeldItem();
+        if (held == null)
+            return UpdateResult.DONE;
+
         IBlockState state = Blocks.sapling.getStateFromMeta(held.getMetadata());
         getWorld().setBlockState(_plantingTarget, state);
 

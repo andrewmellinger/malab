@@ -83,6 +83,9 @@ public class ItemStackMatcher
 
     public boolean matches(ItemStack stack)
     {
+        if (stack == null)
+            return false;
+
         for (ItemStack sample : _samples)
         {
             if (sample.isItemEqual(stack))

@@ -43,7 +43,7 @@ public class TaskPickup extends TaskAcquireBase
         if (eItem == null)
             return UpdateResult.DONE;
 
-        ItemStack collected = VassalUtils.collectEntityIntoNewStack(getWorld(), eItem.getPosition(), 2, _item);
+        ItemStack collected = VassalUtils.collectEntityIntoNewStack(getWorld(), eItem.getPosition(), 3, _item);
         getEntity().setCurrentItemOrArmor(0, collected);
 
         return UpdateResult.DONE;

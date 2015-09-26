@@ -17,43 +17,6 @@ import org.apache.logging.log4j.Logger;
 public abstract class TileEntityBeaconInventory extends TileEntityLockable implements IUpdatePlayerListBox, IInventory,
         IMessager
 {
-//    public ItemStack mergeIntoSlot(ItemStack stack, int slot)
-//    {
-//        LOGGER.debug("mergeIntoSlot: " + slot);
-//        if (slot == -1)
-//        {
-//            stack = mergeIntoBestSlot(stack);
-//            LOGGER.debug("mergeIntoBestSlot returned: " + stack);
-//            return stack;
-//        }
-//
-//        ItemStack current = getStackInSlot(slot);
-//
-//        // We might have been told to put things into a slot that might have become empty
-//        if (current == null)
-//        {
-//            setInventorySlotContents(slot, stack);
-//            stack = null;
-//        }
-//        else if (current.isItemEqual(stack))
-//        {
-//            int freeSpace = current.getMaxStackSize() - current.stackSize;
-//            if (freeSpace > stack.stackSize)
-//            {
-//                current.stackSize += stack.stackSize;
-//                stack = null;
-//            }
-//            else
-//            {
-//                // Not enough room
-//                current.stackSize += freeSpace;
-//                stack.stackSize -= freeSpace;
-//            }
-//        }
-//
-//        return stack;
-//    }
-//
     /**
      * Puts the contents of the stack into the inventory.
      * @param stack The contents to put in.
@@ -63,11 +26,15 @@ public abstract class TileEntityBeaconInventory extends TileEntityLockable imple
     {
         // First try to fill loaded slots, then go back
         // and put rest into empty.
+        LOGGER.debug("mergeIntoBestSlot: stack=" + stack);
+
         int firstEmpty = -1;
-        for (int i = 0; i < getSizeInventory(); ++i)
+        for (int i : getInputSlots())
         {
+            LOGGER.debug("-> checking slot:" + i);
             if (isItemValidForSlot(i, stack))
             {
+                LOGGER.debug("---> item valid");
                 ItemStack current = getStackInSlot(i);
                 if ( current == null)
                 {
@@ -85,6 +52,10 @@ public abstract class TileEntityBeaconInventory extends TileEntityLockable imple
                     }
                 }
             }
+            else
+            {
+                LOGGER.debug("---> item NOT valid");
+            }
         }
 
         if (firstEmpty != -1)
@@ -100,9 +71,10 @@ public abstract class TileEntityBeaconInventory extends TileEntityLockable imple
     public ItemStack extractItems(ItemStackMatcher matcher, int wanted)
     {
         ItemStack returnStack = null;
-        for (int i = 0; i < getSizeInventory(); ++i)
+        for (int i : getOutputSlots())
         {
             ItemStack stack = getStackInSlot(i);
+            LOGGER.debug("extractItems: slot=" + i + ", stack=" + stack);
             if (matcher.matches(stack))
             {
                 if (returnStack == null)
@@ -134,6 +106,10 @@ public abstract class TileEntityBeaconInventory extends TileEntityLockable imple
 
         return returnStack;
     }
+
+    public abstract int[] getOutputSlots();
+
+    public abstract int[] getInputSlots();
 
     private static final Logger LOGGER = LogManager.getLogger();
 }

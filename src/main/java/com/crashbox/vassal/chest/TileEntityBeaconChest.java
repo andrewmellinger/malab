@@ -366,8 +366,28 @@ public class TileEntityBeaconChest extends TileEntityBeaconInventory implements 
         return 0;
     }
 
+    //=============================================================================================
 
-    //---------------------------------------------------------------------------------------------
+
+    @Override
+    public int[] getOutputSlots()
+    {
+        int[] result = new int[27];
+        for (int i = 0; i < 27; ++i)
+            result[i] = i;
+        return result;
+    }
+
+    @Override
+    public int[] getInputSlots()
+    {
+        int[] result = new int[27];
+        for (int i = 0; i < 27; ++i)
+            result[i] = i;
+        return result;
+    }
+
+    //=============================================================================================
     public void blockBroken()
     {
         _chest.terminate();

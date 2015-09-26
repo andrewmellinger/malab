@@ -306,11 +306,11 @@ public class TaskPair implements ITask
         BlockPos pos = _entityAI.getPos();
 
         List<TRAcquireBase> acquires = MessageUtils.extractMessages(this, responses, TRAcquireBase.class);
-        LOGGER.debug("Have (" + acquires.size() + ") acquires ");
+        //LOGGER.debug("Have (" + acquires.size() + ") acquires ");
         if (acquires.size() > 0)
         {
             TRAcquireBase best = findBest(pos, acquires);
-            LOGGER.debug("Best acquire: " + best);
+            //LOGGER.debug("Best acquire: " + best);
             if (VassalUtils.isNotNull(best, LOGGER))
             {
                 setAcquireTask(EntityAIVassal.TASK_FACTORY.makeTaskFromMessage(_entityAI, best));
@@ -328,7 +328,7 @@ public class TaskPair implements ITask
         for (T msg : responses)
         {
             int value = msg.getValue() - Priority.computeDistanceCost(pos, msg.getSender().getPos());
-            LOGGER.debug("Task: " + this + " distance cost: " + value + " msg: " + msg);
+            LOGGER.debug("findBest: task=" + this + ", cost=" + value + ", msg=" + msg);
             if (value > bestValue)
             {
                 bestValue = value;

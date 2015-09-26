@@ -246,7 +246,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
             if ( _itemStacks[FUEL_INDEX] != null)
                 return _itemStacks[FUEL_INDEX].isItemEqual(stack);
             else
-                TileEntityFurnace.isItemFuel(stack);
+                return TileEntityFurnace.isItemFuel(stack);
         }
 
         return false;
@@ -559,6 +559,21 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
 
     //=============================================================================================
 
+    @Override
+    public int[] getOutputSlots()
+    {
+        return new int[] {OUTPUT_INDEX};
+    }
+
+    @Override
+    public int[] getInputSlots()
+    {
+        return new int[] {INPUT_INDEX, FUEL_INDEX};
+    }
+
+
+    //=============================================================================================
+
     public boolean isBurning()
     {
         return _remainingFuelBurnTicks > 0;
@@ -658,7 +673,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
     {
         if (_itemStacks[INPUT_INDEX] == null)
         {
-            return 50;
+            return 20;
         }
 
         // We have a priority based on space
@@ -679,20 +694,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
             return new ItemStackMatcher(_itemStacks[0]);
         }
 
-        // If we aren't consuming anything, then bring any of the samples
-        ItemStackMatcher matcher = new ItemStackMatcher();
-        for ( int i = INPUT_SAMPLE_MIN; i <= INPUT_SAMPLE_MAX; ++i)
-        {
-            if ( _itemStacks[i] != null)
-            {
-                matcher.add(_itemStacks[i]);
-            }
-        }
-
-        if (matcher.size() == 0)
-            return null;
-
-        return matcher;
+        return buildSampleMatcher(INPUT_SAMPLE_MIN, INPUT_SAMPLE_MAX);
     }
 
     /**
@@ -724,6 +726,30 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
         return false;
     }
 
+    private int getFuelNeed()
+    {
+        // TODO: Discount if we make our own
+        // If we have less than 8, then ask for some
+        ItemStack fuelStack = getFuel();
+        if (fuelStack == null)
+            return 50;
+
+        int current = fuelStack.stackSize;
+        if (current > 8)
+            return 0;
+
+        return 8 - current;
+    }
+
+    private ItemStackMatcher getFuelSamples()
+    {
+        // If we have some then just that.
+        ItemStack fuelStack = getFuel();
+        if (fuelStack != null)
+            return new ItemStackMatcher(fuelStack);
+
+        return buildSampleMatcher(FUEL_SAMPLE_MIN, FUEL_SAMPLE_MAX);
+    }
 
     //---------------------------
 
@@ -737,6 +763,24 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
         _furnace.terminate();
     }
 
+    //---------------------------------------------------------------------------------------------
+    private ItemStackMatcher buildSampleMatcher(int min, int max)
+    {
+        // If we aren't consuming anything, then bring any of the samples
+        ItemStackMatcher matcher = new ItemStackMatcher();
+        for (int i = min; i <= max; ++i)
+        {
+            if (_itemStacks[i] != null)
+            {
+                matcher.add(_itemStacks[i]);
+            }
+        }
+
+        if (matcher.size() == 0)
+            return null;
+
+        return matcher;
+    }
 
     //---------------------------------------------------------------------------------------------
     private class Furnace extends BeaconBase
@@ -759,9 +803,9 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
             {
                 // LOGGER.debug("Furnace " + this + " is asked for work." + msg);
                 MessageWorkerAvailability availability = (MessageWorkerAvailability)msg;
-                int priority = smeltableNeedPriority();
 
-                if ( priority > 0)
+                int value = smeltableNeedPriority();
+                if ( value > 0)
                 {
                     // Find smeltable
                     ItemStackMatcher matcher = getSmeltableItemMatcher();
@@ -769,7 +813,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
                     {
                         // Send a message back to this guy telling him that we could use more
                         TRStore req = new TRStore(TileEntityBeaconFurnace.this,
-                                availability.getSender(), msg.getTransactionID(), priority, getSmeltableItemMatcher(),
+                                availability.getSender(), msg.getTransactionID(), value, getSmeltableItemMatcher(),
                                 getSmeltableQuantityWanted());
 
                         LOGGER.debug("Furnace posting: " + req);
@@ -777,26 +821,80 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
                     }
                 }
 
-                // Try emptying output
+                value = getFuelNeed();
+                if (value > 0)
+                {
+                    // TODO:  Compute quantity needed.
+                    ItemStackMatcher matcher = getFuelSamples();
+                    if (matcher != null)
+                    {
+                        TRStore req = new TRStore(TileEntityBeaconFurnace.this,
+                                msg.getSender(), msg.getTransactionID(),
+                                value, matcher, 8);
+                        Broadcaster.postMessage(req);
+                    }
+                }
+
+                // Try emptying output if we have pressure
+                // NOTE:  We don't want this now because we want to provide back-oressuer
+//                if (_itemStacks[OUTPUT_INDEX] != null)
+//                {
+//                    int current = _itemStacks[OUTPUT_INDEX].stackSize;
+//                    int pressure = Priority.inventoryPressure(current, 64);
+//                    if (pressure > 0)
+//                    {
+//                        TRGetFromInventory newReq = new TRGetFromInventory(TileEntityBeaconFurnace.this,
+//                                msg.getSender(), msg.getTransactionID(),
+//                                pressure, new ItemStackMatcher(_itemStacks[OUTPUT_INDEX]), current);
+//                        Broadcaster.postMessage(newReq);
+//                    }
+//                }
 
             }
             else if (msg instanceof MessageIsStorageAvailable)
             {
-                MessageIsStorageAvailable request = (MessageIsStorageAvailable)msg;
-                if (_itemStacks[INPUT_INDEX] != null && request.getMatcher().matches(_itemStacks[INPUT_INDEX]))
+                MessageIsStorageAvailable request = (MessageIsStorageAvailable) msg;
+
+                checkInputAccepts(request, INPUT_INDEX, INPUT_SAMPLE_MIN, INPUT_SAMPLE_MAX);
+                checkInputAccepts(request, FUEL_INDEX, FUEL_SAMPLE_MIN, FUEL_SAMPLE_MAX);
+            }
+
+
+        }
+    }
+
+    private void checkInputAccepts(MessageIsStorageAvailable msg, int slot, int sampleMin, int sampleMax)
+    {
+        ItemStack stack = _itemStacks[slot];
+        if (stack != null)
+        {
+            if (msg.getMatcher().matches(stack))
+            {
+                int free = stack.getMaxStackSize() - stack.stackSize;
+                // Send a message back to this guy telling him that we could use more
+                TRStore req = new TRStore(TileEntityBeaconFurnace.this,
+                        msg.getSender(), msg.getTransactionID(), 0, msg.getMatcher(),
+                        free);
+
+                Broadcaster.postMessage(req);
+            }
+        }
+        else
+        {
+            // Check samples
+            for (int i = sampleMin; i <= sampleMax; ++i)
+            {
+                if (msg.getMatcher().matches(_itemStacks[i]))
                 {
-                    // Send a message back to this guy telling him that we could use more
+                    int free = _itemStacks[i].getMaxStackSize() - _itemStacks[i].stackSize;
                     TRStore req = new TRStore(TileEntityBeaconFurnace.this,
-                            request.getSender(), msg.getTransactionID(), 0, new ItemStackMatcher(_itemStacks[INPUT_INDEX]),
-                            getSmeltableQuantityWanted());
+                            msg.getSender(), msg.getTransactionID(), 0, msg.getMatcher(),
+                            free);
 
                     Broadcaster.postMessage(req);
+                    break;
                 }
             }
-//            else if (msg instanceof MessageItemRequest)
-
-
-            // TODO: We can take fuel too
         }
     }
 

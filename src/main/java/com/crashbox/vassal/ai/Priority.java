@@ -51,6 +51,20 @@ public class Priority
         return bestTask;
     }
 
+
+    public static int inventoryPressure(int current, int max)
+    {
+        if (current < 16)
+            return 0;
+
+        // No pressure below 16. Linear ramp after that.
+        double remain = current - 16;
+        double space = max - 16;
+
+        // Linear ramp for now
+        return (int) ((remain/space) * 10);
+    }
+
     public static int computeDistanceCost(BlockPos startPos, BlockPos endPos, double speed)
     {
         // 1 point for every 5 blocks for a normal zombie.  In the future we
