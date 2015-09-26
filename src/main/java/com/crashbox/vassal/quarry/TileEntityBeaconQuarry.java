@@ -5,12 +5,10 @@ import com.crashbox.vassal.ai.EntityAIVassal;
 import com.crashbox.vassal.beacon.BeaconBase;
 import com.crashbox.vassal.common.AnyItemMatcher;
 import com.crashbox.vassal.common.ItemStackMatcher;
+import com.crashbox.vassal.entity.EntityVassal;
 import com.crashbox.vassal.messaging.*;
 import com.crashbox.vassal.task.TaskQuarry;
 import com.crashbox.vassal.util.StairBuilder;
-import net.minecraft.init.Items;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemTool;
 import net.minecraft.server.gui.IUpdatePlayerListBox;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
@@ -101,9 +99,7 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
         StairBuilder builder = new StairBuilder(getWorld(), getPos(), _radius);
 
         LOGGER.debug("Quarry: Got item request: " + msg.getMatcher());
-//        ItemTool tool = getEntityPickaxe(msg);
-        ItemTool tool = null;
-        if (builder.findFirstQuarryable(msg.getMatcher(), tool) != null)
+        if (builder.findFirstQuarryable(msg.getMatcher(), getEntityFromMessage(msg)) != null)
         {
             LOGGER.debug("Quarry: Found item.");
             TRHarvest quarry = new TRHarvest(this, msg.getSender(), msg.getTransactionID(), 0,
@@ -130,9 +126,7 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
         }
 
         // If we have something that will drop, call him over
-//        ItemTool tool = getEntityPickaxe(msg);
-        ItemTool tool = null;
-        if (builder.findFirstQuarryable(new AnyItemMatcher(), tool) != null)
+        if (builder.findFirstQuarryable(new AnyItemMatcher(), getEntityFromMessage(msg)) != null)
         {
             TRHarvest quarry = new TRHarvest(this, msg.getSender(), msg.getTransactionID(), 0,
                     TaskQuarry.class, new AnyItemMatcher(), 1);
@@ -152,42 +146,17 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
         Broadcaster.postMessage(pair);
     }
 
-//    private BlockPos findQuarryCandidate()
-//    {
-//        // Look around in in our current slab
-//        BlockPos us = getPos();
-//        BlockPos start = new BlockPos(us.getX() - _radius, us.getY(), us.getZ() - _radius);
-//        BlockPos end = new BlockPos(us.getX() + _radius, us.getY() - 1, us.getZ() + _radius);
-//
-//        return VassalUtils.firstDropOccurrence(getWorld(), start, end, ItemStackMatcher.getQuarryMatcher());
-//    }
 
-//    private int findStartingY()
-//    {
-//        BlockPos us = getPos();
-//        BlockPos start = new BlockPos(us.getX() - _radius, us.getY() -1, us.getZ() - _radius);
-//        BlockPos end = new BlockPos(us.getX() + _radius, 11, us.getZ() + _radius);
-//
-//        BlockPos first = VassalUtils.firstDropOccurrence(getWorld(), start, end,
-//                ItemStackMatcher.getQuarryMatcher());
-//        if (first != null)
-//            return first.getY();
-//
-//        return 10;
-//    }
-
-    private ItemTool getEntityPickaxe(Message msg)
+    private EntityVassal getEntityFromMessage(Message msg)
     {
-        ItemTool tool = (ItemTool) Items.stone_pickaxe;
-        if(msg.getSender()instanceof EntityAIVassal)
-
+        if (msg.getSender() instanceof EntityAIVassal)
         {
-            Item item = ((EntityAIVassal) msg.getSender()).getEntity().getCurrentPickAxe().getItem();
-            if (item instanceof ItemTool)
-                tool = (ItemTool) item;
+            EntityAIVassal entityAI = (EntityAIVassal) msg.getSender();
+            return entityAI.getEntity();
         }
-        return tool;
+        return null;
     }
+
 
     private void debugLog(String msg)
     {

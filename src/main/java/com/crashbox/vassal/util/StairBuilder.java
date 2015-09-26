@@ -3,15 +3,15 @@ package com.crashbox.vassal.util;
 import com.crashbox.vassal.VassalUtils;
 import com.crashbox.vassal.common.AnyItemMatcher;
 import com.crashbox.vassal.common.ItemStackMatcher;
+import com.crashbox.vassal.entity.EntityVassal;
+import com.crashbox.vassal.entity.ToolSet;
 import net.minecraft.block.BlockSlab;
 import net.minecraft.block.BlockStoneSlab;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemTool;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
-import scala.xml.dtd.ANY;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,10 +81,9 @@ public class StairBuilder
     /**
      * Finds the first quarryable block that matches in the area.
      * @param matcher The matcher for the item we are looking for.
-     * @param tool The tool we are using.
      * @return True for any.
      */
-    public BlockPos findFirstQuarryable(ItemStackMatcher matcher, ItemTool tool)
+    public BlockPos findFirstQuarryable(ItemStackMatcher matcher, EntityVassal vassal)
     {
 
         LOGGER.debug(this);
@@ -106,18 +105,18 @@ public class StairBuilder
                 continue;
             }
 
-            //LOGGER.debug("Not in exclusion list: " + pos);
-            // Can we break it?
-            if (tool != null && !tool.canHarvestBlock(_world.getBlockState(pos).getBlock()))
-            {
-                LOGGER.debug("Can't harvest block with tool=" + tool + ", pos=" + pos);
-                continue;
-            }
-
             // Will it give us what we want?
             if (!(matcher instanceof AnyItemMatcher) && !VassalUtils.willDrop(_world, pos, matcher))
             {
-                LOGGER.debug("Skipping, donsn't match desired type. pos=" + pos);
+                LOGGER.debug("Skipping, doesn't match desired type. pos=" + pos);
+                continue;
+            }
+
+            //LOGGER.debug("Not in exclusion list: " + pos);
+            // Can we break it?
+            if (vassal != null && vassal.findBestTool(pos) == null)
+            {
+                LOGGER.debug("Couldn't find any tool to harvest block: pos=" + pos + ", entity=" + vassal);
                 continue;
             }
 

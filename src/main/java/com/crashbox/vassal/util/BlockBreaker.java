@@ -1,5 +1,8 @@
 package com.crashbox.vassal.util;
 
+import com.crashbox.vassal.entity.EntityVassal;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 
@@ -10,12 +13,32 @@ import net.minecraft.world.World;
  */
 public class BlockBreaker
 {
-    public BlockBreaker(World world, int entityID, BlockPos pos, int ticksNeeded)
+    public static float breakSeconds(World world, EntityVassal entity, BlockPos pos)
+    {
+        // A stone pickaxe takes about 1 second to break. So I can break 10 in 9 seconds
+        // Stone hardness = 1.5
+        // Stone pickaxe has a 4x dig speed
+        // A 1.0 workspeed is steve.  The bots by default are slower.
+        //
+        // 1.0 = ( x * 1.5) / ( 4 * 1.0 )
+        // 4 = x * 1.5
+        // 4/1.5 = x ~ 2.5
+
+        ItemStack toolStack = entity.findBestTool(pos);
+        IBlockState state = world.getBlockState(pos);
+
+        float digSpeed = toolStack.getItem().getDigSpeed(toolStack, state);
+        float getHardness = state.getBlock().getBlockHardness(world, pos);
+
+        return (BASE_BREAK_TIME * getHardness) / (digSpeed * entity.getWorkSpeedFactor()) ;
+    }
+
+    public BlockBreaker(World world, EntityVassal entity, BlockPos pos)
     {
         _world = world;
-        _entityID = entityID;
+        _entityID = entity.getEntityId();
         _pos = pos;
-        _ticksNeeded = ticksNeeded;
+        _ticksNeeded = (int)(breakSeconds(world, entity, pos) * 20);
     }
 
     public boolean update()
@@ -48,4 +71,5 @@ public class BlockBreaker
     private int _ticksDone;
     private int _previousTicksDone;
 
+    private static final float BASE_BREAK_TIME = 2.5F;
 }

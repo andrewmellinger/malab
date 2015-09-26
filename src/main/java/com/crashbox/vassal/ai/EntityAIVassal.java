@@ -22,9 +22,6 @@ import java.util.concurrent.LinkedTransferQueue;
  */
 public class EntityAIVassal extends EntityAIBase implements IMessager
 {
-    public static int TARGETING_DISTANCE = 16;
-
-
     public static TaskFactory TASK_FACTORY = new TaskFactory();
 
     public EntityAIVassal(EntityVassal entity)
@@ -62,6 +59,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
     @Override
     public void resetTask()
     {
+        // NOTE:  Reset is called every time we complete.
         cancel();
     }
 
@@ -484,6 +482,8 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
                     return State.TARGETING;
                 case DONE:
                     debugLog(" Switching to idle.");
+                    debugLog(this.toString());
+                    debugLog("Now: " + System.currentTimeMillis());
                     return State.IDLING;
             }
         }
@@ -498,7 +498,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         _workArea = null;
         _proposedTasks.clear();
         _responses.clear();
-        _nextElicit = System.currentTimeMillis() + ELICIT_DELAY_MS;
+        _nextElicit = System.currentTimeMillis() + ELICIT_RESET_DELAY;
         getEntity().getNavigator().clearPathEntity();
     }
 
@@ -657,10 +657,12 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
 
     // We don't want to ask for work too often.  If we don't get a response, just hang out.
     private static final int ELICIT_DELAY_MS = 6000;
+    private static final int ELICIT_RESET_DELAY = 500;
     private long _nextElicit = 0;
 
     private static final int DEFAULT_RANGE = 10;
     private static final double DEFAULT_SPEED = 0.5;
+    public static int TARGETING_DISTANCE = 16;
 
     // Time we wait for messages.  5 ticks (250 ms) is usually good enough
     private static final long REQUEST_TIMEOUT_MS = 250;

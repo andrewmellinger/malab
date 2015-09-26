@@ -10,12 +10,17 @@ import net.minecraft.entity.ai.EntityAISwimming;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemPickaxe;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTool;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.common.ForgeHooks;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import javax.tools.Tool;
 
 
 /**
@@ -27,13 +32,18 @@ public class EntityVassal extends EntityCreature
     {
         super(world);
         setupAI();
+
+        _toolStacks[0] = new ItemStack(Items.stone_pickaxe);
+        _toolStacks[1] = new ItemStack(Items.stone_axe);
+        _toolStacks[2] = new ItemStack(Items.stone_shovel);
+        _toolStacks[3] = new ItemStack(Items.stone_sword);
     }
 
     public double getSpeed()
     {
         // TODO: Somehow movement speed got set to 0.6 so we need to do this manually
-        return 0.4D;
-        //return getEntityAttribute(SharedMonsterAttributes.movementSpeed).getAttributeValue();
+        //return 0.4D;
+        return getEntityAttribute(SharedMonsterAttributes.movementSpeed).getAttributeValue();
     }
 
     // you don't have to call this as it is called automatically during EntityLiving subclass creation
@@ -162,21 +172,23 @@ public class EntityVassal extends EntityCreature
             setCurrentItemOrArmor(0, null);
     }
 
-    public ItemStack getCurrentPickAxe()
-    {
-        return new ItemStack(Items.stone_pickaxe);
-    }
+    //=============================================================================================
+    // ToolSet
 
-    public ItemStack getCurrentAxe()
+    public ItemStack findBestTool(BlockPos pos)
     {
-        return new ItemStack(Items.stone_axe);
-    }
+        // Can we use the names to look up the tool?
+        for (int i = 0; i < 4; ++i)
+        {
+            ItemStack stack = _toolStacks[i];
+            if (ForgeHooks.canToolHarvestBlock(getEntityWorld(), pos, stack))
+            {
+                return stack;
+            }
+        }
 
-    public ItemStack getCurrentShovel()
-    {
-        return new ItemStack(Items.stone_shovel);
+        return null;
     }
-
 
     //=============================================================================================
 
@@ -209,11 +221,14 @@ public class EntityVassal extends EntityCreature
 
     //=============================================================================================
 
+    private ItemStack[] _toolStacks = new ItemStack[4];
+
     // How many things we can carry.
     private int _carryCapacity = 4;
+//    private int _carryCapacity = 20;
 
-    // Multiplier on mining speed, a percentage.  Base vassal is 1.0;  Lower faster.
-    private float _workSpeedFactor = 1.0F;
+    // Divider on time.  Higher is faster.  The player (steve) is around 1.0
+    private float _workSpeedFactor = 0.5F;
 
     // We use this alot
     private EntityAIVassal _vassalAI;

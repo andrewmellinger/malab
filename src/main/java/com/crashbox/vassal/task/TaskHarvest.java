@@ -5,7 +5,10 @@ import com.crashbox.vassal.ai.EntityAIVassal;
 import com.crashbox.vassal.ai.RingedSearcher;
 import com.crashbox.vassal.messaging.TRHarvest;
 import com.crashbox.vassal.task.ITask.UpdateResult;
+import com.crashbox.vassal.util.BlockBreaker;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemTool;
 import net.minecraft.util.BlockPos;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -104,53 +107,36 @@ public abstract class TaskHarvest extends TaskAcquireBase
 
     // This adds the specific algorithm that find trees, or blocks of stone,or whatever
     protected abstract Queue<BlockPos> findHarvestList(List<BlockPos> others);
-//    _harvestList = RingedSearcher.findTree(getEntity().getEntityWorld(), getRequester().getPos(), _radius,
-//    _height, _matcher, others);
 
 
     private void startBreaking()
     {
-        IBlockState state = getEntity().getEntityWorld().getBlockState(_harvestBlock);
-        _breakTotalNeeded = (int)(BASE_BREAK_TIME *
-                            state.getBlock().getBlockHardness(getEntity().getEntityWorld(), _harvestBlock) *
-                            getEntity().getWorkSpeedFactor());
+        _breaker = new BlockBreaker(getWorld(), getEntity(), _harvestBlock);
         _isBreaking = true;
-        _breakingProgress = 0;
-        _previousBreakProgress = 0;
-        debugLog(LOGGER, "Start breaking. Need: " + _breakTotalNeeded);
     }
 
     /** @return True to continue harvesting */
     private boolean continueBreaking()
     {
-        _isBreaking = updateBreak();
+        if (_breaker != null)
+            _isBreaking = _breaker.update();
+        else
+            _isBreaking = false;
+
         if (!_isBreaking)
         {
+            _breaker = null;
+
             //debugLog(LOGGER, "Finished breaking, harvesting.");
             VassalUtils.harvestBlockIntoHeld(getWorld(), getEntity(), _harvestBlock, getMatcher());
             // This is kinda a hack...
             onBlockBroken(_harvestBlock);
+
             // We need to find another harvest block
             _harvestBlock = null;
             return false;
         }
         return true;
-    }
-
-    /** @return True to keep processing. */
-    private boolean updateBreak()
-    {
-        // we have 10 stages
-        ++this._breakingProgress;
-        int i = (int)((float)this._breakingProgress / _breakTotalNeeded * 10.0F);
-
-        if (i != this._previousBreakProgress)
-        {
-            getEntity().worldObj.sendBlockBreakProgress(getEntity().getEntityId(), _harvestBlock, i);
-            this._previousBreakProgress = i;
-        }
-
-        return (this._breakingProgress < _breakTotalNeeded);
     }
 
     // Place for subclass to inject logic
@@ -179,14 +165,9 @@ public abstract class TaskHarvest extends TaskAcquireBase
     private Queue<BlockPos> _harvestList;
     private BlockPos _harvestBlock;
 
-    private int _breakTotalNeeded;
-    private int _breakingProgress;
-    private int _previousBreakProgress;
+    // Animating breaking
     private boolean _isBreaking;
-
-    // How long to break a 1.0 hardness thing in ticks
-//    private final int BASE_BREAK_TIME = 40;
-    private final int BASE_BREAK_TIME = 20;
+    private BlockBreaker _breaker;
 
     private static final Logger LOGGER = LogManager.getLogger();
 

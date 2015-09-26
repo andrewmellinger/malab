@@ -7,7 +7,8 @@ import com.crashbox.vassal.common.ItemStackMatcher;
  */
 public class MessageItemRequest extends  Message
 {
-    public MessageItemRequest(IMessager sender, IMessager receiver, Object transactionID, ItemStackMatcher matcher, int quantity)
+    public MessageItemRequest(IMessager sender, IMessager receiver, Object transactionID,
+                              ItemStackMatcher matcher, int quantity)
     {
         super(sender, receiver, transactionID, 0);
         _matcher = matcher;
