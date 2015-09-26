@@ -444,8 +444,9 @@ public class TileEntityBeaconChest extends TileEntityBeaconInventory implements 
                                 msg.getSender(), msg.getTransactionID(), 0, request.getMatcher(),
                                 request.getQuantity());
 
-                        LOGGER.debug("Chest advertising it has item");
+                        LOGGER.debug("Chest advertising it has item: " + ((MessageItemRequest) msg).getMatcher());
                         Broadcaster.postMessage(req);
+                        return;
                     }
                 }
             }

@@ -33,8 +33,9 @@ public class StairBuilder
         _center = center;
         _radius = radius;
         _landing = findLanding(world, center, radius);
+        _dir = VassalUtils.findClockwiseDir(_center, _landing);
         _digCorner = getDigCorner();
-        _slabList = makeSlabList();
+        _slabList = makeSlabList(_dir);
     }
 
     // NOTE:  We are ONLY working below y
@@ -71,8 +72,9 @@ public class StairBuilder
      */
     public BlockPos findFirstQuarryable(ItemStackMatcher matcher, ItemTool tool)
     {
+        LOGGER.debug(this);
         //LOGGER.debug("findFirstQuarrayble: " + matcher);
-        SlabTraverser traverser = new SlabTraverser(_center.down(), _digCorner, _radius);
+        SlabTraverser traverser = new SlabTraverser(_center.down(), _digCorner, _radius, _dir);
         for (BlockPos pos : traverser)
         {
             // Should we skip it?
@@ -163,9 +165,8 @@ public class StairBuilder
         return VassalUtils.nextCornerClockwise(center, corner);
     }
 
-    private List<ProtoBlock> makeSlabList()
+    private List<ProtoBlock> makeSlabList(VassalUtils.COMPASS dir)
     {
-        VassalUtils.COMPASS dir = VassalUtils.findClockwiseDir(_center, _landing);
         LOGGER.debug("From landing stairs go: " + dir + " landing: "+ _landing);
         List<ProtoBlock> result = new ArrayList<ProtoBlock>();
 
@@ -237,11 +238,27 @@ public class StairBuilder
             LOGGER.debug("+++++++>>>>>>>>>>" +proto.getPos());
     }
 
+
+    @Override
+    public String toString()
+    {
+        return "StairBuilder{" +
+                "_center=" + _center +
+                ", _radius=" + _radius +
+                ", _landing=" + _landing +
+                ", _digCorner=" + _digCorner +
+                ", _slabList=" + _slabList +
+                ", _nextStair=" + _nextStair +
+                ", _nextState=" + _nextState +
+                '}';
+    }
+
     private World _world;
     private BlockPos _center;
     private int _radius;
     private BlockPos _landing;
     private BlockPos _digCorner;
+    private VassalUtils.COMPASS _dir;
 
     private List<ProtoBlock> _slabList = new ArrayList<ProtoBlock>();
 

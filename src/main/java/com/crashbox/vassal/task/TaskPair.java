@@ -263,15 +263,6 @@ public class TaskPair implements ITask
     }
 
     /**
-     * @return All the tasks in an order easy to iterate.
-     */
-    @Deprecated
-    public TaskBase[] asList()
-    {
-        return new TaskBase[] { _acquireTask, _deliverTask };
-    }
-
-    /**
      * @return True if entity is done collecting.
      */
     private boolean acquiredEnough()
@@ -315,11 +306,11 @@ public class TaskPair implements ITask
         BlockPos pos = _entityAI.getPos();
 
         List<TRAcquireBase> acquires = MessageUtils.extractMessages(this, responses, TRAcquireBase.class);
-        //debugLog("Have (" + acquires.size() + ") acquires ");
+        LOGGER.debug("Have (" + acquires.size() + ") acquires ");
         if (acquires.size() > 0)
         {
             TRAcquireBase best = findBest(pos, acquires);
-            //debugLog("Best acquire: " + best);
+            LOGGER.debug("Best acquire: " + best);
             if (VassalUtils.isNotNull(best, LOGGER))
             {
                 setAcquireTask(EntityAIVassal.TASK_FACTORY.makeTaskFromMessage(_entityAI, best));
@@ -336,7 +327,8 @@ public class TaskPair implements ITask
 
         for (T msg : responses)
         {
-            int value = Priority.computeDistanceCost(pos, msg.getSender().getPos()) + msg.getValue();
+            int value = msg.getValue() - Priority.computeDistanceCost(pos, msg.getSender().getPos());
+            LOGGER.debug("Task: " + this + " distance cost: " + value + " msg: " + msg);
             if (value > bestValue)
             {
                 bestValue = value;
@@ -345,9 +337,6 @@ public class TaskPair implements ITask
         }
         return best;
     }
-
-
-
 
     @Override
     public String toString()

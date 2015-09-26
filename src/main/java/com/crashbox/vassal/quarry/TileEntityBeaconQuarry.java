@@ -33,8 +33,7 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
         if (worldIn != null && !worldIn.isRemote)
         {
             _quarry = new Quarry(worldIn);
-        }
-        else
+        } else
         {
             if (_quarry != null)
                 _quarry.terminate();
@@ -85,21 +84,32 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
         @Override
         protected void handleMessage(Message msg)
         {
-//            if (msg instanceof MessageItemRequest)
-//            {
-//                handleItemRequest((MessageItemRequest) msg);
-//            }
+            if (msg instanceof MessageItemRequest)
+            {
+                handleItemRequest((MessageItemRequest) msg);
+            }
             if (msg instanceof MessageWorkerAvailability && timeForAvailabilityResponse())
             {
                 debugLog("Handling worker availability.");
-                handleWorkerAvailability((MessageWorkerAvailability)msg);
+                handleWorkerAvailability((MessageWorkerAvailability) msg);
             }
         }
     }
 
     private void handleItemRequest(MessageItemRequest msg)
     {
-        debugLog("Asked for items." + msg);
+        // First, if we need stairs, send a stairs event
+        StairBuilder builder = new StairBuilder(getWorld(), getPos(), _radius);
+
+        LOGGER.debug("Quarry: Got item request: " + msg.getMatcher());
+        ItemTool tool = getEntityPickaxe(msg);
+        if (builder.findFirstQuarryable(msg.getMatcher(), tool) != null)
+        {
+            LOGGER.debug("Quarry: Found item.");
+            TRHarvest quarry = new TRHarvest(this, msg.getSender(), msg.getTransactionID(), 0,
+                    TaskQuarry.class, msg.getMatcher(), 1);
+            Broadcaster.postMessage(quarry);
+        }
     }
 
     private void handleWorkerAvailability(MessageWorkerAvailability msg)
@@ -116,14 +126,7 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
         }
 
         // If we have something that will drop, call him over
-        ItemTool tool = (ItemTool)Items.stone_pickaxe;
-        if (msg.getSender() instanceof EntityAIVassal)
-        {
-            Item item = ((EntityAIVassal)msg.getSender()).getEntity().getCurrentPickAxe().getItem();
-            if (item instanceof ItemTool)
-                tool = (ItemTool)item;
-        }
-
+        ItemTool tool = getEntityPickaxe(msg);
         if (builder.findFirstQuarryable(new AnyItemMatcher(), tool) != null)
         {
             TRHarvest quarry = new TRHarvest(this, msg.getSender(), msg.getTransactionID(), 0,
@@ -134,10 +137,10 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
 
         // If we are here we need a worker to move us down one.
         TRHarvestBlock harvest = new TRHarvestBlock(this, msg.getSender(), msg.getTransactionID(),
-                10, new ItemStackMatcher(VassalMain.BLOCK_BEACON_QUARRY), getPos());
+                20, new ItemStackMatcher(VassalMain.BLOCK_BEACON_QUARRY), getPos());
 
         TRPlaceBlock place = new TRPlaceBlock(this, msg.getSender(), msg.getTransactionID(),
-                10, getPos().down());
+                20, getPos().down());
 
         MessageTaskPairRequest pair = new MessageTaskPairRequest(this, msg.getSender(), msg.getTransactionID(),
                 false, harvest, place);
@@ -167,6 +170,19 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
 //
 //        return 10;
 //    }
+
+    private ItemTool getEntityPickaxe(Message msg)
+    {
+        ItemTool tool = (ItemTool) Items.stone_pickaxe;
+        if(msg.getSender()instanceof EntityAIVassal)
+
+        {
+            Item item = ((EntityAIVassal) msg.getSender()).getEntity().getCurrentPickAxe().getItem();
+            if (item instanceof ItemTool)
+                tool = (ItemTool) item;
+        }
+        return tool;
+    }
 
     private void debugLog(String msg)
     {

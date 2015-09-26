@@ -53,7 +53,11 @@ public class Priority
 
     public static int computeDistanceCost(BlockPos startPos, BlockPos endPos, double speed)
     {
-        return (int) (( Math.sqrt(startPos.distanceSq(endPos)) / speed ) / 40);
+        // 1 point for every 5 blocks for a normal zombie.  In the future we
+        // will compute seconds.
+        // 5 / .4 =  12.5 / 12.5 = 1
+        // 54 / .4 = 160 / 12.5 = 12.8
+        return (int) (( Math.sqrt(startPos.distanceSq(endPos)) / speed ) / 12.5D);
     }
 
     public static int computeDistanceCost(BlockPos startPos, BlockPos endPos)
