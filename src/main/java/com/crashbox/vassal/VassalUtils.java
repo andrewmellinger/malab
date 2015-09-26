@@ -26,6 +26,7 @@ import java.util.Queue;
  */
 public class VassalUtils
 {
+
     public static BlockPos findBlock(World world, BlockPos startPos, int range, Block blockType )
     {
         for ( int x = startPos.getX() - range; x < startPos.getX() + range; ++x)

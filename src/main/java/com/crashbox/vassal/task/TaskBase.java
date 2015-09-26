@@ -12,6 +12,8 @@ import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -21,6 +23,23 @@ import java.util.List;
  */
 public abstract class TaskBase
 {
+    public static TaskBase createTask(EntityAIVassal performer, MessageTaskRequest message)
+    {
+        Class<? extends TaskBase> clazz = message.getTaskClass();
+        try
+        {
+            Constructor<? extends TaskBase> ctor = clazz.getConstructor(EntityAIVassal.class,
+                    message.getClass());
+            return ctor.newInstance(performer, message);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            LOGGER.error("Failed to construct task from msg=" + message, e);
+            throw new IllegalArgumentException("Failed to construct task from msg=" + message, e);
+        }
+    }
+
     /**
      * Base class for all tasks.
      * @param performer The AI performing this task
