@@ -822,7 +822,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
                     if (matcher != null)
                     {
                         // Send a message back to this guy telling him that we could use more
-                        TRStore req = new TRStore(TileEntityBeaconFurnace.this,
+                        TRPutInInventory req = new TRPutInInventory(TileEntityBeaconFurnace.this,
                                 availability.getSender(), msg.getTransactionID(), value, getSmeltableItemMatcher(),
                                 getSmeltableQuantityWanted());
 
@@ -838,7 +838,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
                     ItemStackMatcher matcher = getFuelSamples();
                     if (matcher != null)
                     {
-                        TRStore req = new TRStore(TileEntityBeaconFurnace.this,
+                        TRPutInInventory req = new TRPutInInventory(TileEntityBeaconFurnace.this,
                                 msg.getSender(), msg.getTransactionID(),
                                 value, matcher, 8);
                         Broadcaster.postMessage(req);
@@ -895,7 +895,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
             {
                 int free = stack.getMaxStackSize() - stack.stackSize;
                 // Send a message back to this guy telling him that we could use more
-                TRStore req = new TRStore(TileEntityBeaconFurnace.this,
+                TRPutInInventory req = new TRPutInInventory(TileEntityBeaconFurnace.this,
                         msg.getSender(), msg.getTransactionID(), 0, msg.getMatcher(),
                         free);
 
@@ -910,7 +910,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
                 if (msg.getMatcher().matches(_itemStacks[i]))
                 {
                     int free = _itemStacks[i].getMaxStackSize() - _itemStacks[i].stackSize;
-                    TRStore req = new TRStore(TileEntityBeaconFurnace.this,
+                    TRPutInInventory req = new TRPutInInventory(TileEntityBeaconFurnace.this,
                             msg.getSender(), msg.getTransactionID(), 0, msg.getMatcher(),
                             free);
 

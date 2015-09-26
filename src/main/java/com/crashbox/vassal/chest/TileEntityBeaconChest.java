@@ -426,7 +426,7 @@ public class TileEntityBeaconChest extends TileEntityBeaconInventory implements 
 //                        TRStore req = new TRStore(TileEntityBeaconChest.this, request.getSender(),
 //                                msg.getTransactionID(), 0, new ItemStackMatcher(_itemStacks[slotNum]),
 //                                _itemStacks[slotNum].getMaxStackSize() - _itemStacks[slotNum].stackSize, slotNum);
-                        TRStore req = new TRStore(TileEntityBeaconChest.this, request.getSender(),
+                        TRPutInInventory req = new TRPutInInventory(TileEntityBeaconChest.this, request.getSender(),
                                 msg.getTransactionID(), 0, request.getMatcher(), 64);
 
                         LOGGER.debug("Posting: " + req);
@@ -441,7 +441,7 @@ public class TileEntityBeaconChest extends TileEntityBeaconInventory implements 
                 {
                     if (stack == null)
                     {
-                        TRStore req = new TRStore(TileEntityBeaconChest.this, request.getSender(),
+                        TRPutInInventory req = new TRPutInInventory(TileEntityBeaconChest.this, request.getSender(),
                                 msg.getTransactionID(), 0, request.getMatcher(), 64);
 
                         LOGGER.debug("Posting: " + req);

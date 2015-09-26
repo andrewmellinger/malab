@@ -17,7 +17,7 @@ import java.util.List;
  * <p/>
  * In this task we take the item(s) in our inventory to the target destination.
  */
-public class TaskStore extends TaskDeliverBase
+public class TaskPutInInventory extends TaskDeliverBase
 {
     @Override
     public UpdateResult executeAndIsDone()
@@ -39,7 +39,7 @@ public class TaskStore extends TaskDeliverBase
         return UpdateResult.DONE;
     }
 
-    public TaskStore(EntityAIVassal performer, TRStore message)
+    public TaskPutInInventory(EntityAIVassal performer, TRPutInInventory message)
     {
         super(performer, message.getSender(), message.getValue());
         _matcher = message.getMatcher();

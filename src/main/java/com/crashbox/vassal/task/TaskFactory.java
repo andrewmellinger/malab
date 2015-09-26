@@ -35,8 +35,8 @@ public class TaskFactory
     public TaskDeliverBase makeTaskFromMessage(EntityAIVassal performer, TRDeliverBase message)
     {
         Class<? extends TaskBase> taskClass = message.getTaskClass();
-        if (taskClass == TaskStore.class && message instanceof TRStore)
-            return new TaskStore(performer, (TRStore)message);
+        if (taskClass == TaskPutInInventory.class && message instanceof TRPutInInventory)
+            return new TaskPutInInventory(performer, (TRPutInInventory)message);
 
         if (taskClass == TaskPlantSapling.class && message instanceof TRPlantSapling)
             return new TaskPlantSapling(performer, (TRPlantSapling)message);
