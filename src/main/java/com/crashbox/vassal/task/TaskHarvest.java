@@ -55,6 +55,7 @@ public abstract class TaskHarvest extends TaskAcquireBase
     @Override
     public UpdateResult executeAndIsDone()
     {
+        debugLog(LOGGER, "executeAndDone");
         // If we are in the process of breaking, do that.
         if (_isBreaking)
         {
@@ -63,11 +64,11 @@ public abstract class TaskHarvest extends TaskAcquireBase
                 return UpdateResult.CONTINUE;
             }
 
-            //debugLog(LOGGER, "HarvestList: " + _harvestList);
             // Have we done enough.
             if (getEntity().isHeldInventoryFull() || getEntity().getHeldSize() >= _quantity)
                 return UpdateResult.DONE;
 
+            debugLog(LOGGER, "HarvestList: " + _harvestList);
             if (_harvestList == null || _harvestList.peek() == null)
             {
                 return UpdateResult.DONE;
@@ -116,7 +117,7 @@ public abstract class TaskHarvest extends TaskAcquireBase
         _isBreaking = true;
         _breakingProgress = 0;
         _previousBreakProgress = 0;
-        //debugLog(LOGGER, "Start breaking. Need: " + _breakTotalNeeded);
+        debugLog(LOGGER, "Start breaking. Need: " + _breakTotalNeeded);
     }
 
     /** @return True to continue harvesting */

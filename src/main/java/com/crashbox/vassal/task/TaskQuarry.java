@@ -28,7 +28,8 @@ public class TaskQuarry extends TaskHarvest
     protected Queue<BlockPos> findHarvestList(List<BlockPos> others)
     {
         Queue<BlockPos> list = new LinkedList<BlockPos>();
-        BlockPos pos = _builder.findFirstQuarryable(getMatcher(), (ItemTool) Items.stone_pickaxe);
+        //BlockPos pos = _builder.findFirstQuarryable(getMatcher(), (ItemTool) Items.stone_pickaxe);
+        BlockPos pos = _builder.findFirstQuarryable(getMatcher(), null);
         if (pos != null)
             list.add(pos);
         else

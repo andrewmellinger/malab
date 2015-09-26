@@ -72,25 +72,43 @@ public class StairBuilder
      */
     public BlockPos findFirstQuarryable(ItemStackMatcher matcher, ItemTool tool)
     {
+
         LOGGER.debug(this);
-        //LOGGER.debug("findFirstQuarrayble: " + matcher);
+        LOGGER.debug("findFirstQuarrayble: " + matcher);
         SlabTraverser traverser = new SlabTraverser(_center.down(), _digCorner, _radius, _dir);
         for (BlockPos pos : traverser)
         {
+            // Skip air blocks
+            if (_world.isAirBlock(pos))
+            {
+                LOGGER.debug("Skipping air block. pos=" + pos);
+                continue;
+            }
+
             // Should we skip it?
             if (isInExclusions(pos))
+            {
+                LOGGER.debug("Skipping in exclusions. pos=" + pos);
                 continue;
+            }
 
             //LOGGER.debug("Not in exclusion list: " + pos);
             // Can we break it?
-            if (!tool.canHarvestBlock(_world.getBlockState(pos).getBlock()))
+            if (tool != null && !tool.canHarvestBlock(_world.getBlockState(pos).getBlock()))
+            {
+                LOGGER.debug("Can't harvest block with tool=" + tool + ", pos=" + pos);
                 continue;
+            }
 
             // Will it give us what we want?
             if (!(matcher instanceof AnyItemMatcher) && !VassalUtils.willDrop(_world, pos, matcher))
+            {
+                LOGGER.debug("Skipping, donsn't match desired type. pos=" + pos);
                 continue;
+            }
 
             // We are go for launch!
+            LOGGER.debug("Found quarryable: " + pos);
             return pos;
         }
         return null;
@@ -237,7 +255,6 @@ public class StairBuilder
         for (ProtoBlock proto : _slabList)
             LOGGER.debug("+++++++>>>>>>>>>>" +proto.getPos());
     }
-
 
     @Override
     public String toString()

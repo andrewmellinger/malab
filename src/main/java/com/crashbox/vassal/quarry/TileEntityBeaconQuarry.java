@@ -102,7 +102,8 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
         StairBuilder builder = new StairBuilder(getWorld(), getPos(), _radius);
 
         LOGGER.debug("Quarry: Got item request: " + msg.getMatcher());
-        ItemTool tool = getEntityPickaxe(msg);
+//        ItemTool tool = getEntityPickaxe(msg);
+        ItemTool tool = null;
         if (builder.findFirstQuarryable(msg.getMatcher(), tool) != null)
         {
             LOGGER.debug("Quarry: Found item.");
@@ -126,7 +127,8 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
         }
 
         // If we have something that will drop, call him over
-        ItemTool tool = getEntityPickaxe(msg);
+//        ItemTool tool = getEntityPickaxe(msg);
+        ItemTool tool = null;
         if (builder.findFirstQuarryable(new AnyItemMatcher(), tool) != null)
         {
             TRHarvest quarry = new TRHarvest(this, msg.getSender(), msg.getTransactionID(), 0,

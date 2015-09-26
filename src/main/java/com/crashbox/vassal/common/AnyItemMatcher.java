@@ -12,4 +12,10 @@ public class AnyItemMatcher extends ItemStackMatcher
     {
         return true;
     }
+
+    @Override
+    public String toString()
+    {
+        return "AnyItemMatcher{}";
+    }
 }
