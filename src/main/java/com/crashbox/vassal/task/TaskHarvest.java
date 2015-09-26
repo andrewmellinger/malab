@@ -71,13 +71,7 @@ public abstract class TaskHarvest extends TaskAcquireBase
             if (getEntity().isHeldInventoryFull() || getEntity().getHeldSize() >= _quantity)
                 return UpdateResult.DONE;
 
-            //debugLog(LOGGER, "HarvestList: " + _harvestList);
-            if (_harvestList == null || _harvestList.peek() == null)
-            {
-                return UpdateResult.DONE;
-            }
-
-            // Keep going on this activity
+            // If we have another block, let's keep going
             _harvestBlock = _harvestList.poll();
             if (_harvestBlock == null)
                 return UpdateResult.DONE;
