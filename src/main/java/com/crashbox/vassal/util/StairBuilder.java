@@ -4,7 +4,6 @@ import com.crashbox.vassal.VassalUtils;
 import com.crashbox.vassal.common.AnyItemMatcher;
 import com.crashbox.vassal.common.ItemStackMatcher;
 import com.crashbox.vassal.entity.EntityVassal;
-import com.crashbox.vassal.entity.ToolSet;
 import net.minecraft.block.BlockSlab;
 import net.minecraft.block.BlockStoneSlab;
 import net.minecraft.block.state.IBlockState;
