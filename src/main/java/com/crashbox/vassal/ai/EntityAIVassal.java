@@ -22,8 +22,6 @@ import java.util.concurrent.LinkedTransferQueue;
  */
 public class EntityAIVassal extends EntityAIBase implements IMessager
 {
-    public static TaskFactory TASK_FACTORY = new TaskFactory();
-
     public EntityAIVassal(EntityVassal entity)
     {
         this._entity = entity;
@@ -204,12 +202,12 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         TaskPair pair = new TaskPair(this);
         if (message instanceof TRAcquireBase)
         {
-            TaskAcquireBase task = TASK_FACTORY.makeTaskFromMessage(this, (TRAcquireBase) message);
+            TaskAcquireBase task = (TaskAcquireBase)TaskBase.createTask(this, message);
             pair.setAcquireTask(task);
         }
         else if (message instanceof TRDeliverBase)
         {
-            TaskDeliverBase task = TASK_FACTORY.makeTaskFromMessage(this, (TRDeliverBase) message);
+            TaskDeliverBase task = (TaskDeliverBase)TaskBase.createTask(this, message);
             pair.setDeliverTask(task);
         }
         else
@@ -224,10 +222,10 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
     {
         TaskPair pair = new TaskPair(this);
 
-        TaskAcquireBase taskAcquire = TASK_FACTORY.makeTaskFromMessage(this, message.getAcquireRequest());
+        TaskAcquireBase taskAcquire = (TaskAcquireBase)TaskBase.createTask(this, message.getAcquireRequest());
         pair.setAcquireTask(taskAcquire);
 
-        TaskDeliverBase taskDeliver= TASK_FACTORY.makeTaskFromMessage(this, message.getDeliverRequest());
+        TaskDeliverBase taskDeliver= (TaskDeliverBase)TaskBase.createTask(this, message.getDeliverRequest());
         pair.setDeliverTask(taskDeliver);
 
         // Should we repeat?

@@ -292,7 +292,7 @@ public class TaskPair implements ITask
         TRDeliverBase best = findBest(pos, delivers);
         if (VassalUtils.isNotNull(best, LOGGER))
         {
-            setDeliverTask(EntityAIVassal.TASK_FACTORY.makeTaskFromMessage(_entityAI, best));
+            setDeliverTask((TaskDeliverBase)TaskBase.createTask(_entityAI, best));
 
             return true;
         }
@@ -313,7 +313,7 @@ public class TaskPair implements ITask
             //LOGGER.debug("Best acquire: " + best);
             if (VassalUtils.isNotNull(best, LOGGER))
             {
-                setAcquireTask(EntityAIVassal.TASK_FACTORY.makeTaskFromMessage(_entityAI, best));
+                setAcquireTask((TaskAcquireBase)TaskBase.createTask(_entityAI, best));
                 return true;
             }
         }
