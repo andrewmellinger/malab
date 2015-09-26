@@ -11,9 +11,9 @@ import net.minecraft.item.ItemStack;
  */
 public class TRMakeBigStair extends TRDeliverBase
 {
-    public TRMakeBigStair(IMessager sender, IMessager receiver, Object transactionID, int value)
+    public TRMakeBigStair(IMessager sender, IMessager receiver, Object transactionID, int value, int quantity)
     {
         super(sender, receiver, transactionID, value, TaskMakeBigStair.class,
-                new ItemStackMatcher( Blocks.cobblestone), 2);
+                new ItemStackMatcher( Blocks.cobblestone), quantity);
     }
 }

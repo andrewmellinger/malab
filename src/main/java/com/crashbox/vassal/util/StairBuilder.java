@@ -38,6 +38,20 @@ public class StairBuilder
         _slabList = makeSlabList(_dir);
     }
 
+    public int getNeededStairCount()
+    {
+        int count = 0;
+        for (ProtoBlock proto : _slabList)
+        {
+            if (!_world.getBlockState(proto.getPos()).equals(proto.getState()))
+            {
+                count += 1;
+            }
+        }
+
+        return count;
+    }
+
     // NOTE:  We are ONLY working below y
     public boolean findNextStair()
     {
@@ -54,7 +68,7 @@ public class StairBuilder
         return false;
     }
 
-    public BlockPos getStair()
+    public BlockPos getStairPos()
     {
         return _nextStair;
     }

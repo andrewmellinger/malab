@@ -55,7 +55,7 @@ public abstract class TaskHarvest extends TaskAcquireBase
     @Override
     public UpdateResult executeAndIsDone()
     {
-        debugLog(LOGGER, "executeAndDone");
+        //debugLog(LOGGER, "executeAndDone");
         // If we are in the process of breaking, do that.
         if (_isBreaking)
         {
@@ -68,7 +68,7 @@ public abstract class TaskHarvest extends TaskAcquireBase
             if (getEntity().isHeldInventoryFull() || getEntity().getHeldSize() >= _quantity)
                 return UpdateResult.DONE;
 
-            debugLog(LOGGER, "HarvestList: " + _harvestList);
+            //debugLog(LOGGER, "HarvestList: " + _harvestList);
             if (_harvestList == null || _harvestList.peek() == null)
             {
                 return UpdateResult.DONE;

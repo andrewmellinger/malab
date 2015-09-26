@@ -6,6 +6,7 @@ import com.crashbox.vassal.common.ItemStackMatcher;
 import com.crashbox.vassal.messaging.TRMakeBigStair;
 import com.crashbox.vassal.task.ITask.UpdateResult;
 import com.crashbox.vassal.util.StairBuilder;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import org.apache.logging.log4j.LogManager;
@@ -24,7 +25,7 @@ public class TaskMakeBigStair extends TaskDeliverBase
         _matcher = message.getMatcher();
 
         // TODO: Make sure we have slab or cobblestone
-        _quantity = 1;
+        _quantity = message.getQuantity();
         _builder = new StairBuilder(getWorld(), getRequester().getPos(), getRequester().getRadius());
     }
 
@@ -38,18 +39,24 @@ public class TaskMakeBigStair extends TaskDeliverBase
         debugLog(LOGGER, "Found stair block candidate.");
 
         // We need to build a stair.
-        return _builder.getStair();
+        return _builder.getStairPos();
     }
 
     @Override
     public UpdateResult executeAndIsDone()
     {
         // TODO:  Add break animation
+
+        // Check to make sure it isn't stair.  Someone else may have already done this...
+        IBlockState state = getWorld().getBlockState(_builder.getStairPos());
+        if (state == _builder.getStairState())
+            return UpdateResult.RETARGET;
+
         // If something is there, then break it.
-        VassalUtils.harvestBlockIntoHeld(getWorld(), getPerformer().getEntity(), _builder.getStair(),
+        VassalUtils.harvestBlockIntoHeld(getWorld(), getPerformer().getEntity(), _builder.getStairPos(),
                 ItemStackMatcher.getQuarryMatcher());
 
-        if (getWorld().isAirBlock(_builder.getStair()))
+        if (getWorld().isAirBlock(_builder.getStairPos()))
         {
             // Place the block, and retarget
             debugLog(LOGGER, "place and retarget");
@@ -67,7 +74,7 @@ public class TaskMakeBigStair extends TaskDeliverBase
     public void placeStairBlock()
     {
         // Make sure the block is air
-        if (!getWorld().isAirBlock(_builder.getStair()))
+        if (!getWorld().isAirBlock(_builder.getStairPos()))
             return;
 
         ItemStack held = getEntity().getHeldItem();
@@ -80,7 +87,7 @@ public class TaskMakeBigStair extends TaskDeliverBase
         if (held.stackSize == 0)
             getEntity().setCurrentItemOrArmor(0, null);
 
-        getWorld().setBlockState(_builder.getStair(), _builder.getStairState());
+        getWorld().setBlockState(_builder.getStairPos(), _builder.getStairState());
     }
 
 

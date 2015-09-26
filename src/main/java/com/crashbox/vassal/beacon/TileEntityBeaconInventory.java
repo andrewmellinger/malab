@@ -26,15 +26,15 @@ public abstract class TileEntityBeaconInventory extends TileEntityLockable imple
     {
         // First try to fill loaded slots, then go back
         // and put rest into empty.
-        LOGGER.debug("mergeIntoBestSlot: stack=" + stack);
+        //LOGGER.debug("mergeIntoBestSlot: stack=" + stack);
 
         int firstEmpty = -1;
         for (int i : getInputSlots())
         {
-            LOGGER.debug("-> checking slot:" + i);
+            //LOGGER.debug("-> checking slot:" + i);
             if (isItemValidForSlot(i, stack))
             {
-                LOGGER.debug("---> item valid");
+                //LOGGER.debug("---> item valid");
                 ItemStack current = getStackInSlot(i);
                 if ( current == null)
                 {
@@ -52,10 +52,10 @@ public abstract class TileEntityBeaconInventory extends TileEntityLockable imple
                     }
                 }
             }
-            else
-            {
-                LOGGER.debug("---> item NOT valid");
-            }
+//            else
+//            {
+//                LOGGER.debug("---> item NOT valid");
+//            }
         }
 
         if (firstEmpty != -1)
@@ -74,7 +74,7 @@ public abstract class TileEntityBeaconInventory extends TileEntityLockable imple
         for (int i : getOutputSlots())
         {
             ItemStack stack = getStackInSlot(i);
-            LOGGER.debug("extractItems: slot=" + i + ", stack=" + stack);
+            //LOGGER.debug("extractItems: slot=" + i + ", stack=" + stack);
             if (matcher.matches(stack))
             {
                 if (returnStack == null)

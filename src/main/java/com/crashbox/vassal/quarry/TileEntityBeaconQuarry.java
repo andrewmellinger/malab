@@ -6,7 +6,6 @@ import com.crashbox.vassal.beacon.BeaconBase;
 import com.crashbox.vassal.common.AnyItemMatcher;
 import com.crashbox.vassal.common.ItemStackMatcher;
 import com.crashbox.vassal.messaging.*;
-import com.crashbox.vassal.task.TaskHarvest;
 import com.crashbox.vassal.task.TaskQuarry;
 import com.crashbox.vassal.util.StairBuilder;
 import net.minecraft.init.Items;
@@ -118,10 +117,14 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
         // First, if we need stairs, send a stairs event
         StairBuilder builder = new StairBuilder(getWorld(), getPos(), _radius);
 
-        if (builder.findNextStair())
+        // Set it up.
+        builder.findNextStair();
+
+        int stairsNeeded = builder.getNeededStairCount();
+        if (stairsNeeded > 0)
         {
             LOGGER.debug("Found  first stair.");
-            TRMakeBigStair makeStair = new TRMakeBigStair(this, msg.getSender(), msg.getTransactionID(), 10);
+            TRMakeBigStair makeStair = new TRMakeBigStair(this, msg.getSender(), msg.getTransactionID(), 10, stairsNeeded);
             Broadcaster.postMessage(makeStair);
             return;
         }

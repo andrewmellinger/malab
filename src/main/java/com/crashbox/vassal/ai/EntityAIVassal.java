@@ -22,6 +22,9 @@ import java.util.concurrent.LinkedTransferQueue;
  */
 public class EntityAIVassal extends EntityAIBase implements IMessager
 {
+    public static int TARGETING_DISTANCE = 16;
+
+
     public static TaskFactory TASK_FACTORY = new TaskFactory();
 
     public EntityAIVassal(EntityVassal entity)
@@ -29,6 +32,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         this._entity = entity;
         Broadcaster.getInstance().subscribe(new MyListener());
         _entity.setCustomNameTag(makeName());
+        _nextElicit = System.currentTimeMillis() + ELICIT_DELAY_MS;
     }
 
     public EntityVassal getEntity()
@@ -347,7 +351,6 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         }
     }
 
-
     //=============================================================================================
     // ##### ####   ###  #   #  ###  ##### ##### #####  ###  #   # ##### #   #  ####
     //   #   #   # #   # ##  # #       #     #     #   #   # ##  #   #   ##  # #
@@ -358,8 +361,8 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
     // In this function we transition to the target site. It might be far away.
     private State transition()
     {
-        // If within 20, then issue location request and to start targeting
-        if (posInAreaXY(getPos(), _currentTask.getWorkCenter(), 20))
+        // If within our distance, then issue location request and to start targeting
+        if (posInAreaXY(getPos(), _currentTask.getWorkCenter(), TARGETING_DISTANCE))
         {
             LOGGER.debug(id() + " Within distance, switching to targeting.");
             requestWorkAreas();
