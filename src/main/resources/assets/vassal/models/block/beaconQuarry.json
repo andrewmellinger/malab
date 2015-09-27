@@ -1,6 +1,12 @@
 {
-  "parent": "block/cube_all",
+  "parent": "block/cube",
   "textures": {
-    "all": "vassal:blocks/beaconQuarry"
+    "up": "vassal:blocks/beaconQuarry_top",
+    "down": "vassal:blocks/beaconQuarry_bottom",
+    "north": "vassal:blocks/beaconQuarry_side_NS",
+    "south": "vassal:blocks/beaconQuarry_side_NS",
+    "east": "vassal:blocks/beaconQuarry_side_EW",
+    "west": "vassal:blocks/beaconQuarry_side_EW",
+    "particle": "vassal:blocks/beaconQuarry_bottom"
   }
 }
