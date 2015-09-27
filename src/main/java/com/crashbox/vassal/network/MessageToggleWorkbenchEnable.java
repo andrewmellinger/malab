@@ -67,13 +67,11 @@ public class MessageToggleWorkbenchEnable implements IMessage
         {
             // or Minecraft.getMinecraft() on the client
             IThreadListener mainThread = (WorldServer) ctx.getServerHandler().playerEntity.worldObj;
-            VassalMain.LOGGER.debug("Scheduling task");
             mainThread.addScheduledTask(new Runnable()
             {
                 @Override
                 public void run()
                 {
-                    VassalMain.LOGGER.debug("Running callback.");
                     World world = DimensionManager.getWorld(message.getWorldID());
                     TileEntity entity = world.getTileEntity(message.getPos());
                     if (entity instanceof TileEntityBeaconWorkbench)

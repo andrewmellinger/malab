@@ -66,7 +66,7 @@ public class GuiBeaconWorkbench extends GuiContainer
         // Draw enabled thing
         if (_tileWorkbench.getEnabled())
         {
-            drawTexturedModalRect(marginHorizontal + 120, marginVertical + 10,  // dst x, y
+            drawTexturedModalRect(marginHorizontal + 120, marginVertical + 16,  // dst x, y
                     176, 16,                                                    // src x, y
                     16, 16);                                                    // width, height
         }
@@ -91,11 +91,9 @@ public class GuiBeaconWorkbench extends GuiContainer
         int y = mouseY - marginVertical;
 
         if (120 <= x && x <= 136 &&
-              10 <= y && y <= 26 &&
+              16 <= y && y <= 32 &&
                 mouseButton == 0)
         {
-            LOGGER.debug("Toggle enable");
-
             // Send a packet to the server toggling enabled
             MessageToggleWorkbenchEnable enable = new MessageToggleWorkbenchEnable();
             enable.setWorldID(_tileWorkbench.getWorld().provider.getDimensionId());
