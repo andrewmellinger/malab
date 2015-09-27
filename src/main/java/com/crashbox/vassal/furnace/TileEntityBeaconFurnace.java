@@ -497,7 +497,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
                     {
                         _accumulatedItemSmeltTicks = 0;
                         _totalItemSmeltTicks = timeToBurnOneItem(_itemStacks[0]);
-                        //LOGGER.debug("update: _totalItemSmeltTicks: " + _totalItemSmeltTicks);
+                        //LOGGER.debug("isStillBreaking: _totalItemSmeltTicks: " + _totalItemSmeltTicks);
                         smeltItem();
                         dirtyFlag = true;
                     }

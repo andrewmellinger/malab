@@ -5,6 +5,7 @@ import com.crashbox.vassal.ai.EntityAIVassal;
 import com.crashbox.vassal.common.ItemStackMatcher;
 import com.crashbox.vassal.messaging.TRMakeBigStair;
 import com.crashbox.vassal.task.ITask.UpdateResult;
+import com.crashbox.vassal.util.BlockBreaker;
 import com.crashbox.vassal.util.StairBuilder;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
@@ -46,11 +47,22 @@ public class TaskMakeBigStair extends TaskDeliverBase
     public UpdateResult executeAndIsDone()
     {
         // TODO:  Add break animation
+        if (_breaker == null)
+        {
+            // Check to make sure it isn't stair.  Someone else may have already done this...
+            IBlockState state = getWorld().getBlockState(_builder.getStairPos());
+            if (state == _builder.getStairState())
+                return UpdateResult.RETARGET;
 
-        // Check to make sure it isn't stair.  Someone else may have already done this...
-        IBlockState state = getWorld().getBlockState(_builder.getStairPos());
-        if (state == _builder.getStairState())
-            return UpdateResult.RETARGET;
+            _breaker = new BlockBreaker(getWorld(), getEntity(), _builder.getStairPos());
+            return UpdateResult.CONTINUE;
+        }
+
+        if (_breaker.isStillBreaking())
+            return UpdateResult.CONTINUE;
+
+        // We are done breaking.
+        _breaker = null;
 
         // If something is there, then break it.
         VassalUtils.harvestBlockIntoHeld(getWorld(), getPerformer().getEntity(), _builder.getStairPos(),
@@ -61,10 +73,9 @@ public class TaskMakeBigStair extends TaskDeliverBase
             // Place the block, and retarget
             debugLog(LOGGER, "place and retarget");
             placeStairBlock();
-            return UpdateResult.RETARGET;
         }
 
-        // If we have more inventory, let's try to do this again
+        // If we have more inventory, let's try to do this again.  GetWorkTarger will return null if no more spaces.
         if (getEntity().getHeldSize() == 0)
             return UpdateResult.DONE;
 
@@ -93,5 +104,6 @@ public class TaskMakeBigStair extends TaskDeliverBase
 
     // If these are different we needed to harvest something else
     private final StairBuilder _builder;
+    private BlockBreaker _breaker;
 
     private static final Logger LOGGER = LogManager.getLogger();}

@@ -139,45 +139,6 @@ public abstract class TaskBase
     }
 
     //=============================================================================================
-
-    // Utility Methods
-
-    public static List<MessageTaskRequest> getAllForTask(List<MessageTaskRequest> responses, TaskBase task)
-    {
-        List<MessageTaskRequest> result = new ArrayList<MessageTaskRequest>();
-
-        Iterator<MessageTaskRequest> iterator = responses.iterator();
-        while (iterator.hasNext())
-        {
-            MessageTaskRequest msg =  iterator.next();
-            if (msg.getTransactionID() == task)
-            {
-                iterator.remove();
-                result.add(msg);
-            }
-        }
-
-        return result;
-    }
-
-    public static MessageTaskRequest findBestResponseOption(TaskBase task, List<MessageTaskRequest> messages)
-    {
-        int bestValue = Integer.MIN_VALUE;
-        MessageTaskRequest bestTask = null;
-
-        for (MessageTaskRequest request : messages)
-        {
-            int value = request.getValue() - Priority.computeDistanceCost(request.getSender().getPos(),
-                    task.getRequester().getPos());
-            if (value > bestValue)
-                bestTask = request;
-        }
-
-        return bestTask;
-    }
-
-
-    //=============================================================================================
     protected void setDone(boolean done)
     {
         _done = done;

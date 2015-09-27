@@ -2,13 +2,9 @@ package com.crashbox.vassal.task;
 
 import com.crashbox.vassal.VassalUtils;
 import com.crashbox.vassal.ai.EntityAIVassal;
-import com.crashbox.vassal.ai.RingedSearcher;
 import com.crashbox.vassal.messaging.TRHarvest;
 import com.crashbox.vassal.task.ITask.UpdateResult;
 import com.crashbox.vassal.util.BlockBreaker;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemTool;
 import net.minecraft.util.BlockPos;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -59,35 +55,35 @@ public abstract class TaskHarvest extends TaskAcquireBase
     public UpdateResult executeAndIsDone()
     {
         //debugLog(LOGGER, "executeAndDone");
-        // If we are in the process of breaking, do that.
-        if (_isBreaking)
+        if (_breaker == null)
         {
-            if (continueBreaking())
-            {
-                return UpdateResult.CONTINUE;
-            }
-
-            // Have we done enough.
-            if (getEntity().isHeldInventoryFull() || getEntity().getHeldSize() >= _quantity)
-                return UpdateResult.DONE;
-
-            // If we have another block, let's keep going
-            _harvestBlock = _harvestList.poll();
-            if (_harvestBlock == null)
-                return UpdateResult.DONE;
-
-            startBreaking();
+            _breaker = new BlockBreaker(getWorld(), getEntity(), _harvestBlock);
             return UpdateResult.CONTINUE;
         }
 
-        if (_harvestBlock == null)
-        {
-            debugLog(LOGGER, "Got to end of harvest executeAndIsDone with null harvestBlock...");
-            return UpdateResult.DONE;
-        }
+        if (_breaker.isStillBreaking())
+            return UpdateResult.CONTINUE;
 
-        // Otherwise start breaking
-        startBreaking();
+        // We are done breaking.
+        _breaker = null;
+
+        //debugLog(LOGGER, "Finished breaking, harvesting.");
+        VassalUtils.harvestBlockIntoHeld(getWorld(), getEntity(), _harvestBlock, getMatcher());
+        // This is kinda a hack...
+        onBlockBroken(_harvestBlock);
+        _harvestBlock = null;
+
+        // Have we done enough.
+        if (getEntity().isHeldInventoryFull() || getEntity().getHeldSize() >= _quantity)
+            return UpdateResult.DONE;
+
+        // If we have another block, let's keep going
+        _harvestBlock = _harvestList.poll();
+        if (_harvestBlock == null)
+            return UpdateResult.DONE;
+
+        // If we got here, let's start breaking again
+        _breaker = new BlockBreaker(getWorld(), getEntity(), _harvestBlock);
         return UpdateResult.CONTINUE;
     }
 
@@ -102,35 +98,9 @@ public abstract class TaskHarvest extends TaskAcquireBase
     // This adds the specific algorithm that find trees, or blocks of stone,or whatever
     protected abstract Queue<BlockPos> findHarvestList(List<BlockPos> others);
 
-
     private void startBreaking()
     {
         _breaker = new BlockBreaker(getWorld(), getEntity(), _harvestBlock);
-        _isBreaking = true;
-    }
-
-    /** @return True to continue harvesting */
-    private boolean continueBreaking()
-    {
-        if (_breaker != null)
-            _isBreaking = _breaker.update();
-        else
-            _isBreaking = false;
-
-        if (!_isBreaking)
-        {
-            _breaker = null;
-
-            //debugLog(LOGGER, "Finished breaking, harvesting.");
-            VassalUtils.harvestBlockIntoHeld(getWorld(), getEntity(), _harvestBlock, getMatcher());
-            // This is kinda a hack...
-            onBlockBroken(_harvestBlock);
-
-            // We need to find another harvest block
-            _harvestBlock = null;
-            return false;
-        }
-        return true;
     }
 
     // Place for subclass to inject logic
@@ -160,7 +130,6 @@ public abstract class TaskHarvest extends TaskAcquireBase
     private BlockPos _harvestBlock;
 
     // Animating breaking
-    private boolean _isBreaking;
     private BlockBreaker _breaker;
 
     private static final Logger LOGGER = LogManager.getLogger();

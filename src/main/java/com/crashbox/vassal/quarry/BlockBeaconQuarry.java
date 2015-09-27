@@ -32,6 +32,13 @@ public class BlockBeaconQuarry extends BlockContainer
         setTickRandomly(false);
         useNeighborBrightness = false;
 
+        // TOOD: Switch to iron, later.
+        setHarvestLevel("pickaxe", 1);
+
+        // We want to be a little harder so people to accidentally break them as much
+        setHardness(5.0F);
+        setResistance(45);
+
         LOGGER.info("constructed");
     }
 

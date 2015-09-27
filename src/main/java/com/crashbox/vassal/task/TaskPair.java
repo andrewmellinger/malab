@@ -137,7 +137,7 @@ public class TaskPair implements ITask
             if (task != null)
             {
                 // Five hundred millis for each block we need to walk. TODO:  Rework in entity speed.
-                delay += Priority.computeDistanceCost(pos, task.getWorkCenter()) * 500;
+                delay += Priority.computeDistanceCost(pos, task.getWorkCenter(), _entityAI.getEntity().getSpeed()) * 500;
                 pos = task.getWorkCenter();
                 // Add two seconds to break, pickup, place, etc.
                 delay += 2000;
@@ -327,7 +327,7 @@ public class TaskPair implements ITask
 
         for (T msg : responses)
         {
-            int value = msg.getValue() - Priority.computeDistanceCost(pos, msg.getSender().getPos());
+            int value = msg.getValue() - Priority.computeDistanceCost(pos, msg.getSender().getPos(), _entityAI.getEntity().getSpeed());
             LOGGER.debug("findBest: task=" + this + ", cost=" + value + ", msg=" + msg);
             if (value > bestValue)
             {
@@ -352,7 +352,7 @@ public class TaskPair implements ITask
 
 
     // Back reference to the entityAI.
-    private final EntityAIVassal _entityAI;
+    private final EntityAIVassal    _entityAI;
     private boolean                 _repeat;
 
     private Stage                   _stage = Stage.EMPTYING;

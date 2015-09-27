@@ -74,10 +74,10 @@ public class Priority
         return (int) (( Math.sqrt(startPos.distanceSq(endPos)) / speed ) / 12.5D);
     }
 
-    public static int computeDistanceCost(BlockPos startPos, BlockPos endPos)
-    {
-        return ( (int) Math.sqrt(startPos.distanceSq(endPos)) ) / 10;
-    }
+//    public static int computeDistanceCost(BlockPos startPos, BlockPos endPos)
+//    {
+//        return ( (int) Math.sqrt(startPos.distanceSq(endPos)) ) / 10;
+//    }
 
     private static final Logger LOGGER = LogManager.getLogger();
 }

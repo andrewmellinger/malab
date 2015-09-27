@@ -24,10 +24,14 @@ public class BlockBreaker
         // 4 = x * 1.5
         // 4/1.5 = x ~ 2.5
 
+        // If we don't find a tool stack, we don't use one.
         ItemStack toolStack = entity.findBestTool(pos);
         IBlockState state = world.getBlockState(pos);
 
-        float digSpeed = toolStack.getItem().getDigSpeed(toolStack, state);
+        float digSpeed = 1.0F;
+        if (toolStack != null)
+            digSpeed = toolStack.getItem().getDigSpeed(toolStack, state);
+
         float getHardness = state.getBlock().getBlockHardness(world, pos);
 
         return (BASE_BREAK_TIME * getHardness) / (digSpeed * entity.getWorkSpeedFactor()) ;
@@ -41,7 +45,7 @@ public class BlockBreaker
         _ticksNeeded = (int)(breakSeconds(world, entity, pos) * 20);
     }
 
-    public boolean update()
+    public boolean isStillBreaking()
     {
         // we have 10 stages
         ++_ticksDone;
