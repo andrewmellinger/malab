@@ -13,6 +13,8 @@ import com.crashbox.vassal.grenades.ItemDiggerGrenade;
 import com.crashbox.vassal.grenades.ItemMineshaftGrenade;
 import com.crashbox.vassal.quarry.BlockBeaconQuarry;
 import com.crashbox.vassal.quarry.TileEntityBeaconQuarry;
+import com.crashbox.vassal.workbench.BlockBeaconWorkbench;
+import com.crashbox.vassal.workbench.TileEntityBeaconWorkbench;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -120,6 +122,14 @@ public class VassalMain
     // PRIVATES
     private void preInitBlockAndItems()
     {
+        BLOCK_BEACON_CHEST = new BlockBeaconChest();
+        GameRegistry.registerBlock(BLOCK_BEACON_CHEST, BlockBeaconChest.NAME);
+        GameRegistry.registerTileEntity(TileEntityBeaconChest.class, TileEntityBeaconChest.NAME);
+
+        BLOCK_BEACON_FORESTER = new BlockBeaconForester();
+        GameRegistry.registerBlock(BLOCK_BEACON_FORESTER, BlockBeaconForester.NAME);
+        GameRegistry.registerTileEntity(TileEntityBeaconForester.class, TileEntityBeaconForester.NAME);
+
         BLOCK_BEACON_FURNACE = new BlockBeaconFurnace(false);
         GameRegistry.registerBlock(BLOCK_BEACON_FURNACE, BlockBeaconFurnace.NAME);
         GameRegistry.registerTileEntity(TileEntityBeaconFurnace.class, TileEntityBeaconFurnace.NAME);
@@ -128,21 +138,13 @@ public class VassalMain
         GameRegistry.registerBlock(BLOCK_BEACON_FURNACE_LIT, BlockBeaconFurnace.NAME_LIT);
         //GameRegistry.registerTileEntity(TileEntityBeaconFurnace.class, TileEntityBeaconFurnace.NAME);
 
-        BLOCK_BEACON_FORESTER = new BlockBeaconForester();
-        GameRegistry.registerBlock(BLOCK_BEACON_FORESTER, BlockBeaconForester.NAME);
-        GameRegistry.registerTileEntity(TileEntityBeaconForester.class, TileEntityBeaconForester.NAME);
-
-//        BLOCK_BEACON_WORKBENCH = new BlockBeaconWorkbench();
-//        GameRegistry.registerBlock(BLOCK_BEACON_WORKBENCH, BlockBeaconWorkbench.NAME);
-//        GameRegistry.registerTileEntity(TileEntityBeaconWorkbench.class, TileEntityBeaconWorkbench.NAME);
-
-        BLOCK_BEACON_CHEST = new BlockBeaconChest();
-        GameRegistry.registerBlock(BLOCK_BEACON_CHEST, BlockBeaconChest.NAME);
-        GameRegistry.registerTileEntity(TileEntityBeaconChest.class, TileEntityBeaconChest.NAME);
-
         BLOCK_BEACON_QUARRY = new BlockBeaconQuarry();
         GameRegistry.registerBlock(BLOCK_BEACON_QUARRY, BlockBeaconQuarry.NAME);
         GameRegistry.registerTileEntity(TileEntityBeaconQuarry.class, TileEntityBeaconQuarry.NAME);
+
+        BLOCK_BEACON_WORKBENCH = new BlockBeaconWorkbench();
+        GameRegistry.registerBlock(BLOCK_BEACON_WORKBENCH, BlockBeaconWorkbench.NAME);
+        GameRegistry.registerTileEntity(TileEntityBeaconWorkbench.class, TileEntityBeaconWorkbench.NAME);
 
         // ITEMS
 

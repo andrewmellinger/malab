@@ -49,6 +49,11 @@ public class ClientProxy extends CommonProxy
 
         // BLOCKS
         renderItem.getItemModelMesher().register(
+                Item.getItemFromBlock(VassalMain.BLOCK_BEACON_CHEST),
+                0,
+                new ModelResourceLocation(VassalMain.MODID + ":" + BlockBeaconChest.NAME, "inventory"));
+
+        renderItem.getItemModelMesher().register(
                 Item.getItemFromBlock(VassalMain.BLOCK_BEACON_FURNACE),
                 0,
                 new ModelResourceLocation(VassalMain.MODID + ":" + BlockBeaconFurnace.NAME, "inventory"));
@@ -59,19 +64,14 @@ public class ClientProxy extends CommonProxy
                 new ModelResourceLocation(VassalMain.MODID + ":" + BlockBeaconForester.NAME, "inventory"));
 
         renderItem.getItemModelMesher().register(
-                Item.getItemFromBlock(VassalMain.BLOCK_BEACON_WORKBENCH),
-                0,
-                new ModelResourceLocation(VassalMain.MODID + ":" + BlockBeaconWorkbench.NAME, "inventory"));
-
-        renderItem.getItemModelMesher().register(
-                Item.getItemFromBlock(VassalMain.BLOCK_BEACON_CHEST),
-                0,
-                new ModelResourceLocation(VassalMain.MODID + ":" + BlockBeaconChest.NAME, "inventory"));
-
-        renderItem.getItemModelMesher().register(
                 Item.getItemFromBlock(VassalMain.BLOCK_BEACON_QUARRY),
                 0,
                 new ModelResourceLocation(VassalMain.MODID + ":" + BlockBeaconQuarry.NAME, "inventory"));
+
+        renderItem.getItemModelMesher().register(
+                Item.getItemFromBlock(VassalMain.BLOCK_BEACON_WORKBENCH),
+                0,
+                new ModelResourceLocation(VassalMain.MODID + ":" + BlockBeaconWorkbench.NAME, "inventory"));
 
         // ITEMS
         renderItem.getItemModelMesher().register(VassalMain.ITEM_DIGGER_GRENADE, 0,
