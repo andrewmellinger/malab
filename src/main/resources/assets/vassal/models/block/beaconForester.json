@@ -6,6 +6,7 @@
     "north": "vassal:blocks/beaconForester_side_NS",
     "south": "vassal:blocks/beaconForester_side_NS",
     "east": "vassal:blocks/beaconForester_side_EW",
-    "west": "vassal:blocks/beaconForester_side_EW"
+    "west": "vassal:blocks/beaconForester_side_EW",
+    "particle": "vassal:blocks/beaconForester_bottom"
   }
 }
