@@ -1,5 +1,6 @@
 package com.crashbox.vassal.furnace;
 
+import com.crashbox.vassal.VassalUtils;
 import com.crashbox.vassal.common.SampleFuelSlot;
 import com.crashbox.vassal.common.SampleSlot;
 import net.minecraft.entity.player.EntityPlayer;
@@ -73,6 +74,9 @@ public class ContainerBeaconFurnace extends Container
     public void detectAndSendChanges()
     {
         super.detectAndSendChanges();
+
+//        LOGGER.debug("detectAndSendChanges!!");
+//        VassalUtils.showStack(LOGGER);
 
         // send updates to each crafter
         for (Object crafter : crafters)

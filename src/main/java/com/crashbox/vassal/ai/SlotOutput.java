@@ -10,15 +10,15 @@ import net.minecraft.util.MathHelper;
 /**
  * Copyright 2015 Andrew O. Mellinger
  */
-public class SlotOutputWood extends Slot
+public class SlotOutput extends Slot
 {
     /** The player that is using the GUI where this slot resides. */
     private final EntityPlayer thePlayer;
-    private int numGrinderOutput;
+    private int _numOutput;
 
-    public SlotOutputWood(EntityPlayer parPlayer,
-                             IInventory parIInventory, int parSlotIndex,
-                             int parXDisplayPosition, int parYDisplayPosition)
+    public SlotOutput(EntityPlayer parPlayer,
+                      IInventory parIInventory, int parSlotIndex,
+                      int parXDisplayPosition, int parYDisplayPosition)
     {
         super(parIInventory, parSlotIndex, parXDisplayPosition,
                 parYDisplayPosition);
@@ -36,7 +36,7 @@ public class SlotOutputWood extends Slot
     {
         if (getHasStack())
         {
-            numGrinderOutput += Math.min(parAmount, getStack().stackSize);
+            _numOutput += Math.min(parAmount, getStack().stackSize);
         }
 
         return super.decrStackSize(parAmount);
@@ -52,7 +52,7 @@ public class SlotOutputWood extends Slot
     @Override
     protected void onCrafting(ItemStack parItemStack, int parAmountGround)
     {
-        numGrinderOutput += parAmountGround;
+        _numOutput += parAmountGround;
         onCrafting(parItemStack);
     }
 
@@ -61,7 +61,7 @@ public class SlotOutputWood extends Slot
     {
         if (!thePlayer.worldObj.isRemote)
         {
-            int expEarned = numGrinderOutput;
+            int expEarned = _numOutput;
 //            float expFactor = GrinderRecipes.instance()
 //                    .getGrindingExperience(parItemStack);
             float expFactor = 1.0F;
@@ -98,7 +98,7 @@ public class SlotOutputWood extends Slot
             }
         }
 
-        numGrinderOutput = 0;
+        _numOutput = 0;
 
         // You can trigger achievements here based on output
         // E.g. if (parItemStack.getItem() == Items.grinded_fish)

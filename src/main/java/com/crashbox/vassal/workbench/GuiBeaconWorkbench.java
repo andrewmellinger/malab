@@ -37,7 +37,6 @@ public class GuiBeaconWorkbench extends GuiContainer
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
     {
-        // TODO: What is all this?
 //        LOGGER.debug("drawGuiContainerForegroundLayer");
 //        String s = _tileWorkbench.getDisplayName().getUnformattedText();
         String s = _tileWorkbench.getDisplayName().getUnformattedText();
@@ -59,38 +58,13 @@ public class GuiBeaconWorkbench extends GuiContainer
         mc.getTextureManager().bindTexture(grinderGuiTextures);
         int marginHorizontal = (width - xSize) / 2;
         int marginVertical = (height - ySize) / 2;
-        drawTexturedModalRect(marginHorizontal, marginVertical, 0, 0,
-                xSize, ySize);
+        drawTexturedModalRect(marginHorizontal, marginVertical, 0, 0, xSize, ySize);
 
-//        if(TileEntityBeaconWorkbench.isBurning(_tileWorkbench))
-//        {
-//            int tmp = this.updateBurnIndicator(13);
-//            this.drawTexturedModalRect(marginHorizontal + 56, marginVertical + 36 + 12 - tmp, 176, 12 - tmp, 14, tmp + 1);
-//        }
-
-//        // Draw progress indicator
-//        int progressLevel = getProgressLevel(24);
-//        drawTexturedModalRect(marginHorizontal + 79, marginVertical + 34,
-//                176, 14, progressLevel + 1, 16);
-    }
-
-    private int getProgressLevel(int progressIndicatorPixelWidth)
-    {
-        int totalSoFar = _tileWorkbench._accumulatedItemSmeltTicks;
-        int ticksPerItem = _tileWorkbench._totalItemSmeltTicks;
-        return ticksPerItem != 0 && totalSoFar != 0 ?
-                totalSoFar*progressIndicatorPixelWidth/ticksPerItem
-                : 0;
-    }
-
-    private int updateBurnIndicator(int burnRemain) {
-        int originalBurnTime = _tileWorkbench._originalFuelBurnTicks;
-        if(originalBurnTime == 0)
-        {
-            originalBurnTime = 200;
-        }
-
-        return _tileWorkbench._remainingFuelBurnTicks * burnRemain / originalBurnTime;
+        // Draw progress indicator
+        int progressLevel = (int) (_tileWorkbench.getProgressPercent() * 24F);
+        drawTexturedModalRect(marginHorizontal + 117, marginVertical + 34,   // dst x, y
+                176, 0,                                                      // src x, y
+                progressLevel + 1, 16);                                      // width, height
     }
 
     @Override

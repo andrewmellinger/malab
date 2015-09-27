@@ -339,7 +339,7 @@ public class VassalUtils
 
     public static enum COMPASS { EAST, SOUTH, WEST, NORTH }
 
-    public static void showStack()
+    public static void showStack(Logger logger)
     {
         try
         {
@@ -349,7 +349,7 @@ public class VassalUtils
         {
             for (StackTraceElement elem : e.getStackTrace())
             {
-                LOGGER.debug(elem);
+                logger.debug(elem);
             }
         }
     }

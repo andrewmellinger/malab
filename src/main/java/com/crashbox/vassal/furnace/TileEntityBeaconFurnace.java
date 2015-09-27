@@ -1,5 +1,6 @@
 package com.crashbox.vassal.furnace;
 
+import com.crashbox.vassal.VassalUtils;
 import com.crashbox.vassal.common.ItemStackMatcher;
 import com.crashbox.vassal.messaging.*;
 import com.crashbox.vassal.beacon.BeaconBase;
@@ -558,6 +559,11 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
     }
 
     //=============================================================================================
+    // ##### ##### #     ##### ##### #   # ##### ##### ##### #   # ####  #####  ###   ####  ###  #   # ##### #   # #   # ##### #   # #####  ###  ####  #   #
+    //   #     #   #     #     #     ##  #   #     #     #    # #  #   # #     #   # #     #   # ##  #   #   ##  # #   # #     ##  #   #   #   # #   #  # #
+    //   #     #   #     ####  ####  # # #   #     #     #     #   ##### ####  ##### #     #   # # # #   #   # # #  # #  ####  # # #   #   #   # ####    #
+    //   #     #   #     #     #     #  ##   #     #     #     #   #   # #     #   # #     #   # #  ##   #   #  ##  # #  #     #  ##   #   #   # #   #   #
+    //   #   ##### ##### ##### ##### #   #   #   #####   #     #   ####  ##### #   #  ####  ###  #   # ##### #   #   #   ##### #   #   #    ###  #   #   #
 
     @Override
     public int[] getOutputSlots()
