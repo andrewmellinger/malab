@@ -11,13 +11,13 @@ import com.crashbox.vassal.grenades.EntityDiggerGrenade;
 import com.crashbox.vassal.grenades.EntityMineshaftGrenade;
 import com.crashbox.vassal.grenades.ItemDiggerGrenade;
 import com.crashbox.vassal.grenades.ItemMineshaftGrenade;
+import com.crashbox.vassal.network.MessageToggleWorkbenchEnable;
 import com.crashbox.vassal.quarry.BlockBeaconQuarry;
 import com.crashbox.vassal.quarry.TileEntityBeaconQuarry;
 import com.crashbox.vassal.workbench.BlockBeaconWorkbench;
 import com.crashbox.vassal.workbench.TileEntityBeaconWorkbench;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.Mod;
@@ -28,8 +28,10 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.oredict.OreDictionary;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -59,6 +61,8 @@ public class VassalMain
     public static Item ITEM_DIGGER_GRENADE;
     public static Item ITEM_MINESHAFT_GRENADE;
 
+    public static SimpleNetworkWrapper NETWORK;
+
     // This allows us to us one gui handler for many things
     public static enum GUI_ENUM { VASSAL, FURNACE, WORKBENCH, CHEST }
 
@@ -76,6 +80,10 @@ public class VassalMain
     public void preInit(FMLPreInitializationEvent event)
     {
         preInitBlockAndItems();
+        VassalMain.NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel("vassal");
+        VassalMain.NETWORK.registerMessage(MessageToggleWorkbenchEnable.Handler.class,
+                MessageToggleWorkbenchEnable.class, 0, Side.SERVER );
+
         proxy.preInit(event);
     }
 
@@ -283,6 +291,6 @@ public class VassalMain
 
     private static int modEntityID;
 
-    private static final Logger LOGGER = LogManager.getLogger();
+    public static final Logger LOGGER = LogManager.getLogger();
 }
 

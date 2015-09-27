@@ -1,6 +1,7 @@
 package com.crashbox.vassal.workbench;
 
 import com.crashbox.vassal.VassalMain;
+import com.crashbox.vassal.network.MessageToggleWorkbenchEnable;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -94,8 +95,12 @@ public class GuiBeaconWorkbench extends GuiContainer
                 mouseButton == 0)
         {
             LOGGER.debug("Toggle enable");
-            _tileWorkbench.toggleEnabled();
-            // We need to send packes from client to server
+
+            // Send a packet to the server toggling enabled
+            MessageToggleWorkbenchEnable enable = new MessageToggleWorkbenchEnable();
+            enable.setWorldID(_tileWorkbench.getWorld().provider.getDimensionId());
+            enable.setPos(_tileWorkbench.getPos());
+            VassalMain.NETWORK.sendToServer(enable);
         }
     }
 

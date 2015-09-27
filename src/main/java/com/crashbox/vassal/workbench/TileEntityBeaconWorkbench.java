@@ -261,7 +261,6 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory //imple
             case 1:
                 return _ticksCrafted;
             case 2:
-                LOGGER.debug("Someone getting enabled field.");
                 return _enabled ? 1 : 0;
         }
         return 0;
@@ -279,7 +278,6 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory //imple
                 _ticksCrafted = value;
                 break;
             case 2:
-                LOGGER.debug("Someone setting enabled field.");
                 _enabled = value == 1;
                 break;
         }
@@ -376,16 +374,12 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory //imple
     public void update()
     {
         if (!_enabled)
-        {
-            //LOGGER.debug("Not enabled.");
             return;
-        }
 
         boolean wasCraftingFlag = isCrafting();
         boolean dirtyFlag = false;
         if (isCrafting())
         {
-            LOGGER.debug(".");
             ++_ticksCrafted;
             dirtyFlag = true;
         }
@@ -395,7 +389,6 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory //imple
             // Make sure we are still in a valid crafting configuration
             if (!canCraft())
             {
-                _enabled = false;
                 _ticksCrafted = 0;
                 _ticksToCraft = 0;
                 dirtyFlag = wasCraftingFlag;
@@ -424,10 +417,6 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory //imple
 
                     // We are always dirty because we have to update progress
                     dirtyFlag = true;
-                }
-                else
-                {
-                    _enabled = false;
                 }
             }
         }
