@@ -10,6 +10,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
+
 /**
  * Copyright 2015 Andrew O. Mellinger
  */
@@ -31,7 +33,7 @@ public class GuiBeaconWorkbench extends GuiContainer
         _inventoryPlayer = parInventoryPlayer;
         _tileWorkbench = workbench;
 
-        LOGGER.debug( "Constructed: " + this);
+        LOGGER.debug("Constructed: " + this);
     }
 
     @Override
@@ -60,11 +62,41 @@ public class GuiBeaconWorkbench extends GuiContainer
         int marginVertical = (height - ySize) / 2;
         drawTexturedModalRect(marginHorizontal, marginVertical, 0, 0, xSize, ySize);
 
+        // Draw enabled thing
+        if (_tileWorkbench.getEnabled())
+        {
+            drawTexturedModalRect(marginHorizontal + 120, marginVertical + 10,  // dst x, y
+                    176, 16,                                                    // src x, y
+                    16, 16);                                                    // width, height
+        }
+
         // Draw progress indicator
         int progressLevel = (int) (_tileWorkbench.getProgressPercent() * 24F);
         drawTexturedModalRect(marginHorizontal + 117, marginVertical + 34,   // dst x, y
                 176, 0,                                                      // src x, y
                 progressLevel + 1, 16);                                      // width, height
+    }
+
+
+    @Override
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
+    {
+
+        super.mouseClicked(mouseX, mouseY, mouseButton);
+        int marginHorizontal = (width - xSize) / 2;
+        int marginVertical = (height - ySize) / 2;
+
+        int x = mouseX - marginHorizontal;
+        int y = mouseY - marginVertical;
+
+        if (120 <= x && x <= 136 &&
+              10 <= y && y <= 26 &&
+                mouseButton == 0)
+        {
+            LOGGER.debug("Toggle enable");
+            _tileWorkbench.toggleEnabled();
+            // We need to send packes from client to server
+        }
     }
 
     @Override

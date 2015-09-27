@@ -85,6 +85,7 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory //imple
 
         _ticksToCraft = compound.getShort(NBT_TICKS_TO_CRAFT);
         _ticksCrafted = compound.getShort(NBT_TICKS_CRAFTED);
+        setEnabled(compound.getBoolean(NBT_ENABLED));
 
         if (compound.hasKey(NBT_CUSTOM_NAME, 8))
         {
@@ -99,6 +100,7 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory //imple
         super.writeToNBT(compound);
         compound.setShort(NBT_TICKS_TO_CRAFT, (short) _ticksToCraft);
         compound.setShort(NBT_TICKS_CRAFTED, (short) _ticksCrafted);
+        compound.setBoolean(NBT_ENABLED, _enabled);
         NBTTagList nbtItemList = new NBTTagList();
 
         for (int i = 0; i < _craftingMatrix.getSizeInventory(); ++i)
@@ -258,6 +260,9 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory //imple
                 return _ticksToCraft;
             case 1:
                 return _ticksCrafted;
+            case 2:
+                LOGGER.debug("Someone getting enabled field.");
+                return _enabled ? 1 : 0;
         }
         return 0;
     }
@@ -273,13 +278,17 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory //imple
             case 1:
                 _ticksCrafted = value;
                 break;
+            case 2:
+                LOGGER.debug("Someone setting enabled field.");
+                _enabled = value == 1;
+                break;
         }
     }
 
     @Override
     public int getFieldCount()
     {
-        return 2;
+        return 3;
     }
 
     @Override
@@ -366,10 +375,17 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory //imple
     @Override
     public void update()
     {
+        if (!_enabled)
+        {
+            //LOGGER.debug("Not enabled.");
+            return;
+        }
+
         boolean wasCraftingFlag = isCrafting();
         boolean dirtyFlag = false;
         if (isCrafting())
         {
+            LOGGER.debug(".");
             ++_ticksCrafted;
             dirtyFlag = true;
         }
@@ -379,6 +395,7 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory //imple
             // Make sure we are still in a valid crafting configuration
             if (!canCraft())
             {
+                _enabled = false;
                 _ticksCrafted = 0;
                 _ticksToCraft = 0;
                 dirtyFlag = wasCraftingFlag;
@@ -408,6 +425,10 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory //imple
                     // We are always dirty because we have to update progress
                     dirtyFlag = true;
                 }
+                else
+                {
+                    _enabled = false;
+                }
             }
         }
 
@@ -420,6 +441,28 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory //imple
     //=============================================================================================
     // Custom
     //=============================================================================================
+
+    public boolean getEnabled()
+    {
+        return _enabled;
+    }
+
+    public void setEnabled(boolean enabled)
+    {
+        if (!enabled && _enabled)
+        {
+            // Disable everything
+            _ticksCrafted = 0;
+            _ticksToCraft = 0;
+        }
+        _enabled = enabled;
+        markDirty();
+    }
+
+    public void toggleEnabled()
+    {
+        setEnabled(!_enabled);
+    }
 
     public InventoryBeaconWorkbench makeInventory(Container container)
     {
@@ -613,17 +656,16 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory //imple
     // State Tracker
     private int _ticksToCraft;
     private int _ticksCrafted;
+    private boolean _enabled = false;
 
     private String _customName;
-
-    public static final int FIELD_TICKS_TO_CRAFT = 0;
-    public static final int FIELD_TICK_CRAFTED = 1;
 
     private static final String NBT_ITEMS = "Items";
     private static final String NBT_SLOT = "Slot";
     private static final String NBT_CUSTOM_NAME = "CustomName";
     private static final String NBT_TICKS_TO_CRAFT = "ticksToCraft";
     private static final String NBT_TICKS_CRAFTED = "ticksCrafted";
+    private static final String NBT_ENABLED = "enabled";
 
     //private Workbench _workbench;
     private static final Logger LOGGER = LogManager.getLogger();

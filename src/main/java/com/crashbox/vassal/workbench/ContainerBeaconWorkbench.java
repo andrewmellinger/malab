@@ -224,7 +224,7 @@ public class ContainerBeaconWorkbench extends Container
     public IInventory _craftResult;
     private IInventory _craftOutput;
     private ContainerCraftingCore _craftingCore;
-    private int[] _trackedFields = { 0,0 };
+    private int[] _trackedFields = { 0, 0, 0 };
 
     private static final Logger LOGGER = LogManager.getLogger();
 }
