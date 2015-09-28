@@ -22,20 +22,23 @@ public class MessageToggleWorkbenchEnable implements IMessage
     @Override
     public void fromBytes(ByteBuf buf)
     {
+        // NOTE:  We have to use 5 because of being signed.  It isn't smart enough to deal with signed values.
         _worldID = ByteBufUtils.readVarShort(buf);
-        int x = ByteBufUtils.readVarInt(buf, 4);
-        int y = ByteBufUtils.readVarInt(buf, 4);
-        int z = ByteBufUtils.readVarInt(buf, 4);
+        int x = ByteBufUtils.readVarInt(buf, 5);
+        int y = ByteBufUtils.readVarInt(buf, 5);
+        int z = ByteBufUtils.readVarInt(buf, 5);
         _pos = new BlockPos(x, y, z);
     }
 
     @Override
     public void toBytes(ByteBuf buf)
     {
+        // NOTE:  We have to use 5 because of being signed.  It isn't smart enough to deal with signed values.
+        VassalMain.LOGGER.debug("toBytes pos=" + _pos);
         ByteBufUtils.writeVarShort(buf, _worldID);
-        ByteBufUtils.writeVarInt(buf, _pos.getX(), 4);
-        ByteBufUtils.writeVarInt(buf, _pos.getY(), 4);
-        ByteBufUtils.writeVarInt(buf, _pos.getZ(), 4);
+        ByteBufUtils.writeVarInt(buf, _pos.getX(), 5);
+        ByteBufUtils.writeVarInt(buf, _pos.getY(), 5);
+        ByteBufUtils.writeVarInt(buf, _pos.getZ(), 5);
     }
 
     public int getWorldID()

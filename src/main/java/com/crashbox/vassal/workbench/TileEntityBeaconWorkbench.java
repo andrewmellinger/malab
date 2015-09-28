@@ -1,27 +1,27 @@
 package com.crashbox.vassal.workbench;
 
+import com.crashbox.vassal.VassalUtils;
+import com.crashbox.vassal.beacon.BeaconBase;
 import com.crashbox.vassal.beacon.TileEntityBeaconInventory;
+import com.crashbox.vassal.common.ItemStackMatcher;
+import com.crashbox.vassal.messaging.*;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.inventory.*;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
-import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.server.gui.IUpdatePlayerListBox;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
-import net.minecraft.world.IInteractionObject;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -59,7 +59,7 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory //imple
     @Override
     public void readFromNBT(NBTTagCompound compound)
     {
-        LOGGER.debug("readFromNBT");
+//        LOGGER.debug("readFromNBT");
         super.readFromNBT(compound);
         NBTTagList nbttaglist = compound.getTagList(NBT_ITEMS, 10);
 
@@ -73,13 +73,13 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory //imple
             {
                 ItemStack stack = ItemStack.loadItemStackFromNBT(nbtTagCompound);
                 _craftOutput.setInventorySlotContents(0, stack);
-                LOGGER.debug("craftedOutput from NBT: slot=" + b0 +", stack=" + stack);
+                //LOGGER.debug("craftedOutput from NBT: slot=" + b0 +", stack=" + stack);
             }
             else if (b0 >= 0 && b0 < _craftingMatrix.getSizeInventory())
             {
                 ItemStack stack = ItemStack.loadItemStackFromNBT(nbtTagCompound);
                 _craftingMatrix.setInventorySlotContents(b0, stack);
-                LOGGER.debug("itemStack from NBT: slot=" + b0 +", stack=" + stack);
+                //LOGGER.debug("itemStack from NBT: slot=" + b0 +", stack=" + stack);
             }
         }
 
@@ -96,7 +96,7 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory //imple
     @Override
     public void writeToNBT(NBTTagCompound compound)
     {
-        LOGGER.debug("writeToNBT");
+        //LOGGER.debug("writeToNBT");
         super.writeToNBT(compound);
         compound.setShort(NBT_TICKS_TO_CRAFT, (short) _ticksToCraft);
         compound.setShort(NBT_TICKS_CRAFTED, (short) _ticksCrafted);
@@ -111,7 +111,7 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory //imple
                 nbtTagCompound.setByte(NBT_SLOT, (byte)i);
                 _craftingMatrix.getStackInSlot(i).writeToNBT(nbtTagCompound);
                 nbtItemList.appendTag(nbtTagCompound);
-                LOGGER.debug("itemStack TO NBT: slot=" + i + ", stack=" + _craftingMatrix.getStackInSlot(i));
+                //LOGGER.debug("itemStack TO NBT: slot=" + i + ", stack=" + _craftingMatrix.getStackInSlot(i));
             }
         }
 
@@ -121,7 +121,7 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory //imple
             nbtTagCompound.setByte(NBT_SLOT, (byte)9);
             _craftOutput.getStackInSlot(0).writeToNBT(nbtTagCompound);
             nbtItemList.appendTag(nbtTagCompound);
-            LOGGER.debug("itemStack TO NBT: output=" + _craftResult.getStackInSlot(0));
+            //LOGGER.debug("itemStack TO NBT: output=" + _craftResult.getStackInSlot(0));
         }
 
         compound.setTag(NBT_ITEMS, nbtItemList);
@@ -135,18 +135,18 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory //imple
     @Override
     public void setWorldObj(World worldIn)
     {
-        LOGGER.debug("setWorldObj: " + worldIn);
+        //LOGGER.debug("setWorldObj: " + worldIn);
         super.setWorldObj(worldIn);
-//        if (worldIn != null && !worldIn.isRemote)
-//        {
-//            _workbench = new Workbench(worldIn);
-//        }
-//        else
-//        {
-//            if (_workbench != null)
-//                _workbench.terminate();
-//            _workbench = null;
-//        }
+        if (worldIn != null && !worldIn.isRemote)
+        {
+            _workbench = new Workbench(worldIn);
+        }
+        else
+        {
+            if (_workbench != null)
+                _workbench.terminate();
+            _workbench = null;
+        }
     }
 
     //=============================================================================================
@@ -373,6 +373,11 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory //imple
     @Override
     public void update()
     {
+        // Always update listeners even if not making stuff
+        if (!worldObj.isRemote && _workbench != null)
+            _workbench.update();
+
+        // If we are disabled, we don't do anything
         if (!_enabled)
             return;
 
@@ -386,6 +391,10 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory //imple
 
         if (!worldObj.isRemote)
         {
+
+            if (_workbench != null)
+                _workbench.update();
+
             // Make sure we are still in a valid crafting configuration
             if (!canCraft())
             {
@@ -401,7 +410,7 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory //imple
                         return;
 
                     // Craft it.
-                    LOGGER.debug("Crafting final item");
+                    //LOGGER.debug("Crafting final item");
                     craftItem();
                     dirtyFlag = true;
                 }
@@ -411,7 +420,7 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory //imple
                 {
                     // Start up the crafting
                     ItemStack newStack = CraftingManager.getInstance().findMatchingRecipe(_craftingCore.getCraftingMatrix(), getWorld());
-                    LOGGER.debug("Started crafting: " + newStack );
+                    //LOGGER.debug("Started crafting: " + newStack );
                     _ticksToCraft = ticksToCraftOneItem(newStack);
                     _ticksCrafted = 0;
 
@@ -503,6 +512,11 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory //imple
 
     private boolean canCraft()
     {
+        return canCraft(true);
+    }
+
+    private boolean canCraft(boolean requireMats)
+    {
         ItemStack newStack = CraftingManager.getInstance().findMatchingRecipe(_craftingCore.getCraftingMatrix(), getWorld());
         if (newStack == null)
         {
@@ -511,13 +525,16 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory //imple
         }
 
         // Check to make sure all things have more than one
-        for (int i = 0; i < 9; ++i)
+        if (requireMats)
         {
-            ItemStack stack = _craftingMatrix.getStackInSlot(i);
-            if (stack != null && stack.stackSize < 2)
+            for (int i = 0; i < 9; ++i)
             {
-                //LOGGER.debug("Can't craft, stack size < 2. slot=" + i + ", stack=" + stack);
-                return false;
+                ItemStack stack = _craftingMatrix.getStackInSlot(i);
+                if (stack != null && stack.stackSize < 2)
+                {
+                    //LOGGER.debug("Can't craft, stack size < 2. slot=" + i + ", stack=" + stack);
+                    return false;
+                }
             }
         }
 
@@ -564,7 +581,7 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory //imple
 
     public void blockBroken()
     {
-        //_workbench.terminate();
+        _workbench.terminate();
     }
 
 
@@ -591,49 +608,152 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory //imple
     @Override
     public int[] getInputSlots()
     {
-        return new int[0];
+        return new int[] {0,1,2,3,4,5,6,7,8};
     }
 
     @Override
     public int[] getOutputSlots()
     {
-        return new int[0];
+        return new int[] {10};
     }
 
+    @Override
+    public ItemStack mergeIntoBestSlot(ItemStack stack)
+    {
+        List<ItemStack> candidates = new ArrayList<ItemStack>();
+        int size = 0;
+        for (int i = 0; i < 9; ++i)
+        {
+            ItemStack tmp = _craftingMatrix.getStackInSlot(i);
+            if (tmp != null && tmp.isItemEqual(stack))
+            {
+                candidates.add(tmp);
+                size += tmp.stackSize;
+            }
+        }
+
+        if (candidates.isEmpty())
+            return stack;
+
+        // Now, figure out the final size and add the right amount to each.
+        size += stack.stackSize;
+        size /= candidates.size();
+        if (size > stack.getMaxStackSize())
+            size = stack.getMaxStackSize();
+
+        for (ItemStack tmp : candidates)
+        {
+            int xfer = size - tmp.stackSize;
+            if (xfer > tmp.stackSize)
+                xfer = tmp.stackSize;
+            tmp.stackSize += xfer;
+            stack.stackSize -= xfer;
+        }
+
+        // If we didn't get rid of everything then see if we can dump into the first.
+        if (stack.stackSize > 0)
+            VassalUtils.mergeStacks(candidates.get(0), stack);
+
+        if (stack.stackSize == 0)
+            return null;
+
+        return stack;
+    }
 
     //---------------------------------------------------------------------------------------------
 
     // TaskMaster Workbench
-//    private class Workbench extends TaskMaster
-//    {
-//        Workbench(World world)
-//        {
-//            super(world);
-//        }
-//
-//        @Override
-//        protected void handleMessage(Message msg)
-//        {
-//            if (msg instanceof MessageWorkerAvailability)
-//            {
-//                MessageWorkerAvailability availability = (MessageWorkerAvailability)msg;
-//                LOGGER.debug("Workbench " + this + " is asked for work. In progress work: " + getInProgress().size());
-//
-//                int priority = smeltableNeedPriority();
-//
-//                if ( priority > 0 )
-//                {
-//                    // Find smeltable
-//                    LOGGER.debug("Workbench can use more smeltable: " + getSmeltableItemSample().getUnlocalizedName());
-//
-//                    // Indicate we need some supplies
-//                    availability.getAIVassal().offer(new TaskDeliver(this, TileEntityBeaconWorkbench.this,
-//                            getSmeltableItemSample(), INPUT_INDEX, getSmeltableQuantityWanted()));
-//                }
-//            }
-//        }
-//    }
+    private class Workbench extends BeaconBase
+    {
+        Workbench(World world)
+        {
+            super(world);
+        }
 
+        @Override
+        protected IMessager getSender()
+        {
+            return TileEntityBeaconWorkbench.this;
+        }
+
+        @Override
+        protected void handleMessage(Message msg)
+        {
+            if (msg instanceof MessageWorkerAvailability)
+                handleWorkerAvailability((MessageWorkerAvailability)msg);
+            else if (msg instanceof MessageIsStorageAvailable)
+                handleStorageAvailable((MessageIsStorageAvailable)msg);
+            else if (msg instanceof MessageItemRequest)
+                handleItemRequest((MessageItemRequest)msg);
+        }
+    }
+
+    private void handleWorkerAvailability(MessageWorkerAvailability msg)
+    {
+        // Only ask for things if we have a valid config.
+        if (!canCraft(false))
+            return;
+
+        // If we have anything at 1, build matcher for that.
+        ItemStackMatcher matcher = matcherRequiredInputs(1);
+        if (matcher != null)
+        {
+            TRPutInInventory req = new TRPutInInventory(TileEntityBeaconWorkbench.this,
+                    msg.getSender(), msg.getTransactionID(), 10, matcher, 8);
+            Broadcaster.postMessage(req);
+        }
+
+        // Otherwise we can use a little of everything
+        matcher = matcherRequiredInputs(8);
+        if (matcher != null)
+        {
+            TRPutInInventory req = new TRPutInInventory(TileEntityBeaconWorkbench.this,
+                    msg.getSender(), msg.getTransactionID(), 2, matcher, 8);
+            Broadcaster.postMessage(req);
+        }
+    }
+
+    private void handleStorageAvailable(MessageIsStorageAvailable msg)
+    {
+        ItemStackMatcher matcher = matcherRequiredInputs(32);
+        if (matcher != null)
+        {
+            TRPutInInventory req = new TRPutInInventory(TileEntityBeaconWorkbench.this,
+                    msg.getSender(), msg.getTransactionID(), 0, matcher, 32);
+            Broadcaster.postMessage(req);
+        }
+    }
+
+    private void handleItemRequest(MessageItemRequest msg)
+    {
+        // Anything in the out slot they can have
+        ItemStack stack = _craftOutput.getStackInSlot(0);
+        if (stack != null && msg.getMatcher().matches(stack))
+        {
+            TRGetFromInventory req = new TRGetFromInventory(TileEntityBeaconWorkbench.this,
+                    msg.getSender(), msg.getTransactionID(), 0, new ItemStackMatcher(stack),
+                    msg.getQuantity());
+            Broadcaster.postMessage(req);
+        }
+    }
+
+    //---------------------------------------------------------------------------------------------
+    private ItemStackMatcher matcherRequiredInputs(int size)
+    {
+        ItemStackMatcher matcher = new ItemStackMatcher();
+        int count = 0;
+        for (int i = 0; i < 9; ++i)
+        {
+            ItemStack stack = _craftingMatrix.getStackInSlot(i);
+            if (stack != null && stack.stackSize <= size)
+            {
+                matcher.add(stack);
+                count++;
+            }
+        }
+
+        return count > 0 ? matcher : null;
+    }
 
     //---------------------------------------------------------------------------------------------
 
@@ -656,7 +776,7 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory //imple
     private static final String NBT_TICKS_CRAFTED = "ticksCrafted";
     private static final String NBT_ENABLED = "enabled";
 
-    //private Workbench _workbench;
+    private Workbench _workbench;
     private static final Logger LOGGER = LogManager.getLogger();
 }
 

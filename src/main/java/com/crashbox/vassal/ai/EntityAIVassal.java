@@ -496,8 +496,11 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         _workArea = null;
         _proposedTasks.clear();
         _responses.clear();
-        _nextElicit = System.currentTimeMillis() + ELICIT_RESET_DELAY;
         getEntity().getNavigator().clearPathEntity();
+
+        long tmp = System.currentTimeMillis() + ELICIT_RESET_DELAY;
+        if (tmp > _nextElicit)
+            _nextElicit = tmp;
     }
 
     //=============================================================================================
