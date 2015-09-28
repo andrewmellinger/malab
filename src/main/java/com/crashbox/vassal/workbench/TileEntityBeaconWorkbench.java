@@ -210,9 +210,9 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory //imple
         if (i < 9)
             _craftingMatrix.setInventorySlotContents(i, itemStack);
         else if (i == 9)
-            _craftResult.setInventorySlotContents(i, itemStack);
+            _craftResult.setInventorySlotContents(0, itemStack);
         else if (i == 10)
-            _craftOutput.setInventorySlotContents(i, itemStack);
+            _craftOutput.setInventorySlotContents(0, itemStack);
     }
 
     @Override

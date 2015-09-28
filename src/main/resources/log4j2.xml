@@ -8,6 +8,9 @@
 <Loggers>
     <Logger name="com.crashbox" level="trace" additivity="true"/>
     <Logger name="com.crashbox.vassal.util.StairBuilder" level="info" additivity="true"/>
+    <Logger name="com.crashbox.vassal.chest.TileEntityBeaconChest" level="info" additivity="true"/>
+    <Logger name="com.crashbox.vassal.forester.TileEntityBeaconForester" level="info" additivity="true"/>
+    <Logger name="com.crashbox.vassal.task.TaskPair" level="info" additivity="true"/>
     <Root level="warn">
         <AppenderRef ref="Console"/>
     </Root>

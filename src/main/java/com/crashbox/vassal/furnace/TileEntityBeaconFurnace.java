@@ -603,18 +603,18 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
             {
                 return false;
             }
-            else if (_itemStacks[2] == null)
+            else if (_itemStacks[OUTPUT_INDEX] == null)
             {
                 return true;
             }
-            else if (!_itemStacks[2].isItemEqual(itemstack))
+            else if (!_itemStacks[OUTPUT_INDEX].isItemEqual(itemstack))
             {
                 return false;
             }
             else
             {
-                int result = _itemStacks[2].stackSize + itemstack.stackSize;
-                return result <= getInventoryStackLimit() && result <= _itemStacks[2].getMaxStackSize();
+                int result = _itemStacks[OUTPUT_INDEX].stackSize + itemstack.stackSize;
+                return result <= getInventoryStackLimit() && result <= _itemStacks[OUTPUT_INDEX].getMaxStackSize();
             }
         }
     }
@@ -625,9 +625,11 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
         {
             ItemStack itemstack = FurnaceRecipes.instance().getSmeltingResult(_itemStacks[INPUT_INDEX]);
 
+            // Fuel slot to 8, output slot to almost full, fuel slot, then output slot
+
             // Automatically refuel if we take the same item
             if (_itemStacks[FUEL_INDEX] != null &&
-                    _itemStacks[FUEL_INDEX].stackSize < 48 &&
+                    _itemStacks[FUEL_INDEX].stackSize < 8 &&
                     _itemStacks[FUEL_INDEX].isItemEqual(itemstack))
             {
                 // In case we have multiple outputs
@@ -641,12 +643,28 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
             {
                 _itemStacks[OUTPUT_INDEX] = itemstack.copy();
             }
-            else if (_itemStacks[OUTPUT_INDEX].getItem() == itemstack.getItem())
+            else if (_itemStacks[OUTPUT_INDEX].getItem() == itemstack.getItem() &&
+                    _itemStacks[OUTPUT_INDEX].stackSize <
+                            (_itemStacks[OUTPUT_INDEX].getMaxStackSize() - itemstack.stackSize - 4))
             {
                 _itemStacks[OUTPUT_INDEX].stackSize += itemstack.stackSize;
             }
+            else if (_itemStacks[FUEL_INDEX] != null &&
+                    _itemStacks[FUEL_INDEX].stackSize < 60 &&
+                    _itemStacks[FUEL_INDEX].isItemEqual(itemstack))
+            {
+                // Keep working on fuel.
+                _itemStacks[FUEL_INDEX].stackSize += itemstack.stackSize;
+            }
+            else if (_itemStacks[OUTPUT_INDEX].getItem() == itemstack.getItem() &&
+                    _itemStacks[OUTPUT_INDEX].stackSize <
+                            (_itemStacks[OUTPUT_INDEX].getMaxStackSize() - itemstack.stackSize))
+            {
+                // Now finish up with the output slot
+                _itemStacks[OUTPUT_INDEX].stackSize += itemstack.stackSize;
+            }
 
-            // TODO:  What does this mean??
+            // TODO:  What does this mean??  What does sponge have to with lava?
             if (_itemStacks[INPUT_INDEX].getItem() == Item.getItemFromBlock(Blocks.sponge) &&
                     _itemStacks[INPUT_INDEX].getMetadata() == 1 &&
                     _itemStacks[FUEL_INDEX] != null &&

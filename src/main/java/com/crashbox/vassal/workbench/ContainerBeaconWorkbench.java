@@ -162,9 +162,10 @@ public class ContainerBeaconWorkbench extends Container
             ItemStack itemstack1 = slot.getStack();
             itemstack = itemstack1.copy();
 
-            if (index == 0)
+            // Result and output
+            if (index == 0 || index == 1)
             {
-                if (!this.mergeItemStack(itemstack1, 10, 46, true))
+                if (!this.mergeItemStack(itemstack1, 11, 47, true))
                 {
                     return null;
                 }
@@ -173,19 +174,19 @@ public class ContainerBeaconWorkbench extends Container
             }
             else if (index >= 10 && index < 37)
             {
-                if (!this.mergeItemStack(itemstack1, 37, 46, false))
+                if (!this.mergeItemStack(itemstack1, 38, 47, false))
                 {
                     return null;
                 }
             }
             else if (index >= 37 && index < 46)
             {
-                if (!this.mergeItemStack(itemstack1, 10, 37, false))
+                if (!this.mergeItemStack(itemstack1, 11, 38, false))
                 {
                     return null;
                 }
             }
-            else if (!this.mergeItemStack(itemstack1, 10, 46, false))
+            else if (!this.mergeItemStack(itemstack1, 11, 47, false))
             {
                 return null;
             }

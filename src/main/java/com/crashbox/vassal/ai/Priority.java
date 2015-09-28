@@ -42,10 +42,10 @@ public class Priority
                     bestTask = task;
                 }
             }
-            else
-            {
-                LOGGER.debug("Not computing because unresolved: " + task);
-            }
+//            else
+//            {
+//                LOGGER.debug("Not computing because unresolved: " + task);
+//            }
         }
 
         return bestTask;
