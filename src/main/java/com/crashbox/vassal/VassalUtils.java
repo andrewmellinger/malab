@@ -17,6 +17,7 @@ import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -321,17 +322,33 @@ public class VassalUtils
      */
     public static BlockPos findEmptyOrchardSquare(World world, BlockPos center, int radius)
     {
+        Queue<BlockPos> everyOther = new LinkedList<BlockPos>();
+        boolean even = false;
+
         radius = radius - (radius % 2);
         for (int z = center.getZ() - radius; z <= center.getZ() + radius; z += 2)
         {
             for (int x = center.getX() - radius; x <= center.getX() + radius; x += 2)
             {
                 BlockPos pos = new BlockPos(x, center.getY(), z);
-                if ( world.isAirBlock(pos) )
+                if (even)
                 {
-                    return pos;
+                    everyOther.add(pos);
                 }
+                else
+                {
+                    if (world.isAirBlock(pos))
+                        return pos;
+                }
+                even = !even;
             }
+        }
+
+        // If we are here, let's try every other
+        for (BlockPos pos : everyOther)
+        {
+            if (world.isAirBlock(pos))
+                return pos;
         }
 
         return null;
