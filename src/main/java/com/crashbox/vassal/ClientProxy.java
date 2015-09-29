@@ -6,10 +6,7 @@ import com.crashbox.vassal.entity.EntityVassal;
 import com.crashbox.vassal.entity.RenderVassal;
 import com.crashbox.vassal.furnace.BlockBeaconFurnace;
 import com.crashbox.vassal.forester.BlockBeaconForester;
-import com.crashbox.vassal.grenades.EntityDiggerGrenade;
-import com.crashbox.vassal.grenades.EntityMineshaftGrenade;
-import com.crashbox.vassal.grenades.ItemDiggerGrenade;
-import com.crashbox.vassal.grenades.ItemMineshaftGrenade;
+import com.crashbox.vassal.grenades.*;
 import com.crashbox.vassal.quarry.BlockBeaconQuarry;
 import com.crashbox.vassal.workbench.BlockBeaconWorkbench;
 import net.minecraft.client.Minecraft;
@@ -73,6 +70,7 @@ public class ClientProxy extends CommonProxy
                 0,
                 new ModelResourceLocation(VassalMain.MODID + ":" + BlockBeaconWorkbench.NAME, "inventory"));
 
+        //======================================
         // ITEMS
         renderItem.getItemModelMesher().register(VassalMain.ITEM_DIGGER_GRENADE, 0,
                 new ModelResourceLocation(VassalMain.MODID + ":" + ItemDiggerGrenade.NAME, "inventory"));
@@ -86,6 +84,20 @@ public class ClientProxy extends CommonProxy
 
         RenderingRegistry.registerEntityRenderingHandler(EntityMineshaftGrenade.class,
                 new RenderSnowball(renderManager, VassalMain.ITEM_MINESHAFT_GRENADE, renderItem));
+
+        //---
+        renderItem.getItemModelMesher().register(VassalMain.ITEM_FLATTEN_GRENADE, 0,
+                new ModelResourceLocation(VassalMain.MODID + ":" + ItemFlattenGrenade.NAME, "inventory"));
+
+        RenderingRegistry.registerEntityRenderingHandler(EntityFlattenGrenade.class,
+                new RenderSnowball(renderManager, VassalMain.ITEM_FLATTEN_GRENADE, renderItem));
+
+        //---
+        renderItem.getItemModelMesher().register(VassalMain.ITEM_TUNNEL_GRENADE, 0,
+                new ModelResourceLocation(VassalMain.MODID + ":" + ItemTunnelGrenade.NAME, "inventory"));
+
+        RenderingRegistry.registerEntityRenderingHandler(EntityTunnelGrenade.class,
+                new RenderSnowball(renderManager, VassalMain.ITEM_TUNNEL_GRENADE, renderItem));
     }
 
     @Override

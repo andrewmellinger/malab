@@ -13,11 +13,11 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -695,6 +695,75 @@ public class VassalUtils
         }
     }
 
+    public static void digTunnel(World world, BlockPos pos, int radius, EnumFacing direction,
+                                 int maxDistance, boolean drop, boolean stopAtAir)
+    {
+        for (int i = 0; i < maxDistance; ++i)
+        {
+            int count = clearSlab(world, pos, radius, direction, drop);
+            if (count == 0 && stopAtAir)
+                return;
+            pos = pos.offset(direction, 1);
+        }
+    }
+
+    private static int clearSlab(World world, BlockPos center, int radius, EnumFacing direction, boolean drop)
+    {
+        if ( direction == EnumFacing.NORTH || direction == EnumFacing.SOUTH)
+        {
+            int count = 0;
+            for (int y = center.getY() - radius; y <= center.getY() + radius; ++y)
+            {
+                for (int x = center.getX() - radius; x <= center.getX() + radius; ++x)
+                {
+                    BlockPos pos = new BlockPos(x, y, center.getZ());
+                    if (!world.isAirBlock(pos))
+                    {
+                        world.destroyBlock(pos, drop);
+                        ++count;
+                    }
+                }
+            }
+            return count;
+        }
+        else if (direction == EnumFacing.EAST || direction == EnumFacing.WEST )
+        {
+            int count = 0;
+            for (int y = center.getY() - radius; y <= center.getY() + radius; ++y)
+            {
+                for (int z = center.getZ() - radius; z <= center.getZ() + radius; ++z)
+                {
+                    BlockPos pos = new BlockPos(center.getX(), y, z);
+                    if (!world.isAirBlock(pos))
+                    {
+                        world.destroyBlock(pos, drop);
+                        ++count;
+                    }
+                }
+            }
+            return count;
+        }
+        else
+        {
+            int count = 0;
+            for (int x = center.getX() - radius; x <= center.getX() + radius; ++x)
+            {
+                for (int z = center.getZ() - radius; z <= center.getZ() + radius; ++z)
+                {
+                    BlockPos pos = new BlockPos(x, center.getY(), z);
+                    if (!world.isAirBlock(pos))
+                    {
+                    world.destroyBlock(pos, drop);
+                        ++count;
+                    }
+                }
+            }
+            return count;
+        }
+    }
+
+
+
     public static void spiralStairs(World world, BlockPos pos, int minY)
     {
         int x = pos.getX();
@@ -777,6 +846,50 @@ public class VassalUtils
             world.setBlockState(pos, state);
         }
     }
+
+    public static void flattenArea(World world, BlockPos center, int radius, int height, IBlockState ground)
+    {
+        // Remove all blocks.
+        clearArea(world,
+                new BlockPos(center.getX() - radius, center.getY(), center.getZ() - radius),
+                new BlockPos(center.getX() + radius, center.getY() +height, center.getZ() + radius));
+
+        // Now put down dirt
+        fillArea(world,
+                new BlockPos(center.getX() - radius, center.getY(), center.getZ() - radius),
+                new BlockPos(center.getX() + radius, center.getY(), center.getZ() + radius),
+                ground);
+    }
+
+    private static void clearArea(World world, BlockPos min, BlockPos max)
+    {
+        for (int y = min.getY(); y <= max.getY(); ++y)
+        {
+            for (int x = min.getX(); x <= max.getX(); ++x)
+            {
+                for (int z = min.getZ(); z <= max.getZ(); ++z)
+                {
+                    world.destroyBlock(new BlockPos(x, y, z), false);
+                }
+            }
+        }
+    }
+
+    private static void fillArea(World world, BlockPos min, BlockPos max, IBlockState fill)
+    {
+        for (int y = min.getY(); y <= max.getY(); ++y)
+        {
+            for (int x = min.getX(); x <= max.getX(); ++x)
+            {
+                for (int z = min.getZ(); z <= max.getZ(); ++z)
+                {
+                    world.setBlockState(new BlockPos(x, y, z), fill);
+                }
+            }
+        }
+    }
+
+
 
     //=============================================================================================
 

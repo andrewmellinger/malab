@@ -7,10 +7,7 @@ import com.crashbox.vassal.furnace.BlockBeaconFurnace;
 import com.crashbox.vassal.furnace.TileEntityBeaconFurnace;
 import com.crashbox.vassal.forester.BlockBeaconForester;
 import com.crashbox.vassal.forester.TileEntityBeaconForester;
-import com.crashbox.vassal.grenades.EntityDiggerGrenade;
-import com.crashbox.vassal.grenades.EntityMineshaftGrenade;
-import com.crashbox.vassal.grenades.ItemDiggerGrenade;
-import com.crashbox.vassal.grenades.ItemMineshaftGrenade;
+import com.crashbox.vassal.grenades.*;
 import com.crashbox.vassal.network.MessageToggleWorkbenchEnable;
 import com.crashbox.vassal.quarry.BlockBeaconQuarry;
 import com.crashbox.vassal.quarry.TileEntityBeaconQuarry;
@@ -60,6 +57,8 @@ public class VassalMain
 
     public static Item ITEM_DIGGER_GRENADE;
     public static Item ITEM_MINESHAFT_GRENADE;
+    public static Item ITEM_FLATTEN_GRENADE;
+    public static Item ITEM_TUNNEL_GRENADE;
 
     public static SimpleNetworkWrapper NETWORK;
 
@@ -96,6 +95,10 @@ public class VassalMain
         EntityRegistry.registerModEntity(EntityDiggerGrenade.class, "Digger Grenade",
                 ++modEntityID, VassalMain.instance, 80, 10, true);
         EntityRegistry.registerModEntity(EntityMineshaftGrenade.class, "Mineshaft Grenade",
+                ++modEntityID, VassalMain.instance, 80, 10, true);
+        EntityRegistry.registerModEntity(EntityFlattenGrenade.class, "Flatten Grenade",
+                ++modEntityID, VassalMain.instance, 80, 10, true);
+        EntityRegistry.registerModEntity(EntityTunnelGrenade.class, "Tunnel Grenade",
                 ++modEntityID, VassalMain.instance, 80, 10, true);
 
         NetworkRegistry.INSTANCE.registerGuiHandler(VassalMain.instance,
@@ -162,6 +165,11 @@ public class VassalMain
         ITEM_MINESHAFT_GRENADE = new ItemMineshaftGrenade();
         GameRegistry.registerItem(ITEM_MINESHAFT_GRENADE, ItemMineshaftGrenade.NAME);
 
+        ITEM_FLATTEN_GRENADE = new ItemFlattenGrenade();
+        GameRegistry.registerItem(ITEM_FLATTEN_GRENADE, ItemFlattenGrenade.NAME);
+
+        ITEM_TUNNEL_GRENADE = new ItemTunnelGrenade();
+        GameRegistry.registerItem(ITEM_TUNNEL_GRENADE, ItemTunnelGrenade.NAME);
     }
 
 
