@@ -20,7 +20,8 @@ public class ContainerEntityVassal extends Container
         _inventory = inventory;
 
         // Add slots
-        addSlotToContainer(new Slot(_inventory, 0, 8, 15));
+        addSlotToContainer(new Slot(_inventory, 0, 15, 17));
+        addSlotToContainer(new Slot(_inventory, 1, 15, 53));
 
         // add player inventory slots
         // note that the slot numbers are within the player inventory so can

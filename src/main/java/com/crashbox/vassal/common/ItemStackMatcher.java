@@ -55,6 +55,14 @@ public class ItemStackMatcher
         }
     }
 
+    public ItemStackMatcher(Item... items)
+    {
+        for (Item item : items)
+        {
+            add(item);
+        }
+    }
+
     public void add(ItemStack sample)
     {
         if (sample != null)

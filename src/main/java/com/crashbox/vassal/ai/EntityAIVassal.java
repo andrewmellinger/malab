@@ -9,7 +9,9 @@ import com.crashbox.vassal.task.*;
 import com.crashbox.vassal.entity.RenderVassal.VASSAL_TEXTURE;
 
 import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.BlockPos;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -67,6 +69,14 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         // Process messages should handle data requests
         processMessages();
 
+        // If we can't run (no fuel, etc.) then just return.
+        // We still answered messages from above.
+        if (!canRun())
+        {
+            debugLog("Can't run.");
+            return;
+        }
+
         if (_paused)
         {
             if ((System.currentTimeMillis() / 1000) > _pausedMessageSecs)
@@ -94,10 +104,12 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
                 _state = transition();
                 break;
             case TARGETING:
+                burnFuel();
                 _renderVassal.setTexture(VASSAL_TEXTURE.WORKING);
                 _state = target();
                 break;
             case PERFORMING:
+                burnFuel();
                 _renderVassal.setTexture(VASSAL_TEXTURE.NORMAL);
                 _state = perform();
                 break;
@@ -243,13 +255,27 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
 
     private State idle()
     {
+        // Why separate times?  Well, we don't want to be useless while being low on fuel
+        // Why? Well, we may be able to collect trees and make fuel. So we can influence
+        // our own fuel production.
         // Once in a while we want to tell people we need more
-        if (System.currentTimeMillis() > _nextElicit )
+        if (System.currentTimeMillis() > _nextFuel && needFuel() )
         {
+            debugLog("Low on fuel, requesting!!!");
+            _nextFuel = System.currentTimeMillis() + FUEL_REQUEST_DELAY;
+            _requestEndMS = System.currentTimeMillis() + REQUEST_TIMEOUT_MS;
+
+            postFuelRequest();
+            return State.ELICITING;
+        }
+        else if (System.currentTimeMillis() > _nextElicit )
+        {
+            // Once in a while we want to tell people we need more
             //debugLog("Idle timeout over.");
             _nextElicit = System.currentTimeMillis() + ELICIT_DELAY_MS;
             _requestEndMS = System.currentTimeMillis() + REQUEST_TIMEOUT_MS;
 
+            // TODO:  What if I am holding fuel?
             ItemStack held = getEntity().getHeldItem();
             if (held != null)
                 Broadcaster.postMessage(new MessageIsStorageAvailable(this, null, held.getItem(), 0, new ItemStackMatcher(held)));
@@ -557,6 +583,76 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         return VassalUtils.isWithinSqDist(getEntity().getPosition(), pos, PROXIMITY_SQ);
     }
 
+    //=============================================================================================
+
+    public int getFuelTicks()
+    {
+        return _fuelTicks;
+    }
+
+    public void setFuelTicks(int ticks)
+    {
+        _fuelTicks = ticks;
+    }
+
+    private boolean canRun()
+    {
+        debugLog("fuel=" + getEntity().getFuelStack() + ", _fuelTicks=" + _fuelTicks);
+
+        // If we have fuel ticks or spare fuel then we can run
+        return (_fuelTicks > 0 ||
+                (getEntity().getFuelStack() != null && getEntity().getFuelStack().stackSize > 0));
+    }
+
+    private boolean burnFuel()
+    {
+        if (_fuelTicks != 0)
+        {
+            --_fuelTicks;
+            return true;
+        }
+
+        // Try to get another block
+        ItemStack fuelStack = _entity.getFuelStack();
+        if (fuelStack != null)
+        {
+            _fuelTicks = TileEntityFurnace.getItemBurnTime(fuelStack);
+            --fuelStack.stackSize;
+            if (fuelStack.stackSize == 0)
+                _entity.setFuelStack(null);
+            else
+                _entity.setFuelStack(fuelStack);
+
+            return true;
+        }
+
+        // If we got here out of fuel and nothing in stack
+        cancel();
+        return false;
+    }
+
+    private boolean needFuel()
+    {
+        ItemStack stack = _entity.getFuelStack();
+        return (stack == null || stack.stackSize < 4);
+    }
+
+    private void postFuelRequest()
+    {
+        // Add the task to put the item in our inventory then post special
+        TaskPair pair = new TaskPair(this);
+
+        ItemStack stack = _entity.getFuelStack();
+        ItemStackMatcher matcher;
+        if (stack == null)
+            matcher = new ItemStackMatcher(new ItemStack(Items.coal, 0, 1));
+        else
+            matcher = new ItemStackMatcher(stack);
+
+        // The system will then ask for some.
+        pair.setDeliverTask(new TaskRefuel(this, this, matcher, 8));
+        _proposedTasks.add(pair);
+    }
 
     //=============================================================================================
 
@@ -652,6 +748,9 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         PERFORMING      // Within distance of pos.
     }
 
+    // How many ticks of fuel do I have left.
+    private int _fuelTicks;
+
     // Main state variable for the loop
     private State _state = State.IDLING;
     private boolean _paused = false;
@@ -661,9 +760,12 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
     private static final int ELICIT_RESET_DELAY = 500;
     private long _nextElicit = 0;
 
-    private static final int DEFAULT_RANGE = 10;
-    private static final double DEFAULT_SPEED = 0.5;
-    public static int TARGETING_DISTANCE = 16;
+    private static final int FUEL_REQUEST_DELAY = 2000;
+    private long _nextFuel = 0;
+
+//    private static final int DEFAULT_RANGE = 10;
+//    private static final double DEFAULT_SPEED = 0.5;
+    public static final int TARGETING_DISTANCE = 16;
 
     // Time we wait for messages.  5 ticks (250 ms) is usually good enough
     private static final long REQUEST_TIMEOUT_MS = 250;

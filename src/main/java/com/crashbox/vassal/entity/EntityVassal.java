@@ -4,19 +4,19 @@ import com.crashbox.vassal.VassalMain;
 import com.crashbox.vassal.ai.EntityAIVassal;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAISwimming;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemPickaxe;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemTool;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.common.IExtendedEntityProperties;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -32,11 +32,14 @@ public class EntityVassal extends EntityCreature
     {
         super(world);
         setupAI();
+        registerExtendedProperties("vassal", new ExtendedProps());
 
         _toolStacks[0] = new ItemStack(Items.stone_pickaxe);
         _toolStacks[1] = new ItemStack(Items.stone_axe);
         _toolStacks[2] = new ItemStack(Items.stone_shovel);
         _toolStacks[3] = new ItemStack(Items.stone_sword);
+
+        _fuelStack = null;
     }
 
     public double getSpeed()
@@ -83,6 +86,44 @@ public class EntityVassal extends EntityCreature
 //        LOGGER.debug(getCustomNameTag() + " Someone called despawn entity!!!");
 //        super.despawnEntity();
     }
+
+    private class ExtendedProps implements IExtendedEntityProperties
+    {
+        @Override
+        public void saveNBTData(NBTTagCompound compound)
+        {
+            compound.setInteger("fuelTicks", _vassalAI.getFuelTicks());
+
+            NBTTagCompound fuelCompound = new NBTTagCompound();
+            _fuelStack.writeToNBT(fuelCompound);
+            compound.setTag("fuelStack", fuelCompound);
+        }
+
+        @Override
+        public void loadNBTData(NBTTagCompound compound)
+        {
+            if (compound.hasKey("fuelTicks"))
+            {
+                _vassalAI.setFuelTicks(compound.getInteger("fuelTicks"));
+            }
+
+            if (compound.hasKey("fuelStack"))
+            {
+                _fuelStack = ItemStack.loadItemStackFromNBT(compound.getCompoundTag("fuelStack"));
+            }
+        }
+
+        @Override
+        public void init(Entity entity, World world)
+        {
+            // TODO:  What do we do here???
+        }
+    }
+    
+    
+    //=============================================================================================
+
+
 
     protected void setupAI()
     {
@@ -192,6 +233,19 @@ public class EntityVassal extends EntityCreature
 
     //=============================================================================================
 
+    public ItemStack getFuelStack()
+    {
+        return _fuelStack;
+    }
+
+    public void setFuelStack(ItemStack fuelStack)
+    {
+        _fuelStack = fuelStack;
+    }
+
+
+    //=============================================================================================
+
     protected void clearAITasks()
     {
         tasks.taskEntries.clear();
@@ -222,6 +276,7 @@ public class EntityVassal extends EntityCreature
     //=============================================================================================
 
     private ItemStack[] _toolStacks = new ItemStack[4];
+    private ItemStack   _fuelStack;
 
     // How many things we can carry.
     private int _carryCapacity = 4;

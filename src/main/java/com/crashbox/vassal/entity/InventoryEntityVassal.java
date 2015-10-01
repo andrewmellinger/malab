@@ -11,15 +11,17 @@ public class InventoryEntityVassal extends InventoryBasic
 {
     public InventoryEntityVassal(EntityVassal vassal)
     {
-        super("Label", false, 1);
+        super("Label", false, 2);
         _vassal = vassal;
         setInventorySlotContents(0, vassal.getHeldItem());
+        setInventorySlotContents(1, vassal.getFuelStack());
     }
 
 
     public void flushItemsToVassal()
     {
         _vassal.setCurrentItemOrArmor(0, getStackInSlot(0));
+        _vassal.setFuelStack(getStackInSlot(1));
     }
 
 //    @Override
