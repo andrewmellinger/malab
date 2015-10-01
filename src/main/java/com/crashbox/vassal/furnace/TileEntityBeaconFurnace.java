@@ -48,8 +48,10 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
     {
         INPUT_SLOT, FUEL_SLOT, OUTPUT_SLOT
     }
+
+    // We let them take buckets out of the bottom.
     private static final int[] slotsTop = new int[] { slotEnum.INPUT_SLOT.ordinal() };
-    private static final int[] slotsBottom = new int[] { slotEnum.OUTPUT_SLOT.ordinal() };
+    private static final int[] slotsBottom = new int[] { slotEnum.FUEL_SLOT.ordinal(), slotEnum.OUTPUT_SLOT.ordinal() };
     private static final int[] slotsSides = new int[] { slotEnum.FUEL_SLOT.ordinal() };
 
     // All the things that we contain
@@ -232,7 +234,8 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
     @Override
     public boolean isItemValidForSlot(int index, ItemStack stack)
     {
-        // We don't put things in output or automation
+        // We don't put things in output for automation.  This is different than the furnace
+        // in that we don't just take anything unless they ask for it.
 
         // Supposedly this is for automation
         if ( index == INPUT_INDEX )
@@ -325,16 +328,24 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
     }
 
     @Override
-    public boolean canInsertItem(int index, ItemStack itemStackIn,
-            EnumFacing direction)
+    public boolean canInsertItem(int index, ItemStack stack, EnumFacing direction)
     {
-        return isItemValidForSlot(index, itemStackIn);
+        return isItemValidForSlot(index, stack);
     }
 
     @Override
-    public boolean canExtractItem(int parSlotIndex, ItemStack parStack,
-            EnumFacing parFacing)
+    public boolean canExtractItem(int index, ItemStack stack, EnumFacing direction)
     {
+        if (direction == EnumFacing.DOWN && index == 1)
+        {
+            Item item = stack.getItem();
+
+            if (item != Items.water_bucket && item != Items.bucket)
+            {
+                return false;
+            }
+        }
+
         return true;
     }
 
