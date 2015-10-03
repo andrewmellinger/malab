@@ -6,7 +6,6 @@ import com.crashbox.vassal.common.ItemStackMatcher;
 import com.crashbox.vassal.entity.RenderVassal;
 import com.crashbox.vassal.messaging.*;
 import com.crashbox.vassal.task.*;
-import com.crashbox.vassal.entity.RenderVassal.VASSAL_TEXTURE;
 
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.init.Items;
@@ -29,7 +28,8 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         this._entity = entity;
         Broadcaster.getInstance().subscribe(new MyListener());
         _entity.setCustomNameTag(makeName());
-        _nextElicit = System.currentTimeMillis() + ELICIT_DELAY_MS;
+        _nextElicit = System.currentTimeMillis() + ELICIT_DELAY_MS +
+                (long)(ELICIT_DELAY_MS * _entity.getRNG().nextFloat());
     }
 
     public EntityVassal getEntity()
@@ -328,9 +328,14 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
                 return State.IDLING;
 
             //getEntity().spawnExplosionParticle();
+            BlockPos workCenter = _currentTask.getWorkCenter();
             debugLog("Selected task: " + _currentTask);
-            debugLog("   ==> moving to: " + _currentTask.getWorkCenter());
-            tryMoveTo(_currentTask.getWorkCenter());
+            debugLog("   ==> moving to: " + workCenter);
+            tryMoveTo(workCenter);
+
+            // Look at the work center
+//            _entity.getLookHelper().setLookPosition(workCenter.getX(), workCenter.getY(), workCenter.getZ(),
+//                    0, _entity.getVerticalFaceSpeed());
             return State.TRANSITING;
         }
 
