@@ -90,7 +90,6 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
 
         // As long as we have a task, tell them we are working on it
         handleHeartbeat();
-        handleHealing();
 
         //LOGGER.debug("UpdateTask: " + _state);
         switch (_state)
@@ -256,13 +255,8 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         }
     }
 
-    private void handleHealing()
+    private boolean handleHealing()
     {
-//        debugLog("aiMoveSpeed=" + _entity.getAIMoveSpeed() + ", health=" + _entity.getHealth() +
-//                ", max=" + _entity.getMaxHealth() + ", _fuelTicks=" + _fuelTicks);
-//        public float getAIMoveSpeed()
-//        public void setAIMoveSpeed(float p_70659_1_)
-
         if (_entity.getHealth() < _entity.getMaxHealth())
         {
             if (System.currentTimeMillis() > _nextHeal && _fuelTicks > HEAL_FUEL_PER_HALF_HEART)
@@ -272,7 +266,9 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
                 _nextHeal = System.currentTimeMillis() + HEAL_DELAY;
                 _entity.heal(1.0F);
             }
+            return true;
         }
+        return false;
     }
 
     //=============================================================================================
@@ -284,6 +280,10 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
 
     private State idle()
     {
+        // Check and see if we need to regen. If so, don't do anything else.
+        if (handleHealing())
+            return State.IDLING;
+
         // Why separate times?  Well, we don't want to be useless while being low on fuel
         // Why? Well, we may be able to collect trees and make fuel. So we can influence
         // our own fuel production.
