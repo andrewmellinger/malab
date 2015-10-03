@@ -7,7 +7,7 @@ import net.minecraft.util.BlockPos;
  */
 public interface IMessager
 {
-    public BlockPos getPos();
+    public BlockPos getBlockPos();
 
     public int getRadius();
 }

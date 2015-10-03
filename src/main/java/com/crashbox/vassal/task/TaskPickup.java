@@ -25,7 +25,7 @@ public class TaskPickup extends TaskAcquireBase
     @Override
     public BlockPos getWorkTarget(List<BlockPos> others)
     {
-        EntityItem eItem = VassalUtils.findFirstEntityOfTypeOnGround(getEntity().getEntityWorld(), getRequester().getPos(),
+        EntityItem eItem = VassalUtils.findFirstEntityOfTypeOnGround(getEntity().getEntityWorld(), getRequester().getBlockPos(),
                 getRequester().getRadius(), _item);
 
         if (eItem != null)

@@ -21,7 +21,7 @@ public class TaskQuarry extends TaskHarvest
     public TaskQuarry(EntityAIVassal performer, TRHarvest message)
     {
         super(performer, message);
-        _builder = new StairBuilder(getWorld(), getRequester().getPos(), getRequester().getRadius());
+        _builder = new StairBuilder(getWorld(), getRequester().getBlockPos(), getRequester().getRadius());
     }
 
     @Override
@@ -33,7 +33,7 @@ public class TaskQuarry extends TaskHarvest
         if (pos != null)
             list.add(pos);
         else
-            LOGGER.debug("findHarvestList couldn't find a block." + getRequester().getPos());
+            LOGGER.debug("findHarvestList couldn't find a block." + getRequester().getBlockPos());
         return list;
     }
 

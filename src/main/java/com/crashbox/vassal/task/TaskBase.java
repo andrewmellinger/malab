@@ -84,7 +84,7 @@ public abstract class TaskBase
      */
     public BlockPos getWorkCenter()
     {
-        return getRequester().getPos();
+        return getRequester().getBlockPos();
     }
 
     /**

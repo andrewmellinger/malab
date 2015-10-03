@@ -25,7 +25,7 @@ public class TaskPlantSapling extends TaskDeliverBase
     @Override
     public BlockPos getWorkTarget(List<BlockPos> others)
     {
-        _plantingTarget = VassalUtils.findEmptyOrchardSquare(getWorld(), getRequester().getPos(),
+        _plantingTarget = VassalUtils.findEmptyOrchardSquare(getWorld(), getRequester().getBlockPos(),
                 getRequester().getRadius());
         return _plantingTarget;
     }

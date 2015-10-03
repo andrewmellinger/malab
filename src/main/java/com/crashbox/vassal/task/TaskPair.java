@@ -109,7 +109,7 @@ public class TaskPair implements ITask
     public int getValue(double speed)
     {
         TaskBase[] tasks = { _acquireTask, _deliverTask};
-        BlockPos pos = _entityAI.getPos();
+        BlockPos pos = _entityAI.getBlockPos();
         int value = 0;
         for (TaskBase task : tasks)
         {
@@ -267,7 +267,7 @@ public class TaskPair implements ITask
 
     private boolean linkupDeliverResponses(List<MessageTaskRequest> responses)
     {
-        BlockPos pos = _entityAI.getPos();
+        BlockPos pos = _entityAI.getBlockPos();
 
         List<TRDeliverBase> delivers = MessageUtils.extractMessages(this, responses, TRDeliverBase.class);
         if (delivers.size() == 0)
@@ -297,7 +297,7 @@ public class TaskPair implements ITask
     private boolean linkupAcquireResponses(List<MessageTaskRequest> responses)
     {
         //debugLog("Linking up acquire responses.");
-        BlockPos pos = _entityAI.getPos();
+        BlockPos pos = _entityAI.getBlockPos();
 
         List<TRAcquireBase> acquires = MessageUtils.extractMessages(this, responses, TRAcquireBase.class);
         //LOGGER.debug("Have (" + acquires.size() + ") acquires ");
@@ -321,7 +321,8 @@ public class TaskPair implements ITask
 
         for (T msg : responses)
         {
-            int value = msg.getValue() - Priority.computeDistanceCost(pos, msg.getSender().getPos(), _entityAI.getEntity().getSpeed());
+            int value = msg.getValue() - Priority.computeDistanceCost(pos, msg.getSender().getBlockPos(),
+                    _entityAI.getEntity().getSpeed());
             LOGGER.debug("findBest: task=" + this + ", cost=" + value + ", msg=" + msg);
             if (value > bestValue)
             {

@@ -11,6 +11,7 @@ import com.crashbox.vassal.task.TaskQuarry;
 import com.crashbox.vassal.util.StairBuilder;
 import net.minecraft.server.gui.IUpdatePlayerListBox;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -58,10 +59,10 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
         return _radius;
     }
 
-    public int getMaxVassalCount()
+    @Override
+    public BlockPos getBlockPos()
     {
-        // TODO:  Scale based on area.
-        return 2;
+        return getPos();
     }
 
     private class Quarry extends BeaconBase

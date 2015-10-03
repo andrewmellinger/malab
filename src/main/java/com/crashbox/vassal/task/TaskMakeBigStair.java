@@ -27,7 +27,7 @@ public class TaskMakeBigStair extends TaskDeliverBase
 
         // TODO: Make sure we have slab or cobblestone
         _quantity = message.getQuantity();
-        _builder = new StairBuilder(getWorld(), getRequester().getPos(), getRequester().getRadius());
+        _builder = new StairBuilder(getWorld(), getRequester().getBlockPos(), getRequester().getRadius());
     }
 
     @Override

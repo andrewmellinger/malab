@@ -48,7 +48,7 @@ public abstract class TaskHarvest extends TaskAcquireBase
             return null;
 
         // We want them to move to a place which is correct X,Z but with ground Y.
-        return new BlockPos(_harvestBlock.getX(), getRequester().getPos().getY(), _harvestBlock.getZ());
+        return new BlockPos(_harvestBlock.getX(), getRequester().getBlockPos().getY(), _harvestBlock.getZ());
     }
 
     @Override

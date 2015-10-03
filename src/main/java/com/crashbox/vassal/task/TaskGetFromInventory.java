@@ -26,7 +26,7 @@ public class TaskGetFromInventory extends TaskAcquireBase
             quantity = getPerformer().getEntity().getCarryCapacity();
         _quantity = quantity;
 
-        _workArea = getRequester().getPos();
+        _workArea = getRequester().getBlockPos();
     }
 
     @Override
@@ -43,7 +43,7 @@ public class TaskGetFromInventory extends TaskAcquireBase
 
         // Get the tile entity and extract it
         debugLog(LOGGER, "Going to extract items. ");
-        TileEntity entity = getWorld().getTileEntity(getRequester().getPos());
+        TileEntity entity = getWorld().getTileEntity(getRequester().getBlockPos());
         if (entity instanceof TileEntityBeaconInventory)
         {
             debugLog(LOGGER, "Extracting: entity=" + entity.getClass().getSimpleName() + ", matcher=" + getMatcher() + ", qty=" + _quantity);

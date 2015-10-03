@@ -60,7 +60,7 @@ public class TaskPutInInventory extends TaskDeliverBase
     public BlockPos getWorkTarget(List<BlockPos> others)
     {
         // We just work here.
-        return getRequester().getPos();
+        return getRequester().getBlockPos();
     }
 
     @Override

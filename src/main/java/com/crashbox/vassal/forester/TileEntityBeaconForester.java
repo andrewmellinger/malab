@@ -82,6 +82,12 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
         return _searchRadius;
     }
 
+    @Override
+    public BlockPos getBlockPos()
+    {
+        return getPos();
+    }
+
     //=============================================================================================
 
     public int getMaxVassalCount()

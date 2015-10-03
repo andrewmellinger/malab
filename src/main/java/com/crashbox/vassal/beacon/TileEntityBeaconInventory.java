@@ -7,6 +7,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.gui.IUpdatePlayerListBox;
 import net.minecraft.tileentity.TileEntityLockable;
+import net.minecraft.util.BlockPos;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -105,6 +106,12 @@ public abstract class TileEntityBeaconInventory extends TileEntityLockable imple
         // We have run out of stuff.
 
         return returnStack;
+    }
+
+    @Override
+    public BlockPos getBlockPos()
+    {
+        return getPos();
     }
 
     public abstract int[] getOutputSlots();

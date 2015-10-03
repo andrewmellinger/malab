@@ -10,6 +10,8 @@ import com.crashbox.vassal.task.*;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.BlockPos;
 import org.apache.logging.log4j.LogManager;
@@ -69,13 +71,12 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         // Process messages should handle data requests
         processMessages();
 
+        ensureFuel();
+
         // If we can't run (no fuel, etc.) then just return.
         // We still answered messages from above.
         if (!canRun())
-        {
-            debugLog("Can't run.");
             return;
-        }
 
         if (_paused)
         {
@@ -89,6 +90,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
 
         // As long as we have a task, tell them we are working on it
         handleHeartbeat();
+        handleHealing();
 
         //LOGGER.debug("UpdateTask: " + _state);
         switch (_state)
@@ -120,7 +122,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
     // IMessager
 
     @Override
-    public BlockPos getPos()
+    public BlockPos getBlockPos()
     {
         return getEntity().getPosition();
     }
@@ -251,6 +253,28 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         {
             _nextHeartbeat = now + HEARTBEAT_DELAY;
             _currentTask.sendHeartbeat(_nextHeartbeat + HEARTBEAT_VARIANCE);
+        }
+    }
+
+    private void handleHealing()
+    {
+//        debugLog("aiMoveSpeed=" + _entity.getAIMoveSpeed() + ", health=" + _entity.getHealth() +
+//                ", max=" + _entity.getMaxHealth() + ", _fuelTicks=" + _fuelTicks);
+//        public float getAIMoveSpeed()
+//        public void setAIMoveSpeed(float p_70659_1_)
+
+        if (_entity.getHealth() < _entity.getMaxHealth())
+        {
+
+
+            if (System.currentTimeMillis() > _nextHeal && _fuelTicks > HEAL_FUEL_PER_HALF_HEART)
+            {
+                _entity.addPotionEffect(new PotionEffect(Potion.moveSlowdown.id, 1, 1));
+                _fuelTicks -= HEAL_FUEL_PER_HALF_HEART;
+                _nextHeal = System.currentTimeMillis() + HEAL_DELAY;
+                _entity.heal(1.0F);
+                LOGGER.debug("---------- HEALING!!!!");
+            }
         }
     }
 
@@ -392,7 +416,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
     private State transition()
     {
         // If within our distance, then issue location request and to start targeting
-        if (posInAreaXY(getPos(), _currentTask.getWorkCenter(), TARGETING_DISTANCE))
+        if (posInAreaXY(getBlockPos(), _currentTask.getWorkCenter(), TARGETING_DISTANCE))
         {
             LOGGER.debug(id() + " Within distance, switching to targeting.");
             requestWorkAreas();
@@ -432,7 +456,8 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
                 return State.IDLING;
             }
 
-            LOGGER.debug(id() + " Determining work area and redirecting: " + _workArea + " currently at: " + getPos());
+            LOGGER.debug(id() + " Determining work area and redirecting: " + _workArea + " currently at: " +
+                    getBlockPos());
             _workAreaAttempt = 0;
             tryMoveTo(_workArea);
         }
@@ -580,7 +605,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         }
 
         // Computa position towards us but not on the block, so we aren't actually standing on the thing.
-        BlockPos target = VassalUtils.getBlockBeside(getPos(), pos);
+        BlockPos target = VassalUtils.getBlockBeside(getBlockPos(), pos);
         debugLog("Targeting  Nearby: " + pos + " to: " + target);
         //target = pos;
         return getEntity().getNavigator().tryMoveToXYZ(target.getX(), target.getY(), target.getZ(),
@@ -606,32 +631,34 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
 
     private boolean canRun()
     {
-        //debugLog("fuel=" + getEntity().getFuelStack() + ", _fuelTicks=" + _fuelTicks);
-
         // If we have fuel ticks or spare fuel then we can run
-        return (_fuelTicks > 0 ||
-                (getEntity().getFuelStack() != null && getEntity().getFuelStack().stackSize > 0));
+        return (_fuelTicks > 0);
+    }
+
+
+    private void ensureFuel()
+    {
+        if (_fuelTicks == 0)
+        {
+            ItemStack fuelStack = getEntity().getFuelStack();
+            if (fuelStack != null)
+            {
+                _fuelTicks = TileEntityFurnace.getItemBurnTime(fuelStack);
+                fuelStack.stackSize--;
+                if (fuelStack.stackSize == 0)
+                    _entity.setFuelStack(null);
+                else
+                    _entity.setFuelStack(fuelStack);
+            }
+        }
     }
 
     private boolean burnFuel()
     {
+        ensureFuel();
         if (_fuelTicks != 0)
         {
             --_fuelTicks;
-            return true;
-        }
-
-        // Try to get another block
-        ItemStack fuelStack = _entity.getFuelStack();
-        if (fuelStack != null)
-        {
-            _fuelTicks = TileEntityFurnace.getItemBurnTime(fuelStack);
-            --fuelStack.stackSize;
-            if (fuelStack.stackSize == 0)
-                _entity.setFuelStack(null);
-            else
-                _entity.setFuelStack(fuelStack);
-
             return true;
         }
 
@@ -776,6 +803,10 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
     private static final long HEARTBEAT_DELAY       = 2000;
     private static final long HEARTBEAT_VARIANCE    = 1000;
     private long _nextHeartbeat;
+
+    private static final long HEAL_DELAY                = 500;
+    private static final long HEAL_FUEL_PER_HALF_HEART  = 20;
+    private long _nextHeal                              = 0;
 
 //    private static final int DEFAULT_RANGE = 10;
 //    private static final double DEFAULT_SPEED = 0.5;
