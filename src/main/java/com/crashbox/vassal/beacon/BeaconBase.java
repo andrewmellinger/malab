@@ -85,7 +85,7 @@ public abstract class BeaconBase
 
     protected void handleWorkHeartbeat(MessageWorkingHeartbeat msg)
     {
-        LOGGER.debug("Got heartbeat for: " + msg.getSender());
+        //LOGGER.debug("Got heartbeat for: " + msg.getSender());
         _lastHeartbeat.put(msg.getSender(), msg.getExpireMS());
     }
 
@@ -95,11 +95,11 @@ public abstract class BeaconBase
         ageOutWorkerList();
 
         // If we have fewer than the amount we want, then let's get rid of them.
-        if (_lastHeartbeat.size() >= concurrentWorkerCount())
-        {
-            LOGGER.debug("Not responding to availability. size=" + _lastHeartbeat.size() +
-                    ", max=" + concurrentWorkerCount());
-        }
+//        if (_lastHeartbeat.size() >= concurrentWorkerCount())
+//        {
+//            LOGGER.debug("Not responding to availability. size=" + _lastHeartbeat.size() +
+//                    ", max=" + concurrentWorkerCount());
+//        }
 
         return _lastHeartbeat.size() < concurrentWorkerCount();
     }
@@ -116,7 +116,7 @@ public abstract class BeaconBase
             Map.Entry<IMessager, Long> next =  iter.next();
             if (now > next.getValue())
             {
-                LOGGER.debug("Aged out: " + next.getKey());
+//                LOGGER.debug("Aged out: " + next.getKey());
                 iter.remove();
             }
         }

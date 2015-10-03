@@ -265,15 +265,12 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
 
         if (_entity.getHealth() < _entity.getMaxHealth())
         {
-
-
             if (System.currentTimeMillis() > _nextHeal && _fuelTicks > HEAL_FUEL_PER_HALF_HEART)
             {
-                _entity.addPotionEffect(new PotionEffect(Potion.moveSlowdown.id, 1, 1));
+                _entity.addPotionEffect(new PotionEffect(Potion.moveSlowdown.id, 20, 1));
                 _fuelTicks -= HEAL_FUEL_PER_HALF_HEART;
                 _nextHeal = System.currentTimeMillis() + HEAL_DELAY;
                 _entity.heal(1.0F);
-                LOGGER.debug("---------- HEALING!!!!");
             }
         }
     }
