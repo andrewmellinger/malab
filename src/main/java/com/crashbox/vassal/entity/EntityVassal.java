@@ -94,9 +94,12 @@ public class EntityVassal extends EntityCreature
         {
             compound.setInteger("fuelTicks", _vassalAI.getFuelTicks());
 
-            NBTTagCompound fuelCompound = new NBTTagCompound();
-            _fuelStack.writeToNBT(fuelCompound);
-            compound.setTag("fuelStack", fuelCompound);
+            if (_fuelStack != null)
+            {
+                NBTTagCompound fuelCompound = new NBTTagCompound();
+                _fuelStack.writeToNBT(fuelCompound);
+                compound.setTag("fuelStack", fuelCompound);
+            }
         }
 
         @Override
