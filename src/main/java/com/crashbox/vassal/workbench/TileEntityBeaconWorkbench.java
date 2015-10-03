@@ -8,7 +8,9 @@ import com.crashbox.vassal.messaging.*;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.inventory.*;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.nbt.NBTTagCompound;
@@ -27,7 +29,7 @@ import java.util.List;
 /**
  * Copyright 2015 Andrew O. Mellinger
  */
-public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory //implements ISidedInventory
+public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory implements ISidedInventory
 {
     public static final String NAME = "tileEntityBeaconWorkbench";
 
@@ -48,13 +50,6 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory //imple
     //   #     #   #     ####  ####  # # #   #     #     #     #
     //   #     #   #     #     #     #  ##   #     #     #     #
     //   #   ##### ##### ##### ##### #   #   #   #####   #     #
-
-    @Override
-    public boolean shouldRefresh(World parWorld, BlockPos parPos,
-                                 IBlockState parOldState, IBlockState parNewState)
-    {
-        return false;
-    }
 
     @Override
     public void readFromNBT(NBTTagCompound compound)
@@ -242,11 +237,12 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory //imple
     {
         // NOTE: We don't allow inserting in result or output.
         if (i < 9)
-            return _craftingMatrix.isItemValidForSlot(i, itemStack);
-        else if (i == 9)
-            return false;
-        else if (i == 10)
-            return false;
+        {
+            // We only allow more of the same
+            ItemStack stack = _craftingMatrix.getStackInSlot(i);
+            return stack != null && stack.isItemEqual(itemStack) &&
+                    (stack.stackSize < stack.getMaxStackSize());
+        }
 
         return false;
     }
@@ -302,23 +298,27 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory //imple
     //   #       #   #   #   # #     #   #   #   #  ##  # #  #     #  ##   #   #   # #   #   #
     // #####  ###  ##### ####  ##### ####  ##### #   #   #   ##### #   #   #    ###  #   #   #
 
-//    @Override
-//    public int[] getSlotsForFace(EnumFacing enumFacing)
-//    {
-//        return new int[0];
-//    }
-//
-//    @Override
-//    public boolean canInsertItem(int i, ItemStack itemStack, EnumFacing enumFacing)
-//    {
-//        return false;
-//    }
-//
-//    @Override
-//    public boolean canExtractItem(int i, ItemStack itemStack, EnumFacing enumFacing)
-//    {
-//        return false;
-//    }
+    @Override
+    public int[] getSlotsForFace(EnumFacing direction)
+    {
+        if (direction == EnumFacing.DOWN)
+            return new int[] {10};
+
+        return new int[] {0,1,2,3,4,5,6,7,8};
+    }
+
+    @Override
+    public boolean canInsertItem(int index, ItemStack stack, EnumFacing direction)
+    {
+        return isItemValidForSlot(index, stack);
+    }
+
+    @Override
+    public boolean canExtractItem(int index, ItemStack stack, EnumFacing direction)
+    {
+        // Sure, they are are allowed to take out whatever they want.
+        return true;
+    }
 
 
     //=============================================================================================
@@ -341,10 +341,10 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory //imple
         return _customName != null && _customName.length() > 0;
     }
 
-    public IChatComponent getDisplayName()
-    {
-        return new ChatComponentTranslation("container.beaconWorkbench");
-    }
+//    public IChatComponent getDisplayName()
+//    {
+//        return new ChatComponentTranslation("container.beaconWorkbench");
+//    }
 
     //=============================================================================================
     // IInteractionObject

@@ -1,11 +1,9 @@
 package com.crashbox.vassal.furnace;
 
-import com.crashbox.vassal.VassalUtils;
 import com.crashbox.vassal.common.ItemStackMatcher;
 import com.crashbox.vassal.messaging.*;
 import com.crashbox.vassal.beacon.BeaconBase;
 import com.crashbox.vassal.beacon.TileEntityBeaconInventory;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
@@ -19,7 +17,6 @@ import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntityFurnace;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
@@ -84,13 +81,6 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
     //   #     #   #     ####  ####  # # #   #     #     #     #
     //   #     #   #     #     #     #  ##   #     #     #     #
     //   #   ##### ##### ##### ##### #   #   #   #####   #     #
-
-    @Override
-    public boolean shouldRefresh(World parWorld, BlockPos parPos,
-                                 IBlockState parOldState, IBlockState parNewState)
-    {
-        return false;
-    }
 
     @Override
     public void setWorldObj(World worldIn)

@@ -19,7 +19,7 @@ import java.io.IOException;
 @SideOnly(Side.CLIENT)
 public class GuiBeaconWorkbench extends GuiContainer
 {
-    private static final ResourceLocation grinderGuiTextures =
+    private static final ResourceLocation guiTextures =
             new ResourceLocation(VassalMain.MODID
                 +":textures/gui/container/beaconWorkbench.png");
     private final InventoryPlayer _inventoryPlayer;
@@ -28,9 +28,7 @@ public class GuiBeaconWorkbench extends GuiContainer
     public GuiBeaconWorkbench(InventoryPlayer parInventoryPlayer,
             TileEntityBeaconWorkbench workbench)
     {
-        // We need to set yp our own craft matrix.
         super(new ContainerBeaconWorkbench(parInventoryPlayer, workbench));
-
         _inventoryPlayer = parInventoryPlayer;
         _tileWorkbench = workbench;
 
@@ -58,7 +56,7 @@ public class GuiBeaconWorkbench extends GuiContainer
     {
 //        LOGGER.debug("drawGuiContainerBackgroundLayer");
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        mc.getTextureManager().bindTexture(grinderGuiTextures);
+        mc.getTextureManager().bindTexture(guiTextures);
         int marginHorizontal = (width - xSize) / 2;
         int marginVertical = (height - ySize) / 2;
         drawTexturedModalRect(marginHorizontal, marginVertical, 0, 0, xSize, ySize);

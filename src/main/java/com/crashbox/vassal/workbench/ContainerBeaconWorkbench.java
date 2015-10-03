@@ -63,8 +63,6 @@ public class ContainerBeaconWorkbench extends Container
         }
 
         this.onCraftMatrixChanged(this._craftMatrix);
-
-        LOGGER.debug("Constructed ContainerWorkbench");
     }
 
     /**

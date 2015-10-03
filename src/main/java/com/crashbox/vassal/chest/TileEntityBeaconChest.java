@@ -42,13 +42,6 @@ public class TileEntityBeaconChest extends TileEntityBeaconInventory implements 
     //   #   ##### ##### ##### ##### #   #   #   #####   #     #
 
     @Override
-    public boolean shouldRefresh(World parWorld, BlockPos parPos,
-                                 IBlockState parOldState, IBlockState parNewState)
-    {
-        return false;
-    }
-
-    @Override
     public void setWorldObj(World worldIn)
     {
         LOGGER.debug("TileEntityBeaconChest setWorldObj: " + worldIn);

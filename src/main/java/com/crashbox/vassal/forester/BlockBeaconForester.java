@@ -23,18 +23,7 @@ public class BlockBeaconForester extends BlockContainer
         super(Material.iron);
         setUnlocalizedName(VassalMain.MODID + "_" + NAME);
         setCreativeTab(CreativeTabs.tabRedstone);
-
-//        setDefaultState(blockState.getBaseState().withProperty(
-//                FACING, EnumFacing.NORTH));
-        stepSound = soundTypeSnow;
-        blockParticleGravity = 1.0F;
-        slipperiness = 0.6F;
-        setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
-        lightOpacity = 20; // cast a light shadow
         setTickRandomly(false);
-        useNeighborBrightness = false;
-
-        LOGGER.info("constructed");
     }
 
     @Override

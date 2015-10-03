@@ -9,6 +9,7 @@ import com.crashbox.vassal.entity.GuiEntityVassal;
 import com.crashbox.vassal.entity.InventoryEntityVassal;
 import com.crashbox.vassal.furnace.ContainerBeaconFurnace;
 import com.crashbox.vassal.furnace.GuiBeaconFurnace;
+import com.crashbox.vassal.furnace.TileEntityBeaconFurnace;
 import com.crashbox.vassal.workbench.ContainerBeaconWorkbench;
 import com.crashbox.vassal.workbench.GuiBeaconWorkbench;
 import com.crashbox.vassal.workbench.TileEntityBeaconWorkbench;
@@ -50,7 +51,7 @@ public class GuiHandlerVassal implements IGuiHandler
             return null;
 
         if (ID == VassalMain.GUI_ENUM.FURNACE.ordinal())
-            return new ContainerBeaconFurnace(player.inventory, (IInventory)tileEntity);
+            return new ContainerBeaconFurnace(player.inventory, (TileEntityBeaconFurnace)tileEntity);
 
         if (ID == VassalMain.GUI_ENUM.WORKBENCH.ordinal())
             return new ContainerBeaconWorkbench(player.inventory, (TileEntityBeaconWorkbench)tileEntity);
@@ -81,7 +82,7 @@ public class GuiHandlerVassal implements IGuiHandler
             return null;
 
         if (ID == VassalMain.GUI_ENUM.FURNACE.ordinal())
-            return new GuiBeaconFurnace( player.inventory, (IInventory)tileEntity);
+            return new GuiBeaconFurnace( player.inventory, (TileEntityBeaconFurnace)tileEntity);
 
         if (ID == VassalMain.GUI_ENUM.WORKBENCH.ordinal())
             return new GuiBeaconWorkbench( player.inventory, (TileEntityBeaconWorkbench)tileEntity);

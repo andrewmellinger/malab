@@ -17,19 +17,18 @@ import org.apache.logging.log4j.Logger;
 @SideOnly(Side.CLIENT)
 public class GuiBeaconFurnace extends GuiContainer
 {
-    private static final ResourceLocation grinderGuiTextures =
+    private static final ResourceLocation guiTexture =
             new ResourceLocation(VassalMain.MODID
                     +":textures/gui/container/beaconFurnace.png");
     private final InventoryPlayer _inventoryPlayer;
-    private final IInventory _tileBeacon;
+    private final TileEntityBeaconFurnace _tileBeacon;
 
-    public GuiBeaconFurnace(InventoryPlayer parInventoryPlayer,
-            IInventory parInventoryGrinder)
+    public GuiBeaconFurnace(InventoryPlayer playerInventory,
+                            TileEntityBeaconFurnace tileEntity)
     {
-        super(new ContainerBeaconFurnace(parInventoryPlayer,
-                parInventoryGrinder));
-        _inventoryPlayer = parInventoryPlayer;
-        _tileBeacon = parInventoryGrinder;
+        super(new ContainerBeaconFurnace(playerInventory, tileEntity));
+        _inventoryPlayer = playerInventory;
+        _tileBeacon = tileEntity;
 
         LOGGER.debug( "Constructed: " + this);
     }
@@ -50,7 +49,7 @@ public class GuiBeaconFurnace extends GuiContainer
                                                    int mouseX, int mouseY)
     {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        mc.getTextureManager().bindTexture(grinderGuiTextures);
+        mc.getTextureManager().bindTexture(guiTexture);
         int marginHorizontal = (width - xSize) / 2;
         int marginVertical = (height - ySize) / 2;
         drawTexturedModalRect(marginHorizontal, marginVertical, 0, 0, xSize, ySize);

@@ -25,6 +25,13 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
 {
     public static final String NAME = "tileEntityBeaconForester";
 
+    //=============================================================================================
+    // ##### ##### #     ##### ##### #   # ##### ##### ##### #   #
+    //   #     #   #     #     #     ##  #   #     #     #    # #
+    //   #     #   #     ####  ####  # # #   #     #     #     #
+    //   #     #   #     #     #     #  ##   #     #     #     #
+    //   #   ##### ##### ##### ##### #   #   #   #####   #     #
+
     @Override
     public void setWorldObj(World worldIn)
     {
@@ -42,6 +49,13 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
         }
     }
 
+    //=============================================================================================
+    // ##### #   # ####  ####   ###  ##### ##### ####  #      ###  #   # ##### ####  #     #####  ###  ##### ####   ###  #   #
+    //   #   #   # #   # #   # #   #   #   #     #   # #     #   #  # #  #     #   # #       #   #       #   #   # #   #  # #
+    //   #   #   # ####  #   # #####   #   ####  ####  #     #####   #   ####  ####  #       #    ###    #   ##### #   #   #
+    //   #   #   # #     #   # #   #   #   #     #     #     #   #   #   #     #   # #       #       #   #   #   # #   #  # #
+    // #####  ###  #     ####  #   #   #   ##### #     ##### #   #   #   ##### #   # ##### #####  ###    #   ####   ###  #   #
+
     @Override
     public void update()
     {
@@ -55,17 +69,28 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
         _forester.terminate();
     }
 
+    //=============================================================================================
+    // ##### #   # #####  ###   ###   ###   #### ##### ####
+    //   #   ## ## #     #     #     #   # #     #     #   #
+    //   #   # # # ####   ###   ###  ##### #  ## ####  ####
+    //   #   #   # #         #     # #   # #   # #     #   #
+    // ##### #   # #####  ###   ###  #   #  #### ##### #   #
+
     @Override
     public int getRadius()
     {
         return _searchRadius;
     }
 
+    //=============================================================================================
+
     public int getMaxVassalCount()
     {
         // TODO:  Scale based on area.
         return 2;
     }
+
+    //=============================================================================================
 
     private class Forester extends BeaconBase
     {

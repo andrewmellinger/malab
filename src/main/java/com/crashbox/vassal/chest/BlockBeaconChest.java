@@ -3,14 +3,11 @@ package com.crashbox.vassal.chest;
 import com.crashbox.vassal.VassalMain;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
@@ -34,15 +31,7 @@ public class BlockBeaconChest extends BlockContainer
         super(Material.iron);
         setUnlocalizedName(VassalMain.MODID + "_" + NAME);
         setCreativeTab(CreativeTabs.tabRedstone);
-
-        setDefaultState(blockState.getBaseState());
-        stepSound = soundTypeSnow;
-        blockParticleGravity = 1.0F;
-        slipperiness = 0.6F;
-        setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
-        lightOpacity = 20; // cast a light shadow
         setTickRandomly(false);
-        useNeighborBrightness = false;
     }
 
     @Override
@@ -113,31 +102,6 @@ public class BlockBeaconChest extends BlockContainer
     }
 
     @Override
-    public IBlockState onBlockPlaced(
-            World worldIn,
-            BlockPos pos,
-            EnumFacing facing,
-            float hitX,
-            float hitY,
-            float hitZ,
-            int meta,
-            EntityLivingBase placer)
-    {
-        return getDefaultState();
-    }
-
-    @Override
-    public void onBlockPlacedBy(
-            World worldIn,
-            BlockPos pos,
-            IBlockState state,
-            EntityLivingBase placer,
-            ItemStack stack)
-    {
-        worldIn.setBlockState(pos, state, 2);
-    }
-
-    @Override
     @SideOnly(Side.CLIENT)
     public Item getItem(World worldIn, BlockPos pos)
     {
@@ -147,32 +111,14 @@ public class BlockBeaconChest extends BlockContainer
     @Override
     public int getRenderType()
     {
+        // We want the normal block renderer
         return 3;
-    }
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    public IBlockState getStateForEntityRender(IBlockState state)
-    {
-        return getDefaultState();
-    }
-
-    @Override
-    public IBlockState getStateFromMeta(int meta)
-    {
-        return getDefaultState();
     }
 
     @Override
     public int getMetaFromState(IBlockState state)
     {
         return 0;
-    }
-
-    @Override
-    protected BlockState createBlockState()
-    {
-        return new BlockState(this);
     }
 
     private static final Logger LOGGER = LogManager.getLogger();

@@ -21,8 +21,6 @@ public class ContainerBeaconChest extends Container
     public ContainerBeaconChest(InventoryPlayer inventoryPlayer, IInventory inventory)
     {
         // DEBUG
-        LOGGER.debug("Constructed!!");
-
         _tileInventory = inventory;
         _sizeInventory = _tileInventory.getSizeInventory();
 

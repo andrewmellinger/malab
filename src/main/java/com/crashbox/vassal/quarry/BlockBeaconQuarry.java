@@ -23,14 +23,7 @@ public class BlockBeaconQuarry extends BlockContainer
         super(Material.iron);
         setUnlocalizedName(VassalMain.MODID + "_" + NAME);
         setCreativeTab(CreativeTabs.tabRedstone);
-
-        stepSound = soundTypeSnow;
-        blockParticleGravity = 1.0F;
-        slipperiness = 0.6F;
-        setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
-        lightOpacity = 20; // cast a light shadow
         setTickRandomly(false);
-        useNeighborBrightness = false;
 
         // TOOD: Switch to iron, later.
         setHarvestLevel("pickaxe", 1);

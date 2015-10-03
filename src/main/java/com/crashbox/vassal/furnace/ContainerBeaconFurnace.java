@@ -1,6 +1,5 @@
 package com.crashbox.vassal.furnace;
 
-import com.crashbox.vassal.VassalUtils;
 import com.crashbox.vassal.common.SampleFuelSlot;
 import com.crashbox.vassal.common.SampleSlot;
 import net.minecraft.entity.player.EntityPlayer;
@@ -17,16 +16,16 @@ import org.apache.logging.log4j.Logger;
  */
 public class ContainerBeaconFurnace extends Container
 {
-    private final IInventory _tileBeacon;
+    private final TileEntityBeaconFurnace _tileBeacon;
     private final int _sizeInventory;
     private int[] _trackedFields = { 0,0,0,0};
 
-    public ContainerBeaconFurnace(InventoryPlayer inventoryPlayer, IInventory inventory)
+    public ContainerBeaconFurnace(InventoryPlayer inventoryPlayer, TileEntityBeaconFurnace tileEntity)
     {
         // DEBUG
         LOGGER.debug("Constructed!!");
 
-        _tileBeacon = inventory;
+        _tileBeacon = tileEntity;
         _sizeInventory = _tileBeacon.getSizeInventory();
 
         // Set up all our main interaction slots
@@ -35,10 +34,10 @@ public class ContainerBeaconFurnace extends Container
         addSlotToContainer(new SlotFurnaceOutput(inventoryPlayer.player, _tileBeacon, 2, 148, 35));
 
         for (int i = 0; i < 4; ++i)
-            addSlotToContainer(new SampleSlot(inventory, i + 3, 8+ i*18, 17));
+            addSlotToContainer(new SampleSlot(tileEntity, i + 3, 8+ i*18, 17));
 
         for (int i = 0; i < 4; ++i)
-            addSlotToContainer(new SampleFuelSlot(inventory, i + 7, 8+ i*18, 53));
+            addSlotToContainer(new SampleFuelSlot(tileEntity, i + 7, 8+ i*18, 53));
 
         // add player inventory slots
         // note that the slot numbers are within the player inventory so can
@@ -137,15 +136,6 @@ public class ContainerBeaconFurnace extends Container
             }
             else if (slotIndex != TileEntityBeaconFurnace.slotEnum.INPUT_SLOT.ordinal())
             {
-                // check if there is a grinding recipe for the stack
-//                if (GrinderRecipes.instance().getGrindingResult(itemStack2) != null)
-//                {
-//                    if (!mergeItemStack(itemStack2, 0, 1, false))
-//                    {
-//                        return null;
-//                    }
-//                }
-//                else if (slotIndex >= _sizeInventory
                 if (slotIndex >= _sizeInventory && slotIndex < _sizeInventory +27) // player inventory slots
                 {
                     if (!mergeItemStack(itemStack2, _sizeInventory +27, _sizeInventory +36, false))
