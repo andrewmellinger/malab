@@ -79,16 +79,27 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
         }
 
         @Override
+        protected int concurrentWorkerCount()
+        {
+            // We can't handle that many
+            return 3;
+        }
+
+        @Override
         protected void handleMessage(Message msg)
         {
             if (msg instanceof MessageItemRequest)
             {
-                handleItemRequest((MessageItemRequest) msg);
+                if (haveFreeWorkerSlots())
+                    handleItemRequest((MessageItemRequest) msg);
             }
-            if (msg instanceof MessageWorkerAvailability && timeForAvailabilityResponse())
+            else if (msg instanceof MessageWorkerAvailability)
             {
-                debugLog("Handling worker availability.");
-                handleWorkerAvailability((MessageWorkerAvailability) msg);
+                if (haveFreeWorkerSlots())
+                {
+                    debugLog("Handling worker availability.");
+                    handleWorkerAvailability((MessageWorkerAvailability) msg);
+                }
             }
         }
     }

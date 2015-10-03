@@ -87,30 +87,28 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
             return;
         }
 
+        // As long as we have a task, tell them we are working on it
+        handleHeartbeat();
+
         //LOGGER.debug("UpdateTask: " + _state);
         switch (_state)
         {
             case IDLING:
                 getEntity().setCurrentItemOrArmor(3, null);
-                _renderVassal.setTexture(VASSAL_TEXTURE.NORMAL);
                 _state = idle();
                 break;
             case ELICITING:
-                _renderVassal.setTexture(VASSAL_TEXTURE.NORMAL);
                 _state = elicit();
                 break;
             case TRANSITING:
-                _renderVassal.setTexture(VASSAL_TEXTURE.NORMAL);
                 _state = transition();
                 break;
             case TARGETING:
                 burnFuel();
-                _renderVassal.setTexture(VASSAL_TEXTURE.WORKING);
                 _state = target();
                 break;
             case PERFORMING:
                 burnFuel();
-                _renderVassal.setTexture(VASSAL_TEXTURE.NORMAL);
                 _state = perform();
                 break;
         }
@@ -246,6 +244,16 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         return pair;
     }
 
+    private void handleHeartbeat()
+    {
+        long now = System.currentTimeMillis();
+        if (_currentTask != null && now > _nextHeartbeat)
+        {
+            _nextHeartbeat = now + HEARTBEAT_DELAY;
+            _currentTask.sendHeartbeat(_nextHeartbeat + HEARTBEAT_VARIANCE);
+        }
+    }
+
     //=============================================================================================
     // ##### ####  #     ##### #   #  ####
     //   #   #   # #       #   ##  # #
@@ -315,14 +323,9 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
             _proposedTasks.clear();
 
             if (_currentTask != null)
-            {
-                _currentTask.sendAcceptMessages();
                 _currentTask.start();
-            }
             else
-            {
                 return State.IDLING;
-            }
 
             //getEntity().spawnExplosionParticle();
             debugLog("Selected task: " + _currentTask);
@@ -575,7 +578,8 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         BlockPos target = VassalUtils.getBlockBeside(getPos(), pos);
         debugLog("Targeting  Nearby: " + pos + " to: " + target);
         //target = pos;
-        return getEntity().getNavigator().tryMoveToXYZ(target.getX(), target.getY(), target.getZ(), getEntity().getSpeed());
+        return getEntity().getNavigator().tryMoveToXYZ(target.getX(), target.getY(), target.getZ(),
+                getEntity().getSpeed());
     }
 
     public boolean inProximity(BlockPos pos)
@@ -597,7 +601,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
 
     private boolean canRun()
     {
-        debugLog("fuel=" + getEntity().getFuelStack() + ", _fuelTicks=" + _fuelTicks);
+        //debugLog("fuel=" + getEntity().getFuelStack() + ", _fuelTicks=" + _fuelTicks);
 
         // If we have fuel ticks or spare fuel then we can run
         return (_fuelTicks > 0 ||
@@ -762,6 +766,11 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
 
     private static final int FUEL_REQUEST_DELAY = 2000;
     private long _nextFuel = 0;
+
+    // How often do we send the hearbeat, and how long should they wait
+    private static final long HEARTBEAT_DELAY       = 2000;
+    private static final long HEARTBEAT_VARIANCE    = 1000;
+    private long _nextHeartbeat;
 
 //    private static final int DEFAULT_RANGE = 10;
 //    private static final double DEFAULT_SPEED = 0.5;

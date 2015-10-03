@@ -20,7 +20,7 @@ public interface ITask
 
     int getValue(double speed);
 
-    void sendAcceptMessages();
+    void sendHeartbeat(long expire);
 
     void start();
 

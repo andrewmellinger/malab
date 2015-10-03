@@ -106,8 +106,6 @@ public class TaskPair implements ITask
             linkupAcquireResponses(responses);
     }
 
-
-
     public int getValue(double speed)
     {
         TaskBase[] tasks = { _acquireTask, _deliverTask};
@@ -126,24 +124,20 @@ public class TaskPair implements ITask
         return value;
     }
 
-    public void sendAcceptMessages()
+    public void sendHeartbeat(long expire)
     {
-        int delay = 0;
-        BlockPos pos = _entityAI.getPos();
+        // Send one to acquire if we have one and we are working on it
+        if (_current == _acquireTask && _acquireTask != null)
+            sendHeartbeatFor(_acquireTask, expire);
 
-        TaskBase[] tasks = { _acquireTask, _deliverTask};
-        for (TaskBase task : tasks)
-        {
-            if (task != null)
-            {
-                // Five hundred millis for each block we need to walk. TODO:  Rework in entity speed.
-                delay += Priority.computeDistanceCost(pos, task.getWorkCenter(), _entityAI.getEntity().getSpeed()) * 500;
-                pos = task.getWorkCenter();
-                // Add two seconds to break, pickup, place, etc.
-                delay += 2000;
-                Broadcaster.postMessage(new MessageWorkAccepted(_entityAI, task.getRequester(), null, 0, delay));
-            }
-        }
+        // We are always working before or on deliver
+        if (_deliverTask != null )
+            sendHeartbeatFor(_deliverTask, expire);
+    }
+
+    private void sendHeartbeatFor(TaskBase task, long expire)
+    {
+        Broadcaster.postMessage(new MessageWorkingHeartbeat(_entityAI, task.getRequester(), task, expire));
     }
 
     public void start()
@@ -362,6 +356,7 @@ public class TaskPair implements ITask
 
     private TaskAcquireBase         _acquireTask;
     private TaskDeliverBase         _deliverTask;
+
 
     private static final Logger LOGGER = LogManager.getLogger();
 }

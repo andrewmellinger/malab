@@ -107,19 +107,28 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
         }
 
         @Override
+        protected int concurrentWorkerCount()
+        {
+            return 3;
+        }
+
+        @Override
         protected void handleMessage(Message msg)
         {
             if (msg instanceof MessageItemRequest)
             {
-                handleItemRequest((MessageItemRequest) msg);
+                if (haveFreeWorkerSlots())
+                    handleItemRequest((MessageItemRequest) msg);
             }
-            else if (msg instanceof MessageWorkerAvailability && timeForAvailabilityResponse())
+            else if (msg instanceof MessageWorkerAvailability && haveFreeWorkerSlots())
             {
-                handleWorkerAvailability((MessageWorkerAvailability)msg);
+                if (haveFreeWorkerSlots())
+                    handleWorkerAvailability((MessageWorkerAvailability)msg);
             }
             else if (msg instanceof MessageIsStorageAvailable)
             {
-                handleIsStorageAvailable((MessageIsStorageAvailable) msg);
+                if (haveFreeWorkerSlots())
+                    handleIsStorageAvailable((MessageIsStorageAvailable) msg);
             }
         }
     }

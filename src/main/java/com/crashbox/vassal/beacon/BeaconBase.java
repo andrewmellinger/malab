@@ -6,8 +6,11 @@ import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.swing.text.html.HTMLDocument;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Queue;
-import java.util.Random;
 import java.util.concurrent.LinkedTransferQueue;
 
 /**
@@ -17,11 +20,9 @@ public abstract class BeaconBase
 {
     protected BeaconBase(World world)
     {
-        Random rand = new Random();
         // We only want to listen on the server
         if (!world.isRemote)
         {
-            // TODO:  Deal with channel changes
             _listener = new Listener();
             Broadcaster.getInstance().subscribe(_listener);
         }
@@ -48,12 +49,12 @@ public abstract class BeaconBase
         Message msg;
         while (( msg = _messages.poll()) != null)
         {
-            if (msg instanceof MessageWorkAccepted)
+            if (msg instanceof MessageWorkingHeartbeat)
             {
                 if (msg.getTarget() == getSender())
                 {
                     //LOGGER.debug(id() + " got accepted work message.: " + msg);
-                    handleWorkAccepted((MessageWorkAccepted) msg);
+                    handleWorkHeartbeat((MessageWorkingHeartbeat) msg);
                 }
                 continue;
             }
@@ -75,19 +76,52 @@ public abstract class BeaconBase
      */
     protected abstract void handleMessage(Message msg);
 
-    //=============================================================================================
-
-    protected void handleWorkAccepted(MessageWorkAccepted msg)
-    {
-        _nextAvailabilityResponseMS = System.currentTimeMillis() + msg.getDelayMS();
-    }
-
-    protected boolean timeForAvailabilityResponse()
-    {
-        return System.currentTimeMillis() > _nextAvailabilityResponseMS;
-    }
+    /**
+     * @return Number of concurrent workers we allow.
+     */
+    protected abstract int concurrentWorkerCount();
 
     //=============================================================================================
+
+    protected void handleWorkHeartbeat(MessageWorkingHeartbeat msg)
+    {
+        LOGGER.debug("Got heartbeat for: " + msg.getSender());
+        _lastHeartbeat.put(msg.getSender(), msg.getExpireMS());
+    }
+
+    protected boolean haveFreeWorkerSlots()
+    {
+        // Prune the list
+        ageOutWorkerList();
+
+        // If we have fewer than the amount we want, then let's get rid of them.
+        if (_lastHeartbeat.size() >= concurrentWorkerCount())
+        {
+            LOGGER.debug("Not responding to availability. size=" + _lastHeartbeat.size() +
+                    ", max=" + concurrentWorkerCount());
+        }
+
+        return _lastHeartbeat.size() < concurrentWorkerCount();
+    }
+
+    //=============================================================================================
+
+    private void ageOutWorkerList()
+    {
+        long now = System.currentTimeMillis();
+
+        Iterator<Map.Entry<IMessager, Long>> iter = _lastHeartbeat.entrySet().iterator();
+        while (iter.hasNext())
+        {
+            Map.Entry<IMessager, Long> next =  iter.next();
+            if (now > next.getValue())
+            {
+                LOGGER.debug("Aged out: " + next.getKey());
+                iter.remove();
+            }
+        }
+    }
+
 
     // Listener to deal with all the incoming messages
     private class Listener implements IListener
@@ -117,10 +151,8 @@ public abstract class BeaconBase
 
     private Listener _listener;
 
-    // We only want to respond everyone once in a while.  They send us a message
-    // when they accept
-    private long _nextAvailabilityResponseMS = 0;
-
+    // A list of the people we have working on our project.
+    private final Map<IMessager, Long> _lastHeartbeat = new HashMap<IMessager, Long>();
 
     private static final Logger LOGGER = LogManager.getLogger();
 

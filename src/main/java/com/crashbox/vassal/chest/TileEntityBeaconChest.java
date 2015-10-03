@@ -402,6 +402,13 @@ public class TileEntityBeaconChest extends TileEntityBeaconInventory implements 
         }
 
         @Override
+        protected int concurrentWorkerCount()
+        {
+            // Doesn't matter because we don't respect the concurrency count.
+            return 4;
+        }
+
+        @Override
         protected void handleMessage(Message msg)
         {
             LOGGER.debug(msg);

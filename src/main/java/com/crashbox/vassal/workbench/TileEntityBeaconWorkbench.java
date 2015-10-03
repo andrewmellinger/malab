@@ -677,6 +677,13 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory impleme
         }
 
         @Override
+        protected int concurrentWorkerCount()
+        {
+            // We can handle quite a few because they don't take long here.
+            return 10;
+        }
+
+        @Override
         protected void handleMessage(Message msg)
         {
             if (msg instanceof MessageWorkerAvailability)
