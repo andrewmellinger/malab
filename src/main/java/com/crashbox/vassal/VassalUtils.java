@@ -259,8 +259,6 @@ public class VassalUtils
 
         AxisAlignedBB scanBlock = new AxisAlignedBB(x - range, y - 1, z - range, x + range, y + 1, z + range);
         List entities = world.getEntitiesWithinAABB(EntityItem.class, scanBlock);
-        int count = 0;
-        Item itemType = null;
         for (Object obj :entities)
         {
             if ( obj instanceof EntityItem)
