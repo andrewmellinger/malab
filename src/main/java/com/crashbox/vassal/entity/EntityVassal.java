@@ -40,13 +40,26 @@ public class EntityVassal extends EntityCreature
         _toolStacks[3] = new ItemStack(Items.stone_sword);
 
         _fuelStack = null;
+
+        // Debugging
+//        _carryCapacity = 4;
+//        _workSpeedFactor = 0.5F;
+
+        // Release & testing
+        _carryCapacity = 16;
+        _workSpeedFactor = 0.75F;
     }
 
-    public double getSpeed()
+    // NOTE This is NOT the same as movement speed. This is a scalar based on the movement speed.
+    public double getSpeedFactor()
     {
-        // TODO: Somehow movement speed got set to 0.6 so we need to do this manually
-        //return 0.4D;
-        return getEntityAttribute(SharedMonsterAttributes.movementSpeed).getAttributeValue();
+        // Note on total speed (movementSpeed * factor)
+        // 0.16 is pretty slowe ang good for debugging
+        // 0.25 is kinda quick.
+
+        return 1.25D;  // 1.25 * 0.20 = 0.25 -- pretty zippy
+        // return 1.0D;   // 1.0  * 0.20 = 0.20 -- Little slower than zombie
+        // return 0.75D;  // 0.75 * 0.20 = 0.15 -- good for debugging
     }
 
     // you don't have to call this as it is called automatically during EntityLiving subclass creation
@@ -57,11 +70,13 @@ public class EntityVassal extends EntityCreature
 
         // standard attributes registered to EntityLivingBase
         getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(40.0D);
-//        getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(1.0D);
-        getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.4D);
-//        getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.6D);
         getEntityAttribute(SharedMonsterAttributes.knockbackResistance).setBaseValue(0.8D);
         getEntityAttribute(SharedMonsterAttributes.followRange).setBaseValue(64.0D);
+
+        // IMPORTANT:  This is not the same as the multiplier that is specified in "tryMoveTo".
+        // These two numbers are multiplied together.  Zombie is 0.23000000417232513D
+        getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.20D);  // Debugging
+
 
         // need to register any additional attributes
         //getAttributeMap().registerAttribute(SharedMonsterAttributes.attackDamage);
@@ -303,6 +318,7 @@ public class EntityVassal extends EntityCreature
 
     //=============================================================================================
 
+    // Our pile of tools
     private ItemStack[] _toolStacks = new ItemStack[4];
 
     // Fuel management
@@ -311,11 +327,10 @@ public class EntityVassal extends EntityCreature
     private int _lastFuelSecs = 0;
 
     // How many things we can carry.
-    private int _carryCapacity = 4;
-//    private int _carryCapacity = 20;
+    private int _carryCapacity;
 
     // Divider on time.  Higher is faster.  The player (steve) is around 1.0
-    private float _workSpeedFactor = 0.5F;
+    private float _workSpeedFactor;
 
     // We use this alot
     private EntityAIVassal _vassalAI;

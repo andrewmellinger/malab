@@ -3,7 +3,6 @@ package com.crashbox.vassal.ai;
 import com.crashbox.vassal.VassalUtils;
 import com.crashbox.vassal.entity.EntityVassal;
 import com.crashbox.vassal.common.ItemStackMatcher;
-import com.crashbox.vassal.entity.RenderVassal;
 import com.crashbox.vassal.messaging.*;
 import com.crashbox.vassal.task.*;
 
@@ -159,35 +158,45 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
             ItemStack held = getEntity().getHeldItem();
             if (msg instanceof MessageTaskRequest && _currentTask == null)
             {
-                if (msg.getTransactionID() == MessageWorkerAvailability.class)
+                // Can get to doesn't seem to drop anything
+                if (canGetTo(msg.getSender().getBlockPos()))
                 {
-                    debugLog("Adding new task for message: " + msg);
-                    _proposedTasks.add(makeNewTask((MessageTaskRequest) msg));
-                }
-//                else if (msg instanceof TRStore && held != null && msg.getTransactionID() == held.getItem())
-                else if (msg instanceof TRDeliverBase && held != null && msg.getTransactionID() == held.getItem())
-                {
-                    debugLog("Adding new Deliver task : " + msg);
-                    _proposedTasks.add(makeNewTask((MessageTaskRequest) msg));
-                }
-                else
-                {
-                    debugLog("Adding response task: " + msg);
-                    _responseTasks.add((MessageTaskRequest) msg);
+                    if (msg.getTransactionID() == MessageWorkerAvailability.class)
+                    {
+                        debugLog("Adding new task for message: " + msg);
+                        _proposedTasks.add(makeNewTask((MessageTaskRequest) msg));
+                    }
+                    else if (msg instanceof TRDeliverBase && held != null && msg.getTransactionID() == held.getItem())
+                    {
+                        debugLog("Adding new Deliver task : " + msg);
+                        _proposedTasks.add(makeNewTask((MessageTaskRequest) msg));
+                    }
+                    else
+                    {
+                        debugLog("Adding response task: " + msg);
+                        _responseTasks.add((MessageTaskRequest) msg);
+                    }
                 }
             }
             else if (msg instanceof MessageTaskPairRequest)
             {
-                if (msg.getTransactionID() == MessageWorkerAvailability.class)
+                if (canGetTo(msg.getSender().getBlockPos()))
                 {
-                    debugLog("Adding new tasks for PAIR message: " + msg);
-                    _proposedTasks.add(makeNewTask((MessageTaskPairRequest) msg));
+
+                    if (msg.getTransactionID() == MessageWorkerAvailability.class)
+                    {
+                        debugLog("Adding new tasks for PAIR message: " + msg);
+                        _proposedTasks.add(makeNewTask((MessageTaskPairRequest) msg));
+                    }
                 }
             }
             else if (msg.getTransactionID() != null)
             {
-                // If it has a transactionID it is a response to something we sent before, but isn't a task
-                _responses.add(msg);
+                if (canGetTo(msg.getSender().getBlockPos()))
+                {
+                    // If it has a transactionID it is a response to something we sent before, but isn't a task
+                    _responses.add(msg);
+                }
             }
             else
             {
@@ -341,7 +350,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         if (System.currentTimeMillis() > _requestEndMS)
         {
             debugLog("Selecting from (" + _proposedTasks.size() + ") tasks.");
-            _currentTask = Priority.selectBestTask(getEntity().getPosition(), _proposedTasks, getEntity().getSpeed());
+            _currentTask = Priority.selectBestTask(getEntity().getPosition(), _proposedTasks, getEntity().getSpeedFactor());
             _proposedTasks.clear();
 
             if (_currentTask != null)
@@ -590,6 +599,12 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
                 center.getZ() - radius <= pos.getZ() && pos.getZ() <= center.getZ() + radius);
     }
 
+    public boolean canGetTo(BlockPos pos)
+    {
+        return (_entity.getNavigator().getPathToXYZ(pos.getX(), pos.getY(), pos.getZ()) != null);
+    }
+
+
     // Convenience method
     public boolean tryMoveTo(BlockPos pos)
     {
@@ -607,7 +622,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         debugLog("Targeting  Nearby: " + pos + " to: " + target);
         //target = pos;
         return getEntity().getNavigator().tryMoveToXYZ(target.getX(), target.getY(), target.getZ(),
-                getEntity().getSpeed());
+                getEntity().getSpeedFactor());
     }
 
     public boolean inProximity(BlockPos pos)

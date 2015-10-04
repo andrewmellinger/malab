@@ -75,7 +75,11 @@ public class TaskMakeBigStair extends TaskDeliverBase
             placeStairBlock();
         }
 
-        // If we have more inventory, let's try to do this again.  GetWorkTarger will return null if no more spaces.
+        BlockPos downOne = _builder.getStairPos().down();
+        if (getWorld().isAirBlock(downOne))
+            getEntity().placeHeldBlock(getWorld(), downOne);
+
+        // If we have more inventory, let's try to do this again.  GetWorkTarget will return null if no more spaces.
         if (getEntity().getHeldSize() == 0)
             return UpdateResult.DONE;
 

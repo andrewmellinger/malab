@@ -287,7 +287,6 @@ public class TaskPair implements ITask
         if (VassalUtils.isNotNull(best, LOGGER))
         {
             setDeliverTask((TaskDeliverBase)TaskBase.createTask(_entityAI, best));
-
             return true;
         }
 
@@ -319,10 +318,14 @@ public class TaskPair implements ITask
         T best = null;
         int bestValue = Integer.MIN_VALUE;
 
+        // Move helper
         for (T msg : responses)
         {
+            if (!_entityAI.canGetTo(msg.getSender().getBlockPos()))
+                continue;
+
             int value = msg.getValue() - Priority.computeDistanceCost(pos, msg.getSender().getBlockPos(),
-                    _entityAI.getEntity().getSpeed());
+                    _entityAI.getEntity().getSpeedFactor());
             LOGGER.debug("findBest: task=" + this + ", cost=" + value + ", msg=" + msg);
             if (value > bestValue)
             {
