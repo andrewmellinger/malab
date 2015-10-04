@@ -9,6 +9,7 @@ import com.crashbox.vassal.task.*;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.pathfinding.PathEntity;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.tileentity.TileEntityFurnace;
@@ -158,45 +159,34 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
             ItemStack held = getEntity().getHeldItem();
             if (msg instanceof MessageTaskRequest && _currentTask == null)
             {
-                // Can get to doesn't seem to drop anything
-                if (canGetTo(msg.getSender().getBlockPos()))
+                if (msg.getTransactionID() == MessageWorkerAvailability.class)
                 {
-                    if (msg.getTransactionID() == MessageWorkerAvailability.class)
-                    {
-                        debugLog("Adding new task for message: " + msg);
-                        _proposedTasks.add(makeNewTask((MessageTaskRequest) msg));
-                    }
-                    else if (msg instanceof TRDeliverBase && held != null && msg.getTransactionID() == held.getItem())
-                    {
-                        debugLog("Adding new Deliver task : " + msg);
-                        _proposedTasks.add(makeNewTask((MessageTaskRequest) msg));
-                    }
-                    else
-                    {
-                        debugLog("Adding response task: " + msg);
-                        _responseTasks.add((MessageTaskRequest) msg);
-                    }
+                    debugLog("Adding new task for message: " + msg);
+                    _proposedTasks.add(makeNewTask((MessageTaskRequest) msg));
+                }
+                else if (msg instanceof TRDeliverBase && held != null && msg.getTransactionID() == held.getItem())
+                {
+                    debugLog("Adding new Deliver task : " + msg);
+                    _proposedTasks.add(makeNewTask((MessageTaskRequest) msg));
+                }
+                else
+                {
+                    debugLog("Adding response task: " + msg);
+                    _responseTasks.add((MessageTaskRequest) msg);
                 }
             }
             else if (msg instanceof MessageTaskPairRequest)
             {
-                if (canGetTo(msg.getSender().getBlockPos()))
+                if (msg.getTransactionID() == MessageWorkerAvailability.class)
                 {
-
-                    if (msg.getTransactionID() == MessageWorkerAvailability.class)
-                    {
-                        debugLog("Adding new tasks for PAIR message: " + msg);
-                        _proposedTasks.add(makeNewTask((MessageTaskPairRequest) msg));
-                    }
+                    debugLog("Adding new tasks for PAIR message: " + msg);
+                    _proposedTasks.add(makeNewTask((MessageTaskPairRequest) msg));
                 }
             }
             else if (msg.getTransactionID() != null)
             {
-                if (canGetTo(msg.getSender().getBlockPos()))
-                {
-                    // If it has a transactionID it is a response to something we sent before, but isn't a task
-                    _responses.add(msg);
-                }
+                // If it has a transactionID it is a response to something we sent before, but isn't a task
+                _responses.add(msg);
             }
             else
             {
@@ -601,7 +591,9 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
 
     public boolean canGetTo(BlockPos pos)
     {
-        return (_entity.getNavigator().getPathToXYZ(pos.getX(), pos.getY(), pos.getZ()) != null);
+        debugLog("Checking path to: " + pos);
+        PathEntity path = _entity.getNavigator().getPathToXYZ(pos.getX(), pos.getY(), pos.getZ());
+        return (path != null);
     }
 
 
@@ -617,12 +609,19 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
             return true;
         }
 
-        // Computa position towards us but not on the block, so we aren't actually standing on the thing.
+        // Compute position towards us but not on the block, so we aren't actually standing on the thing.
         BlockPos target = VassalUtils.getBlockBeside(getBlockPos(), pos);
         debugLog("Targeting  Nearby: " + pos + " to: " + target);
         //target = pos;
-        return getEntity().getNavigator().tryMoveToXYZ(target.getX(), target.getY(), target.getZ(),
+        boolean canMove = getEntity().getNavigator().tryMoveToXYZ(target.getX(), target.getY(), target.getZ(),
                 getEntity().getSpeedFactor());
+
+        // Sometimes we can't move near, so just move to
+        if (!canMove)
+            canMove = getEntity().getNavigator().tryMoveToXYZ(pos.getX(), pos.getY(), pos.getZ(),
+                    getEntity().getSpeedFactor());
+
+        return canMove;
     }
 
     public boolean inProximity(BlockPos pos)
