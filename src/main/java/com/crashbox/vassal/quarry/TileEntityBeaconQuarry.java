@@ -1,6 +1,7 @@
 package com.crashbox.vassal.quarry;
 
 import com.crashbox.vassal.VassalMain;
+import com.crashbox.vassal.VassalUtils;
 import com.crashbox.vassal.ai.EntityAIVassal;
 import com.crashbox.vassal.beacon.BeaconBase;
 import com.crashbox.vassal.common.AnyItemMatcher;
@@ -122,7 +123,11 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
 
     private void handleWorkerAvailability(MessageWorkerAvailability msg)
     {
-        // First, if we need stairs, send a stairs event
+        // first clean up any messes
+        if (VassalUtils.generateCleanupTask(this, getWorld(), getPos(), _radius, msg))
+            return;
+
+        // If we need stairs, send a stairs event
         StairBuilder builder = new StairBuilder(getWorld(), getPos(), _radius);
 
         // Set it up.
@@ -131,7 +136,7 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
         int stairsNeeded = builder.getNeededStairCount();
         if (stairsNeeded > 0)
         {
-            LOGGER.debug("Found  first stair.");
+            //LOGGER.debug("Found  first stair.");
             TRMakeBigStair makeStair = new TRMakeBigStair(this, msg.getSender(), msg.getTransactionID(), 10, stairsNeeded);
             Broadcaster.postMessage(makeStair);
             return;
@@ -147,15 +152,9 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
         }
 
         // If we are here we need a worker to move us down one.
-        TRHarvestBlock harvest = new TRHarvestBlock(this, msg.getSender(), msg.getTransactionID(),
-                20, new ItemStackMatcher(VassalMain.BLOCK_BEACON_QUARRY), getPos());
-
-        TRPlaceBlock place = new TRPlaceBlock(this, msg.getSender(), msg.getTransactionID(),
-                20, getPos().down());
-
-        MessageTaskPairRequest pair = new MessageTaskPairRequest(this, msg.getSender(), msg.getTransactionID(),
-                false, harvest, place);
-        Broadcaster.postMessage(pair);
+        VassalUtils.postHarvestPlacePair(this, msg, 20, 20,
+                new ItemStackMatcher(VassalMain.BLOCK_BEACON_QUARRY), getPos(), getPos().down(),
+                false);
     }
 
 

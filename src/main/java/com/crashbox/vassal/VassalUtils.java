@@ -2,6 +2,7 @@ package com.crashbox.vassal;
 
 import com.crashbox.vassal.common.ItemStackMatcher;
 import com.crashbox.vassal.entity.EntityVassal;
+import com.crashbox.vassal.messaging.*;
 import com.crashbox.vassal.util.BlockWalker;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockSlab;
@@ -249,6 +250,28 @@ public class VassalUtils
 
         return null;
     }
+
+    public static Item findFirstItemTypeOnGround(World world, BlockPos startPos, int range)
+    {
+        int x = startPos.getX();
+        int y = startPos.getY();
+        int z = startPos.getZ();
+
+        AxisAlignedBB scanBlock = new AxisAlignedBB(x - range, y - 1, z - range, x + range, y + 1, z + range);
+        List entities = world.getEntitiesWithinAABB(EntityItem.class, scanBlock);
+        int count = 0;
+        Item itemType = null;
+        for (Object obj :entities)
+        {
+            if ( obj instanceof EntityItem)
+            {
+                return (((EntityItem)obj).getEntityItem().getItem());
+            }
+        }
+
+        return null;
+    }
+
 
     /**
      * Searches the area for items of the base item type ignoring metadata.  The first item found sets
@@ -664,6 +687,42 @@ public class VassalUtils
             z = center.getZ() - radius;
         }
         return new BlockPos(x, center.getY(), z);
+    }
+
+    //=============================================================================================
+    // #####  ###   ###  #   # ##### #   #  ####
+    //   #   #   # #     #  #    #   ##  # #
+    //   #   #####  ###  ###     #   # # # #  ##
+    //   #   #   #     # #  #    #   #  ## #   #
+    //   #   #   #  ###  #   # ##### #   #  ####
+
+    public static boolean generateCleanupTask(IMessager sender, World world, BlockPos pos, int radius,
+                                              MessageWorkerAvailability msg)
+    {
+        Item item = VassalUtils.findFirstItemTypeOnGround(world, pos, radius);
+        if (item != null)
+        {
+            Broadcaster.postMessage(new TRPickup(sender, msg.getSender(), msg.getTransactionID(), 0, -1, item));
+            return true;
+        }
+        return false;
+    }
+
+    public static void postHarvestPlacePair(IMessager sender, Message msg,
+                                            int acquirePriority, int deliverPriority,
+                                            ItemStackMatcher matcher, BlockPos srcPos, BlockPos dstPos,
+                                            boolean repeat)
+    {
+        TRHarvestBlock harvest = new TRHarvestBlock(sender, msg.getSender(), msg.getTransactionID(),
+                acquirePriority, matcher, srcPos);
+
+        TRPlaceBlock place = new TRPlaceBlock(sender, msg.getSender(), msg.getTransactionID(),
+                deliverPriority, dstPos);
+
+        MessageTaskPairRequest pair = new MessageTaskPairRequest(sender, msg.getSender(), msg.getTransactionID(),
+                repeat, harvest, place);
+        Broadcaster.postMessage(pair);
+
     }
 
 
