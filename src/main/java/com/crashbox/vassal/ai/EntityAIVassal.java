@@ -618,12 +618,26 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
 
     public int getFuelTicks()
     {
+        debugLog("Fuel Ticks!! " + _fuelTicks);
         return _fuelTicks;
     }
 
     public void setFuelTicks(int ticks)
     {
+        // No one should be calling this!
         _fuelTicks = ticks;
+        if (!_entity.getEntityWorld().isRemote)
+        {
+            if (_fuelSec != _fuelTicks / 20)
+            {
+                _fuelSec = _fuelTicks / 20;
+                _entity.getDataWatcher().updateObject(20, _fuelSec);
+            }
+        }
+        else
+        {
+            LOGGER.warn("Someone calling 'setFuelTicks' from client side!!!");
+        }
     }
 
     private boolean canRun()
@@ -632,7 +646,6 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         return (_fuelTicks > 0);
     }
 
-
     private void ensureFuel()
     {
         if (_fuelTicks == 0)
@@ -640,7 +653,8 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
             ItemStack fuelStack = getEntity().getFuelStack();
             if (fuelStack != null)
             {
-                _fuelTicks = TileEntityFurnace.getItemBurnTime(fuelStack);
+                setFuelTicks(TileEntityFurnace.getItemBurnTime(fuelStack));
+                //debugLog("Setting fuel ticks: " + _fuelTicks);
                 fuelStack.stackSize--;
                 if (fuelStack.stackSize == 0)
                     _entity.setFuelStack(null);
@@ -655,7 +669,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         ensureFuel();
         if (_fuelTicks != 0)
         {
-            --_fuelTicks;
+            setFuelTicks(_fuelTicks - 1);
             return true;
         }
 
@@ -783,6 +797,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
 
     // How many ticks of fuel do I have left.
     private int _fuelTicks;
+    private int _fuelSec;
 
     // Main state variable for the loop
     private State _state = State.IDLING;

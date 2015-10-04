@@ -32,7 +32,7 @@ public class EntityVassal extends EntityCreature
     {
         super(world);
         setupAI();
-        registerExtendedProperties("vassal", new ExtendedProps());
+        //registerExtendedProperties("vassal", new ExtendedProps());
 
         _toolStacks[0] = new ItemStack(Items.stone_pickaxe);
         _toolStacks[1] = new ItemStack(Items.stone_axe);
@@ -74,6 +74,12 @@ public class EntityVassal extends EntityCreature
 //        return true;
 //    }
 
+    protected void entityInit()
+    {
+        super.entityInit();
+        this.dataWatcher.addObject(20, 0);
+    }
+
     @Override
     protected boolean canDespawn()
     {
@@ -87,46 +93,81 @@ public class EntityVassal extends EntityCreature
 //        super.despawnEntity();
     }
 
-    private class ExtendedProps implements IExtendedEntityProperties
+    @Override
+    public void writeEntityToNBT(NBTTagCompound compound)
     {
-        @Override
-        public void saveNBTData(NBTTagCompound compound)
+        super.writeEntityToNBT(compound);
+
+
+        compound.setInteger("fuelTicks", _vassalAI.getFuelTicks());
+        LOGGER.debug("Moving fuel ticks INTO NBT: " + _vassalAI.getFuelTicks());
+
+        if (_fuelStack != null)
         {
-            compound.setInteger("fuelTicks", _vassalAI.getFuelTicks());
-
-            if (_fuelStack != null)
-            {
-                NBTTagCompound fuelCompound = new NBTTagCompound();
-                _fuelStack.writeToNBT(fuelCompound);
-                compound.setTag("fuelStack", fuelCompound);
-            }
-        }
-
-        @Override
-        public void loadNBTData(NBTTagCompound compound)
-        {
-            if (compound.hasKey("fuelTicks"))
-            {
-                _vassalAI.setFuelTicks(compound.getInteger("fuelTicks"));
-            }
-
-            if (compound.hasKey("fuelStack"))
-            {
-                _fuelStack = ItemStack.loadItemStackFromNBT(compound.getCompoundTag("fuelStack"));
-            }
-        }
-
-        @Override
-        public void init(Entity entity, World world)
-        {
-            // TODO:  What do we do here???
+            NBTTagCompound fuelCompound = new NBTTagCompound();
+            _fuelStack.writeToNBT(fuelCompound);
+            compound.setTag("fuelStack", fuelCompound);
         }
     }
+
+    @Override
+    public void readEntityFromNBT(NBTTagCompound compound)
+    {
+        super.readEntityFromNBT(compound);
+
+        if (compound.hasKey("fuelTicks"))
+        {
+            _vassalAI.setFuelTicks(compound.getInteger("fuelTicks"));
+            LOGGER.debug("Setting fuelTicks from NBT: " + compound.getInteger("fuelTicks"));
+        }
+
+        if (compound.hasKey("fuelStack"))
+        {
+            _fuelStack = ItemStack.loadItemStackFromNBT(compound.getCompoundTag("fuelStack"));
+        }
+    }
+
+
+//    private class ExtendedProps implements IExtendedEntityProperties
+//    {
+//        @Override
+//        public void saveNBTData(NBTTagCompound compound)
+//        {
+//            compound.setInteger("fuelTicks", _vassalAI.getFuelTicks());
+//            LOGGER.debug("Moving fuel ticks INTO NBT: " + _vassalAI.getFuelTicks());
+//
+//            if (_fuelStack != null)
+//            {
+//                NBTTagCompound fuelCompound = new NBTTagCompound();
+//                _fuelStack.writeToNBT(fuelCompound);
+//                compound.setTag("fuelStack", fuelCompound);
+//            }
+//        }
+//
+//        @Override
+//        public void loadNBTData(NBTTagCompound compound)
+//        {
+//            if (compound.hasKey("fuelTicks"))
+//            {
+//                _vassalAI.setFuelTicks(compound.getInteger("fuelTicks"));
+//                LOGGER.debug("Setting fuelTicks from NBT: " + compound.getInteger("fuelTicks"));
+//            }
+//
+//            if (compound.hasKey("fuelStack"))
+//            {
+//                _fuelStack = ItemStack.loadItemStackFromNBT(compound.getCompoundTag("fuelStack"));
+//            }
+//        }
+//
+//        @Override
+//        public void init(Entity entity, World world)
+//        {
+//            // TODO:  What do we do here???
+//        }
+//    }
     
     
     //=============================================================================================
-
-
 
     protected void setupAI()
     {
@@ -246,6 +287,11 @@ public class EntityVassal extends EntityCreature
         _fuelStack = fuelStack;
     }
 
+    // Should only be called client side?
+    public int getFuelSecs()
+    {
+        return getDataWatcher().getWatchableObjectInt(20);
+    }
 
     //=============================================================================================
 

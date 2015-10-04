@@ -18,6 +18,9 @@ public class ItemTypeMatcher extends ItemStackMatcher
     @Override
     public boolean matches(ItemStack stack)
     {
+        if (stack == null)
+            return false;
+
         return stack.getItem().equals(_item);
     }
 

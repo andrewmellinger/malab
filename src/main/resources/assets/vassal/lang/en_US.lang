@@ -13,3 +13,4 @@ container.beaconWorkbench=BeaconWorkbench
 tile.vassal_beaconChest.name=Beacon Chest (tile)
 item.vassal_beaconChest.name=Beacon Chest (item)
 container.beaconChest=BeaconChest
+container.vassal.title.fuel=Fuel (sec)

@@ -944,7 +944,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
             // Check samples
             for (int i = sampleMin; i <= sampleMax; ++i)
             {
-                if (msg.getMatcher().matches(_itemStacks[i]))
+                if (_itemStacks[i] != null && msg.getMatcher().matches(_itemStacks[i]))
                 {
                     int free = _itemStacks[i].getMaxStackSize() - _itemStacks[i].stackSize;
                     TRPutInInventory req = new TRPutInInventory(TileEntityBeaconFurnace.this,
