@@ -29,7 +29,8 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
     {
         this._entity = entity;
         Broadcaster.getInstance().subscribe(new MyListener());
-        _entity.setCustomNameTag(makeName());
+        if (!_entity.hasCustomName())
+            _entity.setCustomNameTag(makeName());
         _nextElicit = System.currentTimeMillis() + ELICIT_DELAY_MS +
                 (long)(ELICIT_DELAY_MS * _entity.getRNG().nextFloat());
     }
@@ -746,7 +747,12 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
     //=============================================================================================
     // NAMING
 
-    private static String[] NAMES = { "takara", "akai", "frodo", "sam", "merry", "pippin", "gimli", "legolas", "larry", "moe", "curly", "sleepy", "grumpy", "dopey", "doc", "bashful" };
+    private static String[] NAMES = { "takara", "akai",
+            "frodo", "sam", "merry", "pippin", "gimli", "legolas", "aragorn", "boromir",
+            "larry", "moe", "curly",
+            "sleepy", "grumpy", "dopey", "doc", "bashful",
+            "dobby", "harry", "hermione", "ron", "draco"
+            };
 
     private static int NAME_INDEX = 0;
 

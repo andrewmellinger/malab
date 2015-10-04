@@ -104,8 +104,7 @@ public class EntityVassal extends EntityCreature
     @Override
     protected void despawnEntity()
     {
-//        LOGGER.debug(getCustomNameTag() + " Someone called despawn entity!!!");
-//        super.despawnEntity();
+        // Nothing special to do.
     }
 
     @Override
