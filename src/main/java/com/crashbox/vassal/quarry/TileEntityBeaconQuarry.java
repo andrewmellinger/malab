@@ -84,7 +84,7 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
         protected int concurrentWorkerCount()
         {
             // We can't handle that many
-            return 3;
+            return 1;
         }
 
         @Override
@@ -111,7 +111,7 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
         // First, if we need stairs, send a stairs event
         StairBuilder builder = new StairBuilder(getWorld(), getPos(), _radius);
 
-        LOGGER.debug("Quarry: Got item request: " + msg.getMatcher());
+        LOGGER.debug("Quarry: Got item request: " + msg.getMatcher() + ", from=" + msg.getSender());
         if (builder.findFirstQuarryable(msg.getMatcher(), getEntityFromMessage(msg)) != null)
         {
             LOGGER.debug("Quarry: Found item.");

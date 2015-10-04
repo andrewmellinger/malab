@@ -67,6 +67,9 @@ public class TaskPair implements ITask
         if (getResolving() == Resolving.RESOLVED)
             return true;
 
+        if (getResolving() == Resolving.RESOLVING)
+            return false;
+
         // If we have a deliver we need to make sure we have the item
         ItemStack held = _entityAI.getEntity().getHeldItem();
 
@@ -267,18 +270,15 @@ public class TaskPair implements ITask
 
     private boolean linkupDeliverResponses(List<MessageTaskRequest> responses)
     {
-        BlockPos pos = _entityAI.getBlockPos();
+        // If not an empty, we don't need two deliver tasks.
+        if (getDeliverTask() != null)
+            return false;
 
         List<TRDeliverBase> delivers = MessageUtils.extractMessages(this, responses, TRDeliverBase.class);
         if (delivers.size() == 0)
             return false;
 
-        //debugLog("Found deliver tasks: " + delivers.size());
-
-        // If not an empty, we don't need two deliver tasks.
-        if (getDeliverTask() != null)
-            return false;
-
+        BlockPos pos = _entityAI.getBlockPos();
         if (getAcquireTask() != null)
             pos = getAcquireTask().getWorkCenter();
 
@@ -287,6 +287,7 @@ public class TaskPair implements ITask
         if (VassalUtils.isNotNull(best, LOGGER))
         {
             setDeliverTask((TaskDeliverBase)TaskBase.createTask(_entityAI, best));
+            setResolving(Resolving.UNRESOLVED);
             return true;
         }
 
@@ -307,6 +308,7 @@ public class TaskPair implements ITask
             if (VassalUtils.isNotNull(best, LOGGER))
             {
                 setAcquireTask((TaskAcquireBase)TaskBase.createTask(_entityAI, best));
+                setResolving(Resolving.UNRESOLVED);
                 return true;
             }
         }

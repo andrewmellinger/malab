@@ -287,7 +287,7 @@ public class VassalUtils
         int y = startPos.getY();
         int z = startPos.getZ();
 
-        AxisAlignedBB scanBlock = new AxisAlignedBB(x - range, y, z - range, x + range, y + 1, z + range);
+        AxisAlignedBB scanBlock = new AxisAlignedBB(x - range, y - 1, z - range, x + range, y + 1, z + range);
         List entities = world.getEntitiesWithinAABB(EntityItem.class, scanBlock);
         for (Object obj :entities)
         {

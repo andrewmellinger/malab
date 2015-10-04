@@ -872,7 +872,6 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
         }
     }
 
-
     private void handlerWorkerAvailability(MessageWorkerAvailability msg)
     {
         int value = smeltableNeedPriority();
