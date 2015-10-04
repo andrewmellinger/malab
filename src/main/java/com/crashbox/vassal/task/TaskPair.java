@@ -264,6 +264,12 @@ public class TaskPair implements ITask
      */
     private boolean acquiredEnough()
     {
+        // -1 is sentinel value forget as much as you can
+        if (_deliverTask.getQuantity() == -1)
+        {
+            return _entityAI.getEntity().isHeldInventoryFull();
+        }
+
         return _entityAI.getEntity().isHeldInventoryFull() ||
                _entityAI.getEntity().getHeldSize() >= _deliverTask.getQuantity();
     }

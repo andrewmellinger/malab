@@ -681,7 +681,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         ItemStack stack = _entity.getFuelStack();
         ItemStackMatcher matcher;
         if (stack == null)
-            matcher = new ItemStackMatcher(new ItemStack(Items.coal, 0, 1));
+            matcher = new ItemStackMatcher(new ItemStack(Items.coal, 0, 1), new ItemStack(Items.coal, 0, 0));
         else
             matcher = new ItemStackMatcher(stack);
 
