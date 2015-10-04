@@ -259,10 +259,11 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
     {
         if (_entity.getHealth() < _entity.getMaxHealth())
         {
-            if (System.currentTimeMillis() > _nextHeal && _fuelTicks > HEAL_FUEL_PER_HALF_HEART)
+            int fuelTicks = _entity.getFuelTicks();
+            if (System.currentTimeMillis() > _nextHeal && fuelTicks > HEAL_FUEL_PER_HALF_HEART)
             {
                 _entity.addPotionEffect(new PotionEffect(Potion.moveSlowdown.id, 20, 1));
-                _fuelTicks -= HEAL_FUEL_PER_HALF_HEART;
+                _entity.setFuelTicks(fuelTicks - HEAL_FUEL_PER_HALF_HEART);
                 _nextHeal = System.currentTimeMillis() + HEAL_DELAY;
                 _entity.heal(1.0F);
             }
@@ -616,44 +617,20 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
 
     //=============================================================================================
 
-    public int getFuelTicks()
-    {
-        debugLog("Fuel Ticks!! " + _fuelTicks);
-        return _fuelTicks;
-    }
-
-    public void setFuelTicks(int ticks)
-    {
-        // No one should be calling this!
-        _fuelTicks = ticks;
-        if (!_entity.getEntityWorld().isRemote)
-        {
-            if (_fuelSec != _fuelTicks / 20)
-            {
-                _fuelSec = _fuelTicks / 20;
-                _entity.getDataWatcher().updateObject(20, _fuelSec);
-            }
-        }
-        else
-        {
-            LOGGER.warn("Someone calling 'setFuelTicks' from client side!!!");
-        }
-    }
-
     private boolean canRun()
     {
         // If we have fuel ticks or spare fuel then we can run
-        return (_fuelTicks > 0);
+        return (_entity.getFuelTicks() > 0);
     }
 
     private void ensureFuel()
     {
-        if (_fuelTicks == 0)
+        if (_entity.getFuelTicks() == 0)
         {
             ItemStack fuelStack = getEntity().getFuelStack();
             if (fuelStack != null)
             {
-                setFuelTicks(TileEntityFurnace.getItemBurnTime(fuelStack));
+                _entity.setFuelTicks(TileEntityFurnace.getItemBurnTime(fuelStack));
                 //debugLog("Setting fuel ticks: " + _fuelTicks);
                 fuelStack.stackSize--;
                 if (fuelStack.stackSize == 0)
@@ -667,9 +644,9 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
     private boolean burnFuel()
     {
         ensureFuel();
-        if (_fuelTicks != 0)
+        if (_entity.getFuelTicks() != 0)
         {
-            setFuelTicks(_fuelTicks - 1);
+            _entity.setFuelTicks(_entity.getFuelTicks() - 1);
             return true;
         }
 
@@ -703,13 +680,6 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
 
     //=============================================================================================
 
-    public static void setRenderVassal(RenderVassal render)
-    {
-        _renderVassal = render;
-    }
-
-    //=============================================================================================
-
     class MyListener implements IListener
     {
         @Override
@@ -718,7 +688,6 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
             _messages.add(message);
         }
     }
-
 
     //=============================================================================================
 
@@ -795,10 +764,6 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         PERFORMING      // Within distance of pos.
     }
 
-    // How many ticks of fuel do I have left.
-    private int _fuelTicks;
-    private int _fuelSec;
-
     // Main state variable for the loop
     private State _state = State.IDLING;
     private boolean _paused = false;
@@ -817,7 +782,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
     private long _nextHeartbeat;
 
     private static final long HEAL_DELAY                = 500;
-    private static final long HEAL_FUEL_PER_HALF_HEART  = 20;
+    private static final int HEAL_FUEL_PER_HALF_HEART   = 20;
     private long _nextHeal                              = 0;
 
 //    private static final int DEFAULT_RANGE = 10;
@@ -843,9 +808,6 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
 
     // Do we have a current task we are pursuing?
     private ITask _currentTask;
-
-    // Visual things
-    private static RenderVassal _renderVassal;
 
     private static final int PROXIMITY_SQ = 11;
     private static final Logger LOGGER = LogManager.getLogger();

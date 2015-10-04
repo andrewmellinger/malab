@@ -41,7 +41,6 @@ public class ClientProxy extends CommonProxy
 
         // VASSAL
         RenderVassal renderer = new RenderVassal(renderManager, new ModelZombie(), 0.5F);
-        EntityAIVassal.setRenderVassal(renderer);
         RenderingRegistry.registerEntityRenderingHandler(EntityVassal.class, renderer);
 
         // BLOCKS
