@@ -64,13 +64,6 @@ public class TaskPutInInventory extends TaskDeliverBase
     }
 
     @Override
-    public int getValue()
-    {
-        // No additional cost beyond delivery
-        return _value;
-    }
-
-    @Override
     public void debugInfo(StringBuilder builder)
     {
         super.debugInfo(builder);

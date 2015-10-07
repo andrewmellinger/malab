@@ -1,5 +1,6 @@
 package com.crashbox.vassal;
 
+import com.crashbox.vassal.ai.Priority;
 import com.crashbox.vassal.common.ItemStackMatcher;
 import com.crashbox.vassal.entity.EntityVassal;
 import com.crashbox.vassal.messaging.*;
@@ -445,7 +446,7 @@ public class VassalUtils
         if (xfer > toAdd.stackSize)
             xfer = toAdd.stackSize;
 
-        LOGGER.debug("XFER Size: " + xfer);
+        //LOGGER.debug("XFER Size: " + xfer);
         target.stackSize += xfer;
         toAdd.stackSize -= xfer;
     }
@@ -700,7 +701,8 @@ public class VassalUtils
         Item item = VassalUtils.findFirstItemTypeOnGround(world, pos, radius);
         if (item != null)
         {
-            Broadcaster.postMessage(new TRPickup(sender, msg.getSender(), msg.getTransactionID(), 0, -1, item));
+            Broadcaster.postMessage(new TRPickup(sender, msg.getSender(), msg.getTransactionID(),
+                    Priority.getGenericCleanUpTaskValue(), -1, item));
             return true;
         }
         return false;

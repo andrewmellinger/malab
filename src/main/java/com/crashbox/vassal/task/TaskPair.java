@@ -111,19 +111,36 @@ public class TaskPair implements ITask
 
     public int getValue(double speed)
     {
-        TaskBase[] tasks = { _acquireTask, _deliverTask};
         BlockPos pos = _entityAI.getBlockPos();
         int value = 0;
-        for (TaskBase task : tasks)
+
+//        String msg = "start=" + pos;
+
+        if (_acquireTask != null)
         {
-            if (task != null)
-            {
-                int cost = Priority.computeDistanceCost(pos, task.getWorkCenter(), speed);
-                int val = task.getValue();
-                value = value - cost + val;
-                pos = task.getWorkCenter();
-            }
+            int cost = Priority.computeDistanceCost(pos, _acquireTask.getWorkCenter(), speed);
+            int val = _acquireTask.getValue();
+            pos = _acquireTask.getWorkCenter();
+//            msg += ", acquire=" + _acquireTask.getClass().getSimpleName() +
+//                   ", pos=" + pos +
+//                   ", cost=" + cost +
+//                   ", val=" + val;
+            value = value - cost + val;
         }
+
+        if (_deliverTask != null)
+        {
+            int cost = Priority.computeDistanceCost(pos, _deliverTask.getWorkCenter(), speed);
+            int val = _deliverTask.getValue();
+//            msg += ", deliver=" + _deliverTask.getClass().getSimpleName() +
+//                   ", pos=" + _deliverTask.getWorkCenter() +
+//                   ", cost=" + cost +
+//                   ", val=" + val;
+            value = value - cost + val;
+        }
+
+//        msg += ", total=" + value;
+//        LOGGER.debug(msg);
         return value;
     }
 
@@ -334,7 +351,7 @@ public class TaskPair implements ITask
 
             int value = msg.getValue() - Priority.computeDistanceCost(pos, msg.getSender().getBlockPos(),
                     _entityAI.getEntity().getSpeedFactor());
-            LOGGER.debug("findBest: task=" + this + ", cost=" + value + ", msg=" + msg);
+            //LOGGER.debug("findBest: task=" + this + ", cost=" + value + ", msg=" + msg);
             if (value > bestValue)
             {
                 bestValue = value;

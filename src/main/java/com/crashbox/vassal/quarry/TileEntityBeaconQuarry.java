@@ -3,6 +3,7 @@ package com.crashbox.vassal.quarry;
 import com.crashbox.vassal.VassalMain;
 import com.crashbox.vassal.VassalUtils;
 import com.crashbox.vassal.ai.EntityAIVassal;
+import com.crashbox.vassal.ai.Priority;
 import com.crashbox.vassal.beacon.BeaconBase;
 import com.crashbox.vassal.common.AnyItemMatcher;
 import com.crashbox.vassal.common.ItemStackMatcher;
@@ -115,7 +116,8 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
         if (builder.findFirstQuarryable(msg.getMatcher(), getEntityFromMessage(msg)) != null)
         {
             LOGGER.debug("Quarry: Found item.");
-            TRHarvest quarry = new TRHarvest(this, msg.getSender(), msg.getTransactionID(), 0,
+            TRHarvest quarry = new TRHarvest(this, msg.getSender(), msg.getTransactionID(),
+                    Priority.getQuarryItemHarvestValue(),
                     TaskQuarry.class, msg.getMatcher(), 1);
             Broadcaster.postMessage(quarry);
         }
@@ -137,22 +139,32 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
         if (stairsNeeded > 0)
         {
             //LOGGER.debug("Found  first stair.");
-            TRMakeBigStair makeStair = new TRMakeBigStair(this, msg.getSender(), msg.getTransactionID(), 10, stairsNeeded);
+            TRMakeBigStair makeStair = new TRMakeBigStair(this, msg.getSender(), msg.getTransactionID(),
+                    Priority.getStairBuilderValue(), stairsNeeded);
             Broadcaster.postMessage(makeStair);
+
+            // If we can do stairs, then we don't want to ask for anything else.
             return;
         }
 
         // If we have something that will drop, call him over
         if (builder.findFirstQuarryable(new AnyItemMatcher(), getEntityFromMessage(msg)) != null)
         {
-            TRHarvest quarry = new TRHarvest(this, msg.getSender(), msg.getTransactionID(), 0,
-                    TaskQuarry.class, new AnyItemMatcher(), 1);
+            int value = Priority.getQuarryIdleHarvestingValue();
+            // Add some value the closer we get to the bottom.
+            int y = msg.getSender().getBlockPos().getY();
+            if (y < 60)
+                value += (60 - y)/10;
+
+            TRHarvest quarry = new TRHarvest(this, msg.getSender(), msg.getTransactionID(),
+                    value, TaskQuarry.class, new AnyItemMatcher(), 1);
             Broadcaster.postMessage(quarry);
             return;
         }
 
         // If we are here we need a worker to move us down one.
-        VassalUtils.postHarvestPlacePair(this, msg, 20, 20,
+        VassalUtils.postHarvestPlacePair(this, msg,
+                Priority.getQuarryMoveQuarryBlockValue(), Priority.getQuarryMoveQuarryBlockValue(),
                 new ItemStackMatcher(VassalMain.BLOCK_BEACON_QUARRY), getPos(), getPos().down(),
                 false);
     }

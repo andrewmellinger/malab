@@ -1,5 +1,6 @@
 package com.crashbox.vassal.task;
 
+import com.crashbox.vassal.VassalUtils;
 import com.crashbox.vassal.ai.EntityAIVassal;
 import com.crashbox.vassal.messaging.TRHarvest;
 import com.crashbox.vassal.util.StairBuilder;
@@ -23,6 +24,7 @@ public class TaskQuarry extends TaskHarvest
         super(performer, message);
         _builder = new StairBuilder(getWorld(), getRequester().getBlockPos(), getRequester().getRadius());
     }
+
 
     @Override
     protected Queue<BlockPos> findHarvestList(List<BlockPos> others)

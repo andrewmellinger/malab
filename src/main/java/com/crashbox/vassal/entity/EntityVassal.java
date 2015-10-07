@@ -57,8 +57,8 @@ public class EntityVassal extends EntityCreature
         // 0.16 is pretty slowe ang good for debugging
         // 0.25 is kinda quick.
 
-        return 1.25D;  // 1.25 * 0.20 = 0.25 -- pretty zippy
-        // return 1.0D;   // 1.0  * 0.20 = 0.20 -- Little slower than zombie
+        // return 1.25D;  // 1.25 * 0.20 = 0.25 -- pretty zippy
+        return 1.0D;   // 1.0  * 0.20 = 0.20 -- Little slower than zombie
         // return 0.75D;  // 0.75 * 0.20 = 0.15 -- good for debugging
     }
 

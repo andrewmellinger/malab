@@ -1,6 +1,7 @@
 package com.crashbox.vassal.workbench;
 
 import com.crashbox.vassal.VassalUtils;
+import com.crashbox.vassal.ai.Priority;
 import com.crashbox.vassal.beacon.BeaconBase;
 import com.crashbox.vassal.beacon.TileEntityBeaconInventory;
 import com.crashbox.vassal.common.ItemStackMatcher;
@@ -679,8 +680,8 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory impleme
         @Override
         protected int concurrentWorkerCount()
         {
-            // We can handle quite a few because they don't take long here.
-            return 10;
+            // We just want a few
+            return 1;
         }
 
         @Override
@@ -693,56 +694,66 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory impleme
             else if (msg instanceof MessageItemRequest)
                 handleItemRequest((MessageItemRequest)msg);
         }
-    }
 
-    private void handleWorkerAvailability(MessageWorkerAvailability msg)
-    {
-        // Only ask for things if we have a valid config.
-        if (!canCraft(false))
-            return;
-
-        // If we have anything at 1, build matcher for that.
-        ItemStackMatcher matcher = matcherRequiredInputs(1);
-        if (matcher != null)
+        private void handleWorkerAvailability(MessageWorkerAvailability msg)
         {
-            TRPutInInventory req = new TRPutInInventory(TileEntityBeaconWorkbench.this,
-                    msg.getSender(), msg.getTransactionID(), 10, matcher, 8);
-            Broadcaster.postMessage(req);
+            if (!haveFreeWorkerSlots())
+                return;
+
+                // Only ask for things if we have a valid config.
+            if (!canCraft(false))
+                return;
+
+            // If we have anything at 1, build matcher for that.
+            ItemStackMatcher matcher = matcherRequiredInputs(1);
+            if (matcher != null)
+            {
+                TRPutInInventory req = new TRPutInInventory(TileEntityBeaconWorkbench.this,
+                        msg.getSender(), msg.getTransactionID(),
+                        Priority.getWorkbenchInventoryOutRequestValue(), matcher, 8);
+                Broadcaster.postMessage(req);
+                return;
+            }
+
+            // Otherwise we can use a little of everything
+            matcher = matcherRequiredInputs(8);
+            if (matcher != null)
+            {
+                TRPutInInventory req = new TRPutInInventory(TileEntityBeaconWorkbench.this,
+                        msg.getSender(), msg.getTransactionID(),
+                        Priority.getWorkbenchInventoryLowRequestValue(), matcher, 8);
+                Broadcaster.postMessage(req);
+            }
         }
 
-        // Otherwise we can use a little of everything
-        matcher = matcherRequiredInputs(8);
-        if (matcher != null)
+        private void handleStorageAvailable(MessageIsStorageAvailable msg)
         {
-            TRPutInInventory req = new TRPutInInventory(TileEntityBeaconWorkbench.this,
-                    msg.getSender(), msg.getTransactionID(), 2, matcher, 8);
-            Broadcaster.postMessage(req);
+            ItemStackMatcher matcher = matcherRequiredInputs(32);
+            if (matcher != null)
+            {
+                TRPutInInventory req = new TRPutInInventory(TileEntityBeaconWorkbench.this,
+                        msg.getSender(), msg.getTransactionID(),
+                        Priority.getWorkbenchStorageAvailValue(), matcher, 32);
+                Broadcaster.postMessage(req);
+            }
+        }
+
+        private void handleItemRequest(MessageItemRequest msg)
+        {
+            // Anything in the out slot they can have
+            ItemStack stack = _craftOutput.getStackInSlot(0);
+            if (stack != null && msg.getMatcher().matches(stack))
+            {
+                TRGetFromInventory req = new TRGetFromInventory(TileEntityBeaconWorkbench.this,
+                        msg.getSender(), msg.getTransactionID(),
+                        Priority.getWorkbenchItemRequestValue(), new ItemStackMatcher(stack),
+                        msg.getQuantity());
+                Broadcaster.postMessage(req);
+            }
         }
     }
 
-    private void handleStorageAvailable(MessageIsStorageAvailable msg)
-    {
-        ItemStackMatcher matcher = matcherRequiredInputs(32);
-        if (matcher != null)
-        {
-            TRPutInInventory req = new TRPutInInventory(TileEntityBeaconWorkbench.this,
-                    msg.getSender(), msg.getTransactionID(), 0, matcher, 32);
-            Broadcaster.postMessage(req);
-        }
-    }
 
-    private void handleItemRequest(MessageItemRequest msg)
-    {
-        // Anything in the out slot they can have
-        ItemStack stack = _craftOutput.getStackInSlot(0);
-        if (stack != null && msg.getMatcher().matches(stack))
-        {
-            TRGetFromInventory req = new TRGetFromInventory(TileEntityBeaconWorkbench.this,
-                    msg.getSender(), msg.getTransactionID(), 0, new ItemStackMatcher(stack),
-                    msg.getQuantity());
-            Broadcaster.postMessage(req);
-        }
-    }
 
     //---------------------------------------------------------------------------------------------
     private ItemStackMatcher matcherRequiredInputs(int size)

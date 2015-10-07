@@ -49,12 +49,6 @@ public class TaskPickup extends TaskAcquireBase
         return UpdateResult.DONE;
     }
 
-    @Override
-    public int getValue()
-    {
-        return 0;
-    }
-
     //=============================================================================================
 
     private final Item _item;

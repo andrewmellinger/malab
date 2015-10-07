@@ -52,13 +52,6 @@ public class TaskPlantSapling extends TaskDeliverBase
         return UpdateResult.RETARGET;
     }
 
-    @Override
-    public int getValue()
-    {
-        // SWAG
-        return _value - 10;
-    }
-
     //===================================
 
     @Override

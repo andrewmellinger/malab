@@ -1,6 +1,8 @@
 package com.crashbox.vassal.messaging;
 
 import com.crashbox.vassal.VassalUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Copyright 2015 Andrew o. Mellinger
@@ -12,7 +14,7 @@ public class Message
      * @param sender Who sent the message.
      * @param target Intended recipient, null for broadcast.
      * @param transactionID Reason we sent this.  Used for linking return messages.
-     * @param value
+     * @param value The value executing the task provides.
      */
     protected Message(IMessager sender, IMessager target, Object transactionID, int value)
     {
@@ -67,4 +69,6 @@ public class Message
     private final IMessager _target;
     private final Object _transactionID;
     private final int _value;
+
+    private static final Logger LOGGER = LogManager.getLogger();
 }

@@ -155,7 +155,8 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
         {
             // Offer a task, at our area for the requested thing.
             TRHarvest req = new TRHarvest(TileEntityBeaconForester.this, itemReq.getSender(),
-                    msg.getTransactionID(), 10, TaskHarvestTree.class, itemReq.getMatcher(), itemReq.getQuantity());
+                    msg.getTransactionID(), Priority.getForesterHarvestValue(),
+                    TaskHarvestTree.class, itemReq.getMatcher(), itemReq.getQuantity());
 
             debugLog("Posting request: " + req);
             Broadcaster.postMessage(req);
@@ -165,8 +166,6 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
     private void handleWorkerAvailability(MessageWorkerAvailability msg)
     {
         //LOGGER.debug("Forester " + this + " is asked for work." + msg);
-
-        MessageWorkerAvailability availability = (MessageWorkerAvailability)msg;
 
         //=====================
 
@@ -178,19 +177,27 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
         if (pickup != null && target != null)
         {
             TRPickup pickupRequest = new TRPickup(TileEntityBeaconForester.this,
-                    msg.getSender(), msg.getTransactionID(), 0, 4, Item.getItemFromBlock(Blocks.sapling));
+                    msg.getSender(), msg.getTransactionID(), Priority.getForesterPickupSaplingValue(),
+                    4, Item.getItemFromBlock(Blocks.sapling));
 
             TRPlantSapling plantRequest = new TRPlantSapling(TileEntityBeaconForester.this,
-                    msg.getSender(), msg.getTransactionID(), 0);
+                    msg.getSender(), msg.getTransactionID(), Priority.getForesterPlantSaplingValue());
 
             MessageTaskPairRequest pairRequest = new MessageTaskPairRequest(TileEntityBeaconForester.this,
                     msg.getSender(), msg.getTransactionID(), true, pickupRequest, plantRequest);
 
 //                    //LOGGER.debug("Posting request: " + req);
             Broadcaster.postMessage(pairRequest);
+            return;
         }
 
         //=====================
+
+        if (pickup != null)
+        {
+            if (VassalUtils.generateCleanupTask(this, getWorld(), getBlockPos(), getRadius(),msg))
+                return;
+        }
 
         // We can also just provide wood
 
@@ -198,7 +205,6 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
 //                new ItemTypeMatcher(Item.getItemFromBlock(Blocks.log)));
 
         //int vassalCount = AIUtils.countVassalsInArea(getWorld(), getPos(), getRadius());
-
         ItemStack sample = RingedSearcher.findFirstItemDrop(getWorld(), getPos(), _searchRadius, _searchHeight,
                 new ItemTypeMatcher(Item.getItemFromBlock(Blocks.log)));
 
@@ -206,8 +212,9 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
         if (sample != null)
         {
             // Offer a task, at our area for the requested thing.
-            TRHarvest req = new TRHarvest(TileEntityBeaconForester.this, availability.getSender(),
-                    msg.getTransactionID(), 10, TaskHarvestTree.class, new ItemStackMatcher(sample), -1);
+            TRHarvest req = new TRHarvest(TileEntityBeaconForester.this, msg.getSender(),
+                    msg.getTransactionID(), Priority.getForesterIdleHarvestingValue(),
+                    TaskHarvestTree.class, new ItemStackMatcher(sample), -1);
 
             debugLog("Posting request: " + req);
             Broadcaster.postMessage(req);
@@ -223,7 +230,7 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
         if (!isSapling(msg.getMatcher()))
         {
             LOGGER.debug("NOT A SAPLING");
-           return;
+            return;
         }
 
         BlockPos target = VassalUtils.findEmptyOrchardSquare(getWorld(), getPos(), _searchRadius);
@@ -232,7 +239,7 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
         if (target != null)
         {
             TRPlantSapling plantRequest = new TRPlantSapling(TileEntityBeaconForester.this,
-                    msg.getSender(), msg.getTransactionID(), 50);
+                    msg.getSender(), msg.getTransactionID(), Priority.getForesterStorageSaplingPlantValue());
 
             LOGGER.debug("Posting PLANTING: " + plantRequest);
             Broadcaster.postMessage(plantRequest);
@@ -241,8 +248,6 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
 
     private boolean isSapling(ItemStackMatcher matcher)
     {
-        //List<ItemStack> stacks = OreDictionary.getOres("log");
-
         Item sapling = Item.getItemFromBlock(Blocks.sapling);
 
         LOGGER.debug(matcher);

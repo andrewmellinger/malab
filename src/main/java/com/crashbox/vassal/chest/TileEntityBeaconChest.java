@@ -1,5 +1,6 @@
 package com.crashbox.vassal.chest;
 
+import com.crashbox.vassal.ai.Priority;
 import com.crashbox.vassal.beacon.BeaconBase;
 import com.crashbox.vassal.messaging.*;
 import com.crashbox.vassal.beacon.TileEntityBeaconInventory;
@@ -413,63 +414,63 @@ public class TileEntityBeaconChest extends TileEntityBeaconInventory implements 
         {
             LOGGER.debug(msg);
             if (msg instanceof MessageIsStorageAvailable)
-            {
-                LOGGER.debug("MessageIsStorageAvailable");
-                MessageIsStorageAvailable request = (MessageIsStorageAvailable)msg;
-
-                // First look for existing
-                LOGGER.debug("Looking for existing");
-                for (int slotNum = 0; slotNum < _itemStacks.length; ++slotNum)
-                {
-                    if (_itemStacks[slotNum] != null && request.getMatcher().matches(_itemStacks[slotNum]))
-                    {
-//                        TRStore req = new TRStore(TileEntityBeaconChest.this, request.getSender(),
-//                                msg.getTransactionID(), 0, new ItemStackMatcher(_itemStacks[slotNum]),
-//                                _itemStacks[slotNum].getMaxStackSize() - _itemStacks[slotNum].stackSize, slotNum);
-                        TRPutInInventory req = new TRPutInInventory(TileEntityBeaconChest.this, request.getSender(),
-                                msg.getTransactionID(), 0, request.getMatcher(), 64);
-
-                        LOGGER.debug("Posting: " + req);
-                        Broadcaster.postMessage(req);
-                        return;
-                    }
-                }
-
-                // Do we have an empty one?
-                LOGGER.debug("Looking for empty slot");
-                for ( ItemStack stack : _itemStacks)
-                {
-                    if (stack == null)
-                    {
-                        TRPutInInventory req = new TRPutInInventory(TileEntityBeaconChest.this, request.getSender(),
-                                msg.getTransactionID(), 0, request.getMatcher(), 64);
-
-                        LOGGER.debug("Posting: " + req);
-                        Broadcaster.postMessage(req);
-                        return;
-                    }
-                }
-            }
+                handleIsStorageAvailable((MessageIsStorageAvailable)msg);
             else if (msg instanceof MessageItemRequest)
+                handleItemRequest((MessageItemRequest)msg);
+        }
+
+        private void handleIsStorageAvailable(MessageIsStorageAvailable msg)
+        {
+            // First look for existing
+            LOGGER.debug("Looking for existing");
+            for (int slotNum = 0; slotNum < _itemStacks.length; ++slotNum)
             {
-                LOGGER.debug("Chest is getting item request: " + msg);
-
-                MessageItemRequest request = (MessageItemRequest)msg;
-
-                for (ItemStack stack : _itemStacks)
+                if (_itemStacks[slotNum] != null && msg.getMatcher().matches(_itemStacks[slotNum]))
                 {
-                    if (stack != null && request.getMatcher().matches(stack))
-                    {
-                        TRGetFromInventory req = new TRGetFromInventory(TileEntityBeaconChest.this,
-                                msg.getSender(), msg.getTransactionID(), 0, request.getMatcher(),
-                                request.getQuantity());
+                    TRPutInInventory req = new TRPutInInventory(TileEntityBeaconChest.this, msg.getSender(),
+                            msg.getTransactionID(), Priority.getChestStorageAvailValue(), msg.getMatcher(), 64);
 
-                        LOGGER.debug("Chest advertising it has item: " + ((MessageItemRequest) msg).getMatcher());
-                        Broadcaster.postMessage(req);
-                        return;
-                    }
+                    LOGGER.debug("Posting: " + req);
+                    Broadcaster.postMessage(req);
+                    return;
                 }
             }
+
+            // Do we have an empty one?
+            LOGGER.debug("Looking for empty slot");
+            for ( ItemStack stack : _itemStacks)
+            {
+                if (stack == null)
+                {
+                    TRPutInInventory req = new TRPutInInventory(TileEntityBeaconChest.this, msg.getSender(),
+                            msg.getTransactionID(), Priority.getChestStorageAvailValue(), msg.getMatcher(), 64);
+
+                    LOGGER.debug("Posting: " + req);
+                    Broadcaster.postMessage(req);
+                    return;
+                }
+            }
+        }
+
+        private void handleItemRequest(MessageItemRequest msg)
+        {
+            LOGGER.debug("Chest is getting item request: " + msg);
+
+            for (ItemStack stack : _itemStacks)
+            {
+                if (stack != null && msg.getMatcher().matches(stack))
+                {
+                    TRGetFromInventory req = new TRGetFromInventory(TileEntityBeaconChest.this,
+                            msg.getSender(), msg.getTransactionID(),
+                            Priority.getChestItemAvailValue(), msg.getMatcher(),
+                            msg.getQuantity());
+
+                    LOGGER.debug("Chest advertising it has item: " + ((MessageItemRequest) msg).getMatcher());
+                    Broadcaster.postMessage(req);
+                    return;
+                }
+            }
+
         }
     }
 

@@ -15,6 +15,192 @@ import java.util.List;
  */
 public class Priority
 {
+    private static int QUARRY_MOVE_QUARRY_BLOCK_VALUE = 20;
+
+    private static int STAIR_BUILDER_VALUE = 10;
+
+    private static int FORESTER_IDLE_HARVESTING_VALUE = -5;
+    private static int QUARRY_IDLE_HARVESTING_VALUE = 0;
+
+    private static int FORESTER_PICKUP_SAPLING_VALUE = 10;
+    private static int FORESTER_PLANT_SAPLING_VALUE = 10;
+    private static int FORESTER_HARVEST_VALUE = 0;
+
+    private static int GENERIC_CLEAN_UP_TASK_VALUE = 0;
+
+    private static int FORESTER_STORAGE_SAPLING_PLANT_VALUE = 20;
+    private static int CHEST_STORAGE_AVAIL_VALUE = 0;
+
+    private static int QUARRY_ITEM_HARVEST_VALUE = 5;            // Get it from a quarry before chest
+    private static int CHEST_ITEM_AVAIL_VALUE = 0;
+
+    private static int WORKBENCH_INVENTORY_OUT_REQUEST_VALUE = 40;
+    private static int WORKBENCH_INVENTORY_LOW_REQUEST_VALUE = 20;
+
+    private static int WORKBENCH_ITEM_REQUEST_VALUE = 0;
+    private static int WORKBENCH_STORAGE_AVAIL_VALUE = 0;
+
+
+    public static int getQuarryMoveQuarryBlockValue()
+    {
+        return QUARRY_MOVE_QUARRY_BLOCK_VALUE;
+    }
+
+    public static void setQuarryMoveQuarryBlockValue(int quarryMoveQuarryBlockValue)
+    {
+        QUARRY_MOVE_QUARRY_BLOCK_VALUE = quarryMoveQuarryBlockValue;
+    }
+
+    public static int getStairBuilderValue()
+    {
+        return STAIR_BUILDER_VALUE;
+    }
+
+    public static void setStairBuilderValue(int stairBuilderValue)
+    {
+        STAIR_BUILDER_VALUE = stairBuilderValue;
+    }
+
+    public static int getForesterIdleHarvestingValue()
+    {
+        return FORESTER_IDLE_HARVESTING_VALUE;
+    }
+
+    public static void setForesterIdleHarvestingValue(int foresterIdleHarvestingValue)
+    {
+        FORESTER_IDLE_HARVESTING_VALUE = foresterIdleHarvestingValue;
+    }
+
+    public static int getQuarryIdleHarvestingValue()
+    {
+        return QUARRY_IDLE_HARVESTING_VALUE;
+    }
+
+    public static void setQuarryIdleHarvestingValue(int quarryIdleHarvestingValue)
+    {
+        QUARRY_IDLE_HARVESTING_VALUE = quarryIdleHarvestingValue;
+    }
+
+    public static int getForesterPickupSaplingValue()
+    {
+        return FORESTER_PICKUP_SAPLING_VALUE;
+    }
+
+    public static void setForesterPickupSaplingValue(int foresterPickupSapling)
+    {
+        FORESTER_PICKUP_SAPLING_VALUE = foresterPickupSapling;
+    }
+
+    public static int getForesterPlantSaplingValue()
+    {
+        return FORESTER_PLANT_SAPLING_VALUE;
+    }
+
+    public static void setForesterPlantSaplingValue(int foresterPlantSaplingValue)
+    {
+        FORESTER_PLANT_SAPLING_VALUE = foresterPlantSaplingValue;
+    }
+
+    public static int getForesterHarvestValue()
+    {
+        return FORESTER_HARVEST_VALUE;
+    }
+
+    public static void setForesterHarvestValue(int foresterHarvestValue)
+    {
+        FORESTER_HARVEST_VALUE = foresterHarvestValue;
+    }
+
+    public static int getGenericCleanUpTaskValue()
+    {
+        return GENERIC_CLEAN_UP_TASK_VALUE;
+    }
+
+    public static void setGenericCleanUpTaskValue(int genericCleanUpTaskValue)
+    {
+        GENERIC_CLEAN_UP_TASK_VALUE = genericCleanUpTaskValue;
+    }
+
+    public static int getForesterStorageSaplingPlantValue()
+    {
+        return FORESTER_STORAGE_SAPLING_PLANT_VALUE;
+    }
+
+    public static void setForesterStorageSaplingPlantValue(int foresterStorageSaplingPlantValue)
+    {
+        FORESTER_STORAGE_SAPLING_PLANT_VALUE = foresterStorageSaplingPlantValue;
+    }
+
+    public static int getChestStorageAvailValue()
+    {
+        return CHEST_STORAGE_AVAIL_VALUE;
+    }
+
+    public static void setChestStorageAvailValue(int chestStorageAvailValue)
+    {
+        CHEST_STORAGE_AVAIL_VALUE = chestStorageAvailValue;
+    }
+
+    public static int getQuarryItemHarvestValue()
+    {
+        return QUARRY_ITEM_HARVEST_VALUE;
+    }
+
+    public static void setQuarryItemHarvestValue(int quarryItemHarvestValue)
+    {
+        QUARRY_ITEM_HARVEST_VALUE = quarryItemHarvestValue;
+    }
+
+    public static int getChestItemAvailValue()
+    {
+        return CHEST_ITEM_AVAIL_VALUE;
+    }
+
+    public static void setChestItemAvailValue(int chestItemAvailValue)
+    {
+        CHEST_ITEM_AVAIL_VALUE = chestItemAvailValue;
+    }
+
+    public static int getWorkbenchInventoryOutRequestValue()
+    {
+        return WORKBENCH_INVENTORY_OUT_REQUEST_VALUE;
+    }
+
+    public static void setWorkbenchInventoryOutRequestValue(int workbenchInventoryOutRequestValue)
+    {
+        WORKBENCH_INVENTORY_OUT_REQUEST_VALUE = workbenchInventoryOutRequestValue;
+    }
+
+    public static int getWorkbenchInventoryLowRequestValue()
+    {
+        return WORKBENCH_INVENTORY_LOW_REQUEST_VALUE;
+    }
+
+    public static void setWorkbenchInventoryLowRequestValue(int workbenchInventoryLowRequestValue)
+    {
+        WORKBENCH_INVENTORY_LOW_REQUEST_VALUE = workbenchInventoryLowRequestValue;
+    }
+
+    public static int getWorkbenchItemRequestValue()
+    {
+        return WORKBENCH_ITEM_REQUEST_VALUE;
+    }
+
+    public static void setWorkbenchItemRequestValue(int workbenchItemRequestValue)
+    {
+        WORKBENCH_ITEM_REQUEST_VALUE = workbenchItemRequestValue;
+    }
+
+    public static int getWorkbenchStorageAvailValue()
+    {
+        return WORKBENCH_STORAGE_AVAIL_VALUE;
+    }
+
+    public static void setWorkbenchStorageAvailValue(int workbenchStorageAvailValue)
+    {
+        WORKBENCH_STORAGE_AVAIL_VALUE = workbenchStorageAvailValue;
+    }
+
     /**
      * From a list of task pairs, select the best one based on this position.
      * @param pos The current position.
@@ -69,9 +255,9 @@ public class Priority
     {
         // 1 point for every 5 blocks for a normal zombie.  In the future we
         // will compute seconds.
-        // 5 / .4 =  12.5 / 12.5 = 1
-        // 54 / .4 = 160 / 12.5 = 12.8
-        return (int) (( Math.sqrt(startPos.distanceSq(endPos)) / speed ) / 12.5D);
+        // 5 / 1.24 -> 4 / 4 = 1
+        // 54 / 1.25 -> 43.2 /4 = 10.8
+        return (int) (( Math.sqrt(startPos.distanceSq(endPos)) / speed ) / 4D);
     }
 
 //    public static int computeDistanceCost(BlockPos startPos, BlockPos endPos)

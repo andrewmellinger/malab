@@ -87,14 +87,6 @@ public abstract class TaskHarvest extends TaskAcquireBase
         return UpdateResult.CONTINUE;
     }
 
-    @Override
-    public int getValue()
-    {
-        // SWAG
-        return _value - 10;
-    }
-
-
     // This adds the specific algorithm that find trees, or blocks of stone,or whatever
     protected abstract Queue<BlockPos> findHarvestList(List<BlockPos> others);
 

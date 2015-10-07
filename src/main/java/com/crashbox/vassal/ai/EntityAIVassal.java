@@ -162,17 +162,17 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
             {
                 if (msg.getTransactionID() == MessageWorkerAvailability.class)
                 {
-                    debugLog("Adding new task for message: " + msg);
+                    //debugLog("Adding new task for message: " + msg);
                     _proposedTasks.add(makeNewTask((MessageTaskRequest) msg));
                 }
                 else if (msg instanceof TRDeliverBase && held != null && msg.getTransactionID() == held.getItem())
                 {
-                    debugLog("Adding new Deliver task : " + msg);
+                    //debugLog("Adding new Deliver task : " + msg);
                     _proposedTasks.add(makeNewTask((MessageTaskRequest) msg));
                 }
                 else
                 {
-                    debugLog("Adding response task: " + msg);
+                    //debugLog("Adding response task: " + msg);
                     _responseTasks.add((MessageTaskRequest) msg);
                 }
             }
@@ -180,7 +180,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
             {
                 if (msg.getTransactionID() == MessageWorkerAvailability.class)
                 {
-                    debugLog("Adding new tasks for PAIR message: " + msg);
+                    //debugLog("Adding new tasks for PAIR message: " + msg);
                     _proposedTasks.add(makeNewTask((MessageTaskPairRequest) msg));
                 }
             }
@@ -340,7 +340,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         // When we hit the timeout we are done.
         if (System.currentTimeMillis() > _requestEndMS)
         {
-            debugLog("Selecting from (" + _proposedTasks.size() + ") tasks.");
+//            debugLog("Selecting from (" + _proposedTasks.size() + ") tasks.");
             _currentTask = Priority.selectBestTask(getEntity().getPosition(), _proposedTasks, getEntity().getSpeedFactor());
             _proposedTasks.clear();
 
@@ -351,8 +351,8 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
 
             //getEntity().spawnExplosionParticle();
             BlockPos workCenter = _currentTask.getWorkCenter();
-            debugLog("Selected task: " + _currentTask);
-            debugLog("   ==> moving to: " + workCenter);
+//            debugLog("Selected task: " + _currentTask);
+//            debugLog("   ==> moving to: " + workCenter);
             tryMoveTo(workCenter);
 
             // Look at the work center
@@ -416,7 +416,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         // If within our distance, then issue location request and to start targeting
         if (posInAreaXY(getBlockPos(), _currentTask.getWorkCenter(), TARGETING_DISTANCE))
         {
-            LOGGER.debug(id() + " Within distance, switching to targeting.");
+            //LOGGER.debug(id() + " Within distance, switching to targeting.");
             requestWorkAreas();
             return State.TARGETING;
         }
@@ -449,13 +449,13 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
             _workArea = _currentTask.getWorkTarget(_workAreas);
             if (_workArea == null)
             {
-                LOGGER.debug(id() + " Failed to find work area, aborting. " + _currentTask);
+                debugLog(id() + " Failed to find work area, aborting. " + _currentTask);
                 _currentTask = null;
                 return State.IDLING;
             }
 
-            LOGGER.debug(id() + " Determining work area and redirecting: " + _workArea + " currently at: " +
-                    getBlockPos());
+//            LOGGER.debug(id() + " Determining work area and redirecting: " + _workArea + " currently at: " +
+//                    getBlockPos());
             _workAreaAttempt = 0;
             tryMoveTo(_workArea);
         }
@@ -469,19 +469,20 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
             }
             else
             {
-                if (_workAreaAttempt == 3)
-                {
-                    LOGGER.debug("Failed to move to work area. IDLING. Distance: " +
-                            VassalUtils.sqDistXZ(getEntity().getPosition(), _workArea));
-                    _currentTask = null;
-                    return State.IDLING;
-                }
-                else
-                {
-                    LOGGER.debug("Failed to move to work area. TRYING AGAIN.");
-                    _workAreaAttempt++;
-                    tryMoveTo(_workArea);
-                }
+                return State.IDLING;
+//                if (_workAreaAttempt == 3)
+//                {
+//                    debugLog("Failed to move to work area. IDLING. Distance: " +
+//                            VassalUtils.sqDistXZ(getEntity().getPosition(), _workArea));
+//                    _currentTask = null;
+//                    return State.IDLING;
+//                }
+//                else
+//                {
+//                    debugLog("Failed to move to work area. TRYING AGAIN.");
+//                    _workAreaAttempt++;
+//                    tryMoveTo(_workArea);
+//                }
             }
         }
 

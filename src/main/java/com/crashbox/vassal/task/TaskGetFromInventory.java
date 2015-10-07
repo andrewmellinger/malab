@@ -42,23 +42,17 @@ public class TaskGetFromInventory extends TaskAcquireBase
         _workArea = null;
 
         // Get the tile entity and extract it
-        debugLog(LOGGER, "Going to extract items. ");
+        //debugLog(LOGGER, "Going to extract items. ");
         TileEntity entity = getWorld().getTileEntity(getRequester().getBlockPos());
         if (entity instanceof TileEntityBeaconInventory)
         {
-            debugLog(LOGGER, "Extracting: entity=" + entity.getClass().getSimpleName() + ", matcher=" + getMatcher() + ", qty=" + _quantity);
+            //debugLog(LOGGER, "Extracting: entity=" + entity.getClass().getSimpleName() + ", matcher=" + getMatcher() + ", qty=" + _quantity);
             ItemStack extracted = ((TileEntityBeaconInventory) entity).extractItems(getMatcher(), _quantity);
             getEntity().setCurrentItemOrArmor(0, extracted);
-            debugLog(LOGGER, "Extracted: " + extracted);
+            //debugLog(LOGGER, "Extracted: " + extracted);
         }
 
         return UpdateResult.DONE;
-    }
-
-    @Override
-    public int getValue()
-    {
-        return 0;
     }
 
     @Override

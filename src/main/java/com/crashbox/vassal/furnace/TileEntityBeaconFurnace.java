@@ -845,7 +845,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
             {
                 // We don't want to ask everyone to collect resources for us all the time
                 if (haveFreeWorkerSlots())
-                    handlerWorkerAvailability((MessageWorkerAvailability)msg);
+                    handleWorkerAvailability((MessageWorkerAvailability) msg);
             }
             else if (msg instanceof MessageIsStorageAvailable)
             {
@@ -872,7 +872,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
         }
     }
 
-    private void handlerWorkerAvailability(MessageWorkerAvailability msg)
+    private void handleWorkerAvailability(MessageWorkerAvailability msg)
     {
         int value = smeltableNeedPriority();
         if (value > 0)
