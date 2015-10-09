@@ -2,11 +2,10 @@ package com.crashbox.vassal.ai;
 
 import com.crashbox.vassal.VassalUtils;
 import com.crashbox.vassal.task.ITask;
-import com.crashbox.vassal.task.TaskBase;
-import com.crashbox.vassal.task.TaskPair;
 import net.minecraft.util.BlockPos;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import scala.Int;
 
 import java.util.List;
 
@@ -39,6 +38,8 @@ public class Priority
 
     private static int WORKBENCH_ITEM_REQUEST_VALUE = 0;
     private static int WORKBENCH_STORAGE_AVAIL_VALUE = 0;
+
+    private static int LONGEST_DISTANCE = 64;
 
 
     public static int getQuarryMoveQuarryBlockValue()
@@ -201,6 +202,16 @@ public class Priority
         WORKBENCH_STORAGE_AVAIL_VALUE = workbenchStorageAvailValue;
     }
 
+    public static int getLongestDistance()
+    {
+        return LONGEST_DISTANCE;
+    }
+
+    public static void setLongestDistance(int longestDistance)
+    {
+        LONGEST_DISTANCE = longestDistance;
+    }
+
     /**
      * From a list of task pairs, select the best one based on this position.
      * @param pos The current position.
@@ -257,7 +268,13 @@ public class Priority
         // will compute seconds.
         // 5 / 1.24 -> 4 / 4 = 1
         // 54 / 1.25 -> 43.2 /4 = 10.8
-        return (int) (( Math.sqrt(startPos.distanceSq(endPos)) / speed ) / 4D);
+//        return (int) (( Math.sqrt(startPos.distanceSq(endPos)) / speed ) / 4D);
+
+        // We don't want to do this.
+        if (startPos.distanceSq(endPos) > ( LONGEST_DISTANCE * LONGEST_DISTANCE))
+            return Integer.MAX_VALUE;
+
+        return (int) (( Math.sqrt(startPos.distanceSq(endPos)) / speed ) / 2D);
     }
 
 //    public static int computeDistanceCost(BlockPos startPos, BlockPos endPos)

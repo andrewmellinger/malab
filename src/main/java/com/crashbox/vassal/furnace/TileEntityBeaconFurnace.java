@@ -930,12 +930,15 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
             if (msg.getMatcher().matches(stack))
             {
                 int free = stack.getMaxStackSize() - stack.stackSize;
-                // Send a message back to this guy telling him that we could use more
-                TRPutInInventory req = new TRPutInInventory(TileEntityBeaconFurnace.this,
-                        msg.getSender(), msg.getTransactionID(), 0, msg.getMatcher(),
-                        free);
+                if (free > 8)
+                {
+                    // Send a message back to this guy telling him that we could use more
+                    TRPutInInventory req = new TRPutInInventory(TileEntityBeaconFurnace.this,
+                            msg.getSender(), msg.getTransactionID(), 0, msg.getMatcher(),
+                            free);
 
-                Broadcaster.postMessage(req);
+                    Broadcaster.postMessage(req);
+                }
             }
         }
         else
@@ -946,12 +949,15 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
                 if (_itemStacks[i] != null && msg.getMatcher().matches(_itemStacks[i]))
                 {
                     int free = _itemStacks[i].getMaxStackSize() - _itemStacks[i].stackSize;
-                    TRPutInInventory req = new TRPutInInventory(TileEntityBeaconFurnace.this,
-                            msg.getSender(), msg.getTransactionID(), 0, msg.getMatcher(),
-                            free);
+                    if (free > 8)
+                    {
+                        TRPutInInventory req = new TRPutInInventory(TileEntityBeaconFurnace.this,
+                                msg.getSender(), msg.getTransactionID(), 0, msg.getMatcher(),
+                                free);
 
-                    Broadcaster.postMessage(req);
-                    break;
+                        Broadcaster.postMessage(req);
+                        break;
+                    }
                 }
             }
         }

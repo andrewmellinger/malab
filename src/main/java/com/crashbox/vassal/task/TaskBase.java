@@ -30,7 +30,8 @@ public abstract class TaskBase
         {
             Constructor<? extends TaskBase> ctor = clazz.getConstructor(EntityAIVassal.class,
                     message.getClass());
-            return ctor.newInstance(performer, message);
+            TaskBase task = ctor.newInstance(performer, message);
+            return task;
         }
         catch (Exception e)
         {

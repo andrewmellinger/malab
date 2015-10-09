@@ -346,8 +346,8 @@ public class TaskPair implements ITask
         // Move helper
         for (T msg : responses)
         {
-            if (!_entityAI.canGetTo(msg.getSender().getBlockPos()))
-                continue;
+//            if (!_entityAI.canGetTo(msg.getSender().getBlockPos()))
+//                continue;
 
             int value = msg.getValue() - Priority.computeDistanceCost(pos, msg.getSender().getBlockPos(),
                     _entityAI.getEntity().getSpeedFactor());

@@ -114,9 +114,9 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
                 _state = perform();
                 break;
         }
+
     }
 
-    private long _pausedMessageSecs = 0;
 
     // ================
     // IMessager
@@ -556,9 +556,10 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         _responses.clear();
         getEntity().getNavigator().clearPathEntity();
 
-        long tmp = System.currentTimeMillis() + ELICIT_RESET_DELAY;
-        if (tmp > _nextElicit)
-            _nextElicit = tmp;
+        _nextElicit = System.currentTimeMillis() + ELICIT_RESET_DELAY;
+//        long tmp = System.currentTimeMillis() + ELICIT_RESET_DELAY;
+//        if (tmp > _nextElicit)
+//            _nextElicit = tmp;
     }
 
     //=============================================================================================
@@ -612,13 +613,17 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         // Compute position towards us but not on the block, so we aren't actually standing on the thing.
         BlockPos target = VassalUtils.getBlockBeside(getBlockPos(), pos);
 //        debugLog("Targeting  Nearby: " + pos + " to: " + target);
+
         boolean canMove = getEntity().getNavigator().tryMoveToXYZ(target.getX(), target.getY(), target.getZ(),
                 getEntity().getSpeedFactor());
 
         // Sometimes we can't move near, so just move to
         if (!canMove)
+        {
+
             canMove = getEntity().getNavigator().tryMoveToXYZ(pos.getX(), pos.getY(), pos.getZ(),
                     getEntity().getSpeedFactor());
+        }
 
         return canMove;
     }
@@ -785,10 +790,11 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
     // Main state variable for the loop
     private State _state = State.IDLING;
     private boolean _paused = false;
+    private long _pausedMessageSecs = 0;
 
     // We don't want to ask for work too often.  If we don't get a response, just hang out.
     private static final int ELICIT_DELAY_MS = 6000;
-    private static final int ELICIT_RESET_DELAY = 500;
+    private static final int ELICIT_RESET_DELAY = 100;
     private long _nextElicit = 0;
 
     private static final int FUEL_REQUEST_DELAY = 2000;
