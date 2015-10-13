@@ -7,6 +7,7 @@ import com.crashbox.vassal.common.ItemStackMatcher;
 import com.crashbox.vassal.common.ItemTypeMatcher;
 import com.crashbox.vassal.messaging.*;
 import com.crashbox.vassal.task.TaskHarvestTree;
+import com.crashbox.vassal.util.RingedSearcher;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;

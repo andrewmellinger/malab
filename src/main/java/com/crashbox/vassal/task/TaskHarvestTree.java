@@ -1,7 +1,7 @@
 package com.crashbox.vassal.task;
 
 import com.crashbox.vassal.ai.EntityAIVassal;
-import com.crashbox.vassal.ai.RingedSearcher;
+import com.crashbox.vassal.util.RingedSearcher;
 import com.crashbox.vassal.messaging.TRHarvest;
 import net.minecraft.util.BlockPos;
 

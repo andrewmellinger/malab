@@ -1,4 +1,4 @@
-package com.crashbox.vassal.ai;
+package com.crashbox.vassal.util;
 
 import com.crashbox.vassal.VassalUtils;
 import com.crashbox.vassal.common.ItemStackMatcher;

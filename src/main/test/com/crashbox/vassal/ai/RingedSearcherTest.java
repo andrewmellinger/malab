@@ -1,11 +1,8 @@
 package com.crashbox.vassal.ai;
 
+import com.crashbox.vassal.util.RingedSearcher;
 import net.minecraft.util.BlockPos;
 import org.junit.Test;
-
-import java.util.Iterator;
-
-import static org.junit.Assert.*;
 
 public class RingedSearcherTest
 {
