@@ -248,7 +248,6 @@ public class Priority
         return bestTask;
     }
 
-
     public static int inventoryPressure(int current, int max)
     {
         if (current < 16)
