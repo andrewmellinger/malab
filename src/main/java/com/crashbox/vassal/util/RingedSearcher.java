@@ -13,7 +13,37 @@ import java.util.*;
  */
 public class RingedSearcher  implements Iterable<BlockPos>
 {
-    // UNDERSTANDS LOG METADATA
+    // Finds a tree looking in rings from the starting spot.
+    public static Queue<BlockPos> findTree(World world, BlockPos start, int radius, int height,
+                                           ItemStackMatcher matcher, List<BlockPos> exclusions,
+                                           BlockBounds bounds)
+    {
+        RingedSearcher searcher = new RingedSearcher(start, radius, height);
+        for (BlockPos pos : searcher)
+        {
+            if (VassalUtils.willDrop(world, pos, matcher) &&
+                    bounds.inBounds(pos) &&
+                    !VassalUtils.pointInAreas(pos, exclusions, 1))
+            {
+                Queue<BlockPos> result = new LinkedList<BlockPos>();
+
+                // Move down to bottom
+                for (int y = pos.getY(); y >= start.getY(); --y)
+                {
+                    BlockPos tmp = new BlockPos(pos.getX(), y, pos.getZ());
+                    if (VassalUtils.willDrop(world, tmp, matcher))
+                    {
+                        result.add(tmp);
+                    }
+                }
+                return result;
+            }
+        }
+
+        return null;
+    }
+
+
     public static Queue<BlockPos> findTree(World world, BlockPos center, int radius, int height,
             ItemStackMatcher matcher, List<BlockPos> exclusions)
     {

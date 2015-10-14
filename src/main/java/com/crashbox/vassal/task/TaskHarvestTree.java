@@ -1,6 +1,8 @@
 package com.crashbox.vassal.task;
 
+import com.crashbox.vassal.VassalUtils;
 import com.crashbox.vassal.ai.EntityAIVassal;
+import com.crashbox.vassal.util.BlockBounds;
 import com.crashbox.vassal.util.RingedSearcher;
 import com.crashbox.vassal.messaging.TRHarvest;
 import net.minecraft.util.BlockPos;
@@ -21,7 +23,9 @@ public class TaskHarvestTree extends TaskHarvest
     @Override
     protected Queue<BlockPos> findHarvestList(List<BlockPos> others)
     {
-        return RingedSearcher.findTree(getEntity().getEntityWorld(), getRequester().getBlockPos(), _radius,
-                _height, getMatcher(), others);
+        BlockBounds bounds = new BlockBounds(getRequester().getBlockPos(), _radius);
+        BlockPos start = VassalUtils.findIntersect(getRequester().getBlockPos(), _radius, getEntity().getPosition());
+        return RingedSearcher.findTree(getEntity().getEntityWorld(), start, _radius * 2, _height,
+                getMatcher(), others, bounds);
     }
 }
