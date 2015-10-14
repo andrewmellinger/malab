@@ -1,11 +1,8 @@
 package com.crashbox.vassal.task;
 
-import com.crashbox.vassal.VassalUtils;
 import com.crashbox.vassal.ai.EntityAIVassal;
 import com.crashbox.vassal.messaging.TRHarvest;
 import com.crashbox.vassal.util.StairBuilder;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemTool;
 import net.minecraft.util.BlockPos;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

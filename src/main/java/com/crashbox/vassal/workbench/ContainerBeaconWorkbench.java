@@ -1,6 +1,5 @@
 package com.crashbox.vassal.workbench;
 
-import com.crashbox.vassal.VassalUtils;
 import com.crashbox.vassal.ai.SlotOutput;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;

@@ -1,7 +1,6 @@
 package com.crashbox.vassal.workbench;
 
 import com.crashbox.vassal.VassalMain;
-import com.crashbox.vassal.VassalUtils;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;

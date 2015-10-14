@@ -1,7 +1,6 @@
 package com.crashbox.vassal.util;
 
-import com.crashbox.vassal.VassalUtils;
-import com.crashbox.vassal.VassalUtils.COMPASS;
+import com.crashbox.vassal.util.VassalUtils.COMPASS;
 import net.minecraft.util.BlockPos;
 
 import java.util.Iterator;

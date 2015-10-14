@@ -1,6 +1,6 @@
 package com.crashbox.vassal.messaging;
 
-import com.crashbox.vassal.VassalUtils;
+import com.crashbox.vassal.util.VassalUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

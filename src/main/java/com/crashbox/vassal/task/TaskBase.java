@@ -1,9 +1,8 @@
 package com.crashbox.vassal.task;
 
-import com.crashbox.vassal.VassalUtils;
+import com.crashbox.vassal.util.VassalUtils;
 import com.crashbox.vassal.entity.EntityVassal;
 import com.crashbox.vassal.ai.EntityAIVassal;
-import com.crashbox.vassal.ai.Priority;
 import com.crashbox.vassal.messaging.IMessager;
 import com.crashbox.vassal.messaging.MessageTaskRequest;
 import com.crashbox.vassal.task.ITask.UpdateResult;
@@ -13,9 +12,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**

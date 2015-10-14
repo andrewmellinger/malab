@@ -1,6 +1,7 @@
 package com.crashbox.vassal;
 
 import com.crashbox.vassal.util.BlockWalker;
+import com.crashbox.vassal.util.VassalUtils;
 import net.minecraft.util.BlockPos;
 import org.junit.Test;
 

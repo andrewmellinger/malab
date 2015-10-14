@@ -1,6 +1,5 @@
 package com.crashbox.vassal.util;
 
-import com.crashbox.vassal.VassalUtils;
 import com.crashbox.vassal.common.AnyItemMatcher;
 import com.crashbox.vassal.common.ItemStackMatcher;
 import com.crashbox.vassal.entity.EntityVassal;

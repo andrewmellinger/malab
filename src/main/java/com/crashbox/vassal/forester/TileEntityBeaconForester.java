@@ -1,6 +1,6 @@
 package com.crashbox.vassal.forester;
 
-import com.crashbox.vassal.VassalUtils;
+import com.crashbox.vassal.util.VassalUtils;
 import com.crashbox.vassal.ai.*;
 import com.crashbox.vassal.beacon.BeaconBase;
 import com.crashbox.vassal.common.ItemStackMatcher;

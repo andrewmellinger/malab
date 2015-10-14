@@ -1,17 +1,14 @@
 package com.crashbox.vassal.workbench;
 
-import com.crashbox.vassal.VassalUtils;
+import com.crashbox.vassal.util.VassalUtils;
 import com.crashbox.vassal.ai.Priority;
 import com.crashbox.vassal.beacon.BeaconBase;
 import com.crashbox.vassal.beacon.TileEntityBeaconInventory;
 import com.crashbox.vassal.common.ItemStackMatcher;
 import com.crashbox.vassal.messaging.*;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.inventory.*;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.nbt.NBTTagCompound;

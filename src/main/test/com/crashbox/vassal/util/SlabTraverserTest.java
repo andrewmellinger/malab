@@ -1,10 +1,7 @@
 package com.crashbox.vassal.util;
 
-import com.crashbox.vassal.VassalUtils;
 import net.minecraft.util.BlockPos;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 public class SlabTraverserTest
 {

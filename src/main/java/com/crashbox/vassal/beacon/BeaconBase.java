@@ -1,12 +1,11 @@
 package com.crashbox.vassal.beacon;
 
-import com.crashbox.vassal.VassalUtils;
+import com.crashbox.vassal.util.VassalUtils;
 import com.crashbox.vassal.messaging.*;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.swing.text.html.HTMLDocument;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;

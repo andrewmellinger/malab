@@ -1,11 +1,9 @@
 package com.crashbox.vassal.ai;
 
-import com.crashbox.vassal.VassalUtils;
 import com.crashbox.vassal.task.ITask;
 import net.minecraft.util.BlockPos;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import scala.Int;
 
 import java.util.List;
 

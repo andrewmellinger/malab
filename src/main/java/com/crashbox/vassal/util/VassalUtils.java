@@ -1,10 +1,9 @@
-package com.crashbox.vassal;
+package com.crashbox.vassal.util;
 
 import com.crashbox.vassal.ai.Priority;
 import com.crashbox.vassal.common.ItemStackMatcher;
 import com.crashbox.vassal.entity.EntityVassal;
 import com.crashbox.vassal.messaging.*;
-import com.crashbox.vassal.util.BlockWalker;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockSlab;
 import net.minecraft.block.BlockStoneSlab;

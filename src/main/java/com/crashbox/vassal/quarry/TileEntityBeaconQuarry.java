@@ -1,7 +1,7 @@
 package com.crashbox.vassal.quarry;
 
 import com.crashbox.vassal.VassalMain;
-import com.crashbox.vassal.VassalUtils;
+import com.crashbox.vassal.util.VassalUtils;
 import com.crashbox.vassal.ai.EntityAIVassal;
 import com.crashbox.vassal.ai.Priority;
 import com.crashbox.vassal.beacon.BeaconBase;

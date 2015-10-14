@@ -1,7 +1,7 @@
 package com.crashbox.vassal.util;
 
 import net.minecraft.util.BlockPos;
-import com.crashbox.vassal.VassalUtils.COMPASS;
+import com.crashbox.vassal.util.VassalUtils.COMPASS;
 
 /**
  * Copyright 2015 Andrew O. Mellinger

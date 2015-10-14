@@ -1,6 +1,6 @@
 package com.crashbox.vassal.beacon;
 
-import com.crashbox.vassal.VassalUtils;
+import com.crashbox.vassal.util.VassalUtils;
 import com.crashbox.vassal.common.ItemStackMatcher;
 import com.crashbox.vassal.messaging.IMessager;
 import net.minecraft.inventory.IInventory;

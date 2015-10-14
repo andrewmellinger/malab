@@ -1,6 +1,5 @@
 package com.crashbox.vassal.util;
 
-import com.crashbox.vassal.VassalUtils;
 import com.crashbox.vassal.common.ItemStackMatcher;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;

@@ -1,6 +1,5 @@
 package com.crashbox.vassal.messaging;
 
-import com.crashbox.vassal.VassalUtils;
 import com.crashbox.vassal.common.ItemStackMatcher;
 import com.crashbox.vassal.task.TaskHarvest;
 import org.apache.logging.log4j.LogManager;
