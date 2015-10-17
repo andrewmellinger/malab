@@ -6,6 +6,7 @@ import com.crashbox.vassal.ai.Priority;
 import com.crashbox.vassal.messaging.*;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
+import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -118,7 +119,7 @@ public class TaskPair implements ITask
 
         if (_acquireTask != null)
         {
-            int cost = Priority.computeDistanceCost(pos, _acquireTask.getWorkCenter(), speed);
+            int cost = Priority.computeDistanceCost(getWorld(), _acquireTask.getWorkCenter(), speed, pos);
             int val = _acquireTask.getValue();
             pos = _acquireTask.getWorkCenter();
 //            msg += ", acquire=" + _acquireTask.getClass().getSimpleName() +
@@ -130,7 +131,7 @@ public class TaskPair implements ITask
 
         if (_deliverTask != null)
         {
-            int cost = Priority.computeDistanceCost(pos, _deliverTask.getWorkCenter(), speed);
+            int cost = Priority.computeDistanceCost(getWorld(), _deliverTask.getWorkCenter(), speed, pos);
             int val = _deliverTask.getValue();
 //            msg += ", deliver=" + _deliverTask.getClass().getSimpleName() +
 //                   ", pos=" + _deliverTask.getWorkCenter() +
@@ -349,8 +350,8 @@ public class TaskPair implements ITask
 //            if (!_entityAI.canGetTo(msg.getSender().getBlockPos()))
 //                continue;
 
-            int value = msg.getValue() - Priority.computeDistanceCost(pos, msg.getSender().getBlockPos(),
-                    _entityAI.getEntity().getSpeedFactor());
+            int value = msg.getValue() - Priority.computeDistanceCost(getWorld(), msg.getSender().getBlockPos(), _entityAI.getEntity().getSpeedFactor(), pos
+            );
             //LOGGER.debug("findBest: task=" + this + ", cost=" + value + ", msg=" + msg);
             if (value > bestValue)
             {
@@ -359,6 +360,11 @@ public class TaskPair implements ITask
             }
         }
         return best;
+    }
+
+    private World getWorld()
+    {
+        return _entityAI.getEntity().getEntityWorld();
     }
 
     @Override

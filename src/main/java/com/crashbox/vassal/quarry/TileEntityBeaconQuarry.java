@@ -153,7 +153,7 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
         // If we have something that will drop, call him over
         if (builder.findFirstQuarryable(new AnyItemMatcher(), getEntityFromMessage(msg)) != null)
         {
-            int value = Priority.getQuarryIdleHarvestingValue();
+            int value = Priority.getQuarryIdleHarvestingValue(getWorld());
 
             // Add some value the closer we get to the bottom.
             value += Priority.quarryDepthValue(msg.getSender().getBlockPos().getY());

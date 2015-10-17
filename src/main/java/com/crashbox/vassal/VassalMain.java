@@ -1,5 +1,6 @@
 package com.crashbox.vassal;
 
+import com.crashbox.vassal.ai.Priority;
 import com.crashbox.vassal.chest.BlockBeaconChest;
 import com.crashbox.vassal.chest.TileEntityBeaconChest;
 import com.crashbox.vassal.entity.EntityVassal;
@@ -8,7 +9,6 @@ import com.crashbox.vassal.furnace.TileEntityBeaconFurnace;
 import com.crashbox.vassal.forester.BlockBeaconForester;
 import com.crashbox.vassal.forester.TileEntityBeaconForester;
 import com.crashbox.vassal.grenades.*;
-import com.crashbox.vassal.network.MessageToggleWorkbenchEnable;
 import com.crashbox.vassal.quarry.BlockBeaconQuarry;
 import com.crashbox.vassal.quarry.TileEntityBeaconQuarry;
 import com.crashbox.vassal.workbench.BlockBeaconWorkbench;
@@ -18,6 +18,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
@@ -25,17 +26,15 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartedEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
-import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.oredict.OreDictionary;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Arrays;
-
 
 /**
  * Copyright 2015 Andrew o. Mellinger
@@ -51,12 +50,13 @@ public class VassalMain
 
     public static CreativeTabs VASSAL_TAB;
 
+    public static Block BLOCK_BEACON_CHEST;
+    //public static Block BLOCK_BEACON_CONTROLLER;
     public static Block BLOCK_BEACON_FURNACE;
     public static Block BLOCK_BEACON_FURNACE_LIT;
     public static Block BLOCK_BEACON_FORESTER;
-    public static Block BLOCK_BEACON_WORKBENCH;
-    public static Block BLOCK_BEACON_CHEST;
     public static Block BLOCK_BEACON_QUARRY;
+    public static Block BLOCK_BEACON_WORKBENCH;
 
     public static Item ITEM_DIGGER_GRENADE;
     public static Item ITEM_MINESHAFT_GRENADE;
@@ -66,7 +66,7 @@ public class VassalMain
     //public static SimpleNetworkWrapper NETWORK;
 
     // This allows us to us one gui handler for many things
-    public static enum GUI_ENUM { VASSAL, FURNACE, WORKBENCH, CHEST }
+    public static enum GUI_ENUM { VASSAL, FURNACE, WORKBENCH, CHEST, CONTROLLER }
 
     // These are the blocks and items we load that other parts need to use.
     //public static ItemThrowableTorch ITEM_THROWABLE_TORCH;
@@ -81,6 +81,7 @@ public class VassalMain
     @EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
+
         VASSAL_TAB = new CreativeTabVassal();
         preInitBlockAndItems();
 //        VassalMain.NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel("vassal");
@@ -126,6 +127,13 @@ public class VassalMain
 //        LOGGER.debug("Cobblestone hardness: " + Blocks.cobblestone.getBlockHardness(null, null));
     }
 
+    @EventHandler
+    public void fmlLifeCycle(FMLServerStartedEvent event)
+    {
+        // DEBUG
+        Priority.addGameRules(MinecraftServer.getServer().worldServerForDimension(0));
+    }
+
     public void registerModEntityWithEgg(Class parEntityClass, String parEntityName,
                                          int parEggColor, int parEggSpotsColor)
     {
@@ -140,6 +148,10 @@ public class VassalMain
         BLOCK_BEACON_CHEST = new BlockBeaconChest();
         GameRegistry.registerBlock(BLOCK_BEACON_CHEST, BlockBeaconChest.NAME);
         GameRegistry.registerTileEntity(TileEntityBeaconChest.class, TileEntityBeaconChest.NAME);
+
+//        BLOCK_BEACON_CONTROLLER = new BlockController();
+//        GameRegistry.registerBlock(BLOCK_BEACON_CONTROLLER, BlockController.NAME);
+        //GameRegistry.registerTileEntity(TileEntityBeaconForester.class, TileEntityBeaconForester.NAME);
 
         BLOCK_BEACON_FORESTER = new BlockBeaconForester();
         GameRegistry.registerBlock(BLOCK_BEACON_FORESTER, BlockBeaconForester.NAME);
