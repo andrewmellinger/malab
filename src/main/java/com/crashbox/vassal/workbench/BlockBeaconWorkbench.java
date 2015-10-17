@@ -29,7 +29,7 @@ public class BlockBeaconWorkbench extends BlockContainer
     {
         super(Material.iron);
         setUnlocalizedName(VassalMain.MODID + "_" + NAME);
-        setCreativeTab(CreativeTabs.tabRedstone);
+        setCreativeTab(VassalMain.VASSAL_TAB);
         setTickRandomly(false);
     }
 

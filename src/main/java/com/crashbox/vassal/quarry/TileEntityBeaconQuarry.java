@@ -151,10 +151,9 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
         if (builder.findFirstQuarryable(new AnyItemMatcher(), getEntityFromMessage(msg)) != null)
         {
             int value = Priority.getQuarryIdleHarvestingValue();
+
             // Add some value the closer we get to the bottom.
-            int y = msg.getSender().getBlockPos().getY();
-            if (y < 60)
-                value += (60 - y)/10;
+            value += Priority.quarryDepthValue(msg.getSender().getBlockPos().getY());
 
             TRHarvest quarry = new TRHarvest(this, msg.getSender(), msg.getTransactionID(),
                     value, TaskQuarry.class, new AnyItemMatcher(), 1);

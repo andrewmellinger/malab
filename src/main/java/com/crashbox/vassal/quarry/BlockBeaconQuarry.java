@@ -22,7 +22,7 @@ public class BlockBeaconQuarry extends BlockContainer
     {
         super(Material.iron);
         setUnlocalizedName(VassalMain.MODID + "_" + NAME);
-        setCreativeTab(CreativeTabs.tabRedstone);
+        setCreativeTab(VassalMain.VASSAL_TAB);
         setTickRandomly(false);
 
         // TOOD: Switch to iron, later.

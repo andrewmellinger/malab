@@ -14,6 +14,7 @@ import com.crashbox.vassal.quarry.TileEntityBeaconQuarry;
 import com.crashbox.vassal.workbench.BlockBeaconWorkbench;
 import com.crashbox.vassal.workbench.TileEntityBeaconWorkbench;
 import net.minecraft.block.Block;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -48,6 +49,8 @@ public class VassalMain
     public static final String NAME = "Vassal";
     public static final String VERSION = "0.1.0";
 
+    public static CreativeTabs VASSAL_TAB;
+
     public static Block BLOCK_BEACON_FURNACE;
     public static Block BLOCK_BEACON_FURNACE_LIT;
     public static Block BLOCK_BEACON_FORESTER;
@@ -59,6 +62,8 @@ public class VassalMain
     public static Item ITEM_MINESHAFT_GRENADE;
     public static Item ITEM_FLATTEN_GRENADE;
     public static Item ITEM_TUNNEL_GRENADE;
+
+
 
     public static SimpleNetworkWrapper NETWORK;
 
@@ -78,6 +83,7 @@ public class VassalMain
     @EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
+        VASSAL_TAB = new CreativeTabVassal();
         preInitBlockAndItems();
         VassalMain.NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel("vassal");
         VassalMain.NETWORK.registerMessage(MessageToggleWorkbenchEnable.Handler.class,

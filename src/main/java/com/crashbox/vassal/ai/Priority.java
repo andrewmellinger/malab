@@ -1,6 +1,7 @@
 package com.crashbox.vassal.ai;
 
 import com.crashbox.vassal.task.ITask;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -38,6 +39,12 @@ public class Priority
     private static int WORKBENCH_STORAGE_AVAIL_VALUE = 0;
 
     private static int LONGEST_DISTANCE = 64;
+
+    // Need accessors
+    private static int QUARRY_DEPTH_BLOCKS_PER_PLUS = 10;
+
+    private static int FURNACE_ASK_THRESHOLD = 8;
+    private static int FURNACE_FUEL_PIECES_PER_PLUS = 5;
 
 
     public static int getQuarryMoveQuarryBlockValue()
@@ -237,13 +244,35 @@ public class Priority
                     bestTask = task;
                 }
             }
-//            else
-//            {
-//                LOGGER.debug("Not computing because unresolved: " + task);
-//            }
         }
 
         return bestTask;
+    }
+
+    /**
+     * How much value mining at a particular depth provides.  The deeper the more depth.
+     * @param y Current y value.
+     * @return Value to mine at that depth.
+     */
+    public static int quarryDepthValue(int y)
+    {
+        if (y < 60)
+            return (60 - y)/QUARRY_DEPTH_BLOCKS_PER_PLUS;
+
+        return 0;
+    }
+
+    public static int getFuelNeed(ItemStack fuelStack)
+    {
+        if (fuelStack == null)
+            return 100;
+
+        int current = fuelStack.stackSize;
+        if (current > FURNACE_ASK_THRESHOLD)
+            return 0;
+
+
+        return (FURNACE_ASK_THRESHOLD - current)/FURNACE_FUEL_PIECES_PER_PLUS;
     }
 
     public static int inventoryPressure(int current, int max)
@@ -273,11 +302,6 @@ public class Priority
 
         return (int) (( Math.sqrt(startPos.distanceSq(endPos)) / speed ) / 2D);
     }
-
-//    public static int computeDistanceCost(BlockPos startPos, BlockPos endPos)
-//    {
-//        return ( (int) Math.sqrt(startPos.distanceSq(endPos)) ) / 10;
-//    }
 
     private static final Logger LOGGER = LogManager.getLogger();
 }

@@ -33,7 +33,7 @@ public class BlockBeaconFurnace extends BlockContainer
         setUnlocalizedName(VassalMain.MODID + "_" + NAME);
 
         if (!lit)
-            setCreativeTab(CreativeTabs.tabRedstone);
+            setCreativeTab(VassalMain.VASSAL_TAB);
         setTickRandomly(false);
     }
 

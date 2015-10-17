@@ -1,5 +1,6 @@
 package com.crashbox.vassal.furnace;
 
+import com.crashbox.vassal.ai.Priority;
 import com.crashbox.vassal.common.ItemStackMatcher;
 import com.crashbox.vassal.messaging.*;
 import com.crashbox.vassal.beacon.BeaconBase;
@@ -761,21 +762,6 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
         return false;
     }
 
-    private int getFuelNeed()
-    {
-        // TODO: Discount if we make our own
-        // If we have less than 8, then ask for some
-        ItemStack fuelStack = getFuel();
-        if (fuelStack == null)
-            return 100;
-
-        int current = fuelStack.stackSize;
-        if (current > 8)
-            return 0;
-
-        return 8 - current;
-    }
-
     private ItemStackMatcher getFuelSamples()
     {
         // If we have some then just that.
@@ -785,6 +771,15 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
 
         return buildSampleMatcher(FUEL_SAMPLE_MIN, FUEL_SAMPLE_MAX);
     }
+
+    private int getFuelQuantityWanted()
+    {
+        if (getFuel() == null)
+            return 64;
+
+        return getFuel().getMaxStackSize() - getFuel().stackSize;
+    }
+
 
     //---------------------------
 
@@ -868,7 +863,6 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
                     Broadcaster.postMessage(newReq);
                 }
             }
-
         }
     }
 
@@ -891,7 +885,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
             }
         }
 
-        value = getFuelNeed();
+        value = Priority.getFuelNeed(getFuel());
         if (value > 0)
         {
             // TODO:  Compute quantity needed.
@@ -900,7 +894,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
             {
                 TRPutInInventory req = new TRPutInInventory(TileEntityBeaconFurnace.this,
                         msg.getSender(), msg.getTransactionID(),
-                        value, matcher, 8);
+                        value, matcher, getFuelQuantityWanted());
                 Broadcaster.postMessage(req);
             }
         }
