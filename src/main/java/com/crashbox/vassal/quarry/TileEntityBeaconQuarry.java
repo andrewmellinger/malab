@@ -44,6 +44,9 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
     @Override
     public void update()
     {
+        if (!worldObj.isRemote)
+            return;
+
         if (_quarry != null)
             _quarry.update();
     }

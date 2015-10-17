@@ -10,7 +10,7 @@
     <Logger name="com.crashbox.vassal.util.StairBuilder" level="info" additivity="true"/>
     <Logger name="com.crashbox.vassal.chest.TileEntityBeaconChest" level="info" additivity="true"/>
     <Logger name="com.crashbox.vassal.forester.TileEntityBeaconForester" level="info" additivity="true"/>
-    <Logger name="com.crashbox.vassal.quarry.TileEntityBeaconQuarry" level="info" additivity="true"/>
+    <Logger name="com.crashbox.vassal.quarry.TileEntityBeaconQuarry" level="debug" additivity="true"/>
     <Logger name="com.crashbox.vassal.furnace.TileEntityBeaconFurnace" level="info" additivity="true"/>
     <Logger name="com.crashbox.vassal.task.TaskPair" level="info" additivity="true"/>
     <Logger name="com.crashbox.vassal.task.TaskMakeBigStair" level="info" additivity="true"/>

@@ -318,6 +318,9 @@ public class TileEntityBeaconChest extends TileEntityBeaconInventory implements 
     @Override
     public void update()
     {
+        if (!worldObj.isRemote)
+            return;
+
         if (_chest != null)
             _chest.update();
     }
@@ -470,7 +473,6 @@ public class TileEntityBeaconChest extends TileEntityBeaconInventory implements 
                     return;
                 }
             }
-
         }
     }
 
