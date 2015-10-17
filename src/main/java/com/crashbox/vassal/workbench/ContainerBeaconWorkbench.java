@@ -1,6 +1,8 @@
 package com.crashbox.vassal.workbench;
 
 import com.crashbox.vassal.ai.SlotOutput;
+import com.crashbox.vassal.common.SampleFuelSlot;
+import com.crashbox.vassal.common.SampleSlot;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.*;
@@ -25,13 +27,17 @@ public class ContainerBeaconWorkbench extends Container
         _craftMatrix = _craftingCore.getCraftingMatrix();
         _craftResult = _craftingCore.getCraftResult();
         _craftOutput = _craftingCore.getCraftOutput();
+        _controls = _craftingCore.getControls();
 
         // Crafting result slot
         this.addSlotToContainer(new SlotCrafting(playerInventory.player, _craftMatrix, _craftResult,
-                0, 93, 35));
+                0, 93, 43));
 
         // Output slot
-        addSlotToContainer(new SlotOutput(playerInventory.player, _craftOutput, 0, 147, 35 ));
+        addSlotToContainer(new SlotOutput(playerInventory.player, _craftOutput, 0, 147, 43 ));
+
+        // Control Slot
+        addSlotToContainer(new SampleSlot(_controls, 0, 121, 19 ));
 
         // ===========================
         int i;
@@ -221,6 +227,7 @@ public class ContainerBeaconWorkbench extends Container
     public InventoryCrafting _craftMatrix;
     public IInventory _craftResult;
     private IInventory _craftOutput;
+    private IInventory _controls;
     private ContainerCraftingCore _craftingCore;
     private int[] _trackedFields = { 0, 0, 0 };
 

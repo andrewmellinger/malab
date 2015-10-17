@@ -2,6 +2,7 @@ package com.crashbox.vassal.workbench;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.*;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
@@ -50,9 +51,39 @@ public class ContainerCraftingCore extends Container
         return _craftOutput;
     }
 
+    public IInventory getControls()
+    {
+        return _controls;
+    }
+
+    private class ControlInventory extends InventoryBasic
+    {
+        public ControlInventory()
+        {
+            super("controls", false, 1);
+        }
+
+        @Override
+        public void setInventorySlotContents(int slot, ItemStack itemStack)
+        {
+            super.setInventorySlotContents(slot, itemStack);
+            _workbench.setEnabled(itemStack != null && itemStack.stackSize > 0);
+        }
+
+        @Override
+        public ItemStack decrStackSize(int i, int i1)
+        {
+            if (getStackInSlot(0) != null && getStackInSlot(0).stackSize == i1)
+                _workbench.setEnabled(false);
+            return super.decrStackSize(i, i1);
+        }
+    }
+
+
     private InventoryCrafting _craftMatrix;
     private IInventory _craftResult = new InventoryCraftResult();
     private IInventory _craftOutput = new InventoryBasic("output", false, 1);
+    private IInventory _controls = new ControlInventory();
     private TileEntityBeaconWorkbench _workbench;
     private World _world;
 

@@ -63,9 +63,7 @@ public class VassalMain
     public static Item ITEM_FLATTEN_GRENADE;
     public static Item ITEM_TUNNEL_GRENADE;
 
-
-
-    public static SimpleNetworkWrapper NETWORK;
+    //public static SimpleNetworkWrapper NETWORK;
 
     // This allows us to us one gui handler for many things
     public static enum GUI_ENUM { VASSAL, FURNACE, WORKBENCH, CHEST }
@@ -85,9 +83,9 @@ public class VassalMain
     {
         VASSAL_TAB = new CreativeTabVassal();
         preInitBlockAndItems();
-        VassalMain.NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel("vassal");
-        VassalMain.NETWORK.registerMessage(MessageToggleWorkbenchEnable.Handler.class,
-                MessageToggleWorkbenchEnable.class, 0, Side.SERVER );
+//        VassalMain.NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel("vassal");
+//        VassalMain.NETWORK.registerMessage(MessageToggleWorkbenchEnable.Handler.class,
+//                MessageToggleWorkbenchEnable.class, 0, Side.SERVER );
 
         proxy.preInit(event);
     }

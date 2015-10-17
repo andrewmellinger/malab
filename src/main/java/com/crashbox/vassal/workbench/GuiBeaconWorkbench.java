@@ -62,20 +62,19 @@ public class GuiBeaconWorkbench extends GuiContainer
         drawTexturedModalRect(marginHorizontal, marginVertical, 0, 0, xSize, ySize);
 
         // Draw enabled thing
-        if (_tileWorkbench.getEnabled())
-        {
-            drawTexturedModalRect(marginHorizontal + 120, marginVertical + 16,  // dst x, y
-                    176, 16,                                                    // src x, y
-                    16, 16);                                                    // width, height
-        }
+//        if (_tileWorkbench.getEnabled())
+//        {
+//            drawTexturedModalRect(marginHorizontal + 120, marginVertical + 16,  // dst x, y
+//                    176, 16,                                                    // src x, y
+//                    16, 16);                                                    // width, height
+//        }
 
         // Draw progress indicator
         int progressLevel = (int) (_tileWorkbench.getProgressPercent() * 24F);
-        drawTexturedModalRect(marginHorizontal + 117, marginVertical + 34,   // dst x, y
+        drawTexturedModalRect(marginHorizontal + 117, marginVertical + 44,   // dst x, y
                 176, 0,                                                      // src x, y
                 progressLevel + 1, 16);                                      // width, height
     }
-
 
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
@@ -96,7 +95,7 @@ public class GuiBeaconWorkbench extends GuiContainer
             MessageToggleWorkbenchEnable enable = new MessageToggleWorkbenchEnable();
             enable.setWorldID(_tileWorkbench.getWorld().provider.getDimensionId());
             enable.setPos(_tileWorkbench.getPos());
-            VassalMain.NETWORK.sendToServer(enable);
+//            VassalMain.NETWORK.sendToServer(enable);
         }
     }
 

@@ -8,6 +8,7 @@ import com.crashbox.vassal.common.ItemStackMatcher;
 import com.crashbox.vassal.messaging.*;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.inventory.*;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
@@ -40,6 +41,7 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory impleme
         _craftingMatrix = _craftingCore.getCraftingMatrix();
         _craftResult = _craftingCore.getCraftResult();
         _craftOutput = _craftingCore.getCraftOutput();
+        _controls = _craftingCore.getControls();
     }
 
     //=============================================================================================
@@ -52,10 +54,14 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory impleme
     @Override
     public void readFromNBT(NBTTagCompound compound)
     {
-//        LOGGER.debug("readFromNBT");
+        LOGGER.debug("readFromNBT: " + compound);
         super.readFromNBT(compound);
+        // NOTE:  10 is a type not a size...
         NBTTagList nbttaglist = compound.getTagList(NBT_ITEMS, 10);
+//        LOGGER.debug("after super read: " + compound);
+//        LOGGER.debug("Item="+nbttaglist);
 
+        boolean enabled = false;
         for (int i = 0; i < nbttaglist.tagCount(); ++i)
         {
             NBTTagCompound nbtTagCompound = nbttaglist.getCompoundTagAt(i);
@@ -66,19 +72,27 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory impleme
             {
                 ItemStack stack = ItemStack.loadItemStackFromNBT(nbtTagCompound);
                 _craftOutput.setInventorySlotContents(0, stack);
-                //LOGGER.debug("craftedOutput from NBT: slot=" + b0 +", stack=" + stack);
+//                LOGGER.debug("craftedOutput from NBT: slot=" + b0 +", stack=" + stack);
+            }
+            // Control slot
+            else if (b0 == 10)
+            {
+                ItemStack stack = ItemStack.loadItemStackFromNBT(nbtTagCompound);
+                _controls.setInventorySlotContents(0, stack);
+                enabled = (stack != null && stack.stackSize > 0);
+//                LOGGER.debug("control from NBT: slot=" + b0 +", stack=" + stack);
             }
             else if (b0 >= 0 && b0 < _craftingMatrix.getSizeInventory())
             {
                 ItemStack stack = ItemStack.loadItemStackFromNBT(nbtTagCompound);
                 _craftingMatrix.setInventorySlotContents(b0, stack);
-                //LOGGER.debug("itemStack from NBT: slot=" + b0 +", stack=" + stack);
+//                LOGGER.debug("itemStack from NBT: slot=" + b0 +", stack=" + stack);
             }
         }
 
         _ticksToCraft = compound.getShort(NBT_TICKS_TO_CRAFT);
         _ticksCrafted = compound.getShort(NBT_TICKS_CRAFTED);
-        setEnabled(compound.getBoolean(NBT_ENABLED));
+        setEnabled(enabled);
 
         if (compound.hasKey(NBT_CUSTOM_NAME, 8))
         {
@@ -89,32 +103,40 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory impleme
     @Override
     public void writeToNBT(NBTTagCompound compound)
     {
-        //LOGGER.debug("writeToNBT");
+//        LOGGER.debug("writeToNBT");
         super.writeToNBT(compound);
         compound.setShort(NBT_TICKS_TO_CRAFT, (short) _ticksToCraft);
         compound.setShort(NBT_TICKS_CRAFTED, (short) _ticksCrafted);
-        compound.setBoolean(NBT_ENABLED, _enabled);
         NBTTagList nbtItemList = new NBTTagList();
 
         for (int i = 0; i < _craftingMatrix.getSizeInventory(); ++i)
         {
             if (_craftingMatrix.getStackInSlot(i) != null)
             {
+//                LOGGER.debug("Adding slot=" + i + ", content:" + _craftingMatrix.getStackInSlot(i));
                 NBTTagCompound nbtTagCompound = new NBTTagCompound();
                 nbtTagCompound.setByte(NBT_SLOT, (byte)i);
                 _craftingMatrix.getStackInSlot(i).writeToNBT(nbtTagCompound);
                 nbtItemList.appendTag(nbtTagCompound);
-                //LOGGER.debug("itemStack TO NBT: slot=" + i + ", stack=" + _craftingMatrix.getStackInSlot(i));
             }
         }
 
         if (_craftOutput.getStackInSlot(0) != null)
         {
+//            LOGGER.debug("Adding craftingOutput=" + _craftOutput.getStackInSlot(0));
             NBTTagCompound nbtTagCompound = new NBTTagCompound();
             nbtTagCompound.setByte(NBT_SLOT, (byte)9);
             _craftOutput.getStackInSlot(0).writeToNBT(nbtTagCompound);
             nbtItemList.appendTag(nbtTagCompound);
-            //LOGGER.debug("itemStack TO NBT: output=" + _craftResult.getStackInSlot(0));
+        }
+
+        if (_controls.getStackInSlot(0) != null)
+        {
+//            LOGGER.debug("Adding controls=" + _controls.getStackInSlot(0));
+            NBTTagCompound nbtTagCompound = new NBTTagCompound();
+            nbtTagCompound.setByte(NBT_SLOT, (byte)10);
+            _controls.getStackInSlot(0).writeToNBT(nbtTagCompound);
+            nbtItemList.appendTag(nbtTagCompound);
         }
 
         compound.setTag(NBT_ITEMS, nbtItemList);
@@ -123,6 +145,8 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory impleme
         {
             compound.setString(NBT_CUSTOM_NAME, _customName);
         }
+
+        LOGGER.debug("Finished writing NBT: " + compound);
     }
 
     @Override
@@ -154,8 +178,12 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory impleme
     @Override
     public int getSizeInventory()
     {
-        // Crafting grid, result, output
-        return 11;
+        // Crafting grid, result, output, control
+        // 0-8: grid
+        // 9: result
+        // 10: output
+        // 11: controls
+        return 12;
     }
 
     @Override
@@ -167,6 +195,8 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory impleme
             return _craftResult.getStackInSlot(0);
         else if (i == 10)
             return _craftOutput.getStackInSlot(0);
+        else if (i == 11)
+            return _controls.getStackInSlot(0);
 
         return null;
     }
@@ -180,6 +210,8 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory impleme
             return _craftResult.decrStackSize(0, i1);
         else if (i == 10)
             return _craftOutput.decrStackSize(0, i1);
+        else if (i == 11)
+            return _controls.decrStackSize(0, i1);
 
         return null;
     }
@@ -187,12 +219,15 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory impleme
     @Override
     public ItemStack getStackInSlotOnClosing(int i)
     {
+        // Do we need this if we don't dump things??
         if (i < 9)
             return _craftingMatrix.getStackInSlotOnClosing(i);
         else if (i == 9)
             return _craftResult.getStackInSlotOnClosing(0);
         else if (i == 10)
             return _craftOutput.getStackInSlotOnClosing(0);
+        else if (i == 11)
+            return _controls.getStackInSlotOnClosing(0);
 
         return null;
     }
@@ -206,6 +241,8 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory impleme
             _craftResult.setInventorySlotContents(0, itemStack);
         else if (i == 10)
             _craftOutput.setInventorySlotContents(0, itemStack);
+        else if (i == 11)
+            _controls.setInventorySlotContents(0, itemStack);
     }
 
     @Override
@@ -240,6 +277,10 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory impleme
             ItemStack stack = _craftingMatrix.getStackInSlot(i);
             return stack != null && stack.isItemEqual(itemStack) &&
                     (stack.stackSize < stack.getMaxStackSize());
+        }
+        else if(i == 11)
+        {
+            return (itemStack.getItem() == Items.redstone);
         }
 
         return false;
@@ -503,6 +544,9 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory impleme
      */
     public float getProgressPercent()
     {
+        if (_ticksToCraft == 0)
+            return 0;
+
         return (_ticksCrafted * 1.0F)/(_ticksToCraft * 1.0F);
     }
 
@@ -772,9 +816,10 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory impleme
 
     //---------------------------------------------------------------------------------------------
 
-    private final InventoryCrafting _craftingMatrix;
-    private final IInventory        _craftResult;
-    private final IInventory        _craftOutput;
+    private final InventoryCrafting     _craftingMatrix;
+    private final IInventory            _craftResult;
+    private final IInventory            _craftOutput;
+    private final IInventory            _controls;
     private final ContainerCraftingCore _craftingCore;
 
     // State Tracker
@@ -789,7 +834,6 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory impleme
     private static final String NBT_CUSTOM_NAME = "CustomName";
     private static final String NBT_TICKS_TO_CRAFT = "ticksToCraft";
     private static final String NBT_TICKS_CRAFTED = "ticksCrafted";
-    private static final String NBT_ENABLED = "enabled";
 
     private Workbench _workbench;
     private static final Logger LOGGER = LogManager.getLogger();
