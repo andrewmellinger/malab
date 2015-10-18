@@ -880,7 +880,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
                         msg.getSender(), msg.getTransactionID(), value, getSmeltableItemMatcher(),
                         getSmeltableQuantityWanted());
 
-                LOGGER.debug("Furnace posting: " + req);
+                LOGGER.debug("Furnace= " + getPos() + ", posting=" + req);
                 Broadcaster.postMessage(req);
             }
         }

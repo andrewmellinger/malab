@@ -1,6 +1,7 @@
 package com.crashbox.vassal.ai;
 
 import com.crashbox.vassal.task.ITask;
+import com.crashbox.vassal.util.VassalUtils;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.BlockPos;
@@ -18,22 +19,16 @@ public class Priority
 {
     private static final int QUARRY_MOVE_QUARRY_BLOCK_VALUE = 20;
 
-    private static int QUARRY_IDLE_HARVESTING_VALUE = 0;
-    private static int FORESTER_IDLE_HARVESTING_VALUE = -5;
     private static int GENERIC_CLEAN_UP_TASK_VALUE = 0;
-    private static int QUARRY_DEPTH_BLOCKS_PER_PLUS = 10;
-
 
     private static int STAIR_BUILDER_VALUE = 10;
 
     private static int FORESTER_PICKUP_SAPLING_VALUE = 10;
     private static int FORESTER_PLANT_SAPLING_VALUE = 10;
-    private static int FORESTER_HARVEST_VALUE = 0;
 
     private static int FORESTER_STORAGE_SAPLING_PLANT_VALUE = 20;
     private static int CHEST_STORAGE_AVAIL_VALUE = 0;
 
-    private static int QUARRY_ITEM_HARVEST_VALUE = 5;            // Get it from a quarry before chest
     private static int CHEST_ITEM_AVAIL_VALUE = 0;
 
     private static int WORKBENCH_INVENTORY_OUT_REQUEST_VALUE = 40;
@@ -45,30 +40,68 @@ public class Priority
     private static int FURNACE_ASK_THRESHOLD = 8;
     private static int FURNACE_FUEL_PIECES_PER_PLUS = 5;
 
-    public static void addGameRules(World world)
+    private static final String MAX_DISTANCE = "vassal.distance";
+
+    private static final String FORESTER_HARVEST_PRIORITY = "vassal.forester.harvest.value";
+    private static final String FORESTER_IDLE_HARVEST_PRIORITY = "vassal.forester.idle.harvest.value";
+
+    private static final String QUARRY_HARVEST_PRIORITY = "vassal.quarry.harvest.value";
+    private static final String QUARRY_IDLE_HARVEST_PRIORITY = "vassal.quarry.idle.harvest.value";
+
+    private static final String QUARRY_DEPTH_PRIORITY_PER_BLOCK = "vassal.quarry.depth.value.tenths.per.block";
+
+    public static void setupGameRules(World world)
     {
         GameRules rules = world.getGameRules();
-        rules.addGameRule("vassal.distance", "64", GameRules.ValueType.NUMERICAL_VALUE);
-        rules.addGameRule("vassal.quarry.idle.harvesting.priority", "0", GameRules.ValueType.NUMERICAL_VALUE);
-        rules.addGameRule("vassal.forester.idle.harvesting.priority", "-5", GameRules.ValueType.NUMERICAL_VALUE);
+
+        if (!rules.hasRule(MAX_DISTANCE))
+            rules.addGameRule(MAX_DISTANCE, "64", GameRules.ValueType.NUMERICAL_VALUE);
+
+        if (!rules.hasRule(FORESTER_HARVEST_PRIORITY))
+            rules.addGameRule(FORESTER_HARVEST_PRIORITY, "0", GameRules.ValueType.NUMERICAL_VALUE);
+
+        if (!rules.hasRule(FORESTER_IDLE_HARVEST_PRIORITY))
+            rules.addGameRule(FORESTER_IDLE_HARVEST_PRIORITY, "-5", GameRules.ValueType.NUMERICAL_VALUE);
+
+        if (!rules.hasRule(QUARRY_HARVEST_PRIORITY))
+            rules.addGameRule(QUARRY_HARVEST_PRIORITY, "5", GameRules.ValueType.NUMERICAL_VALUE);
+
+        if (!rules.hasRule(QUARRY_IDLE_HARVEST_PRIORITY))
+            rules.addGameRule(QUARRY_IDLE_HARVEST_PRIORITY, "0", GameRules.ValueType.NUMERICAL_VALUE);
+
+        if (!rules.hasRule(QUARRY_DEPTH_PRIORITY_PER_BLOCK))
+            rules.addGameRule(QUARRY_DEPTH_PRIORITY_PER_BLOCK, "2", GameRules.ValueType.NUMERICAL_VALUE);
     }
 
     public static int getLongestDistance(World world)
     {
-        return world.getGameRules().getInt("vassal.quarry.idle.harvesting.priority");
+        return world.getGameRules().getInt(MAX_DISTANCE);
     }
 
-    public static int getQuarryIdleHarvestingValue(World world)
+    public static int getForesterHarvestValue(World world)
     {
-        return world.getGameRules().getInt("vassal.quarry.idle.harvesting.priority");
+        return world.getGameRules().getInt(FORESTER_HARVEST_PRIORITY);
     }
 
-    public static int getForesterIdleHarvestingValue(World world)
+    public static int getForesterIdleHarvestValue(World world)
     {
-        return world.getGameRules().getInt("vassal.forester.idle.harvesting.priority");
+        return world.getGameRules().getInt(FORESTER_IDLE_HARVEST_PRIORITY);
     }
 
+    public static int getQuarryItemHarvestValue(World world)
+    {
+        return world.getGameRules().getInt(QUARRY_HARVEST_PRIORITY);
+    }
 
+    public static int getQuarryIdleHarvestValue(World world)
+    {
+        return world.getGameRules().getInt(QUARRY_IDLE_HARVEST_PRIORITY);
+    }
+
+    public static int getQuarryDepthValueTenthsPerBlock(World world)
+    {
+        return world.getGameRules().getInt(QUARRY_DEPTH_PRIORITY_PER_BLOCK);
+    }
 
 
     /** Priority for moving the quarry block. */
@@ -82,7 +115,6 @@ public class Priority
         return STAIR_BUILDER_VALUE;
     }
 
-
     public static int getForesterPickupSaplingValue()
     {
         return FORESTER_PICKUP_SAPLING_VALUE;
@@ -91,11 +123,6 @@ public class Priority
     public static int getForesterPlantSaplingValue()
     {
         return FORESTER_PLANT_SAPLING_VALUE;
-    }
-
-    public static int getForesterHarvestValue()
-    {
-        return FORESTER_HARVEST_VALUE;
     }
 
     public static int getGenericCleanUpTaskValue()
@@ -111,11 +138,6 @@ public class Priority
     public static int getChestStorageAvailValue()
     {
         return CHEST_STORAGE_AVAIL_VALUE;
-    }
-
-    public static int getQuarryItemHarvestValue()
-    {
-        return QUARRY_ITEM_HARVEST_VALUE;
     }
 
     public static int getChestItemAvailValue()
@@ -142,7 +164,6 @@ public class Priority
     {
         return WORKBENCH_STORAGE_AVAIL_VALUE;
     }
-
 
     /**
      * From a list of task pairs, select the best one based on this position.
@@ -178,13 +199,15 @@ public class Priority
 
     /**
      * How much value mining at a particular depth provides.  The deeper the more depth.
+     *
+     * @param world The world we are in.
      * @param y Current y value.
      * @return Value to mine at that depth.
      */
-    public static int quarryDepthValue(int y)
+    public static int quarryDepthValue(World world, int y)
     {
         if (y < 60)
-            return (60 - y)/QUARRY_DEPTH_BLOCKS_PER_PLUS;
+            return ((60 - y) * getQuarryDepthValueTenthsPerBlock(world))/10;
 
         return 0;
     }
@@ -225,8 +248,11 @@ public class Priority
 
         // We don't want to do this.
         int longestDistance = getLongestDistance(world);
-        if (startPos.distanceSq(endPos) > ( longestDistance * longestDistance))
+        if (VassalUtils.sqDistXZ(startPos, endPos) > ( longestDistance * longestDistance ))
+        {
+            //LOGGER.debug("distanceSq=" + startPos.distanceSq(endPos) +", longest=" + longestDistance);
             return Integer.MAX_VALUE;
+        }
 
         return (int) (( Math.sqrt(startPos.distanceSq(endPos)) / speed ) / 2D);
     }

@@ -83,7 +83,6 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         {
             if ((System.currentTimeMillis() / 1000) > _pausedMessageSecs)
             {
-                LOGGER.debug("----- PAUSED -----");
                 _pausedMessageSecs = (System.currentTimeMillis() / 1000);
             }
             return;
@@ -567,7 +566,6 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
 
     public void cancelAndPause()
     {
-        debugLog("---------------------->>>>>>> PAUSING <<<<<<<<<<<<<<<<<<<----------------");
         _paused = true;
         cancel();
     }

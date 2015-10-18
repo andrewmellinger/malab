@@ -318,7 +318,7 @@ public class TileEntityBeaconChest extends TileEntityBeaconInventory implements 
     @Override
     public void update()
     {
-        if (!worldObj.isRemote)
+        if (worldObj.isRemote)
             return;
 
         if (_chest != null)
@@ -468,7 +468,7 @@ public class TileEntityBeaconChest extends TileEntityBeaconInventory implements 
                             Priority.getChestItemAvailValue(), msg.getMatcher(),
                             msg.getQuantity());
 
-                    LOGGER.debug("Chest advertising it has item: " + ((MessageItemRequest) msg).getMatcher());
+                    LOGGER.debug("Chest advertising it has item: " + msg.getMatcher());
                     Broadcaster.postMessage(req);
                     return;
                 }

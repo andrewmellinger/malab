@@ -115,17 +115,17 @@ public class TaskPair implements ITask
         BlockPos pos = _entityAI.getBlockPos();
         int value = 0;
 
-//        String msg = "start=" + pos;
+        String msg = "start=" + pos;
 
         if (_acquireTask != null)
         {
             int cost = Priority.computeDistanceCost(getWorld(), _acquireTask.getWorkCenter(), speed, pos);
             int val = _acquireTask.getValue();
             pos = _acquireTask.getWorkCenter();
-//            msg += ", acquire=" + _acquireTask.getClass().getSimpleName() +
-//                   ", pos=" + pos +
-//                   ", cost=" + cost +
-//                   ", val=" + val;
+            msg += ", acquire=" + _acquireTask.getClass().getSimpleName() +
+                   ", pos=" + pos +
+                   ", cost=" + cost +
+                   ", val=" + val;
             value = value - cost + val;
         }
 
@@ -133,15 +133,15 @@ public class TaskPair implements ITask
         {
             int cost = Priority.computeDistanceCost(getWorld(), _deliverTask.getWorkCenter(), speed, pos);
             int val = _deliverTask.getValue();
-//            msg += ", deliver=" + _deliverTask.getClass().getSimpleName() +
-//                   ", pos=" + _deliverTask.getWorkCenter() +
-//                   ", cost=" + cost +
-//                   ", val=" + val;
+            msg += ", deliver=" + _deliverTask.getClass().getSimpleName() +
+                   ", pos=" + _deliverTask.getWorkCenter() +
+                   ", cost=" + cost +
+                   ", val=" + val;
             value = value - cost + val;
         }
 
-//        msg += ", total=" + value;
-//        LOGGER.debug(msg);
+        msg += ", total=" + value;
+        LOGGER.debug(msg);
         return value;
     }
 
@@ -347,9 +347,6 @@ public class TaskPair implements ITask
         // Move helper
         for (T msg : responses)
         {
-//            if (!_entityAI.canGetTo(msg.getSender().getBlockPos()))
-//                continue;
-
             int value = msg.getValue() - Priority.computeDistanceCost(getWorld(), msg.getSender().getBlockPos(), _entityAI.getEntity().getSpeedFactor(), pos
             );
             //LOGGER.debug("findBest: task=" + this + ", cost=" + value + ", msg=" + msg);

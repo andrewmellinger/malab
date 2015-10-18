@@ -156,7 +156,7 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
         {
             // Offer a task, at our area for the requested thing.
             TRHarvest req = new TRHarvest(TileEntityBeaconForester.this, itemReq.getSender(),
-                    msg.getTransactionID(), Priority.getForesterHarvestValue(),
+                    msg.getTransactionID(), Priority.getForesterHarvestValue(getWorld()),
                     TaskHarvestTree.class, itemReq.getMatcher(), itemReq.getQuantity());
 
             debugLog("Posting request: " + req);
@@ -214,7 +214,7 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
         {
             // Offer a task, at our area for the requested thing.
             TRHarvest req = new TRHarvest(TileEntityBeaconForester.this, msg.getSender(),
-                    msg.getTransactionID(), Priority.getForesterIdleHarvestingValue(getWorld()),
+                    msg.getTransactionID(), Priority.getForesterIdleHarvestValue(getWorld()),
                     TaskHarvestTree.class, new ItemStackMatcher(sample), -1);
 
             debugLog("Posting request: " + req);

@@ -131,7 +131,7 @@ public class VassalMain
     public void fmlLifeCycle(FMLServerStartedEvent event)
     {
         // DEBUG
-        Priority.addGameRules(MinecraftServer.getServer().worldServerForDimension(0));
+        Priority.setupGameRules(MinecraftServer.getServer().worldServerForDimension(0));
     }
 
     public void registerModEntityWithEgg(Class parEntityClass, String parEntityName,

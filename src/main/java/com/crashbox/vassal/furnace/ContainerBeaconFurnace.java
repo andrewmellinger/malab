@@ -23,7 +23,7 @@ public class ContainerBeaconFurnace extends Container
     public ContainerBeaconFurnace(InventoryPlayer inventoryPlayer, TileEntityBeaconFurnace tileEntity)
     {
         // DEBUG
-        LOGGER.debug("Constructed!!");
+        //LOGGER.debug("Constructed!!");
 
         _tileBeacon = tileEntity;
         _sizeInventory = _tileBeacon.getSizeInventory();

@@ -44,7 +44,7 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
     @Override
     public void update()
     {
-        if (!worldObj.isRemote)
+        if (worldObj.isRemote)
             return;
 
         if (_quarry != null)
@@ -120,7 +120,7 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
         {
             LOGGER.debug("Quarry: Found item.");
             TRHarvest quarry = new TRHarvest(this, msg.getSender(), msg.getTransactionID(),
-                    Priority.getQuarryItemHarvestValue(),
+                    Priority.getQuarryItemHarvestValue(getWorld()),
                     TaskQuarry.class, msg.getMatcher(), 1);
             Broadcaster.postMessage(quarry);
         }
@@ -153,10 +153,10 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
         // If we have something that will drop, call him over
         if (builder.findFirstQuarryable(new AnyItemMatcher(), getEntityFromMessage(msg)) != null)
         {
-            int value = Priority.getQuarryIdleHarvestingValue(getWorld());
+            int value = Priority.getQuarryIdleHarvestValue(getWorld());
 
             // Add some value the closer we get to the bottom.
-            value += Priority.quarryDepthValue(msg.getSender().getBlockPos().getY());
+            value += Priority.quarryDepthValue(getWorld(), msg.getSender().getBlockPos().getY());
 
             TRHarvest quarry = new TRHarvest(this, msg.getSender(), msg.getTransactionID(),
                     value, TaskQuarry.class, new AnyItemMatcher(), 1);

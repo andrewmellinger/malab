@@ -30,7 +30,7 @@ public class GuiEntityVassal extends GuiContainer
         _inventoryPlayer = parInventoryPlayer;
         _inventory = inventory;
 
-        LOGGER.debug("Constructed: " + this);
+        //LOGGER.debug("Constructed: " + this);
     }
 
     @Override
