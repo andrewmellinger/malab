@@ -11,29 +11,19 @@ public class InventoryEntityVassal extends InventoryBasic
 {
     public InventoryEntityVassal(EntityVassal vassal)
     {
-        super("Label", false, 2);
+        super("Label", false, 3);
         _vassal = vassal;
         setInventorySlotContents(0, vassal.getHeldItem());
         setInventorySlotContents(1, vassal.getFuelStack());
+        setInventorySlotContents(2, vassal.getFollowMeStack());
     }
-
 
     public void flushItemsToVassal()
     {
         _vassal.setCurrentItemOrArmor(0, getStackInSlot(0));
         _vassal.setFuelStack(getStackInSlot(1));
+        _vassal.setFollowMeStack(getStackInSlot(2));
     }
-
-//    @Override
-//    public ItemStack getStackInSlotOnClosing(int slot)
-//    {
-//        if (slot == 0)
-//        {
-//            LOGGER.debug(getStackInSlot(0));
-//            LOGGER.debug(_vassal.getHeldItem());
-//        }
-//        return super.getStackInSlotOnClosing(slot);
-//    }
 
     private final EntityVassal _vassal;
     private static final Logger LOGGER = LogManager.getLogger();

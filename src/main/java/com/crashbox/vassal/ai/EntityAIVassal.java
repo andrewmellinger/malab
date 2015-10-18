@@ -261,7 +261,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
             int fuelTicks = _entity.getFuelTicks();
             if (System.currentTimeMillis() > _nextHeal && fuelTicks > HEAL_FUEL_PER_HALF_HEART)
             {
-                _entity.addPotionEffect(new PotionEffect(Potion.moveSlowdown.id, 20, 1));
+                _entity.addPotionEffect(new PotionEffect(Potion.moveSlowdown.id, 10, 1));
                 _entity.setFuelTicks(fuelTicks - HEAL_FUEL_PER_HALF_HEART);
                 _nextHeal = System.currentTimeMillis() + HEAL_DELAY;
                 _entity.heal(1.0F);
@@ -618,7 +618,6 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         // Sometimes we can't move near, so just move to
         if (!canMove)
         {
-
             canMove = getEntity().getNavigator().tryMoveToXYZ(pos.getX(), pos.getY(), pos.getZ(),
                     getEntity().getSpeedFactor());
         }

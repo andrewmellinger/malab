@@ -1,10 +1,15 @@
 package com.crashbox.vassal.entity;
 
+import com.crashbox.vassal.common.ItemStackMatcher;
+import com.crashbox.vassal.common.SampleMatcherSlot;
+import com.crashbox.vassal.common.SampleSlot;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
+import net.minecraft.item.Item;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -22,6 +27,10 @@ public class ContainerEntityVassal extends Container
         // Add slots
         addSlotToContainer(new Slot(_inventory, 0, 15, 17));
         addSlotToContainer(new Slot(_inventory, 1, 15, 53));
+
+        // Follow me slot
+        addSlotToContainer(new SampleMatcherSlot(_inventory, 2, 144, 53,
+                new ItemStackMatcher(Items.redstone)));
 
         // add player inventory slots
         // note that the slot numbers are within the player inventory so can
@@ -56,6 +65,11 @@ public class ContainerEntityVassal extends Container
         // Put the thing into the vassal
         super.onContainerClosed(playerIn);
         _inventory.flushItemsToVassal();
+        if (_inventory.getStackInSlot(2) != null)
+        {
+            _vassal.setFollowPlayer(playerIn);
+        }
+
         _vassal.resume();
     }
 

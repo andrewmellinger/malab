@@ -1,6 +1,7 @@
 package com.crashbox.vassal.entity;
 
 import com.crashbox.vassal.VassalMain;
+import com.crashbox.vassal.ai.EntityAIFollowPlayer;
 import com.crashbox.vassal.ai.EntityAIVassal;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -149,6 +150,10 @@ public class EntityVassal extends EntityCreature
         int priority = 0;
         tasks.addTask(priority++, new EntityAISwimming(this));
 
+        // We should follow first
+        tasks.addTask(priority++, new EntityAIFollowPlayer(this, 6, 32));
+
+
         // We wander slower than we normally move
         //tasks.addTask(priority++, new EntityAIWander(this, 0.2D, 10));
         _vassalAI = new EntityAIVassal(this);
@@ -286,7 +291,31 @@ public class EntityVassal extends EntityCreature
         }
     }
 
-//=============================================================================================
+    //=============================================================================================
+    public ItemStack getFollowMeStack()
+    {
+        return  _followMeStack;
+    }
+
+    public void setFollowMeStack(ItemStack stack)
+    {
+        _followMeStack = stack;
+    }
+
+    public void setFollowPlayer(EntityPlayer player)
+    {
+        _followPlayer = player;
+    }
+
+    public EntityPlayer getFollowPlayer()
+    {
+        if (_followMeStack == null)
+            return null;
+
+        return _followPlayer;
+    }
+
+    //=============================================================================================
 
     protected void clearAITasks()
     {
@@ -321,9 +350,12 @@ public class EntityVassal extends EntityCreature
     private ItemStack[] _toolStacks = new ItemStack[4];
 
     // Fuel management
-    private ItemStack   _fuelStack;
+    private ItemStack _fuelStack;
     private int _fuelTicks = 0;
     private int _lastFuelSecs = 0;
+
+    private ItemStack _followMeStack;
+    private EntityPlayer _followPlayer;
 
     // How many things we can carry.
     private int _carryCapacity;
