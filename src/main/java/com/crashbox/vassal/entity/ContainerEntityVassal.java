@@ -29,7 +29,7 @@ public class ContainerEntityVassal extends Container
         addSlotToContainer(new Slot(_inventory, 1, 15, 53));
 
         // Follow me slot
-        addSlotToContainer(new SampleMatcherSlot(_inventory, 2, 144, 53,
+        addSlotToContainer(new SampleMatcherSlot(_inventory, 2, 143, 53,
                 new ItemStackMatcher(Items.redstone)));
 
         // add player inventory slots

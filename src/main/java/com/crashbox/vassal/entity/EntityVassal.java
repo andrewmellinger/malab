@@ -347,7 +347,7 @@ public class EntityVassal extends EntityCreature
     {
         if (_fuelTicks > 0)
         {
-            --_fuelTicks;
+            setFuelTicks(_fuelTicks - 1);
             return true;
         }
 
@@ -379,33 +379,38 @@ public class EntityVassal extends EntityCreature
 
     public int burnFuel(int qty)
     {
-        if (qty < _fuelTicks)
+        int finalFuelTicks = _fuelTicks;
+        if (qty < finalFuelTicks)
         {
-            _fuelTicks -= qty;
-            return 0;
+            finalFuelTicks -= qty;
+            qty = 0;
         }
-
-        qty -= _fuelTicks;
-        _fuelTicks = 0;
-
-        if (_fuelStack != null)
+        else
         {
-            int ticks = TileEntityFurnace.getItemBurnTime(_fuelStack);
-            while (_fuelStack != null)
+            qty -= finalFuelTicks;
+            finalFuelTicks = 0;
+
+            if (_fuelStack != null)
             {
-                _fuelStack.stackSize -= 1;
-                if (_fuelStack.stackSize == 0)
-                    _fuelStack = null;
-
-                if (ticks > qty)
+                int ticks = TileEntityFurnace.getItemBurnTime(_fuelStack);
+                while (_fuelStack != null)
                 {
-                    _fuelTicks = ticks - qty;
-                    return 0;
-                }
+                    _fuelStack.stackSize -= 1;
+                    if (_fuelStack.stackSize == 0)
+                        _fuelStack = null;
 
-                qty -= ticks;
+                    if (ticks > qty)
+                    {
+                        finalFuelTicks = ticks - qty;
+                        qty = 0;
+                        break;
+                    }
+
+                    qty -= ticks;
+                }
             }
         }
+        setFuelTicks(finalFuelTicks);
 
         // We ran out of fuel so return what we couldn't do.
         return qty;
@@ -417,7 +422,7 @@ public class EntityVassal extends EntityCreature
         {
             if (_fuelStack != null)
             {
-                _fuelTicks = TileEntityFurnace.getItemBurnTime(_fuelStack);
+                setFuelTicks(TileEntityFurnace.getItemBurnTime(_fuelStack));
                 //debugLog("Setting fuel ticks: " + _fuelTicks);
                 _fuelStack.stackSize--;
                 if (_fuelStack.stackSize == 0)
@@ -456,7 +461,7 @@ public class EntityVassal extends EntityCreature
         return _fuelTicks;
     }
 
-    public void setFuelTicks(int fuelTicks)
+    private void setFuelTicks(int fuelTicks)
     {
         _fuelTicks = fuelTicks;
 
