@@ -52,18 +52,23 @@ public class EntityVassal extends EntityCreature
         // Release & testing
         _carryCapacity = 16;
         _workSpeedFactor = 0.75F;
-    }
 
-    // NOTE This is NOT the same as movement speed. This is a scalar based on the movement speed.
-    public double getSpeedFactor()
-    {
         // Note on total speed (movementSpeed * factor)
         // 0.16 is pretty slow ang good for debugging
         // 0.25 is kinda quick, maybe too quick
+        // _moveSpeedFactor = 1.25D;  // 1.25 * 0.20 = 0.25 -- pretty zippy
+        _moveSpeedFactor = 1.0D;      // 1.0  * 0.20 = 0.20 -- Little slower than zombie
+        // _moveSpeedFactor = 0.75D;  // 0.75 * 0.20 = 0.15 -- good for debugging
+    }
 
-        // return 1.25D;  // 1.25 * 0.20 = 0.25 -- pretty zippy
-        return 1.0D;      // 1.0  * 0.20 = 0.20 -- Little slower than zombie
-        // return 0.75D;  // 0.75 * 0.20 = 0.15 -- good for debugging
+    // NOTE This is NOT the same as movement speed. This is a scalar (factor) applied to the movement speed.
+    public double getSpeedFactor()
+    {
+        if (!hasFuel())
+        {
+            return _moveSpeedFactor * 0.5;
+        }
+        return _moveSpeedFactor;
     }
 
     // you don't have to call this as it is called automatically during EntityLiving subclass creation
@@ -79,8 +84,7 @@ public class EntityVassal extends EntityCreature
 
         // IMPORTANT:  This is not the same as the multiplier that is specified in "tryMoveTo".
         // These two numbers are multiplied together.  Zombie is 0.23000000417232513D
-        getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.20D);  // Debugging
-
+        getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.20D);
 
         // need to register any additional attributes
         //getAttributeMap().registerAttribute(SharedMonsterAttributes.attackDamage);
@@ -124,6 +128,14 @@ public class EntityVassal extends EntityCreature
             _fuelStack.writeToNBT(fuelCompound);
             compound.setTag("fuelStack", fuelCompound);
         }
+
+        if (_followMeStack != null)
+        {
+            NBTTagCompound followMeCompount = new NBTTagCompound();
+            _followMeStack.writeToNBT(followMeCompount);
+            compound.setTag("followMeStack", followMeCompount);
+        }
+
     }
 
     @Override
@@ -140,12 +152,16 @@ public class EntityVassal extends EntityCreature
         {
             _fuelStack = ItemStack.loadItemStackFromNBT(compound.getCompoundTag("fuelStack"));
         }
+
+        if (compound.hasKey("followMeStack"))
+        {
+            _followMeStack = ItemStack.loadItemStackFromNBT(compound.getCompoundTag("followMeStack"));
+        }
     }
 
     @Override
     public void onLivingUpdate()
     {
-        // NOT GOING TO WORK.  This is client side and the values are server side...
         super.onLivingUpdate();
 
         if (_durationTicks <= 0)
@@ -234,8 +250,7 @@ public class EntityVassal extends EntityCreature
         tasks.addTask(priority++, new EntityAISwimming(this));
 
         // We should follow first
-        tasks.addTask(priority++, new EntityAIFollowPlayer(this, 6, 32));
-
+        tasks.addTask(priority++, new EntityAIFollowPlayer(this, 2, 32));
 
         // We wander slower than we normally move
         //tasks.addTask(priority++, new EntityAIWander(this, 0.2D, 10));
@@ -254,10 +269,13 @@ public class EntityVassal extends EntityCreature
     }
 
     /**
-     * @return A performance modifier for mining speed.  Lower faster.
+     * @return A performance modifier for mining speed.  Higher is faster.
      */
     public float getWorkSpeedFactor()
     {
+        if (!hasFuel())
+            return _workSpeedFactor * 0.5F;
+
         return _workSpeedFactor;
     }
 
@@ -546,6 +564,9 @@ public class EntityVassal extends EntityCreature
 
     // Divider on time.  Higher is faster.  The player (steve) is around 1.0
     private float _workSpeedFactor;
+
+    // Factor applied to base move speed
+    private double _moveSpeedFactor;
 
     // For handling particle effects
     private int _effectID;

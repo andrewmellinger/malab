@@ -25,7 +25,9 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
 {
     public EntityAIVassal(EntityVassal entity)
     {
-        this._entity = entity;
+        setMutexBits(3);
+
+        _entity = entity;
         Broadcaster.getInstance().subscribe(new MyListener());
         if (!_entity.hasCustomName())
             _entity.setCustomNameTag(makeName());
@@ -74,8 +76,9 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
 
         // If we can't run (no fuel, etc.) then just return.
         // We still answered messages from above.
-        if (!_entity.hasFuel())
-            return;
+        // We just move really slow.
+//        if (!_entity.hasFuel())
+//            return;
 
         if (_paused)
         {
@@ -289,7 +292,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         // Once in a while we want to tell people we need more
         if (System.currentTimeMillis() > _nextFuelMS && _entity.needFuel() )
         {
-            debugLog("Low on fuel, requesting!!!");
+            //debugLog("Low on fuel, requesting!!!");
             _nextFuelMS = System.currentTimeMillis() + FUEL_REQUEST_DELAY;
             _requestEndMS = System.currentTimeMillis() + REQUEST_TIMEOUT_MS;
 

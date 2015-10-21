@@ -5,9 +5,10 @@ import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.pathfinding.PathNavigate;
 import net.minecraft.pathfinding.PathNavigateGround;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.MathHelper;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.world.World;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Copyright 2015 Andrew O. Mellinger
@@ -80,7 +81,7 @@ public class EntityAIFollowPlayer extends EntityAIBase
      */
     public void updateTask()
     {
-        _vassal.getLookHelper().setLookPositionWithEntity(_player, 10.0F, (float)_vassal.getVerticalFaceSpeed());
+        _vassal.getLookHelper().setLookPositionWithEntity(_player, 10.0F, (float) _vassal.getVerticalFaceSpeed());
 
         if (_vassal.getFollowPlayer() != _player)
             return;
@@ -94,13 +95,16 @@ public class EntityAIFollowPlayer extends EntityAIBase
             return;
         }
 
-        // Only recompute every 10 ticks
+        // Only recompute every second
+        _vassal.burnFuel();
         if (--_tickCounter <= 0)
         {
-            _tickCounter = 10;
+            _tickCounter = 20;
 
             // Just keep trying to get there
             _botPathfinder.tryMoveToEntityLiving(_player, _vassal.getSpeedFactor());
+            //_vassal.sendParticleMessage(EnumParticleTypes.HEART, 22);
+
 //            if (!_botPathfinder.tryMoveToEntityLiving(_player, _speed))
 //            {
 //                if (!_vassal.getLeashed())
@@ -131,4 +135,6 @@ public class EntityAIFollowPlayer extends EntityAIBase
 //            }
         }
     }
+
+    private static final Logger LOGGER = LogManager.getLogger();
 }
