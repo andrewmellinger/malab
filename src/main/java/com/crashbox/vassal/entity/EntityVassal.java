@@ -3,6 +3,7 @@ package com.crashbox.vassal.entity;
 import com.crashbox.vassal.VassalMain;
 import com.crashbox.vassal.ai.EntityAIFollowPlayer;
 import com.crashbox.vassal.ai.EntityAIVassal;
+import com.crashbox.vassal.network.MessageVassalEffects;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
@@ -14,7 +15,9 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.IExtendedEntityProperties;
@@ -55,11 +58,11 @@ public class EntityVassal extends EntityCreature
     public double getSpeedFactor()
     {
         // Note on total speed (movementSpeed * factor)
-        // 0.16 is pretty slowe ang good for debugging
-        // 0.25 is kinda quick.
+        // 0.16 is pretty slow ang good for debugging
+        // 0.25 is kinda quick, maybe too quick
 
         // return 1.25D;  // 1.25 * 0.20 = 0.25 -- pretty zippy
-        return 1.0D;   // 1.0  * 0.20 = 0.20 -- Little slower than zombie
+        return 1.0D;      // 1.0  * 0.20 = 0.20 -- Little slower than zombie
         // return 0.75D;  // 0.75 * 0.20 = 0.15 -- good for debugging
     }
 
@@ -137,6 +140,86 @@ public class EntityVassal extends EntityCreature
         {
             _fuelStack = ItemStack.loadItemStackFromNBT(compound.getCompoundTag("fuelStack"));
         }
+    }
+
+    @Override
+    public void onLivingUpdate()
+    {
+        // NOT GOING TO WORK.  This is client side and the values are server side...
+        super.onLivingUpdate();
+
+        if (_durationTicks <= 0)
+            return;
+
+        --_durationTicks;
+        showParticles(EnumParticleTypes.getParticleFromId(_effectID));
+    }
+
+    @Override
+    public void onEntityUpdate()
+    {
+        super.onEntityUpdate();
+        if (!worldObj.isRemote)
+        {
+            if (_fuelTicks == 0 && _fuelStack == null)
+            {
+                --_fuelOutTicks;
+                if (_fuelOutTicks <= 0)
+                {
+                    sendParticleMessage(EnumParticleTypes.SPELL_MOB_AMBIENT, 12); // pretty good
+
+//                    sendParticleMessage(EnumParticleTypes.PORTAL, 12);
+//                    sendParticleMessage(EnumParticleTypes.SPELL_INSTANT, 12);     // ok
+//                    sendParticleMessage(EnumParticleTypes.REDSTONE, 12);          // no
+//                    sendParticleMessage(EnumParticleTypes.SPELL_MOB, 12);
+//                    sendParticleMessage(EnumParticleTypes.EXPLOSION_HUGE, 12);    // Can't see what is going on
+//                    sendParticleMessage(EnumParticleTypes.CLOUD, 12);             // White stuff
+//                    sendParticleMessage(EnumParticleTypes.SMOKE_LARGE, 12);
+//                    sendParticleMessage(EnumParticleTypes.ENCHANTMENT_TABLE, 12);  // maybe for healing
+//                    sendParticleMessage(EnumParticleTypes.BARRIER, 12);       // Big "no" symbol
+//                    sendParticleMessage(EnumParticleTypes.SUSPENDED, 12);     // Nothing
+//                    sendParticleMessage(EnumParticleTypes.TOWN_AURA, 12);     // Bedrock effect
+//                    sendParticleMessage(EnumParticleTypes.SPELL_WITCH, 12);   // Purple effect.
+                    _fuelOutTicks = 10;
+                }
+            }
+            _fuelOutTicks = 0;
+        }
+    }
+
+    public void showParticles(EnumParticleTypes particleType)
+    {
+        double var1 = this.rand.nextGaussian() * 0.02D;
+        double var3 = this.rand.nextGaussian() * 0.02D;
+        double var5 = this.rand.nextGaussian() * 0.02D;
+        this.worldObj.spawnParticle(particleType,
+                this.posX + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width,
+                this.posY + 0.5D + (double)(this.rand.nextFloat() * this.height),
+                this.posZ + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width,
+                var1, var3, var5, new int[0]);
+    }
+
+    /**
+     * Used to set a particle effect on the bot.  This is for things like visual feedback
+     * on healing, out of fuel, etc.
+     * @param particleID The particle ID.
+     * @param durationTicks  How many ticks to show it for.
+     */
+    public void setParticleEffect(int particleID, int durationTicks)
+    {
+        _effectID = particleID;
+        _durationTicks = durationTicks;
+    }
+
+    // This is server side
+    public void sendParticleMessage(EnumParticleTypes type, int durationTicks)
+    {
+        MessageVassalEffects msg = new MessageVassalEffects();
+        msg.setup(getEntityWorld().provider.getDimensionId(),
+                getEntityId(),
+                type.getParticleID(),
+                durationTicks);
+        VassalMain.NETWORK.sendToAll(msg);
     }
 
     //=============================================================================================
@@ -253,6 +336,102 @@ public class EntityVassal extends EntityCreature
 
     //=============================================================================================
 
+
+    public boolean hasFuel()
+    {
+        // If we have fuel ticks or spare fuel then we can run
+        return (_fuelTicks > 0);
+    }
+
+    public boolean burnFuel()
+    {
+        if (_fuelTicks > 0)
+        {
+            --_fuelTicks;
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean hasFuel(int qty)
+    {
+        if (_fuelTicks > qty)
+            return true;
+
+        qty -= _fuelTicks;
+
+        if (_fuelStack != null)
+        {
+            int ticks = TileEntityFurnace.getItemBurnTime(_fuelStack);
+            for (int i = 0; i < _fuelStack.stackSize; ++i)
+            {
+                if (ticks > qty)
+                    return true;
+
+                qty -= ticks;
+            }
+        }
+
+        // We ran out of fuel to check.
+        return false;
+    }
+
+    public int burnFuel(int qty)
+    {
+        if (qty < _fuelTicks)
+        {
+            _fuelTicks -= qty;
+            return 0;
+        }
+
+        qty -= _fuelTicks;
+        _fuelTicks = 0;
+
+        if (_fuelStack != null)
+        {
+            int ticks = TileEntityFurnace.getItemBurnTime(_fuelStack);
+            while (_fuelStack != null)
+            {
+                _fuelStack.stackSize -= 1;
+                if (_fuelStack.stackSize == 0)
+                    _fuelStack = null;
+
+                if (ticks > qty)
+                {
+                    _fuelTicks = ticks - qty;
+                    return 0;
+                }
+
+                qty -= ticks;
+            }
+        }
+
+        // We ran out of fuel so return what we couldn't do.
+        return qty;
+    }
+
+    public void ensureFuel()
+    {
+        if (_fuelTicks == 0)
+        {
+            if (_fuelStack != null)
+            {
+                _fuelTicks = TileEntityFurnace.getItemBurnTime(_fuelStack);
+                //debugLog("Setting fuel ticks: " + _fuelTicks);
+                _fuelStack.stackSize--;
+                if (_fuelStack.stackSize == 0)
+                    _fuelStack = null;
+            }
+        }
+    }
+
+
+    public boolean needFuel()
+    {
+        return (_fuelStack == null || _fuelStack.stackSize < 4);
+    }
+
     public ItemStack getFuelStack()
     {
         return _fuelStack;
@@ -272,7 +451,7 @@ public class EntityVassal extends EntityCreature
             return (int) _fuelTicks/20;
     }
 
-    public int getFuelTicks()
+    private int getFuelTicks()
     {
         return _fuelTicks;
     }
@@ -362,6 +541,11 @@ public class EntityVassal extends EntityCreature
 
     // Divider on time.  Higher is faster.  The player (steve) is around 1.0
     private float _workSpeedFactor;
+
+    // For handling particle effects
+    private int _effectID;
+    private int _durationTicks;
+    private int _fuelOutTicks;
 
     // We use this alot
     private EntityAIVassal _vassalAI;

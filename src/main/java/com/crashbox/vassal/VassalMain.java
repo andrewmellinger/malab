@@ -9,6 +9,8 @@ import com.crashbox.vassal.furnace.TileEntityBeaconFurnace;
 import com.crashbox.vassal.forester.BlockBeaconForester;
 import com.crashbox.vassal.forester.TileEntityBeaconForester;
 import com.crashbox.vassal.grenades.*;
+import com.crashbox.vassal.network.MessageToggleWorkbenchEnable;
+import com.crashbox.vassal.network.MessageVassalEffects;
 import com.crashbox.vassal.quarry.BlockBeaconQuarry;
 import com.crashbox.vassal.quarry.TileEntityBeaconQuarry;
 import com.crashbox.vassal.workbench.BlockBeaconWorkbench;
@@ -28,8 +30,10 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartedEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.oredict.OreDictionary;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -63,7 +67,7 @@ public class VassalMain
     public static Item ITEM_FLATTEN_GRENADE;
     public static Item ITEM_TUNNEL_GRENADE;
 
-    //public static SimpleNetworkWrapper NETWORK;
+    public static SimpleNetworkWrapper NETWORK;
 
     // This allows us to us one gui handler for many things
     public static enum GUI_ENUM { VASSAL, FURNACE, WORKBENCH, CHEST, CONTROLLER }
@@ -84,9 +88,9 @@ public class VassalMain
 
         VASSAL_TAB = new CreativeTabVassal();
         preInitBlockAndItems();
-//        VassalMain.NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel("vassal");
-//        VassalMain.NETWORK.registerMessage(MessageToggleWorkbenchEnable.Handler.class,
-//                MessageToggleWorkbenchEnable.class, 0, Side.SERVER );
+        VassalMain.NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel("vassal");
+        VassalMain.NETWORK.registerMessage(MessageVassalEffects.Handler.class,
+                MessageVassalEffects.class, 0, Side.CLIENT );
 
         proxy.preInit(event);
     }

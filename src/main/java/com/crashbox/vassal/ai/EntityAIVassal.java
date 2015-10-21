@@ -10,10 +10,8 @@ import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.pathfinding.PathEntity;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionEffect;
-import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumParticleTypes;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -72,11 +70,11 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         // Process messages should handle data requests
         processMessages();
 
-        ensureFuel();
+        _entity.ensureFuel();
 
         // If we can't run (no fuel, etc.) then just return.
         // We still answered messages from above.
-        if (!canRun())
+        if (!_entity.hasFuel())
             return;
 
         if (_paused)
@@ -105,11 +103,11 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
                 _state = transition();
                 break;
             case TARGETING:
-                burnFuel();
+                _entity.burnFuel();
                 _state = target();
                 break;
             case PERFORMING:
-                burnFuel();
+                _entity.burnFuel();
                 _state = perform();
                 break;
         }
@@ -247,10 +245,10 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
     private void handleHeartbeat()
     {
         long now = System.currentTimeMillis();
-        if (_currentTask != null && now > _nextHeartbeat)
+        if (_currentTask != null && now > _nextHeartbeatMS)
         {
-            _nextHeartbeat = now + HEARTBEAT_DELAY;
-            _currentTask.sendHeartbeat(_nextHeartbeat + HEARTBEAT_VARIANCE);
+            _nextHeartbeatMS = now + HEARTBEAT_DELAY;
+            _currentTask.sendHeartbeat(_nextHeartbeatMS + HEARTBEAT_VARIANCE);
         }
     }
 
@@ -258,12 +256,13 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
     {
         if (_entity.getHealth() < _entity.getMaxHealth())
         {
-            int fuelTicks = _entity.getFuelTicks();
-            if (System.currentTimeMillis() > _nextHeal && fuelTicks > HEAL_FUEL_PER_HALF_HEART)
+            // If healing, show something.
+            if (System.currentTimeMillis() > _nextHealMS && _entity.hasFuel(FUEL_PER_HALF_HEART_HEAL))
             {
-                _entity.addPotionEffect(new PotionEffect(Potion.moveSlowdown.id, 10, 1));
-                _entity.setFuelTicks(fuelTicks - HEAL_FUEL_PER_HALF_HEART);
-                _nextHeal = System.currentTimeMillis() + HEAL_DELAY;
+                // Send a message to all the clients.
+                _nextHealMS = System.currentTimeMillis() + HEAL_DELAY_MS;
+                _entity.sendParticleMessage(EnumParticleTypes.ENCHANTMENT_TABLE, 12);
+                _entity.burnFuel(FUEL_PER_HALF_HEART_HEAL);
                 _entity.heal(1.0F);
             }
             return true;
@@ -288,10 +287,10 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         // Why? Well, we may be able to collect trees and make fuel. So we can influence
         // our own fuel production.
         // Once in a while we want to tell people we need more
-        if (System.currentTimeMillis() > _nextFuel && needFuel() )
+        if (System.currentTimeMillis() > _nextFuelMS && _entity.needFuel() )
         {
             debugLog("Low on fuel, requesting!!!");
-            _nextFuel = System.currentTimeMillis() + FUEL_REQUEST_DELAY;
+            _nextFuelMS = System.currentTimeMillis() + FUEL_REQUEST_DELAY;
             _requestEndMS = System.currentTimeMillis() + REQUEST_TIMEOUT_MS;
 
             postFuelRequest();
@@ -632,50 +631,6 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
 
     //=============================================================================================
 
-    private boolean canRun()
-    {
-        // If we have fuel ticks or spare fuel then we can run
-        return (_entity.getFuelTicks() > 0);
-    }
-
-    private void ensureFuel()
-    {
-        if (_entity.getFuelTicks() == 0)
-        {
-            ItemStack fuelStack = getEntity().getFuelStack();
-            if (fuelStack != null)
-            {
-                _entity.setFuelTicks(TileEntityFurnace.getItemBurnTime(fuelStack));
-                //debugLog("Setting fuel ticks: " + _fuelTicks);
-                fuelStack.stackSize--;
-                if (fuelStack.stackSize == 0)
-                    _entity.setFuelStack(null);
-                else
-                    _entity.setFuelStack(fuelStack);
-            }
-        }
-    }
-
-    private boolean burnFuel()
-    {
-        ensureFuel();
-        if (_entity.getFuelTicks() != 0)
-        {
-            _entity.setFuelTicks(_entity.getFuelTicks() - 1);
-            return true;
-        }
-
-        // If we got here out of fuel and nothing in stack
-        cancel();
-        return false;
-    }
-
-    private boolean needFuel()
-    {
-        ItemStack stack = _entity.getFuelStack();
-        return (stack == null || stack.stackSize < 4);
-    }
-
     private void postFuelRequest()
     {
         // Add the task to put the item in our inventory then post special
@@ -790,21 +745,21 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
     private long _pausedMessageSecs = 0;
 
     // We don't want to ask for work too often.  If we don't get a response, just hang out.
-    private static final int ELICIT_DELAY_MS = 6000;
+    private static final int ELICIT_DELAY_MS    = 6000;
     private static final int ELICIT_RESET_DELAY = 100;
-    private long _nextElicit = 0;
+    private long _nextElicit                    = 0;
 
     private static final int FUEL_REQUEST_DELAY = 2000;
-    private long _nextFuel = 0;
+    private long _nextFuelMS                    = 0;
 
     // How often do we send the hearbeat, and how long should they wait
     private static final long HEARTBEAT_DELAY       = 2000;
     private static final long HEARTBEAT_VARIANCE    = 1000;
-    private long _nextHeartbeat;
+    private long _nextHeartbeatMS                   = 0;
 
-    private static final long HEAL_DELAY                = 500;
-    private static final int HEAL_FUEL_PER_HALF_HEART   = 20;
-    private long _nextHeal                              = 0;
+    private static final long HEAL_DELAY_MS             = 500;
+    private static final int FUEL_PER_HALF_HEART_HEAL   = 20;
+    private long _nextHealMS                            = 0;
 
 //    private static final int DEFAULT_RANGE = 10;
 //    private static final double DEFAULT_SPEED = 0.5;
