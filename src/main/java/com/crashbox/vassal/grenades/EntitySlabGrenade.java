@@ -11,14 +11,14 @@ import net.minecraft.world.World;
 /**
  * Copyright 2015 Andrew O. Mellinger
  */
-public class EntityFlattenGrenade extends EntityThrowable
+public class EntitySlabGrenade extends EntityThrowable
 {
-    public EntityFlattenGrenade(World world)
+    public EntitySlabGrenade(World world)
     {
         super(world);
     }
 
-    public EntityFlattenGrenade(World world, EntityPlayer playerEntity)
+    public EntitySlabGrenade(World world, EntityPlayer playerEntity)
     {
         super(world, playerEntity);
     }
@@ -28,14 +28,14 @@ public class EntityFlattenGrenade extends EntityThrowable
     {
         if (!worldObj.isRemote)
         {
-            // Place a single torch if we didn't hit an entity
             if (mop.entityHit == null)
             {
-                IBlockState dirt = Blocks.dirt.getDefaultState();
-                VassalUtils.flattenArea(worldObj, mop.getBlockPos(), 5, 4, dirt);
+                IBlockState stuff = Blocks.bedrock.getDefaultState();
+                VassalUtils.flattenArea(worldObj, mop.getBlockPos(), 5, 4, stuff);
             }
 
             setDead();
         }
     }
+
 }

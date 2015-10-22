@@ -15,6 +15,7 @@ import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.RenderSnowball;
 import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -71,32 +72,34 @@ public class ClientProxy extends CommonProxy
 
         //======================================
         // ITEMS
-        renderItem.getItemModelMesher().register(VassalMain.ITEM_DIGGER_GRENADE, 0,
-                new ModelResourceLocation(VassalMain.MODID + ":" + ItemDiggerGrenade.NAME, "inventory"));
 
-        RenderingRegistry.registerEntityRenderingHandler(EntityDiggerGrenade.class,
-                new RenderSnowball(renderManager, VassalMain.ITEM_DIGGER_GRENADE, renderItem));
+        registerSnowball(renderManager, renderItem, VassalMain.ITEM_DIGGER_GRENADE,
+                ItemDiggerGrenade.NAME, EntityDiggerGrenade.class);
 
-        //---
-        renderItem.getItemModelMesher().register(VassalMain.ITEM_MINESHAFT_GRENADE, 0,
-                new ModelResourceLocation(VassalMain.MODID + ":" + ItemMineshaftGrenade.NAME, "inventory"));
+        registerSnowball(renderManager, renderItem, VassalMain.ITEM_MINESHAFT_GRENADE,
+                ItemMineshaftGrenade.NAME, EntityMineshaftGrenade.class);
 
-        RenderingRegistry.registerEntityRenderingHandler(EntityMineshaftGrenade.class,
-                new RenderSnowball(renderManager, VassalMain.ITEM_MINESHAFT_GRENADE, renderItem));
+        registerSnowball(renderManager, renderItem, VassalMain.ITEM_FLATTEN_GRENADE,
+                ItemFlattenGrenade.NAME, EntityFlattenGrenade.class);
 
-        //---
-        renderItem.getItemModelMesher().register(VassalMain.ITEM_FLATTEN_GRENADE, 0,
-                new ModelResourceLocation(VassalMain.MODID + ":" + ItemFlattenGrenade.NAME, "inventory"));
+        registerSnowball(renderManager, renderItem, VassalMain.ITEM_SLAB_GRENADE,
+                ItemSlabGrenade.NAME, EntitySlabGrenade.class);
 
-        RenderingRegistry.registerEntityRenderingHandler(EntityFlattenGrenade.class,
-                new RenderSnowball(renderManager, VassalMain.ITEM_FLATTEN_GRENADE, renderItem));
+        registerSnowball(renderManager, renderItem, VassalMain.ITEM_TUNNEL_GRENADE,
+                ItemTunnelGrenade.NAME, EntityTunnelGrenade.class);
 
-        //---
-        renderItem.getItemModelMesher().register(VassalMain.ITEM_TUNNEL_GRENADE, 0,
-                new ModelResourceLocation(VassalMain.MODID + ":" + ItemTunnelGrenade.NAME, "inventory"));
+        registerSnowball(renderManager, renderItem, VassalMain.ITEM_WALL_GRENADE,
+                ItemWallGrenade.NAME, EntityWallGrenade.class);
+    }
 
-        RenderingRegistry.registerEntityRenderingHandler(EntityTunnelGrenade.class,
-                new RenderSnowball(renderManager, VassalMain.ITEM_TUNNEL_GRENADE, renderItem));
+    private void registerSnowball(RenderManager renderManager, RenderItem renderItem,
+                             Item item, String name, Class<? extends Entity> entityClass )
+    {
+        renderItem.getItemModelMesher().register(item, 0,
+                new ModelResourceLocation(VassalMain.MODID + ":" + name, "inventory"));
+
+        RenderingRegistry.registerEntityRenderingHandler(entityClass,
+                new RenderSnowball(renderManager, item, renderItem));
     }
 
     @Override

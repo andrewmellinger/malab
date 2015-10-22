@@ -65,7 +65,9 @@ public class VassalMain
     public static Item ITEM_DIGGER_GRENADE;
     public static Item ITEM_MINESHAFT_GRENADE;
     public static Item ITEM_FLATTEN_GRENADE;
+    public static Item ITEM_SLAB_GRENADE;
     public static Item ITEM_TUNNEL_GRENADE;
+    public static Item ITEM_WALL_GRENADE;
 
     public static SimpleNetworkWrapper NETWORK;
 
@@ -107,7 +109,11 @@ public class VassalMain
                 ++modEntityID, VassalMain.instance, 80, 10, true);
         EntityRegistry.registerModEntity(EntityFlattenGrenade.class, "Flatten Grenade",
                 ++modEntityID, VassalMain.instance, 80, 10, true);
+        EntityRegistry.registerModEntity(EntitySlabGrenade.class, "Slab Grenade",
+                ++modEntityID, VassalMain.instance, 80, 10, true);
         EntityRegistry.registerModEntity(EntityTunnelGrenade.class, "Tunnel Grenade",
+                ++modEntityID, VassalMain.instance, 80, 10, true);
+        EntityRegistry.registerModEntity(EntityWallGrenade.class, "Wall Grenade",
                 ++modEntityID, VassalMain.instance, 80, 10, true);
 
         NetworkRegistry.INSTANCE.registerGuiHandler(VassalMain.instance,
@@ -188,8 +194,14 @@ public class VassalMain
         ITEM_FLATTEN_GRENADE = new ItemFlattenGrenade();
         GameRegistry.registerItem(ITEM_FLATTEN_GRENADE, ItemFlattenGrenade.NAME);
 
+        ITEM_SLAB_GRENADE = new ItemSlabGrenade();
+        GameRegistry.registerItem(ITEM_SLAB_GRENADE, ItemSlabGrenade.NAME);
+
         ITEM_TUNNEL_GRENADE = new ItemTunnelGrenade();
         GameRegistry.registerItem(ITEM_TUNNEL_GRENADE, ItemTunnelGrenade.NAME);
+
+        ITEM_WALL_GRENADE = new ItemWallGrenade();
+        GameRegistry.registerItem(ITEM_WALL_GRENADE, ItemWallGrenade.NAME);
     }
 
 

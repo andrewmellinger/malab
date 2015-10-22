@@ -919,7 +919,7 @@ public class VassalUtils
                 ground);
     }
 
-    private static void clearArea(World world, BlockPos min, BlockPos max)
+    public static void clearArea(World world, BlockPos min, BlockPos max)
     {
         for (int y = min.getY(); y <= max.getY(); ++y)
         {
@@ -927,13 +927,15 @@ public class VassalUtils
             {
                 for (int z = min.getZ(); z <= max.getZ(); ++z)
                 {
-                    world.destroyBlock(new BlockPos(x, y, z), false);
+                    // Never clear below y = 2
+                    if (y > 1)
+                        world.destroyBlock(new BlockPos(x, y, z), false);
                 }
             }
         }
     }
 
-    private static void fillArea(World world, BlockPos min, BlockPos max, IBlockState fill)
+    public static void fillArea(World world, BlockPos min, BlockPos max, IBlockState fill)
     {
         for (int y = min.getY(); y <= max.getY(); ++y)
         {
@@ -946,6 +948,8 @@ public class VassalUtils
             }
         }
     }
+
+
 
 
 
