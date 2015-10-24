@@ -32,8 +32,6 @@ public class BlockBeaconQuarry extends BlockContainer
         // We want to be a little harder so people to accidentally break them as much
         setHardness(5.0F);
         setResistance(45);
-
-        LOGGER.info("constructed");
     }
 
     @Override

@@ -1,0 +1,12 @@
+{
+  "parent": "block/cube",
+  "textures": {
+    "up": "vassal:blocks/vassalHead",
+    "down": "vassal:blocks/vassalHead",
+    "north": "vassal:blocks/vassalHead",
+    "south": "vassal:blocks/vassalHead",
+    "east": "vassal:blocks/vassalHead",
+    "west": "vassal:blocks/vassalHead",
+    "particle": "vassal:blocks/vassalHead"
+  }
+}

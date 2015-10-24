@@ -4,6 +4,7 @@ import com.crashbox.vassal.ai.Priority;
 import com.crashbox.vassal.chest.BlockBeaconChest;
 import com.crashbox.vassal.chest.TileEntityBeaconChest;
 import com.crashbox.vassal.circuit.ItemCircuit;
+import com.crashbox.vassal.entity.BlockVassalHead;
 import com.crashbox.vassal.entity.EntityVassal;
 import com.crashbox.vassal.furnace.BlockBeaconFurnace;
 import com.crashbox.vassal.furnace.TileEntityBeaconFurnace;
@@ -61,6 +62,8 @@ public class VassalMain
     public static Block BLOCK_BEACON_FORESTER;
     public static Block BLOCK_BEACON_QUARRY;
     public static Block BLOCK_BEACON_WORKBENCH;
+
+    public static Block BLOCK_VASSAL_HEAD;
 
     public static Item ITEM_CIRCUIT;
 
@@ -120,9 +123,9 @@ public class VassalMain
         NetworkRegistry.INSTANCE.registerGuiHandler(VassalMain.instance,
                 new GuiHandlerVassal());
 
-        initRecipes();
-
         proxy.init(event);
+
+        initRecipes();
     }
 
     @EventHandler
@@ -182,10 +185,14 @@ public class VassalMain
         GameRegistry.registerBlock(BLOCK_BEACON_WORKBENCH, BlockBeaconWorkbench.NAME);
         GameRegistry.registerTileEntity(TileEntityBeaconWorkbench.class, TileEntityBeaconWorkbench.NAME);
 
+
+        BLOCK_VASSAL_HEAD = new BlockVassalHead();
+        GameRegistry.registerBlock(BLOCK_VASSAL_HEAD, BlockVassalHead.NAME);
+
+
         // ITEMS
         ITEM_CIRCUIT = new ItemCircuit();
         GameRegistry.registerItem(ITEM_CIRCUIT, ItemCircuit.NAME);
-
 
         // Construction grenades - MOVE
 
@@ -252,6 +259,60 @@ public class VassalMain
                 'G', Items.gold_nugget,
                 'L', new ItemStack(Items.dye, 0, 4),
                 'S', Blocks.stone_slab
+        );
+
+        GameRegistry.addRecipe(new ItemStack(BLOCK_VASSAL_HEAD),
+                "I",
+                "C",
+                "G",
+                'H', Items.iron_helmet,
+                'C', ITEM_CIRCUIT,
+                'G', Blocks.glass_pane
+        );
+
+        GameRegistry.addRecipe(new ItemStack(BLOCK_BEACON_CHEST),
+                "BCB",
+                "-S-",
+                "B-B",
+                'S', Blocks.chest,
+                'C', ITEM_CIRCUIT,
+                'B', Blocks.iron_bars
+        );
+
+        GameRegistry.addRecipe(new ItemStack(BLOCK_BEACON_FORESTER),
+                "BCB",
+                "-S-",
+                "B-B",
+                'S', Items.iron_axe,
+                'C', ITEM_CIRCUIT,
+                'B', Blocks.iron_bars
+        );
+
+        GameRegistry.addRecipe(new ItemStack(BLOCK_BEACON_QUARRY),
+                "BCB",
+                "-S-",
+                "B-B",
+                'S', Items.iron_pickaxe,
+                'C', ITEM_CIRCUIT,
+                'B', Blocks.iron_bars
+        );
+
+        GameRegistry.addRecipe(new ItemStack(BLOCK_BEACON_FURNACE),
+                "BCB",
+                "-S-",
+                "B-B",
+                'S', Blocks.furnace,
+                'C', ITEM_CIRCUIT,
+                'B', Blocks.iron_bars
+        );
+
+        GameRegistry.addRecipe(new ItemStack(BLOCK_BEACON_WORKBENCH),
+                "BCB",
+                "-S-",
+                "B-B",
+                'S', Blocks.crafting_table,
+                'C', ITEM_CIRCUIT,
+                'B', Blocks.iron_bars
         );
 
 //        // Basic tangler grenade
