@@ -3,6 +3,7 @@ package com.crashbox.vassal;
 import com.crashbox.vassal.ai.Priority;
 import com.crashbox.vassal.chest.BlockBeaconChest;
 import com.crashbox.vassal.chest.TileEntityBeaconChest;
+import com.crashbox.vassal.circuit.ItemCircuit;
 import com.crashbox.vassal.entity.EntityVassal;
 import com.crashbox.vassal.furnace.BlockBeaconFurnace;
 import com.crashbox.vassal.furnace.TileEntityBeaconFurnace;
@@ -17,6 +18,7 @@ import com.crashbox.vassal.workbench.TileEntityBeaconWorkbench;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
@@ -54,12 +56,13 @@ public class VassalMain
     public static CreativeTabs VASSAL_TAB;
 
     public static Block BLOCK_BEACON_CHEST;
-    //public static Block BLOCK_BEACON_CONTROLLER;
     public static Block BLOCK_BEACON_FURNACE;
     public static Block BLOCK_BEACON_FURNACE_LIT;
     public static Block BLOCK_BEACON_FORESTER;
     public static Block BLOCK_BEACON_QUARRY;
     public static Block BLOCK_BEACON_WORKBENCH;
+
+    public static Item ITEM_CIRCUIT;
 
     public static Item ITEM_DIGGER_GRENADE;
     public static Item ITEM_MINESHAFT_GRENADE;
@@ -116,6 +119,8 @@ public class VassalMain
 
         NetworkRegistry.INSTANCE.registerGuiHandler(VassalMain.instance,
                 new GuiHandlerVassal());
+
+        initRecipes();
 
         proxy.init(event);
     }
@@ -178,6 +183,11 @@ public class VassalMain
         GameRegistry.registerTileEntity(TileEntityBeaconWorkbench.class, TileEntityBeaconWorkbench.NAME);
 
         // ITEMS
+        ITEM_CIRCUIT = new ItemCircuit();
+        GameRegistry.registerItem(ITEM_CIRCUIT, ItemCircuit.NAME);
+
+
+        // Construction grenades - MOVE
 
         ITEM_DIGGER_GRENADE = new ItemDiggerGrenade();
         GameRegistry.registerItem(ITEM_DIGGER_GRENADE, ItemDiggerGrenade.NAME);
@@ -232,34 +242,18 @@ public class VassalMain
 
     }
 
-    private void initModEntities()
+    private void initRecipes()
     {
+        GameRegistry.addRecipe(new ItemStack(ITEM_CIRCUIT),
+                "GLG",
+                "RSR",
+                "GRG",
+                'R', Items.redstone,
+                'G', Items.gold_nugget,
+                'L', new ItemStack(Items.dye, 0, 4),
+                'S', Blocks.stone_slab
+        );
 
-//        // Do your mod setup. Build whatever data structures you care about. Register recipes.
-//        int entityID = 0;
-//        EntityRegistry.registerModEntity(EntityTanglerGrenadePlain.class, "Tangler Grenade",
-//                ++entityID, TanglerMod.instance, 80, 10, true);
-//        EntityRegistry.registerModEntity(EntityTanglerGrenadeBig.class, "Tangler Grenade Big",
-//                ++entityID, TanglerMod.instance, 80, 10, true);
-//        EntityRegistry.registerModEntity(EntityTanglerGrenadeGlow.class, "Tangler Grenade Glow",
-//                ++entityID, TanglerMod.instance, 80, 10, true);
-//        EntityRegistry.registerModEntity(EntityTanglerGrenadeTorch.class, "Tangler Grenade Torch",
-//                ++entityID, TanglerMod.instance, 80, 10, true);
-//        EntityRegistry.registerModEntity(EntityTanglerGrenadeHard.class, "Tangler Grenade Hard",
-//                ++entityID, TanglerMod.instance, 80, 10, true);
-//        EntityRegistry.registerModEntity(EntityTanglerGrenadeBoom.class, "Tangler Grenade Boom",
-//                ++entityID, TanglerMod.instance, 80, 10, true);
-//
-//        initRecipes();
-//
-//        proxy.init(event);
-
-    }
-
-
-//
-//    private void initRecipes()
-//    {
 //        // Basic tangler grenade
 //        GameRegistry.addRecipe(new ItemStack(ITEM_TANGLER_GRENADE_PLAIN),
 //                "-S-",
@@ -321,7 +315,7 @@ public class VassalMain
 //                'S', Items.slime_ball,
 //                'G', Items.gunpowder
 //        );
-//    }
+    }
 
     private static int modEntityID;
 

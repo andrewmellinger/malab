@@ -8,6 +8,7 @@ item.vassal.beaconForester.name=Beacon Forester (item)
 item.vassal.beaconQuarry.name=Beacon Quarry (item)
 item.vassal.beaconWorkbench.name=Beacon Workbench (item)
 item.vassal.beaconChest.name=Beacon Chest (item)
+item.circuit.name=Circuit
 container.beaconFurnace=BeaconFurnace
 container.beaconForester=BeaconForester
 container.beaconQuarry=BeaconQuarry

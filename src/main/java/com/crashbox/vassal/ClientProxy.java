@@ -1,7 +1,7 @@
 package com.crashbox.vassal;
 
-import com.crashbox.vassal.ai.EntityAIVassal;
 import com.crashbox.vassal.chest.BlockBeaconChest;
+import com.crashbox.vassal.circuit.ItemCircuit;
 import com.crashbox.vassal.entity.EntityVassal;
 import com.crashbox.vassal.entity.RenderVassal;
 import com.crashbox.vassal.furnace.BlockBeaconFurnace;
@@ -72,6 +72,12 @@ public class ClientProxy extends CommonProxy
 
         //======================================
         // ITEMS
+
+        renderItem.getItemModelMesher().register(VassalMain.ITEM_CIRCUIT, 0,
+                new ModelResourceLocation(VassalMain.MODID + ":" + ItemCircuit.NAME, "inventory"));
+
+        //======================================
+        // Construction Grenades
 
         registerSnowball(renderManager, renderItem, VassalMain.ITEM_DIGGER_GRENADE,
                 ItemDiggerGrenade.NAME, EntityDiggerGrenade.class);

@@ -228,7 +228,6 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
         // We don't put things in output for automation.  This is different than the furnace
         // in that we don't just take anything unless they ask for it.
 
-        // Supposedly this is for automation
         if ( index == INPUT_INDEX )
         {
             if (_itemStacks[INPUT_INDEX] != null)
