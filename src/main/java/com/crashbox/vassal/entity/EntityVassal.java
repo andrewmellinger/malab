@@ -536,13 +536,6 @@ public class EntityVassal extends EntityCreature
                 0,
                 0);
 
-//        if (!this.worldObj.isRemote && (this.riddenByEntity == null ||
-//                this.riddenByEntity == playerEntity) && this.isTame())
-//        {
-//            this.horseChest.setCustomName(this.getName());
-//            playerEntity.displayGUIHorse(this, this.horseChest);
-//        }
-
         return true;
     }
 

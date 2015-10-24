@@ -9,7 +9,6 @@ import com.crashbox.vassal.furnace.TileEntityBeaconFurnace;
 import com.crashbox.vassal.forester.BlockBeaconForester;
 import com.crashbox.vassal.forester.TileEntityBeaconForester;
 import com.crashbox.vassal.grenades.*;
-import com.crashbox.vassal.network.MessageToggleWorkbenchEnable;
 import com.crashbox.vassal.network.MessageVassalEffects;
 import com.crashbox.vassal.quarry.BlockBeaconQuarry;
 import com.crashbox.vassal.quarry.TileEntityBeaconQuarry;
