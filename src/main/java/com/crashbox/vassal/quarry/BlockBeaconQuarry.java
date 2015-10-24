@@ -1,6 +1,7 @@
 package com.crashbox.vassal.quarry;
 
 import com.crashbox.vassal.VassalMain;
+import com.crashbox.vassal.util.VassalUtils;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -21,7 +22,7 @@ public class BlockBeaconQuarry extends BlockContainer
     public BlockBeaconQuarry()
     {
         super(Material.iron);
-        setUnlocalizedName(VassalMain.MODID + "_" + NAME);
+        setUnlocalizedName(VassalUtils.getLabeledName(NAME));
         setCreativeTab(VassalMain.VASSAL_TAB);
         setTickRandomly(false);
 

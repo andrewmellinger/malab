@@ -1,5 +1,6 @@
 package com.crashbox.vassal.util;
 
+import com.crashbox.vassal.VassalMain;
 import com.crashbox.vassal.ai.Priority;
 import com.crashbox.vassal.common.ItemStackMatcher;
 import com.crashbox.vassal.entity.EntityVassal;
@@ -28,6 +29,12 @@ import java.util.Queue;
  */
 public class VassalUtils
 {
+    public static String getLabeledName(String name)
+    {
+        return VassalMain.MODID + "." + name;
+    }
+
+
 
     public static BlockPos findBlock(World world, BlockPos startPos, int range, Block blockType )
     {
@@ -775,10 +782,13 @@ public class VassalUtils
                 for (int x = center.getX() - radius; x <= center.getX() + radius; ++x)
                 {
                     BlockPos pos = new BlockPos(x, y, center.getZ());
-                    if (!world.isAirBlock(pos))
+                    if (y > 2)
                     {
-                        world.destroyBlock(pos, drop);
-                        ++count;
+                        if (!world.isAirBlock(pos))
+                        {
+                            world.destroyBlock(pos, drop);
+                            ++count;
+                        }
                     }
                 }
             }

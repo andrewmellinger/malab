@@ -1,6 +1,7 @@
 package com.crashbox.vassal.entity;
 
 import net.minecraft.inventory.InventoryBasic;
+import net.minecraft.util.ChatComponentTranslation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -11,7 +12,8 @@ public class InventoryEntityVassal extends InventoryBasic
 {
     public InventoryEntityVassal(EntityVassal vassal)
     {
-        super("Label", false, 3);
+
+        super(new ChatComponentTranslation("container.vassal.title").getUnformattedText(), false, 3);
         _vassal = vassal;
         setInventorySlotContents(0, vassal.getHeldItem());
         setInventorySlotContents(1, vassal.getFuelStack());

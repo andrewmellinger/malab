@@ -1,6 +1,7 @@
 package com.crashbox.vassal.furnace;
 
 import com.crashbox.vassal.VassalMain;
+import com.crashbox.vassal.util.VassalUtils;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -30,7 +31,7 @@ public class BlockBeaconFurnace extends BlockContainer
     public BlockBeaconFurnace(boolean lit)
     {
         super(Material.iron);
-        setUnlocalizedName(VassalMain.MODID + "_" + NAME);
+        setUnlocalizedName(VassalUtils.getLabeledName(NAME));
 
         if (!lit)
             setCreativeTab(VassalMain.VASSAL_TAB);

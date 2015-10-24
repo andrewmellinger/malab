@@ -36,14 +36,25 @@ public class GuiEntityVassal extends GuiContainer
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
     {
+        // Display name
         String s = _inventory.getDisplayName().getUnformattedText();
         fontRendererObj.drawString(s, xSize / 2 - fontRendererObj.getStringWidth(s) / 2, 6, 4210752);
         fontRendererObj.drawString(_inventoryPlayer.getDisplayName().getUnformattedText(), 8, ySize - 96 + 2, 4210752);
 
-        // Get text from the from the localization
+        // Text for held
+        String heldTitle = new ChatComponentTranslation("container.vassal.title.held").getUnformattedText();
+        fontRendererObj.drawString(heldTitle, 42, 20, 4210752);
+
+        // Text for fuel
         String fuelTitle = new ChatComponentTranslation("container.vassal.title.fuel").getUnformattedText();
         fuelTitle += ": " + _vassal.getFuelSecs();
         fontRendererObj.drawString(fuelTitle, 42, 56, 4210752);
+
+        // Text for follow me
+        String followMeTitle = new ChatComponentTranslation("container.vassal.title.followme").getUnformattedText();
+        int start = 141 - fontRendererObj.getStringWidth(followMeTitle);
+        fontRendererObj.drawString(followMeTitle, start, 20, 4210752);
+
     }
 
     /**
