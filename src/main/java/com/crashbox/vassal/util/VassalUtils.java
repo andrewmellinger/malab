@@ -820,8 +820,6 @@ public class VassalUtils
         }
     }
 
-
-
     public static void spiralStairs(World world, BlockPos pos, int minY)
     {
         int x = pos.getX();

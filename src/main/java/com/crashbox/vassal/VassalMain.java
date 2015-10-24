@@ -87,7 +87,6 @@ public class VassalMain
     @EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
-
         VASSAL_TAB = new CreativeTabVassal();
         preInitBlockAndItems();
         VassalMain.NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel("vassal");
@@ -158,10 +157,6 @@ public class VassalMain
         BLOCK_BEACON_CHEST = new BlockBeaconChest();
         GameRegistry.registerBlock(BLOCK_BEACON_CHEST, BlockBeaconChest.NAME);
         GameRegistry.registerTileEntity(TileEntityBeaconChest.class, TileEntityBeaconChest.NAME);
-
-//        BLOCK_BEACON_CONTROLLER = new BlockController();
-//        GameRegistry.registerBlock(BLOCK_BEACON_CONTROLLER, BlockController.NAME);
-        //GameRegistry.registerTileEntity(TileEntityBeaconForester.class, TileEntityBeaconForester.NAME);
 
         BLOCK_BEACON_FORESTER = new BlockBeaconForester();
         GameRegistry.registerBlock(BLOCK_BEACON_FORESTER, BlockBeaconForester.NAME);
