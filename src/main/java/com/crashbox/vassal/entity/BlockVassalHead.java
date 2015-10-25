@@ -28,6 +28,10 @@ public class BlockVassalHead extends Block
         setUnlocalizedName(VassalUtils.getLabeledName(NAME));
         setCreativeTab(VassalMain.VASSAL_TAB);
         setTickRandomly(false);
+
+        setHardness(1.5F);
+        setResistance(10);
+        setStepSound(Block.soundTypePiston);
     }
 
     @Override

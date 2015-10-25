@@ -262,7 +262,7 @@ public class VassalMain
         );
 
         GameRegistry.addRecipe(new ItemStack(BLOCK_VASSAL_HEAD),
-                "I",
+                "H",
                 "C",
                 "G",
                 'H', Items.iron_helmet,

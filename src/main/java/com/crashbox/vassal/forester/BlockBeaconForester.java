@@ -2,6 +2,7 @@ package com.crashbox.vassal.forester;
 
 import com.crashbox.vassal.VassalMain;
 import com.crashbox.vassal.util.VassalUtils;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -25,6 +26,10 @@ public class BlockBeaconForester extends BlockContainer
         setUnlocalizedName(VassalUtils.getLabeledName(NAME));
         setCreativeTab(VassalMain.VASSAL_TAB);
         setTickRandomly(false);
+
+        setHardness(4.5F);
+        setResistance(30);
+        setStepSound(Block.soundTypePiston);
     }
 
     @Override

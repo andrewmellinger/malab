@@ -2,6 +2,7 @@ package com.crashbox.vassal.quarry;
 
 import com.crashbox.vassal.VassalMain;
 import com.crashbox.vassal.util.VassalUtils;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -30,8 +31,9 @@ public class BlockBeaconQuarry extends BlockContainer
         setHarvestLevel("pickaxe", 1);
 
         // We want to be a little harder so people to accidentally break them as much
-        setHardness(5.0F);
-        setResistance(45);
+        setHardness(4.5F);
+        setResistance(30);
+        setStepSound(Block.soundTypePiston);
     }
 
     @Override
