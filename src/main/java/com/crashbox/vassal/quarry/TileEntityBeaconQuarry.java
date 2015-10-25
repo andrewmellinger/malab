@@ -88,7 +88,7 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
         protected int concurrentWorkerCount()
         {
             // We can't handle that many
-            return 1;
+            return 2;
         }
 
         @Override
@@ -101,11 +101,8 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
             }
             else if (msg instanceof MessageWorkerAvailability)
             {
-                if (haveFreeWorkerSlots())
-                {
-                    debugLog("Handling worker availability.");
+                if (haveFreeWorkerSlots() && readyForNextAvailabilityResponseMS())
                     handleWorkerAvailability((MessageWorkerAvailability) msg);
-                }
             }
         }
     }
@@ -115,10 +112,10 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
         // First, if we need stairs, send a stairs event
         StairBuilder builder = new StairBuilder(getWorld(), getPos(), _radius);
 
-        LOGGER.debug("Quarry: Got item request: " + msg.getMatcher() + ", from=" + msg.getSender());
-        if (builder.findFirstQuarryable(msg.getMatcher(), getEntityFromMessage(msg)) != null)
+        LOGGER.debug("handleItemRequest: " + msg.getMatcher() + ", from=" + msg.getSender());
+        if (builder.findFirstQuarryable(msg.getMatcher(), getEntityFromMessage(msg), null) != null)
         {
-            LOGGER.debug("Quarry: Found item.");
+            LOGGER.debug("--found item.");
             TRHarvest quarry = new TRHarvest(this, msg.getSender(), msg.getTransactionID(),
                     Priority.getQuarryItemHarvestValue(getWorld()),
                     TaskQuarry.class, msg.getMatcher(), 1);
@@ -128,9 +125,14 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
 
     private void handleWorkerAvailability(MessageWorkerAvailability msg)
     {
+        debugLog("handleWorkerAvailability=" + msg);
+
         // first clean up any messes
         if (VassalUtils.generateCleanupTask(this, getWorld(), getPos(), _radius, msg))
+        {
+            _quarry.setNextAvailabilityResponseMS();
             return;
+        }
 
         // If we need stairs, send a stairs event
         StairBuilder builder = new StairBuilder(getWorld(), getPos(), _radius);
@@ -144,6 +146,8 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
             //LOGGER.debug("Found  first stair.");
             TRMakeBigStair makeStair = new TRMakeBigStair(this, msg.getSender(), msg.getTransactionID(),
                     Priority.getStairBuilderValue(), stairsNeeded);
+
+            _quarry.setNextAvailabilityResponseMS();
             Broadcaster.postMessage(makeStair);
 
             // If we can do stairs, then we don't want to ask for anything else.
@@ -151,7 +155,7 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
         }
 
         // If we have something that will drop, call him over
-        if (builder.findFirstQuarryable(new AnyItemMatcher(), getEntityFromMessage(msg)) != null)
+        if (builder.findFirstQuarryable(new AnyItemMatcher(), getEntityFromMessage(msg), null) != null)
         {
             int value = Priority.getQuarryIdleHarvestValue(getWorld());
 
@@ -160,11 +164,14 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
 
             TRHarvest quarry = new TRHarvest(this, msg.getSender(), msg.getTransactionID(),
                     value, TaskQuarry.class, new AnyItemMatcher(), 1);
+
+            _quarry.setNextAvailabilityResponseMS();
             Broadcaster.postMessage(quarry);
             return;
         }
 
         // If we are here we need a worker to move us down one.
+        _quarry.setNextAvailabilityResponseMS();
         VassalUtils.postHarvestPlacePair(this, msg,
                 Priority.getQuarryMoveQuarryBlockValue(), Priority.getQuarryMoveQuarryBlockValue(),
                 new ItemStackMatcher(VassalMain.BLOCK_BEACON_QUARRY), getPos(), getPos().down(),
@@ -185,15 +192,13 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
 
     private void debugLog(String msg)
     {
-        LOGGER.debug("Quarry: " + msg);
+        LOGGER.debug(msg);
     }
 
     @Override
     public String toString()
     {
-        return "Quarry{" +
-                "_quarry=" + _quarry +
-                '}';
+        return "TEBQuarry@" + Integer.toHexString(this.hashCode()) + "{}";
     }
 
     private Quarry _quarry;

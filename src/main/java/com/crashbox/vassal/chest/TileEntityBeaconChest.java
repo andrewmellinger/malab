@@ -17,6 +17,8 @@ import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.Arrays;
+
 
 /**
  * Copyright 2015 Andrew O. Mellinger
@@ -390,6 +392,12 @@ public class TileEntityBeaconChest extends TileEntityBeaconInventory implements 
         _chest.terminate();
     }
 
+
+    @Override
+    public String toString()
+    {
+        return "TEBChest@" + Integer.toHexString(this.hashCode()) + "{}";
+    }
 
     //---------------------------------------------------------------------------------------------
     private class Chest extends BeaconBase

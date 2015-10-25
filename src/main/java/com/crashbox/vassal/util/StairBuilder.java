@@ -79,11 +79,12 @@ public class StairBuilder
     /**
      * Finds the first quarryable block that matches in the area.
      * @param matcher The matcher for the item we are looking for.
+     * @param vassal The vassal doing the work (for tool check.)
+     * @param exclusions Places to skip
      * @return True for any.
      */
-    public BlockPos findFirstQuarryable(ItemStackMatcher matcher, EntityVassal vassal)
+    public BlockPos findFirstQuarryable(ItemStackMatcher matcher, EntityVassal vassal, List<BlockPos> exclusions)
     {
-
         LOGGER.debug(this);
         LOGGER.debug("findFirstQuarrayble: " + matcher);
         SlabTraverser traverser = new SlabTraverser(_center.down(), _digCorner, _radius, _dir);
@@ -101,6 +102,22 @@ public class StairBuilder
             {
                 LOGGER.debug("Skipping in exclusions. pos=" + pos);
                 continue;
+            }
+
+            // Is it in the external exclusions
+            if (exclusions != null)
+            {
+                boolean hadCollision = false;
+                for (BlockPos exPos : exclusions)
+                {
+                    if (VassalUtils.pointInArea(pos, exPos, 1))
+                    {
+                        hadCollision = true;
+                        break;
+                    }
+                }
+                if (hadCollision)
+                    continue;
             }
 
             // Will it give us what we want?

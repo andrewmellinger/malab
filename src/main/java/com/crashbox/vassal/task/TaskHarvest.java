@@ -88,7 +88,7 @@ public abstract class TaskHarvest extends TaskAcquireBase
     }
 
     // This adds the specific algorithm that find trees, or blocks of stone,or whatever
-    protected abstract Queue<BlockPos> findHarvestList(List<BlockPos> others);
+    protected abstract Queue<BlockPos> findHarvestList(List<BlockPos> exclusions);
 
     private void startBreaking()
     {

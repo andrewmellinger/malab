@@ -6,7 +6,6 @@ import com.crashbox.vassal.ai.EntityAIVassal;
 import com.crashbox.vassal.network.MessageVassalEffects;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAISwimming;
@@ -20,11 +19,8 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.IExtendedEntityProperties;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import javax.tools.Tool;
 
 
 /**
@@ -157,6 +153,10 @@ public class EntityVassal extends EntityCreature
         {
             _followMeStack = ItemStack.loadItemStackFromNBT(compound.getCompoundTag("followMeStack"));
         }
+
+        // We always want a custom name.  If we don't have one by now, make one!
+        if (!hasCustomName())
+            setCustomNameTag(makeName(getEntityWorld()));
     }
 
     @Override
@@ -537,6 +537,51 @@ public class EntityVassal extends EntityCreature
                 0);
 
         return true;
+    }
+
+    //=============================================================================================
+
+    @Override
+    public String toString()
+    {
+        return getCustomNameTag() + '{' +
+                "fuel=" + _fuelTicks + '/' + (_fuelStack == null ? 0 : _fuelStack.stackSize) +
+                '}';
+    }
+
+
+    //=============================================================================================
+    // NAMING
+
+    private static String[] NAMES = { "takara", "akai",
+            "frodo", "sam", "merry", "pippin", "gimli", "legolas", "aragorn", "boromir",
+            "larry", "moe", "curly",
+            "sleepy", "grumpy", "dopey", "doc", "bashful",
+            "dobby", "harry", "hermione", "ron", "draco"
+    };
+
+    private static int getNextID(World world)
+    {
+        int id = world.getGameRules().getInt(VassalMain.GAME_RULE_NEXT_VASSAL_ID);
+        world.getGameRules().setOrCreateGameRule(VassalMain.GAME_RULE_NEXT_VASSAL_ID, Integer.toString(id + 1));
+        return id;
+    }
+
+
+    // This is NOT shared across restarts.
+    private static int NAME_INDEX = 0;
+
+    private static String makeName(World world)
+    {
+        int id = getNextID(world);
+
+        int idx = id % NAMES.length;
+        int suffix = id / NAMES.length;
+        String name = NAMES[idx];
+        if (suffix > 0)
+            name = name + suffix;
+
+        return name;
     }
 
     //=============================================================================================

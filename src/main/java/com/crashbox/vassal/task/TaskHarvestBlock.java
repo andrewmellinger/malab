@@ -21,7 +21,7 @@ public class TaskHarvestBlock extends TaskHarvest
     }
 
     @Override
-    protected Queue<BlockPos> findHarvestList(List<BlockPos> others)
+    protected Queue<BlockPos> findHarvestList(List<BlockPos> exclusions)
     {
         Queue<BlockPos> result = new LinkedList<BlockPos>();
         if (!getWorld().isAirBlock(_pos) &&

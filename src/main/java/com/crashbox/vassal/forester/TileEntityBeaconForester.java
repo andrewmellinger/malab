@@ -262,9 +262,7 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
     @Override
     public String toString()
     {
-        return "Forester{" +
-                "_forester=" + _forester +
-                '}';
+        return "Forester@" + Integer.toHexString(this.hashCode()) + "{}";
     }
 
     private Forester _forester;

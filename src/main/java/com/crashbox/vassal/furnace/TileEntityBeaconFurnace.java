@@ -961,11 +961,11 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
     @Override
     public String toString()
     {
-        return "TileEntityBeacon{" +
-                "_remainingFuelBurnTicks=" + _remainingFuelBurnTicks +
-                ", _originalFuelBurnTicks" + _originalFuelBurnTicks +
-                ", _accumulatedItemSmeltTicks=" + _accumulatedItemSmeltTicks +
-                ", _totalItemSmeltTicks=" + _totalItemSmeltTicks +
+        return "TEBFurnace@" + Integer.toHexString(this.hashCode()) + "{" +
+                "remainBurnTicks=" + _remainingFuelBurnTicks +
+                ", origBurnTicks" + _originalFuelBurnTicks +
+                ", accSmeltTicks=" + _accumulatedItemSmeltTicks +
+                ", totalSmeltTicks=" + _totalItemSmeltTicks +
                 '}';
     }
 

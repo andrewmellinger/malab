@@ -158,6 +158,7 @@ public class TaskPair implements ITask
 
     private void sendHeartbeatFor(TaskBase task, long expire)
     {
+        //LOGGER.debug(_entityAI.getEntity().getCustomNameTag() + " sending heartbeat to=" + task.getRequester() + ", for=" + task);
         Broadcaster.postMessage(new MessageWorkingHeartbeat(_entityAI, task.getRequester(), task, expire));
     }
 

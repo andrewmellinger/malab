@@ -814,6 +814,13 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory impleme
         return count > 0 ? matcher : null;
     }
 
+    @Override
+    public String toString()
+    {
+        return "TEBWorkbench@" + Integer.toHexString(this.hashCode()) + "{}";
+    }
+
+
     //---------------------------------------------------------------------------------------------
 
     private final InventoryCrafting     _craftingMatrix;

@@ -17,6 +17,10 @@ import java.util.List;
  */
 public class Priority
 {
+    // Delays between responses from beacon
+    public static final int BEACON_AVAILABILITY_RESPONSE_DELAY_MS = 600;
+
+
     private static final int QUARRY_MOVE_QUARRY_BLOCK_VALUE = 20;
 
     private static int GENERIC_CLEAN_UP_TASK_VALUE = 0;

@@ -1,5 +1,6 @@
 package com.crashbox.vassal.messaging;
 
+import com.crashbox.vassal.ai.EntityAIVassal;
 import com.crashbox.vassal.util.VassalUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -59,8 +60,16 @@ public class Message
 
     public void debugInfo(StringBuilder builder)
     {
-        builder.append(" sender=").append(VassalUtils.objID(_sender));
-        builder.append(", target=").append(VassalUtils.objID(_target));
+        String sender = VassalUtils.objID(_sender);
+        if (_sender instanceof EntityAIVassal)
+            sender = ((EntityAIVassal)_sender).getEntity().getCustomNameTag();
+
+        String target = VassalUtils.objID(_target);
+        if (_target instanceof EntityAIVassal)
+            target = ((EntityAIVassal)_target).getEntity().getCustomNameTag();
+
+        builder.append(" sender=").append(sender);
+        builder.append(", target=").append(target);
         builder.append(", transactionID=").append(VassalUtils.objID(_transactionID));
         builder.append(", priority=").append(_value);
     }

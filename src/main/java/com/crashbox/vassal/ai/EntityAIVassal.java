@@ -29,8 +29,6 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
 
         _entity = entity;
         Broadcaster.getInstance().subscribe(new MyListener());
-        if (!_entity.hasCustomName())
-            _entity.setCustomNameTag(makeName());
         _nextElicit = System.currentTimeMillis() + ELICIT_DELAY_MS +
                 (long)(ELICIT_DELAY_MS * _entity.getRNG().nextFloat());
     }
@@ -493,8 +491,6 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
     private void requestWorkAreas()
     {
         Broadcaster.postMessage(new MessageRequestWorkArea(this, null, _currentTask, 0));
-
-        // TODO: Request work areas
         _workArea = null;
         _workAreas.clear();
         _requestEndMS = System.currentTimeMillis() + REQUEST_TIMEOUT_MS;
@@ -702,33 +698,6 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
                 '}';
     }
 
-
-    //=============================================================================================
-    // NAMING
-
-    private static String[] NAMES = { "takara", "akai",
-            "frodo", "sam", "merry", "pippin", "gimli", "legolas", "aragorn", "boromir",
-            "larry", "moe", "curly",
-            "sleepy", "grumpy", "dopey", "doc", "bashful",
-            "dobby", "harry", "hermione", "ron", "draco"
-            };
-
-    private static int NAME_INDEX = 0;
-
-    private static String makeName()
-    {
-        int idx = NAME_INDEX % NAMES.length;
-        int suffix = NAME_INDEX / NAMES.length;
-        String name = NAMES[idx];
-        if (suffix > 0)
-            name = name + suffix;
-
-        NAME_INDEX++;
-
-        return name;
-    }
-
-
     //=============================================================================================
     //=============================================================================================
 
@@ -749,7 +718,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
     private long _pausedMessageSecs = 0;
 
     // We don't want to ask for work too often.  If we don't get a response, just hang out.
-    private static final int ELICIT_DELAY_MS    = 6000;
+    private static final int ELICIT_DELAY_MS    = 3000;
     private static final int ELICIT_RESET_DELAY = 100;
     private long _nextElicit                    = 0;
 

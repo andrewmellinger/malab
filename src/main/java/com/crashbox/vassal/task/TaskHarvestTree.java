@@ -21,11 +21,11 @@ public class TaskHarvestTree extends TaskHarvest
     }
 
     @Override
-    protected Queue<BlockPos> findHarvestList(List<BlockPos> others)
+    protected Queue<BlockPos> findHarvestList(List<BlockPos> exclusions)
     {
         BlockBounds bounds = new BlockBounds(getRequester().getBlockPos(), _radius);
         BlockPos start = VassalUtils.findIntersect(getRequester().getBlockPos(), _radius, getEntity().getPosition());
         return RingedSearcher.findTree(getEntity().getEntityWorld(), start, _radius * 2, _height,
-                getMatcher(), others, bounds);
+                getMatcher(), exclusions, bounds);
     }
 }

@@ -23,6 +23,8 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.GameRules;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
@@ -73,6 +75,8 @@ public class VassalMain
     public static Item ITEM_SLAB_GRENADE;
     public static Item ITEM_TUNNEL_GRENADE;
     public static Item ITEM_WALL_GRENADE;
+
+    public static String GAME_RULE_NEXT_VASSAL_ID = "vassal.next.name.id";
 
     public static SimpleNetworkWrapper NETWORK;
 
@@ -146,8 +150,15 @@ public class VassalMain
     @EventHandler
     public void fmlLifeCycle(FMLServerStartedEvent event)
     {
-        // DEBUG
-        Priority.setupGameRules(MinecraftServer.getServer().worldServerForDimension(0));
+        World world = MinecraftServer.getServer().worldServerForDimension(0);
+
+        Priority.setupGameRules(world);
+
+        // Add other custom game rules
+        GameRules rules = world.getGameRules();
+
+        if (!rules.hasRule(GAME_RULE_NEXT_VASSAL_ID))
+            rules.addGameRule(GAME_RULE_NEXT_VASSAL_ID, "1", GameRules.ValueType.NUMERICAL_VALUE);
     }
 
     public void registerModEntityWithEgg(Class parEntityClass, String parEntityName,
@@ -185,10 +196,8 @@ public class VassalMain
         GameRegistry.registerBlock(BLOCK_BEACON_WORKBENCH, BlockBeaconWorkbench.NAME);
         GameRegistry.registerTileEntity(TileEntityBeaconWorkbench.class, TileEntityBeaconWorkbench.NAME);
 
-
         BLOCK_VASSAL_HEAD = new BlockVassalHead();
         GameRegistry.registerBlock(BLOCK_VASSAL_HEAD, BlockVassalHead.NAME);
-
 
         // ITEMS
         ITEM_CIRCUIT = new ItemCircuit();

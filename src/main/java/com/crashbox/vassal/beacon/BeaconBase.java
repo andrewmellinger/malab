@@ -1,5 +1,6 @@
 package com.crashbox.vassal.beacon;
 
+import com.crashbox.vassal.ai.Priority;
 import com.crashbox.vassal.util.VassalUtils;
 import com.crashbox.vassal.messaging.*;
 import net.minecraft.world.World;
@@ -121,7 +122,6 @@ public abstract class BeaconBase
         }
     }
 
-
     // Listener to deal with all the incoming messages
     private class Listener implements IListener
     {
@@ -135,8 +135,12 @@ public abstract class BeaconBase
     @Override
     public String toString()
     {
+        String listener = "none";
+        if (_listener != null)
+            listener = Integer.toHexString(_listener.hashCode());
+
         return "Beacon{" +
-                ", _listener=" + Integer.toHexString(_listener.hashCode()) +
+                ", _listener=" + listener +
                 '}';
     }
 
@@ -145,8 +149,18 @@ public abstract class BeaconBase
         return VassalUtils.objID(this);
     }
 
+    public boolean readyForNextAvailabilityResponseMS()
+    {
+        return _nextAvailabilityResponseMS < System.currentTimeMillis();
+    }
+
+    public void setNextAvailabilityResponseMS()
+    {
+        _nextAvailabilityResponseMS = System.currentTimeMillis() + Priority.BEACON_AVAILABILITY_RESPONSE_DELAY_MS;
+    }
 
     private final Queue<Message> _messages = new LinkedTransferQueue<Message>();
+    private long _nextAvailabilityResponseMS = 0;
 
     private Listener _listener;
 
