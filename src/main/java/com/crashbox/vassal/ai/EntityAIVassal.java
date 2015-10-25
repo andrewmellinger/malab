@@ -557,10 +557,11 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         _responses.clear();
         getEntity().getNavigator().clearPathEntity();
 
-        _nextElicit = System.currentTimeMillis() + ELICIT_RESET_DELAY;
-//        long tmp = System.currentTimeMillis() + ELICIT_RESET_DELAY;
-//        if (tmp > _nextElicit)
-//            _nextElicit = tmp;
+        // If we are here and we have already passed next elicit push it out by a small
+        // delay so we don't spam.  If the delay next time hasn't happened yet, just use
+        // that because some other logic had good reasons for setting it.
+        if (_nextElicit <= System.currentTimeMillis())
+            _nextElicit = System.currentTimeMillis() + ELICIT_RESET_DELAY;
     }
 
     //=============================================================================================

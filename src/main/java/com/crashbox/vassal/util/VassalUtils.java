@@ -366,7 +366,12 @@ public class VassalUtils
                 else
                 {
                     if (world.isAirBlock(pos))
-                        return pos;
+                    {
+                        BlockPos down = pos.down();
+                        IBlockState downState = world.getBlockState(down);
+                        if (downState.getBlock() == Blocks.grass || downState.getBlock() == Blocks.dirt)
+                            return pos;
+                    }
                 }
                 even = !even;
             }

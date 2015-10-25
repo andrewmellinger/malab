@@ -38,7 +38,7 @@ public class TaskPickup extends TaskAcquireBase
     public UpdateResult executeAndIsDone()
     {
         EntityItem eItem = VassalUtils.findFirstEntityOfTypeOnGround(getEntity().getEntityWorld(), getEntity()
-                .getPosition(), 2, _item);
+                .getPosition(), 3, _item);
 
         if (eItem == null)
             return UpdateResult.DONE;
