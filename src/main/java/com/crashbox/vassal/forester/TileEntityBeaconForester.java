@@ -170,6 +170,7 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
         LOGGER.debug("handleWorkerAvailability, this= " + VassalUtils.objID(this) +", msg=" + msg);
 
         //=====================
+        // Replant trees
 
         EntityItem pickup = VassalUtils.findFirstEntityOfTypeOnGround(getWorld(), getPos(), _searchRadius + 2,
                 Item.getItemFromBlock(Blocks.sapling));
@@ -195,11 +196,14 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
 
         //=====================
 
-        if (pickup != null)
+        // Cleanup anything
+        if (pickup == null)
         {
             if (VassalUtils.generateCleanupTask(this, getWorld(), getBlockPos(), getRadius() + 2,msg))
                 return;
         }
+
+        //=====================
 
         // We can also just provide wood
 
