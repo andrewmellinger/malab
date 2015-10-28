@@ -567,7 +567,6 @@ public class EntityVassal extends EntityCreature
         return id;
     }
 
-
     // This is NOT shared across restarts.
     private static int NAME_INDEX = 0;
 
@@ -582,6 +581,12 @@ public class EntityVassal extends EntityCreature
             name = name + suffix;
 
         return name;
+    }
+
+    public void setUpCustomName()
+    {
+        if (!hasCustomName())
+            setCustomNameTag(makeName(getEntityWorld()));
     }
 
     //=============================================================================================

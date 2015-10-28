@@ -37,7 +37,7 @@ public class BlockVassalHead extends Block
     @Override
     public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state)
     {
-        // Look for blocks below and spawn chicken
+        // Look for blocks below and spawn vassal
         BlockPos down1 = pos.down();
         BlockPos down2 = pos.down(2);
 
@@ -49,6 +49,7 @@ public class BlockVassalHead extends Block
             worldIn.destroyBlock(down2, false);
 
             EntityVassal entityVassal = new EntityVassal(worldIn);
+            entityVassal.setUpCustomName();
             entityVassal.setLocationAndAngles((double)down2.getX() + 0.5D,
                     (double)down2.getY() + 0.05D,
                     (double)down2.getZ() + 0.5D,
@@ -56,7 +57,6 @@ public class BlockVassalHead extends Block
                     0.0F);
             worldIn.spawnEntityInWorld(entityVassal);
         }
-        // If we are
     }
 
     private static final Logger LOGGER = LogManager.getLogger();

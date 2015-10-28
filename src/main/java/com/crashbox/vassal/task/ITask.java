@@ -10,7 +10,7 @@ import java.util.List;
  */
 public interface ITask
 {
-    enum Resolving { UNRESOLVED, RESOLVING, RESOLVED }
+    enum Resolving { UNRESOLVED, RESOLVING, RESOLVED, CANT_RESOLVE }
     enum UpdateResult { CONTINUE, RETARGET, DONE }
 
     /** @return True if resolved */

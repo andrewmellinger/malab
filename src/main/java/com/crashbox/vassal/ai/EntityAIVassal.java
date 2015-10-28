@@ -344,9 +344,27 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
             _proposedTasks.clear();
 
             if (_currentTask != null)
+            {
+                //debugLog("Selected:" + _currentTask);
                 _currentTask.start();
+            }
             else
+            {
+//                debugLog("Don't have any valid task, but hands full. Looking for storage.");
+//                // If we are here we tried but couldn't find anything matching
+//                ItemStack held = getEntity().getHeldItem();
+//                if (held != null)
+//                {
+//                    _nextElicit = System.currentTimeMillis() + ELICIT_DELAY_MS;
+//                    _requestEndMS = System.currentTimeMillis() + REQUEST_TIMEOUT_MS;
+//                    Message msg = new MessageIsStorageAvailable(this, null, held.getItem(), 0, new ItemStackMatcher(held));
+//                    debugLog("-- " + msg);
+//                    Broadcaster.postMessage(msg);
+//                    return State.ELICITING;
+//                }
+//
                 return State.IDLING;
+            }
 
             //getEntity().spawnExplosionParticle();
             BlockPos workCenter = _currentTask.getWorkCenter();
