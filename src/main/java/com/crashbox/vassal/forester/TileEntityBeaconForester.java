@@ -196,12 +196,9 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
 
         //=====================
 
-        // Cleanup anything
-        if (pickup == null)
-        {
-            if (VassalUtils.generateCleanupTask(this, getWorld(), getBlockPos(), getRadius() + 2,msg))
-                return;
-        }
+        // Cleanup anything else laying around
+        if (VassalUtils.generateCleanupTask(this, getWorld(), getBlockPos(), getRadius() + 2,msg))
+            return;
 
         //=====================
 
