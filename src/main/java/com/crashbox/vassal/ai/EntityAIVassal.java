@@ -755,7 +755,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
     private long _nextHeartbeatMS                   = 0;
 
     private static final long HEAL_DELAY_MS             = 500;
-    private static final int FUEL_PER_HALF_HEART_HEAL   = 20;
+    private static final int FUEL_PER_HALF_HEART_HEAL   = 60;
     private long _nextHealMS                            = 0;
 
 //    private static final int DEFAULT_RANGE = 10;
