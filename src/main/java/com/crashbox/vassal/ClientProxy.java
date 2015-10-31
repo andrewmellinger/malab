@@ -7,7 +7,6 @@ import com.crashbox.vassal.entity.EntityVassal;
 import com.crashbox.vassal.entity.RenderVassal;
 import com.crashbox.vassal.furnace.BlockBeaconFurnace;
 import com.crashbox.vassal.forester.BlockBeaconForester;
-import com.crashbox.vassal.grenades.*;
 import com.crashbox.vassal.quarry.BlockBeaconQuarry;
 import com.crashbox.vassal.workbench.BlockBeaconWorkbench;
 import net.minecraft.client.Minecraft;
@@ -88,27 +87,6 @@ public class ClientProxy extends CommonProxy
 
         renderItem.getItemModelMesher().register(VassalMain.ITEM_CIRCUIT, 0,
                 new ModelResourceLocation(VassalMain.MODID + ":" + ItemCircuit.NAME, "inventory"));
-
-        //======================================
-        // Construction Grenades
-
-        registerSnowball(renderManager, renderItem, VassalMain.ITEM_DIGGER_GRENADE,
-                ItemDiggerGrenade.NAME, EntityDiggerGrenade.class);
-
-        registerSnowball(renderManager, renderItem, VassalMain.ITEM_MINESHAFT_GRENADE,
-                ItemMineshaftGrenade.NAME, EntityMineshaftGrenade.class);
-
-        registerSnowball(renderManager, renderItem, VassalMain.ITEM_FLATTEN_GRENADE,
-                ItemFlattenGrenade.NAME, EntityFlattenGrenade.class);
-
-        registerSnowball(renderManager, renderItem, VassalMain.ITEM_SLAB_GRENADE,
-                ItemSlabGrenade.NAME, EntitySlabGrenade.class);
-
-        registerSnowball(renderManager, renderItem, VassalMain.ITEM_TUNNEL_GRENADE,
-                ItemTunnelGrenade.NAME, EntityTunnelGrenade.class);
-
-        registerSnowball(renderManager, renderItem, VassalMain.ITEM_WALL_GRENADE,
-                ItemWallGrenade.NAME, EntityWallGrenade.class);
     }
 
     private void registerSnowball(RenderManager renderManager, RenderItem renderItem,
