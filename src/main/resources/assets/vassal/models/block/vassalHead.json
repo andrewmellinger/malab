@@ -1,12 +1,12 @@
 {
   "parent": "block/cube",
   "textures": {
-    "up": "vassal:blocks/vassalHead",
-    "down": "vassal:blocks/vassalHead",
-    "north": "vassal:blocks/vassalHead",
-    "south": "vassal:blocks/vassalHead",
-    "east": "vassal:blocks/vassalHead",
-    "west": "vassal:blocks/vassalHead",
-    "particle": "vassal:blocks/vassalHead"
+    "up": "vassal:blocks/vassalHead_top",
+    "down": "vassal:blocks/vassalHead_bottom",
+    "north": "vassal:blocks/vassalHead_side_N",
+    "south": "vassal:blocks/vassalHead_side_S",
+    "east": "vassal:blocks/vassalHead_side_E",
+    "west": "vassal:blocks/vassalHead_side_W",
+    "particle": "vassal:blocks/vassalHead_top"
   }
 }
