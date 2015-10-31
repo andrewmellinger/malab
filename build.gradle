@@ -17,7 +17,7 @@ buildscript {
 
 apply plugin: 'forge'
 
-version = "1.0"
+version = "0.9.001"
 group= "com.crashbox.vassal" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "vassal-1.8"
 
