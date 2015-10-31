@@ -248,7 +248,8 @@ public class TaskPair implements ITask
                 // If we have enough stuff, then we are good
                 if (acquiredEnough())
                 {
-                    LOGGER.debug(_entityAI.id() + ":  acquiredEnough.");
+                    //LOGGER.debug(_entityAI.id() + ":  acquiredEnough inv=" + _entityAI.getEntity().getHeldSize() +
+                    //        ", req=" + _deliverTask.getQuantity());
                     _current = _deliverTask;
                     _stage = Stage.DELIVERING;
                 }
@@ -373,8 +374,10 @@ public class TaskPair implements ITask
                 "stage=" + _stage.name() +
                 ", resolving=" + _resolving.name() +
                 ", current=" + (_current != null) +
-                ", acquireTask=" + VassalUtils.getSimpleName(_acquireTask) +
-                ", deliverTask=" + VassalUtils.getSimpleName(_deliverTask) +
+//                ", acquireTask=" + VassalUtils.getSimpleName(_acquireTask) +
+                ", acquireTask=" + _acquireTask +
+//                ", deliverTask=" + VassalUtils.getSimpleName(_deliverTask) +
+                ", deliverTask=" + _deliverTask +
                 '}';
     }
 

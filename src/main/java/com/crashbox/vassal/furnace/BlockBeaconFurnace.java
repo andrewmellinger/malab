@@ -91,8 +91,6 @@ public class BlockBeaconFurnace extends BlockContainer
             }
         }
 
-        LOGGER.warn("hasTileEntity: " + hasTileEntity(inBlockState));
-        LOGGER.warn("!!!! Removing tile entity: " + inPos);
         // This MUST be last because it removes the TileEntity.
         super.breakBlock(inWorld, inPos, inBlockState);
     }

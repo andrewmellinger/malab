@@ -17,12 +17,13 @@ buildscript {
 
 apply plugin: 'forge'
 
-version = "0.9.001"
+version = "0.9.003"
 group= "com.crashbox.vassal" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "vassal-1.8"
 
 minecraft {
-    version = "1.8-11.14.1.1334"
+    version = "1.8-11.14.3.1450"
+    //version = "1.8-11.14.1.1334"
     runDir = "eclipse"
     
     // the mappings can be changed at any time, and must be in the following format.

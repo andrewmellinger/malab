@@ -17,6 +17,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
 import org.apache.logging.log4j.LogManager;
@@ -343,7 +344,7 @@ public class EntityVassal extends EntityCreature
         for (int i = 0; i < 4; ++i)
         {
             ItemStack stack = _toolStacks[i];
-            if (ForgeHooks.canToolHarvestBlock(getEntityWorld(), pos, stack))
+            if (canToolHarvestBlock(getEntityWorld(), pos, stack))
             {
                 return stack;
             }
@@ -351,6 +352,19 @@ public class EntityVassal extends EntityCreature
 
         return null;
     }
+
+    // Copy paste from ForgeHooks
+    public static boolean canToolHarvestBlock(IBlockAccess world, BlockPos pos, ItemStack stack)
+    {
+        IBlockState state = world.getBlockState(pos);
+        state = state.getBlock().getActualState(state, world, pos);
+        String tool = state.getBlock().getHarvestTool(state);
+        if (stack == null || tool == null) return false;
+        boolean canHarvest = stack.getItem().getHarvestLevel(stack, tool) >= state.getBlock().getHarvestLevel(state);
+//       LOGGER.debug("CanHarvest=" + canHarvest + ", stack=" + stack + ", tool=" + tool + ", block=" + state);
+        return canHarvest;
+    }
+
 
     //=============================================================================================
 

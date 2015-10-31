@@ -156,7 +156,7 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
             return;
         }
 
-        // If we have something that will drop, call him over
+        // If we have something to harvest, call him over
         if (builder.findFirstQuarryable(new AnyItemMatcher(), getEntityFromMessage(msg), null) != null)
         {
             int value = Priority.getQuarryIdleHarvestValue(getWorld());
@@ -165,10 +165,11 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
             value += Priority.quarryDepthValue(getWorld(), msg.getSender().getBlockPos().getY());
 
             TRHarvest quarry = new TRHarvest(this, msg.getSender(), msg.getTransactionID(),
-                    value, TaskQuarry.class, new AnyItemMatcher(), 1);
+                    value, TaskQuarry.class, new AnyItemMatcher(), -1);
 
             _quarry.setNextAvailabilityResponseMS();
             _broadcastHelper.postMessage(quarry);
+            //LOGGER.debug("Posted: " + quarry);
             return;
         }
 

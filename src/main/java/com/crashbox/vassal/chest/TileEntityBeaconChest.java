@@ -437,7 +437,7 @@ public class TileEntityBeaconChest extends TileEntityBeaconInventory implements 
                 if (_itemStacks[slotNum] != null && msg.getMatcher().matches(_itemStacks[slotNum]))
                 {
                     TRPutInInventory req = new TRPutInInventory(TileEntityBeaconChest.this, msg.getSender(),
-                            msg.getTransactionID(), Priority.getChestStorageAvailValue(), msg.getMatcher(), 1);
+                            msg.getTransactionID(), Priority.getChestStorageAvailValue(), msg.getMatcher(), 64);
 
                     LOGGER.debug("Posting: " + req);
                     _broadcastHelper.postMessage(req);
@@ -452,7 +452,7 @@ public class TileEntityBeaconChest extends TileEntityBeaconInventory implements 
                 if (stack == null)
                 {
                     TRPutInInventory req = new TRPutInInventory(TileEntityBeaconChest.this, msg.getSender(),
-                            msg.getTransactionID(), Priority.getChestStorageAvailValue(), msg.getMatcher(), 1);
+                            msg.getTransactionID(), Priority.getChestStorageAvailValue(), msg.getMatcher(), 64);
 
                     LOGGER.debug("Posting: " + req);
                     _broadcastHelper.postMessage(req);
