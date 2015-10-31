@@ -27,10 +27,13 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
     {
         setMutexBits(3);
 
+        int dimensionId = entity.getEntityWorld().provider.getDimensionId();
+
         _entity = entity;
-        Broadcaster.getInstance().subscribe(new MyListener());
+        Broadcaster.getInstance().subscribe(new MyListener(), dimensionId);
         _nextElicit = System.currentTimeMillis() + ELICIT_DELAY_MS +
                 (long)(ELICIT_DELAY_MS * _entity.getRNG().nextFloat());
+        _broadcastHelper = new Broadcaster.BroadcastHelper(dimensionId);
     }
 
     public EntityVassal getEntity()
@@ -202,7 +205,8 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         if (msg instanceof MessageRequestWorkArea)
         {
             if (_workArea != null)
-                Broadcaster.postMessage(new MessageWorkArea(this, msg.getSender(), msg.getTransactionID(), _workArea));
+                _broadcastHelper.postMessage(
+                        new MessageWorkArea(this, msg.getSender(), msg.getTransactionID(), _workArea));
         }
     }
 
@@ -307,9 +311,9 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
             // TODO:  What if I am holding fuel?
             ItemStack held = getEntity().getHeldItem();
             if (held != null)
-                Broadcaster.postMessage(new MessageIsStorageAvailable(this, null, held.getItem(), 0, new ItemStackMatcher(held)));
+                _broadcastHelper.postMessage(new MessageIsStorageAvailable(this, null, held.getItem(), 0, new ItemStackMatcher(held)));
             else
-                Broadcaster.postMessage(new MessageWorkerAvailability(_entity.worldObj, this));
+                _broadcastHelper.postMessage(new MessageWorkerAvailability(_entity.worldObj, this));
 
             return State.ELICITING;
         }
@@ -508,7 +512,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
 
     private void requestWorkAreas()
     {
-        Broadcaster.postMessage(new MessageRequestWorkArea(this, null, _currentTask, 0));
+        _broadcastHelper.postMessage(new MessageRequestWorkArea(this, null, _currentTask, 0));
         _workArea = null;
         _workAreas.clear();
         _requestEndMS = System.currentTimeMillis() + REQUEST_TIMEOUT_MS;
@@ -729,6 +733,8 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         TARGETING,      // Fine grained movement
         PERFORMING      // Within distance of pos.
     }
+
+    private Broadcaster.BroadcastHelper _broadcastHelper;
 
     // Main state variable for the loop
     private State _state = State.IDLING;

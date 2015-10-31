@@ -33,11 +33,13 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
         if (worldIn != null && !worldIn.isRemote)
         {
             _quarry = new Quarry(worldIn);
+            _broadcastHelper = new Broadcaster.BroadcastHelper(worldIn.provider.getDimensionId());
         } else
         {
             if (_quarry != null)
                 _quarry.terminate();
             _quarry = null;
+            _broadcastHelper = null;
         }
     }
 
@@ -119,7 +121,7 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
             TRHarvest quarry = new TRHarvest(this, msg.getSender(), msg.getTransactionID(),
                     Priority.getQuarryItemHarvestValue(getWorld()),
                     TaskQuarry.class, msg.getMatcher(), 1);
-            Broadcaster.postMessage(quarry);
+            _broadcastHelper.postMessage(quarry);
         }
     }
 
@@ -148,7 +150,7 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
                     Priority.getStairBuilderValue(), stairsNeeded);
 
             _quarry.setNextAvailabilityResponseMS();
-            Broadcaster.postMessage(makeStair);
+            _broadcastHelper.postMessage(makeStair);
 
             // If we can do stairs, then we don't want to ask for anything else.
             return;
@@ -166,13 +168,13 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
                     value, TaskQuarry.class, new AnyItemMatcher(), 1);
 
             _quarry.setNextAvailabilityResponseMS();
-            Broadcaster.postMessage(quarry);
+            _broadcastHelper.postMessage(quarry);
             return;
         }
 
         // If we are here we need a worker to move us down one.
         _quarry.setNextAvailabilityResponseMS();
-        VassalUtils.postHarvestPlacePair(this, msg,
+        VassalUtils.postHarvestPlacePair(getWorld(), this, msg,
                 Priority.getQuarryMoveQuarryBlockValue(), Priority.getQuarryMoveQuarryBlockValue(),
                 new ItemStackMatcher(VassalMain.BLOCK_BEACON_QUARRY), getPos(), getPos().down(),
                 false);
@@ -202,6 +204,7 @@ public class TileEntityBeaconQuarry extends TileEntity implements IUpdatePlayerL
     }
 
     private Quarry _quarry;
+    private Broadcaster.BroadcastHelper _broadcastHelper;
 
     private int _radius = 3;
 

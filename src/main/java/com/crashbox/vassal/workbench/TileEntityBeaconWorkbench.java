@@ -157,12 +157,14 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory impleme
         if (worldIn != null && !worldIn.isRemote)
         {
             _workbench = new Workbench(worldIn);
+            _broadcastHelper = new Broadcaster.BroadcastHelper(worldIn.provider.getDimensionId());
         }
         else
         {
             if (_workbench != null)
                 _workbench.terminate();
             _workbench = null;
+            _broadcastHelper = null;
         }
     }
 
@@ -752,7 +754,7 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory impleme
                 TRPutInInventory req = new TRPutInInventory(TileEntityBeaconWorkbench.this,
                         msg.getSender(), msg.getTransactionID(),
                         Priority.getWorkbenchInventoryOutRequestValue(), matcher, 8);
-                Broadcaster.postMessage(req);
+                _broadcastHelper.postMessage(req);
                 return;
             }
 
@@ -763,7 +765,7 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory impleme
                 TRPutInInventory req = new TRPutInInventory(TileEntityBeaconWorkbench.this,
                         msg.getSender(), msg.getTransactionID(),
                         Priority.getWorkbenchInventoryLowRequestValue(), matcher, 8);
-                Broadcaster.postMessage(req);
+                _broadcastHelper.postMessage(req);
             }
         }
 
@@ -775,7 +777,7 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory impleme
                 TRPutInInventory req = new TRPutInInventory(TileEntityBeaconWorkbench.this,
                         msg.getSender(), msg.getTransactionID(),
                         Priority.getWorkbenchStorageAvailValue(), matcher, 32);
-                Broadcaster.postMessage(req);
+                _broadcastHelper.postMessage(req);
             }
         }
 
@@ -789,7 +791,7 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory impleme
                         msg.getSender(), msg.getTransactionID(),
                         Priority.getWorkbenchItemRequestValue(), new ItemStackMatcher(stack),
                         msg.getQuantity());
-                Broadcaster.postMessage(req);
+                _broadcastHelper.postMessage(req);
             }
         }
     }
@@ -843,6 +845,8 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory impleme
     private static final String NBT_TICKS_CRAFTED = "ticksCrafted";
 
     private Workbench _workbench;
+    private Broadcaster.BroadcastHelper _broadcastHelper;
+
     private static final Logger LOGGER = LogManager.getLogger();
 }
 

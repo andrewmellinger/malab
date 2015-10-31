@@ -91,12 +91,14 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
         if (worldIn != null && !worldIn.isRemote)
         {
             _furnace = new Furnace(worldIn);
+            _broadcastHelper = new Broadcaster.BroadcastHelper(worldIn.provider.getDimensionId());
         }
         else
         {
             if (_furnace != null)
                 _furnace.terminate();
             _furnace = null;
+            _broadcastHelper = null;
         }
     }
 
@@ -859,7 +861,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
 
                     TRGetFromInventory newReq = new TRGetFromInventory(TileEntityBeaconFurnace.this,
                             msg.getSender(), msg.getTransactionID(), 0, req.getMatcher(), qty);
-                    Broadcaster.postMessage(newReq);
+                    _broadcastHelper.postMessage(newReq);
                 }
             }
         }
@@ -880,7 +882,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
                         getSmeltableQuantityWanted());
 
                 LOGGER.debug("Furnace= " + getPos() + ", posting=" + req);
-                Broadcaster.postMessage(req);
+                _broadcastHelper.postMessage(req);
             }
         }
 
@@ -894,7 +896,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
                 TRPutInInventory req = new TRPutInInventory(TileEntityBeaconFurnace.this,
                         msg.getSender(), msg.getTransactionID(),
                         value, matcher, getFuelQuantityWanted());
-                Broadcaster.postMessage(req);
+                _broadcastHelper.postMessage(req);
             }
         }
 
@@ -930,7 +932,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
                             msg.getSender(), msg.getTransactionID(), 0, msg.getMatcher(),
                             free);
 
-                    Broadcaster.postMessage(req);
+                    _broadcastHelper.postMessage(req);
                 }
             }
         }
@@ -948,7 +950,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
                                 msg.getSender(), msg.getTransactionID(), 0, msg.getMatcher(),
                                 free);
 
-                        Broadcaster.postMessage(req);
+                        _broadcastHelper.postMessage(req);
                         break;
                     }
                 }
@@ -975,6 +977,8 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
     private float _maxRequestThreshold = 0.75F;
 
     private Furnace _furnace;
+    private Broadcaster.BroadcastHelper _broadcastHelper;
+
     private static final Logger LOGGER = LogManager.getLogger();
 }
 

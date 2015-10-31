@@ -24,6 +24,7 @@ public class TaskPair implements ITask
     public TaskPair(EntityAIVassal entityAI)
     {
         _entityAI = entityAI;
+        _broadcastHelper = new Broadcaster.BroadcastHelper(_entityAI.getEntity().getEntityWorld().provider.getDimensionId());
     }
 
     public TaskAcquireBase getAcquireTask()
@@ -80,7 +81,7 @@ public class TaskPair implements ITask
             // If we are holding the right thing, just deliver it
             if (held == null || !getDeliverTask().getMatcher().matches(held))
             {
-                Broadcaster.postMessage(new MessageItemRequest(_entityAI, null, this, getDeliverTask().getMatcher(),
+                _broadcastHelper.postMessage(new MessageItemRequest(_entityAI, null, this, getDeliverTask().getMatcher(),
                         getDeliverTask().getQuantity()));
                 setResolving(Resolving.RESOLVING);
                 return false;
@@ -90,7 +91,7 @@ public class TaskPair implements ITask
         // We accepted an acquire before deliver.  So a really full chest or orchard
         if (getAcquireTask() != null && getDeliverTask() == null)
         {
-            Broadcaster.postMessage(new MessageIsStorageAvailable(_entityAI, null, this, 0, getAcquireTask().getMatcher()));
+            _broadcastHelper.postMessage(new MessageIsStorageAvailable(_entityAI, null, this, 0, getAcquireTask().getMatcher()));
             setResolving(Resolving.RESOLVING);
             return false;
         }
@@ -159,7 +160,7 @@ public class TaskPair implements ITask
     private void sendHeartbeatFor(TaskBase task, long expire)
     {
         //LOGGER.debug(_entityAI.getEntity().getCustomNameTag() + " sending heartbeat to=" + task.getRequester() + ", for=" + task);
-        Broadcaster.postMessage(new MessageWorkingHeartbeat(_entityAI, task.getRequester(), task, expire));
+        _broadcastHelper.postMessage(new MessageWorkingHeartbeat(_entityAI, task.getRequester(), task, expire));
     }
 
     public void start()
@@ -380,6 +381,8 @@ public class TaskPair implements ITask
 
     // Back reference to the entityAI.
     private final EntityAIVassal    _entityAI;
+    private final Broadcaster.BroadcastHelper _broadcastHelper;
+
     private boolean                 _repeat;
 
     private Stage                   _stage = Stage.EMPTYING;

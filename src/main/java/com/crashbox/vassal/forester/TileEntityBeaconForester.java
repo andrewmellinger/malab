@@ -41,6 +41,7 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
         if (worldIn != null && !worldIn.isRemote)
         {
             _forester = new Forester(worldIn);
+            _broadcastHelper = new Broadcaster.BroadcastHelper(worldIn.provider.getDimensionId());
         }
         else
         {
@@ -161,7 +162,7 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
                     TaskHarvestTree.class, msg.getMatcher(), msg.getQuantity());
 
             debugLog("Forest has item at=" + foundPos + ", for=" + req);
-            Broadcaster.postMessage(req);
+            _broadcastHelper.postMessage(req);
         }
     }
 
@@ -190,7 +191,7 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
                     msg.getSender(), msg.getTransactionID(), true, pickupRequest, plantRequest);
 
 //                    //LOGGER.debug("Posting request: " + req);
-            Broadcaster.postMessage(pairRequest);
+            _broadcastHelper.postMessage(pairRequest);
             return;
         }
 
@@ -220,7 +221,7 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
                     TaskHarvestTree.class, new ItemStackMatcher(sample), -1);
 
             debugLog("-- posting request: " + req);
-            Broadcaster.postMessage(req);
+            _broadcastHelper.postMessage(req);
         }
     }
 
@@ -243,7 +244,7 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
                     msg.getSender(), msg.getTransactionID(), Priority.getForesterStorageSaplingPlantValue());
 
             LOGGER.debug("-- posting PLANTING: " + plantRequest);
-            Broadcaster.postMessage(plantRequest);
+            _broadcastHelper.postMessage(plantRequest);
         }
     }
 
@@ -267,6 +268,7 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
     }
 
     private Forester _forester;
+    private Broadcaster.BroadcastHelper _broadcastHelper;
     private int _searchRadius = 5;
     private int _searchHeight = 10;
     private static final Logger LOGGER = LogManager.getLogger();

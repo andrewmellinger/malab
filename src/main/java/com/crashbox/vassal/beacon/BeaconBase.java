@@ -24,7 +24,7 @@ public abstract class BeaconBase
         if (!world.isRemote)
         {
             _listener = new Listener();
-            Broadcaster.getInstance().subscribe(_listener);
+            Broadcaster.getInstance().subscribe(_listener, world.provider.getDimensionId());
         }
     }
 

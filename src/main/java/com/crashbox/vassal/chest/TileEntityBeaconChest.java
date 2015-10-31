@@ -4,7 +4,6 @@ import com.crashbox.vassal.ai.Priority;
 import com.crashbox.vassal.beacon.BeaconBase;
 import com.crashbox.vassal.messaging.*;
 import com.crashbox.vassal.beacon.TileEntityBeaconInventory;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
@@ -12,12 +11,9 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.Arrays;
 
 
 /**
@@ -52,12 +48,14 @@ public class TileEntityBeaconChest extends TileEntityBeaconInventory implements 
         if (worldIn != null && !worldIn.isRemote)
         {
             _chest = new Chest(worldIn);
+            _broadcastHelper = new Broadcaster.BroadcastHelper(worldIn.provider.getDimensionId());
         }
         else
         {
             if (_chest != null)
                 _chest.terminate();
             _chest = null;
+            _broadcastHelper = null;
         }
     }
 
@@ -442,7 +440,7 @@ public class TileEntityBeaconChest extends TileEntityBeaconInventory implements 
                             msg.getTransactionID(), Priority.getChestStorageAvailValue(), msg.getMatcher(), 1);
 
                     LOGGER.debug("Posting: " + req);
-                    Broadcaster.postMessage(req);
+                    _broadcastHelper.postMessage(req);
                     return;
                 }
             }
@@ -457,7 +455,7 @@ public class TileEntityBeaconChest extends TileEntityBeaconInventory implements 
                             msg.getTransactionID(), Priority.getChestStorageAvailValue(), msg.getMatcher(), 1);
 
                     LOGGER.debug("Posting: " + req);
-                    Broadcaster.postMessage(req);
+                    _broadcastHelper.postMessage(req);
                     return;
                 }
             }
@@ -477,7 +475,7 @@ public class TileEntityBeaconChest extends TileEntityBeaconInventory implements 
                             msg.getQuantity());
 
                     LOGGER.debug("Chest advertising it has item: " + msg.getMatcher());
-                    Broadcaster.postMessage(req);
+                    _broadcastHelper.postMessage(req);
                     return;
                 }
             }
@@ -485,6 +483,7 @@ public class TileEntityBeaconChest extends TileEntityBeaconInventory implements 
     }
 
     private Chest _chest;
+    private Broadcaster.BroadcastHelper _broadcastHelper;
     private static final Logger LOGGER = LogManager.getLogger();
 }
 

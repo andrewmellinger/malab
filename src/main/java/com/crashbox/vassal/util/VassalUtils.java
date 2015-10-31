@@ -713,13 +713,13 @@ public class VassalUtils
         if (item != null)
         {
             Broadcaster.postMessage(new TRPickup(sender, msg.getSender(), msg.getTransactionID(),
-                    Priority.getGenericCleanUpTaskValue(), -1, item));
+                    Priority.getGenericCleanUpTaskValue(), -1, item), world.provider.getDimensionId());
             return true;
         }
         return false;
     }
 
-    public static void postHarvestPlacePair(IMessager sender, Message msg,
+    public static void postHarvestPlacePair(World world, IMessager sender, Message msg,
                                             int acquirePriority, int deliverPriority,
                                             ItemStackMatcher matcher, BlockPos srcPos, BlockPos dstPos,
                                             boolean repeat)
@@ -732,7 +732,7 @@ public class VassalUtils
 
         MessageTaskPairRequest pair = new MessageTaskPairRequest(sender, msg.getSender(), msg.getTransactionID(),
                 repeat, harvest, place);
-        Broadcaster.postMessage(pair);
+        Broadcaster.postMessage(pair, world.provider.getDimensionId());
 
     }
 

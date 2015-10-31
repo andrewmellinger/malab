@@ -4,7 +4,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Copyright 2015 Andrew O. Mellinger
@@ -21,17 +23,24 @@ public class Broadcaster
         return BROADCASTER;
     }
 
-    public static void postMessage(Message message)
+    public static void postMessage(Message message, int dimensionID)
     {
-        getInstance().broadcastSync(message);
+        getInstance().broadcastSync(message, dimensionID);
     }
 
-    public void subscribe(IListener listener)
+    public void subscribe(IListener listener, int dimensionId)
     {
         synchronized (_lock)
         {
-            if (!_listeners.contains(listener))
-                _listeners.add(listener);
+            List<IListener> listeners = _listeners.get(dimensionId);
+            if (listeners == null)
+            {
+                listeners = new ArrayList<IListener>();
+                _listeners.put(dimensionId, listeners);
+            }
+
+            if (!listeners.contains(listener))
+                listeners.add(listener);
         }
     }
 
@@ -39,20 +48,27 @@ public class Broadcaster
     {
         synchronized (_lock)
         {
-            _listeners.remove(listener);
+            for (List<IListener> listeners : _listeners.values())
+            {
+                listeners.remove(listener);
+            }
         }
     }
 
     /**
      * This is synchronous!
      * @param message The message to send.
+     * @param dimensionId The dimension we are targeting
      */
-    public void broadcastSync(Message message)
+    public void broadcastSync(Message message, int dimensionId)
     {
         List<IListener> listeners;
         synchronized (_lock)
         {
-            listeners = new ArrayList<IListener>(_listeners);
+            List<IListener> tmp = _listeners.get(dimensionId);
+            if (tmp == null)
+                return;
+            listeners = new ArrayList<IListener>(tmp);
         }
 
         for (IListener tmp : listeners)
@@ -61,12 +77,29 @@ public class Broadcaster
         }
     }
 
+    public static class BroadcastHelper
+    {
+        public BroadcastHelper(int dimensionId)
+        {
+            _dimensionId = dimensionId;
+            _broadcaster = Broadcaster.getInstance();
+        }
+
+        public void postMessage(Message message)
+        {
+            _broadcaster.broadcastSync(message, _dimensionId);
+        }
+
+        private Broadcaster _broadcaster;
+        private final int _dimensionId;
+    }
+
     //-------------------------------------------------------------------------
 
     // TODO: Make listener list weak
     private final Object _lock = new Object();
-    private final List<IListener> _listeners = new ArrayList<IListener>();
 
+    private Map<Integer, List<IListener>> _listeners = new HashMap<Integer, List<IListener>>();
     private static Broadcaster BROADCASTER;
 
     private static final Logger LOGGER = LogManager.getLogger();
