@@ -14,11 +14,13 @@ In Vassal there are two types of robots, mobile ( moving ) and fixed ( still ). 
 
 # Vassal #
 
-The vassals are charcoal/coal powered mobile robots. They actually determine what work to do from beacon's requests, and perform the work. They require a source of fuel such as charcoal and will automatically refuel themselves from available sources.       ( like chests or furnace output ) If they run out of fuel they will work very slowly and emit spell-like particles. 
+The Vassals are mobile robots that do the actual block breaking and carrying. They solicit the work from the beacon's requests, select the most appropriate task and perform the work. They can only interact with beacons and will not interact with normal inventories or other mods.  
 
-They can only interact with beacons and will not interact with normal inventories or other mods.  
+The vassals are charcoal or coal powered. They require a source of fuel such as charcoal and will automatically refuel themselves from available sources ( such as chests or furnace output ). If they run out of fuel they will work very slowly and emit spell-like particles. 
 
-Vassals may be interacted with by right clicking on them. From the inventory you may remove what is in their hands, adjust their fuel, or see how much run time they have left before consuming another piece of fuel. Activating the Vassal interface will cause the Vassal to stop the current task. This can also be used to "reset" a Vassal should it get stuck or have problems it cannot fix by itself. There is also a "follow me" slot.  If redstone is placed in this slot, the robot will follow the player that placed redstone in the slot.  If a Vassal takes damage it will self-heal between tasks, emitting a enchanting table particle effect.
+Vassals may be interacted with by right clicking on them. From the inventory you may remove what is in their hands, adjust their fuel, or see how much run time they have left before consuming another piece of fuel. Activating the Vassal interface will cause the Vassal to stop the current task. This can also be used to "reset" a Vassal should it get stuck or have problems it cannot fix by itself. There is also a "follow me" slot.  If redstone is placed in this slot, the robot will follow the player that placed redstone in the slot. 
+
+If a Vassal takes damage it will self-heal between tasks, emitting a enchanting table particle effect.  The vassal will consume a significant amount of fuel while healing, roughly six times what they do when working or moving.
 
 Constructing a Vassal is similar to constructing a snowman.  Place a piston on the ground, a furnace on top of that, then a vassal head in top of that.  The recipe for a Vassal head is:
 
