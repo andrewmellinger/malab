@@ -190,7 +190,10 @@ public class Priority
             if (task.resolve())
             {
                 int value = task.getValue(speed);
-                if (value > bestValue)
+
+                // If the value is better than what we had AND not total junk, try it out.
+                // -100 is arbitrary, mostly it keeps us from going too far.
+                if (value > bestValue && value > -100)
                 {
                     bestValue = value;
                     bestTask = task;
@@ -242,7 +245,7 @@ public class Priority
         return (int) ((remain/space) * 10);
     }
 
-    public static int computeDistanceCost(World world, BlockPos endPos, double speed, BlockPos startPos)
+    public static int computeDistanceCost(BlockPos endPos, double speed, BlockPos startPos)
     {
         // 1 point for every 5 blocks for a normal zombie.  In the future we
         // will compute seconds.
@@ -250,15 +253,13 @@ public class Priority
         // 54 / 1.25 -> 43.2 /4 = 10.8
 //        return (int) (( Math.sqrt(startPos.distanceSq(endPos)) / speed ) / 4D);
 
-        // We don't want to do this.
-        int longestDistance = getLongestDistance(world);
-        if (VassalUtils.sqDistXZ(startPos, endPos) > ( longestDistance * longestDistance ))
-        {
-            //LOGGER.debug("distanceSq=" + startPos.distanceSq(endPos) +", longest=" + longestDistance);
-            return Integer.MAX_VALUE;
-        }
-
         return (int) (( Math.sqrt(startPos.distanceSq(endPos)) / speed ) / 2D);
+    }
+
+    public static boolean outOfRange(World world, BlockPos startPos, BlockPos endPos)
+    {
+        int longestDistance = getLongestDistance(world);
+        return VassalUtils.sqDistXZ(startPos, endPos) > ( longestDistance * longestDistance );
     }
 
     private static final Logger LOGGER = LogManager.getLogger();

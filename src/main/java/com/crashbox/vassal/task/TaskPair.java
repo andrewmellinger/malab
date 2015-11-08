@@ -72,6 +72,9 @@ public class TaskPair implements ITask
         if (getResolving() == Resolving.RESOLVING)
             return false;
 
+        if (getResolving() == Resolving.CANT_RESOLVE)
+            return false;
+
         // If we have a deliver we need to make sure we have the item
         ItemStack held = _entityAI.getEntity().getHeldItem();
 
@@ -94,6 +97,28 @@ public class TaskPair implements ITask
             _broadcastHelper.postMessage(new MessageIsStorageAvailable(_entityAI, null, this, 0, getAcquireTask().getMatcher()));
             setResolving(Resolving.RESOLVING);
             return false;
+        }
+
+        // Check distances
+        BlockPos startPos = _entityAI.getBlockPos();
+        if (getAcquireTask() != null)
+        {
+            if (Priority.outOfRange(getWorld(), startPos, getAcquireTask().getWorkCenter()))
+            {
+                // Too far
+                setResolving(Resolving.CANT_RESOLVE);
+                return false;
+            }
+            startPos = getAcquireTask().getWorkCenter();
+        }
+        if (getDeliverTask() != null)
+        {
+            if (Priority.outOfRange(getWorld(), startPos, getDeliverTask().getWorkCenter()))
+            {
+                // Too far
+                setResolving(Resolving.CANT_RESOLVE);
+                return false;
+            }
         }
 
         // Everybody is good, we don't need anything
@@ -120,7 +145,7 @@ public class TaskPair implements ITask
 
         if (_acquireTask != null)
         {
-            int cost = Priority.computeDistanceCost(getWorld(), _acquireTask.getWorkCenter(), speed, pos);
+            int cost = Priority.computeDistanceCost(_acquireTask.getWorkCenter(), speed, pos);
             int val = _acquireTask.getValue();
             pos = _acquireTask.getWorkCenter();
             msg += ", acquire=" + _acquireTask.getClass().getSimpleName() +
@@ -132,7 +157,7 @@ public class TaskPair implements ITask
 
         if (_deliverTask != null)
         {
-            int cost = Priority.computeDistanceCost(getWorld(), _deliverTask.getWorkCenter(), speed, pos);
+            int cost = Priority.computeDistanceCost(_deliverTask.getWorkCenter(), speed, pos);
             int val = _deliverTask.getValue();
             msg += ", deliver=" + _deliverTask.getClass().getSimpleName() +
                    ", pos=" + _deliverTask.getWorkCenter() +
@@ -350,7 +375,7 @@ public class TaskPair implements ITask
         // Move helper
         for (T msg : responses)
         {
-            int value = msg.getValue() - Priority.computeDistanceCost(getWorld(), msg.getSender().getBlockPos(), _entityAI.getEntity().getSpeedFactor(), pos
+            int value = msg.getValue() - Priority.computeDistanceCost(msg.getSender().getBlockPos(), _entityAI.getEntity().getSpeedFactor(), pos
             );
             //LOGGER.debug("findBest: task=" + this + ", cost=" + value + ", msg=" + msg);
             if (value > bestValue)
