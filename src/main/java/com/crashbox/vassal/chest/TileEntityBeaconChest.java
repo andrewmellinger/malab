@@ -15,24 +15,11 @@ import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-
 /**
  * Copyright 2015 Andrew O. Mellinger
  */
 public class TileEntityBeaconChest extends TileEntityBeaconInventory implements IInventory
 {
-    // All the things that we contain
-    private ItemStack[] _itemStacks = new ItemStack[27];
-
-    // State trackers
-    private String _customName;
-
-    public static final String NAME = "tileEntityBeaconChest";
-
-    private static final String NBT_ITEMS = "Items";
-    private static final String NBT_SLOT = "Slot";
-    private static final String NBT_CUSTOM_NAME = "CustomName";
-
     //=============================================================================================
     // ##### ##### #     ##### ##### #   # ##### ##### ##### #   #
     //   #     #   #     #     #     ##  #   #     #     #    # #
@@ -165,13 +152,9 @@ public class TileEntityBeaconChest extends TileEntityBeaconInventory implements 
     public boolean isItemValidForSlot(int index, ItemStack stack)
     {
         // All slots are valid
-        if (_itemStacks[index] == null)
-            return true;
-
-        if (_itemStacks[index].stackSize >= _itemStacks[index].getMaxStackSize())
-            return false;
-
-        return _itemStacks[index].isItemEqual(stack);
+        return _itemStacks[index] == null ||
+                _itemStacks[index].stackSize < _itemStacks[index].getMaxStackSize() &&
+                        _itemStacks[index].isItemEqual(stack);
     }
 
     @Override
@@ -433,9 +416,9 @@ public class TileEntityBeaconChest extends TileEntityBeaconInventory implements 
         {
             // First look for existing
             LOGGER.debug("Looking for existing");
-            for (int slotNum = 0; slotNum < _itemStacks.length; ++slotNum)
+            for (ItemStack itemStack : _itemStacks)
             {
-                if (_itemStacks[slotNum] != null && msg.getMatcher().matches(_itemStacks[slotNum]))
+                if (itemStack != null && msg.getMatcher().matches(itemStack))
                 {
                     TRPutInInventory req = new TRPutInInventory(TileEntityBeaconChest.this, msg.getSender(),
                             msg.getTransactionID(), Priority.getChestStorageAvailValue(), msg.getMatcher(), 64);
@@ -482,6 +465,18 @@ public class TileEntityBeaconChest extends TileEntityBeaconInventory implements 
             }
         }
     }
+
+    // All the things that we contain
+    private ItemStack[] _itemStacks = new ItemStack[27];
+
+    // State trackers
+    private String _customName;
+
+    public static final String NAME = "tileEntityBeaconChest";
+
+    private static final String NBT_ITEMS = "Items";
+    private static final String NBT_SLOT = "Slot";
+    private static final String NBT_CUSTOM_NAME = "CustomName";
 
     private Chest _chest;
     private Broadcaster.BroadcastHelper _broadcastHelper;

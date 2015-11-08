@@ -13,15 +13,12 @@ import org.apache.logging.log4j.Logger;
 
 /**
  * Copyright 2015 Andrew O. Mellinger
+ * <p>
+ * The GUI for the beacon chest.  Pretty much identical to the normal chest.
  */
 @SideOnly(Side.CLIENT)
 public class GuiBeaconChest extends GuiContainer
 {
-    private static final ResourceLocation guiTexture =
-            new ResourceLocation(VassalMain.MODID +":textures/gui/container/beaconChest.png");
-
-    private final InventoryPlayer _inventoryPlayer;
-    private final IInventory _tileBeacon;
 
     public GuiBeaconChest(InventoryPlayer parInventoryPlayer,
             IInventory parInventoryGrinder)
@@ -67,6 +64,12 @@ public class GuiBeaconChest extends GuiContainer
                 ", tileBeacon=" + _tileBeacon +
                 '}';
     }
+
+    private static final ResourceLocation guiTexture =
+            new ResourceLocation(VassalMain.MODID +":textures/gui/container/beaconChest.png");
+
+    private final InventoryPlayer _inventoryPlayer;
+    private final IInventory _tileBeacon;
 
     private static final Logger LOGGER = LogManager.getLogger();
 }

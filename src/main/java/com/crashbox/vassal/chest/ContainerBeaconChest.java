@@ -6,8 +6,6 @@ import net.minecraft.inventory.*;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  * Copyright 2015 Andrew O. Mellinger
@@ -105,8 +103,6 @@ public class ContainerBeaconChest extends Container
     @Override
     public ItemStack transferStackInSlot(EntityPlayer playerIn, int slotIndex)
     {
-        // Look at chest
-
         ItemStack itemStack = null;
         Slot slot = (Slot)inventorySlots.get(slotIndex);
 
@@ -115,51 +111,29 @@ public class ContainerBeaconChest extends Container
             ItemStack itemStack1 = slot.getStack();
             itemStack = itemStack1.copy();
 
-            if (slotIndex < 27)
+            if (slotIndex < _sizeInventory)
             {
-                if (!this.mergeItemStack(itemStack1, 27, this.inventorySlots.size(), true))
+                if (!this.mergeItemStack(itemStack1, _sizeInventory, this.inventorySlots.size(), true))
                 {
                     return null;
                 }
             }
-            else if (!this.mergeItemStack(itemStack1, 0, 27, false))
+            else if (!this.mergeItemStack(itemStack1, 0, _sizeInventory, false))
             {
                 return null;
             }
 
             if (itemStack1.stackSize == 0)
-            {
-                slot.putStack((ItemStack)null);
-            }
+                slot.putStack(null);
             else
-            {
                 slot.onSlotChanged();
-            }
 
+            if (itemStack1.stackSize == itemStack.stackSize)
+                return null;
 
-//            ItemStack itemStack2 = slot.getStack();
-//            itemStack1 = itemStack2.copy();
-//
-//            if (!mergeItemStack(itemStack2, _sizeInventory, _sizeInventory + 36, false))
-//            {
-//                return null;
-//            }
-//
-//            if (itemStack2.stackSize == 0)
-//                slot.putStack((ItemStack)null);
-//            else
-//                slot.onSlotChanged();
-//
-//            if (itemStack2.stackSize == itemStack1.stackSize)
-//                return null;
-//
-//            slot.onPickupFromSlot(playerIn, itemStack2);
+            slot.onPickupFromSlot(playerIn, itemStack1);
         }
 
-//        return itemStack1;
         return itemStack;
     }
-
-    private static final Logger LOGGER = LogManager.getLogger();
-
 }
