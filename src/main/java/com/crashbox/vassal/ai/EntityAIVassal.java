@@ -344,7 +344,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
         if (System.currentTimeMillis() > _requestEndMS)
         {
 //            debugLog("Selecting from (" + _proposedTasks.size() + ") tasks.");
-            _currentTask = Priority.selectBestTask(getEntity().getPosition(), _proposedTasks, getEntity().getSpeedFactor());
+            _currentTask = Priority.selectBestTask(_proposedTasks, getEntity().getSpeedFactor());
             _proposedTasks.clear();
 
             if (_currentTask != null)
@@ -475,9 +475,6 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
                 return State.IDLING;
             }
 
-//            LOGGER.debug(id() + " Determining work area and redirecting: " + _workArea + " currently at: " +
-//                    getBlockPos());
-            _workAreaAttempt = 0;
             tryMoveTo(_workArea);
         }
 
@@ -491,19 +488,6 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
             else
             {
                 return State.IDLING;
-//                if (_workAreaAttempt == 3)
-//                {
-//                    debugLog("Failed to move to work area. IDLING. Distance: " +
-//                            VassalUtils.sqDistXZ(getEntity().getPosition(), _workArea));
-//                    _currentTask = null;
-//                    return State.IDLING;
-//                }
-//                else
-//                {
-//                    debugLog("Failed to move to work area. TRYING AGAIN.");
-//                    _workAreaAttempt++;
-//                    tryMoveTo(_workArea);
-//                }
             }
         }
 
@@ -768,7 +752,6 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
 
     // For Targeting
     private BlockPos _workArea = null;
-    private int _workAreaAttempt;
 
     private final List<ITask> _proposedTasks = new ArrayList<ITask>();
 

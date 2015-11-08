@@ -5,29 +5,27 @@ import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.pathfinding.PathNavigate;
 import net.minecraft.pathfinding.PathNavigateGround;
-import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.world.World;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  * Copyright 2015 Andrew O. Mellinger
+ * <p>
+ * This AI module is used to make the entity follow a specific player.  It is designed
+ * to work with the vassal bot, which exposes the "getFollowPlayer" function.
+ * The bot will try to keep up, but will stop moving if gets too close as to prevent
+ * "crowding."
  */
 public class EntityAIFollowPlayer extends EntityAIBase
 {
     private final EntityVassal _vassal;
-    private final World _world;
     private EntityPlayer _player;
     private PathNavigate _botPathfinder;
     private final double _maxDistSq;
     private final double _minDistSq;
     private int _tickCounter;
-    //private boolean field_75344_i;
 
     public EntityAIFollowPlayer(EntityVassal vassal, float minDist, float maxDist)
     {
         _vassal = vassal;
-        _world = vassal.worldObj;
         _botPathfinder = vassal.getNavigator();
         _minDistSq = minDist * minDist;
         _maxDistSq = maxDist * maxDist;
@@ -62,7 +60,6 @@ public class EntityAIFollowPlayer extends EntityAIBase
     public void startExecuting()
     {
         _tickCounter = 0;
-//        field_75344_i = ((PathNavigateGround)_vassal.getNavigator()).func_179689_e();
         ((PathNavigateGround)_vassal.getNavigator()).func_179690_a(false);
     }
 
@@ -135,6 +132,4 @@ public class EntityAIFollowPlayer extends EntityAIBase
 //            }
         }
     }
-
-    private static final Logger LOGGER = LogManager.getLogger();
 }

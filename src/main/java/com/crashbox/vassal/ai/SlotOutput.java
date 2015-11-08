@@ -62,28 +62,19 @@ public class SlotOutput extends Slot
         if (!thePlayer.worldObj.isRemote)
         {
             int expEarned = _numOutput;
-//            float expFactor = GrinderRecipes.instance()
-//                    .getGrindingExperience(parItemStack);
             float expFactor = 1.0F;
 
-            if (expFactor == 0.0F)
-            {
-                expEarned = 0;
-            }
-            else if (expFactor < 1.0F)
-            {
-                int possibleExpEarned = MathHelper.floor_float(
-                        expEarned * expFactor);
+            int possibleExpEarned = MathHelper.floor_float(
+                    expEarned * expFactor);
 
-                if (possibleExpEarned < MathHelper.ceiling_float_int(
-                        expEarned*expFactor)
-                        && Math.random() < expEarned*expFactor-possibleExpEarned)
-                {
-                    ++possibleExpEarned;
-                }
-
-                expEarned = possibleExpEarned;
+            if (possibleExpEarned < MathHelper.ceiling_float_int(
+                    expEarned*expFactor)
+                    && Math.random() < expEarned*expFactor-possibleExpEarned)
+            {
+                ++possibleExpEarned;
             }
+
+            expEarned = possibleExpEarned;
 
             // create experience orbs
             int expInOrb;
@@ -99,12 +90,5 @@ public class SlotOutput extends Slot
         }
 
         _numOutput = 0;
-
-        // You can trigger achievements here based on output
-        // E.g. if (parItemStack.getItem() == Items.grinded_fish)
-        //      {
-        //          thePlayer.triggerAchievement(AchievementList.grindFish);
-        //      }
     }
-
 }

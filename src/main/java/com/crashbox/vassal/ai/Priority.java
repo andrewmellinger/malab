@@ -3,12 +3,9 @@ package com.crashbox.vassal.ai;
 import com.crashbox.vassal.task.ITask;
 import com.crashbox.vassal.util.VassalUtils;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 
@@ -22,27 +19,6 @@ public class Priority
 
 
     private static final int QUARRY_MOVE_QUARRY_BLOCK_VALUE = 20;
-
-    private static int GENERIC_CLEAN_UP_TASK_VALUE = 0;
-
-    private static int STAIR_BUILDER_VALUE = 10;
-
-    private static int FORESTER_PICKUP_SAPLING_VALUE = 10;
-    private static int FORESTER_PLANT_SAPLING_VALUE = 10;
-
-    private static int FORESTER_STORAGE_SAPLING_PLANT_VALUE = 20;
-    private static int CHEST_STORAGE_AVAIL_VALUE = 0;
-
-    private static int CHEST_ITEM_AVAIL_VALUE = 0;
-
-    private static int WORKBENCH_INVENTORY_OUT_REQUEST_VALUE = 40;
-    private static int WORKBENCH_INVENTORY_LOW_REQUEST_VALUE = 20;
-
-    private static int WORKBENCH_ITEM_REQUEST_VALUE = 0;
-    private static int WORKBENCH_STORAGE_AVAIL_VALUE = 0;
-
-    private static int FURNACE_ASK_THRESHOLD = 8;
-    private static int FURNACE_FUEL_PIECES_PER_PLUS = 5;
 
     private static final String MAX_DISTANCE = "vassal.distance";
 
@@ -116,67 +92,66 @@ public class Priority
 
     public static int getStairBuilderValue()
     {
-        return STAIR_BUILDER_VALUE;
+        return 10;
     }
 
     public static int getForesterPickupSaplingValue()
     {
-        return FORESTER_PICKUP_SAPLING_VALUE;
+        return 10;
     }
 
     public static int getForesterPlantSaplingValue()
     {
-        return FORESTER_PLANT_SAPLING_VALUE;
+        return 10;
     }
 
     public static int getGenericCleanUpTaskValue()
     {
-        return GENERIC_CLEAN_UP_TASK_VALUE;
+        return 0;
     }
 
     public static int getForesterStorageSaplingPlantValue()
     {
-        return FORESTER_STORAGE_SAPLING_PLANT_VALUE;
+        return 20;
     }
 
     public static int getChestStorageAvailValue()
     {
-        return CHEST_STORAGE_AVAIL_VALUE;
+        return 0;
     }
 
     public static int getChestItemAvailValue()
     {
-        return CHEST_ITEM_AVAIL_VALUE;
+        return 0;
     }
 
     public static int getWorkbenchInventoryOutRequestValue()
     {
-        return WORKBENCH_INVENTORY_OUT_REQUEST_VALUE;
+        return 40;
     }
 
     public static int getWorkbenchInventoryLowRequestValue()
     {
-        return WORKBENCH_INVENTORY_LOW_REQUEST_VALUE;
+        return 20;
     }
 
     public static int getWorkbenchItemRequestValue()
     {
-        return WORKBENCH_ITEM_REQUEST_VALUE;
+        return 0;
     }
 
     public static int getWorkbenchStorageAvailValue()
     {
-        return WORKBENCH_STORAGE_AVAIL_VALUE;
+        return 0;
     }
 
     /**
      * From a list of task pairs, select the best one based on this position.
-     * @param pos The current position.
      * @param tasks The list of tasks.
      * @param speed How fast the entity moves.
      * @return The best task.
      */
-    public static ITask selectBestTask(BlockPos pos, List<ITask> tasks, double speed)
+    public static ITask selectBestTask(List<ITask> tasks, double speed)
     {
         int bestValue = Integer.MIN_VALUE;
         ITask bestTask = null;
@@ -225,11 +200,11 @@ public class Priority
             return 100;
 
         int current = fuelStack.stackSize;
-        if (current > FURNACE_ASK_THRESHOLD)
+        if (current > 8)
             return 0;
 
 
-        return (FURNACE_ASK_THRESHOLD - current)/FURNACE_FUEL_PIECES_PER_PLUS;
+        return (8 - current)/ 5;
     }
 
     public static int inventoryPressure(int current, int max)
@@ -262,5 +237,4 @@ public class Priority
         return VassalUtils.sqDistXZ(startPos, endPos) > ( longestDistance * longestDistance );
     }
 
-    private static final Logger LOGGER = LogManager.getLogger();
 }

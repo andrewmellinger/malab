@@ -8,9 +8,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.server.gui.IUpdatePlayerListBox;
 import net.minecraft.tileentity.TileEntityLockable;
 import net.minecraft.util.BlockPos;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 
 /**
  * Copyright 2015 Andrew O. Mellinger
@@ -19,7 +16,9 @@ public abstract class TileEntityBeaconInventory extends TileEntityLockable imple
         IMessager
 {
     /**
-     * Puts the contents of the stack into the inventory.
+     * Puts the contents of the stack into the inventory.  Similar to the container
+     * "mergeIntoSlot" api, but is used for things that don't get a container
+     * such as directly to the tile entity.
      * @param stack The contents to put in.
      * @return The remainder or null.
      */
@@ -27,15 +26,11 @@ public abstract class TileEntityBeaconInventory extends TileEntityLockable imple
     {
         // First try to fill loaded slots, then go back
         // and put rest into empty.
-        //LOGGER.debug("mergeIntoBestSlot: stack=" + stack);
-
         int firstEmpty = -1;
         for (int i : getInputSlots())
         {
-            //LOGGER.debug("-> checking slot:" + i);
             if (isItemValidForSlot(i, stack))
             {
-                //LOGGER.debug("---> item valid");
                 ItemStack current = getStackInSlot(i);
                 if ( current == null)
                 {
@@ -53,10 +48,6 @@ public abstract class TileEntityBeaconInventory extends TileEntityLockable imple
                     }
                 }
             }
-//            else
-//            {
-//                LOGGER.debug("---> item NOT valid");
-//            }
         }
 
         if (firstEmpty != -1)
@@ -68,14 +59,12 @@ public abstract class TileEntityBeaconInventory extends TileEntityLockable imple
         return stack;
     }
 
-
     public ItemStack extractItems(ItemStackMatcher matcher, int wanted)
     {
         ItemStack returnStack = null;
         for (int i : getOutputSlots())
         {
             ItemStack stack = getStackInSlot(i);
-            //LOGGER.debug("extractItems: slot=" + i + ", stack=" + stack);
             if (matcher.matches(stack))
             {
                 if (returnStack == null)
@@ -114,11 +103,16 @@ public abstract class TileEntityBeaconInventory extends TileEntityLockable imple
         return getPos();
     }
 
+    /**
+     * @return Indexes of all available output slots.
+     */
     public abstract int[] getOutputSlots();
 
+    /**
+     * @return Indexes of all available input slots.
+     */
     public abstract int[] getInputSlots();
 
-    private static final Logger LOGGER = LogManager.getLogger();
 }
 
 

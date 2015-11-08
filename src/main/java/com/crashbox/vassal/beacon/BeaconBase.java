@@ -4,8 +4,6 @@ import com.crashbox.vassal.ai.Priority;
 import com.crashbox.vassal.util.VassalUtils;
 import com.crashbox.vassal.messaging.*;
 import net.minecraft.world.World;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -94,13 +92,6 @@ public abstract class BeaconBase
         // Prune the list
         ageOutWorkerList();
 
-        // If we have fewer than the amount we want, then let's get rid of them.
-//        if (_lastHeartbeat.size() >= concurrentWorkerCount())
-//        {
-//            LOGGER.debug("Not responding to availability. size=" + _lastHeartbeat.size() +
-//                    ", max=" + concurrentWorkerCount());
-//        }
-
         return _lastHeartbeat.size() < concurrentWorkerCount();
     }
 
@@ -116,7 +107,6 @@ public abstract class BeaconBase
             Map.Entry<IMessager, Long> next =  iter.next();
             if (now > next.getValue())
             {
-//                LOGGER.debug("Aged out: " + next.getKey());
                 iter.remove();
             }
         }
@@ -166,7 +156,5 @@ public abstract class BeaconBase
 
     // A list of the people we have working on our project.
     private final Map<IMessager, Long> _lastHeartbeat = new HashMap<IMessager, Long>();
-
-    private static final Logger LOGGER = LogManager.getLogger();
 
 }
