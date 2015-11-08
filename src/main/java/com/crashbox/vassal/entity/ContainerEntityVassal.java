@@ -10,6 +10,8 @@ import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntityFurnace;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -58,6 +60,57 @@ public class ContainerEntityVassal extends Container
         return true;
     }
 
+    @Override
+    public ItemStack transferStackInSlot(EntityPlayer playerIn, int index)
+    {
+        ItemStack itemstack = null;
+        Slot slot = (Slot) this.inventorySlots.get(index);
+
+        // DESIGN:
+        // Held slot: 0
+        // Fuel slot: 1
+        // Follow me: 2
+
+        // Player Inv: 3 - 29
+        // Player hot bar: 30-38
+
+        if (slot != null && slot.getHasStack())
+        {
+            ItemStack itemstack1 = slot.getStack();
+            itemstack = itemstack1.copy();
+
+            if (index == 0 || index == 1 || index == 2)
+            {
+                // Get stuff out of bot fields
+                if (!mergeItemStack(itemstack1, 3, 38, true))
+                    return null;
+            }
+            else
+            {
+                // We only support putting things into fuel.
+                // Otherwise we really want them to specify, because not all are the same.
+                ItemStack current = getSlot(1).getStack();
+                if (TileEntityFurnace.isItemFuel(itemstack1) &&
+                        (current == null || current.isItemEqual(itemstack1)))
+                {
+                    if (!mergeItemStack(itemstack1, 1, 2, false))
+                        return null;
+                }
+            }
+
+            if (itemstack1.stackSize == 0)
+                slot.putStack((ItemStack)null);
+            else
+                slot.onSlotChanged();
+
+            if (itemstack1.stackSize == itemstack.stackSize)
+                return null;
+
+            slot.onPickupFromSlot(playerIn, itemstack1);
+        }
+
+        return itemstack;
+    }
 
     @Override
     public void onContainerClosed(EntityPlayer playerIn)
