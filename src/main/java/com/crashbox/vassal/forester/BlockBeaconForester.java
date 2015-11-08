@@ -6,12 +6,9 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  * Copyright 2015 Andrew O. Mellinger
@@ -47,7 +44,7 @@ public class BlockBeaconForester extends BlockContainer
             TileEntity entity = inWorld.getTileEntity(inPos);
             if (entity instanceof TileEntityBeaconForester)
             {
-                ((TileEntityBeaconForester)entity).blockBroken();
+                ((TileEntityBeaconForester) entity).blockBroken();
             }
         }
 
@@ -60,6 +57,4 @@ public class BlockBeaconForester extends BlockContainer
     {
         return 3;
     }
-
-    private static final Logger LOGGER = LogManager.getLogger();
 }
