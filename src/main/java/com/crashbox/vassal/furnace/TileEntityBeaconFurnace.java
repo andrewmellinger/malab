@@ -26,7 +26,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-
 /**
  * Copyright 2015 Andrew O. Mellinger
  */
@@ -48,9 +47,9 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
     }
 
     // We let them take buckets out of the bottom.
-    private static final int[] slotsTop = new int[] { slotEnum.INPUT_SLOT.ordinal() };
-    private static final int[] slotsBottom = new int[] { slotEnum.FUEL_SLOT.ordinal(), slotEnum.OUTPUT_SLOT.ordinal() };
-    private static final int[] slotsSides = new int[] { slotEnum.FUEL_SLOT.ordinal() };
+    private static final int[] slotsTop = new int[]{slotEnum.INPUT_SLOT.ordinal()};
+    private static final int[] slotsBottom = new int[]{slotEnum.FUEL_SLOT.ordinal(), slotEnum.OUTPUT_SLOT.ordinal()};
+    private static final int[] slotsSides = new int[]{slotEnum.FUEL_SLOT.ordinal()};
 
     // All the things that we contain
     private ItemStack[] _itemStacks = new ItemStack[11];
@@ -178,8 +177,8 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
     {
         boolean isSameItemStackAlreadyInSlot =
                 stack != null &&
-                stack.isItemEqual(_itemStacks[index]) &&
-                ItemStack.areItemStackTagsEqual(stack, _itemStacks[index]);
+                        stack.isItemEqual(_itemStacks[index]) &&
+                        ItemStack.areItemStackTagsEqual(stack, _itemStacks[index]);
         _itemStacks[index] = stack;
 
         if (_itemStacks[index] != null)
@@ -213,16 +212,20 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
     @Override
     public boolean isUseableByPlayer(EntityPlayer playerIn)
     {
-        return worldObj.getTileEntity(pos) != this ? false :
-                playerIn.getDistanceSq(pos.getX()+0.5D, pos.getY()+0.5D,
-                        pos.getZ()+0.5D) <= 64.0D;
+        return worldObj.getTileEntity(pos) == this &&
+                playerIn.getDistanceSq(pos.getX() + 0.5D, pos.getY() + 0.5D,
+                        pos.getZ() + 0.5D) <= 64.0D;
     }
 
     @Override
-    public void openInventory(EntityPlayer playerIn) {}
+    public void openInventory(EntityPlayer playerIn)
+    {
+    }
 
     @Override
-    public void closeInventory(EntityPlayer playerIn) {}
+    public void closeInventory(EntityPlayer playerIn)
+    {
+    }
 
     @Override
     public boolean isItemValidForSlot(int index, ItemStack stack)
@@ -230,16 +233,16 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
         // We don't put things in output for automation.  This is different than the furnace
         // in that we don't just take anything unless they ask for it.
 
-        if ( index == INPUT_INDEX )
+        if (index == INPUT_INDEX)
         {
             if (_itemStacks[INPUT_INDEX] != null)
                 return _itemStacks[INPUT_INDEX].isItemEqual(stack);
             else
                 return inputSampleContains(stack);
         }
-        else if ( index == FUEL_INDEX )
+        else if (index == FUEL_INDEX)
         {
-            if ( _itemStacks[FUEL_INDEX] != null)
+            if (_itemStacks[FUEL_INDEX] != null)
                 return _itemStacks[FUEL_INDEX].isItemEqual(stack);
             else
                 return fuelSampleContains(stack);
@@ -416,7 +419,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
             if (_itemStacks[i] != null)
             {
                 NBTTagCompound nbtTagCompound = new NBTTagCompound();
-                nbtTagCompound.setByte(NBT_SLOT, (byte)i);
+                nbtTagCompound.setByte(NBT_SLOT, (byte) i);
                 _itemStacks[i].writeToNBT(nbtTagCompound);
                 nbttaglist.appendTag(nbtTagCompound);
             }
@@ -540,7 +543,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
 
     @Override
     public Container createContainer(InventoryPlayer playerInventory,
-            EntityPlayer playerIn)
+                                     EntityPlayer playerIn)
     {
         // DEBUG
         // Don't know when this is called.  I think the GuiHandler does all the construction
@@ -571,13 +574,13 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
     @Override
     public int[] getOutputSlots()
     {
-        return new int[] {OUTPUT_INDEX};
+        return new int[]{OUTPUT_INDEX};
     }
 
     @Override
     public int[] getInputSlots()
     {
-        return new int[] {INPUT_INDEX, FUEL_INDEX};
+        return new int[]{INPUT_INDEX, FUEL_INDEX};
     }
 
 
@@ -588,6 +591,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
         return _remainingFuelBurnTicks > 0;
     }
 
+    @SuppressWarnings("UnusedParameters")
     public int timeToBurnOneItem(ItemStack itemStack)
     {
         return 200;
@@ -638,7 +642,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
                 // In case we have multiple outputs
                 _itemStacks[FUEL_INDEX].stackSize += itemstack.stackSize;
             }
-            else if (_itemStacks[FUEL_INDEX] == null && fuelSampleContains(itemstack)                    )
+            else if (_itemStacks[FUEL_INDEX] == null && fuelSampleContains(itemstack))
             {
                 _itemStacks[FUEL_INDEX] = itemstack.copy();
             }
@@ -691,11 +695,6 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
 
     //---------------------------------------------------------------------------------------------
 
-    private ItemStack getSmeltable()
-    {
-        return _itemStacks[INPUT_INDEX];
-    }
-
     private int smeltableNeedPriority()
     {
         if (_itemStacks[INPUT_INDEX] == null)
@@ -705,13 +704,14 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
 
         // We have a priority based on space
         int size = _itemStacks[INPUT_INDEX].stackSize;
-        int maxSize = _itemStacks[INPUT_INDEX].getMaxStackSize();;
+        int maxSize = _itemStacks[INPUT_INDEX].getMaxStackSize();
         int space = _itemStacks[INPUT_INDEX].getMaxStackSize() - size;
 
-        if (size > (_maxRequestThreshold * maxSize))
+        float MAX_REQUEST_THRESHOLD = 0.75F;
+        if (size > (MAX_REQUEST_THRESHOLD * maxSize))
             return 0;
 
-        return (space * 50)/maxSize;
+        return (space * 50) / maxSize;
     }
 
     private boolean inputSampleContains(ItemStack stack)
@@ -784,11 +784,6 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
 
     //---------------------------
 
-    private ItemStack getOutput()
-    {
-        return _itemStacks[OUTPUT_INDEX];
-    }
-
     public void blockBroken()
     {
         _furnace.terminate();
@@ -852,7 +847,7 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
             }
             else if (msg instanceof MessageItemRequest)
             {
-                MessageItemRequest req = (MessageItemRequest)msg;
+                MessageItemRequest req = (MessageItemRequest) msg;
                 if (_itemStacks[OUTPUT_INDEX] != null && req.getMatcher().matches(_itemStacks[OUTPUT_INDEX]))
                 {
                     int qty = req.getQuantity();
@@ -970,11 +965,6 @@ public class TileEntityBeaconFurnace extends TileEntityBeaconInventory implement
                 ", totalSmeltTicks=" + _totalItemSmeltTicks +
                 '}';
     }
-
-    private float _fuelRequestFraction = 0.5F;
-
-    // Don't ask if we have more than this
-    private float _maxRequestThreshold = 0.75F;
 
     private Furnace _furnace;
     private Broadcaster.BroadcastHelper _broadcastHelper;

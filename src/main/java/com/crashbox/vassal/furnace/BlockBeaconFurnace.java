@@ -6,7 +6,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.Item;
@@ -16,8 +15,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
 
 import java.util.Random;
 
@@ -45,7 +43,6 @@ public class BlockBeaconFurnace extends BlockContainer
 
     public static void setState(boolean active, World worldIn, BlockPos pos)
     {
-        IBlockState iblockstate = worldIn.getBlockState(pos);
         TileEntity tileentity = worldIn.getTileEntity(pos);
         keepInventory = true;
 
@@ -158,5 +155,4 @@ public class BlockBeaconFurnace extends BlockContainer
     }
 
     private static boolean keepInventory = false;
-    private static final Logger LOGGER = LogManager.getLogger();
 }

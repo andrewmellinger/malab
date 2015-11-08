@@ -10,8 +10,6 @@ import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  * Copyright 2015 Andrew O. Mellinger
@@ -20,7 +18,7 @@ public class ContainerBeaconFurnace extends Container
 {
     private final TileEntityBeaconFurnace _tileBeacon;
     private final int _sizeInventory;
-    private int[] _trackedFields = { 0,0,0,0};
+    private int[] _trackedFields = {0, 0, 0, 0};
 
 
     public ContainerBeaconFurnace(InventoryPlayer inventoryPlayer, TileEntityBeaconFurnace tileEntity)
@@ -37,10 +35,10 @@ public class ContainerBeaconFurnace extends Container
         addSlotToContainer(new SlotFurnaceOutput(inventoryPlayer.player, _tileBeacon, 2, 148, 35));
 
         for (int i = 0; i < 4; ++i)
-            addSlotToContainer(new SampleSlot(tileEntity, i + 3, 8+ i*18, 17));
+            addSlotToContainer(new SampleSlot(tileEntity, i + 3, 8 + i * 18, 17));
 
         for (int i = 0; i < 4; ++i)
-            addSlotToContainer(new SampleFuelSlot(tileEntity, i + 7, 8+ i*18, 53));
+            addSlotToContainer(new SampleFuelSlot(tileEntity, i + 7, 8 + i * 18, 53));
 
         // add player inventory slots
         // note that the slot numbers are within the player inventory so can
@@ -50,7 +48,7 @@ public class ContainerBeaconFurnace extends Container
         {
             for (int j = 0; j < 9; ++j)
             {
-                addSlotToContainer(new Slot(inventoryPlayer, j+i*9+9, 8+j*18, 84+i*18));
+                addSlotToContainer(new Slot(inventoryPlayer, j + i * 9 + 9, 8 + j * 18, 84 + i * 18));
             }
         }
 
@@ -123,10 +121,10 @@ public class ContainerBeaconFurnace extends Container
         // If it didn't use it all, we return ENTIRE THING WE TRIED TO MOVE!?!?
 
         ItemStack itemStack = null;
-        Slot slot = (Slot)inventorySlots.get(slotIndex);
+        Slot slot = (Slot) inventorySlots.get(slotIndex);
 
         int inIndex = TileEntityBeaconFurnace.slotEnum.INPUT_SLOT.ordinal();     // 0
-        int fuelIndex =  TileEntityBeaconFurnace.slotEnum.FUEL_SLOT.ordinal();   // 1
+        int fuelIndex = TileEntityBeaconFurnace.slotEnum.FUEL_SLOT.ordinal();   // 1
         int outIndex = TileEntityBeaconFurnace.slotEnum.OUTPUT_SLOT.ordinal();   // 2
 
         if (slot != null && slot.getHasStack())
@@ -174,7 +172,7 @@ public class ContainerBeaconFurnace extends Container
 
             // If all was used up, clear out the slot.
             if (itemStack1.stackSize == 0)
-                slot.putStack((ItemStack)null);
+                slot.putStack(null);
             else
                 slot.onSlotChanged();
 
@@ -191,9 +189,9 @@ public class ContainerBeaconFurnace extends Container
     private boolean mergeIfMatches(ItemStack itemStack1, int slotIndex, int targetIndex)
     {
         // TO fuel
-        ItemStack targetStack =  ((Slot)inventorySlots.get(targetIndex)).getStack();
+        ItemStack targetStack = ((Slot) inventorySlots.get(targetIndex)).getStack();
         // If fuel already has stuff, just put into normal inventory
-        if ( targetStack == null || targetStack.isItemEqual(itemStack1))
+        if (targetStack == null || targetStack.isItemEqual(itemStack1))
         {
             return this.mergeItemStack(itemStack1, targetIndex, targetIndex + 1, false);
         }
@@ -220,7 +218,4 @@ public class ContainerBeaconFurnace extends Container
 
         return false;
     }
-
-    private static final Logger LOGGER = LogManager.getLogger();
-
 }

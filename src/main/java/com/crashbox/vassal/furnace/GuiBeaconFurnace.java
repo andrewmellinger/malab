@@ -4,7 +4,6 @@ import com.crashbox.vassal.VassalMain;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -19,7 +18,7 @@ public class GuiBeaconFurnace extends GuiContainer
 {
     private static final ResourceLocation guiTexture =
             new ResourceLocation(VassalMain.MODID
-                    +":textures/gui/container/beaconFurnace.png");
+                    + ":textures/gui/container/beaconFurnace.png");
     private final InventoryPlayer _inventoryPlayer;
     private final TileEntityBeaconFurnace _tileBeacon;
 
@@ -30,14 +29,14 @@ public class GuiBeaconFurnace extends GuiContainer
         _inventoryPlayer = playerInventory;
         _tileBeacon = tileEntity;
 
-        LOGGER.debug( "Constructed: " + this);
+        LOGGER.debug("Constructed: " + this);
     }
 
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
     {
         String s = _tileBeacon.getDisplayName().getUnformattedText();
-        fontRendererObj.drawString(s, xSize/2-fontRendererObj.getStringWidth(s)/2, 6, 4210752);
+        fontRendererObj.drawString(s, xSize / 2 - fontRendererObj.getStringWidth(s) / 2, 6, 4210752);
         fontRendererObj.drawString(_inventoryPlayer.getDisplayName().getUnformattedText(), 8, ySize - 96 + 2, 4210752);
     }
 
@@ -55,7 +54,7 @@ public class GuiBeaconFurnace extends GuiContainer
         drawTexturedModalRect(marginHorizontal, marginVertical, 0, 0, xSize, ySize);
 
         // Draw burning icon
-        if(TileEntityBeaconFurnace.isBurning(_tileBeacon))
+        if (TileEntityBeaconFurnace.isBurning(_tileBeacon))
         {
             int tmp = this.updateBurnIndicator(13);
 //            this.drawTexturedModalRect(marginHorizontal + 56, marginVertical + 36 + 12 - tmp, 176, 12 - tmp, 14, tmp + 1);
@@ -73,13 +72,14 @@ public class GuiBeaconFurnace extends GuiContainer
         int ticksGrindingItemSoFar = _tileBeacon.getField(2);
         int ticksPerItem = _tileBeacon.getField(3);
         return ticksPerItem != 0 && ticksGrindingItemSoFar != 0 ?
-                ticksGrindingItemSoFar*progressIndicatorPixelWidth/ticksPerItem
+                ticksGrindingItemSoFar * progressIndicatorPixelWidth / ticksPerItem
                 : 0;
     }
 
-    private int updateBurnIndicator(int burnRemain) {
+    private int updateBurnIndicator(int burnRemain)
+    {
         int originalBurnTime = _tileBeacon.getField(1);
-        if(originalBurnTime == 0)
+        if (originalBurnTime == 0)
         {
             originalBurnTime = 200;
         }
