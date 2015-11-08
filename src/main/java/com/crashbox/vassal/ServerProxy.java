@@ -1,13 +1,11 @@
 package com.crashbox.vassal;
 
-import com.crashbox.vassal.network.MessageToggleWorkbenchEnable;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.relauncher.Side;
 
 /**
- * Copyright 2015 Andrew o. Mellinger
+ * Copyright 2015 Andrew O. Mellinger
  */
 public class ServerProxy extends CommonProxy
 {

@@ -15,15 +15,12 @@ import com.crashbox.vassal.workbench.GuiBeaconWorkbench;
 import com.crashbox.vassal.workbench.TileEntityBeaconWorkbench;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.IGuiHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  * Copyright 2015 Andrew O. Mellinger
@@ -92,8 +89,4 @@ public class GuiHandlerVassal implements IGuiHandler
 
         return null;
     }
-
-
-    private static final Logger LOGGER = LogManager.getLogger();
-
 }

@@ -13,16 +13,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelZombie;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.renderer.entity.RenderSnowball;
 import net.minecraft.client.resources.model.ModelResourceLocation;
-import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  * Copyright 2015 Andrew O. Mellinger
@@ -89,23 +85,9 @@ public class ClientProxy extends CommonProxy
                 new ModelResourceLocation(VassalMain.MODID + ":" + ItemCircuit.NAME, "inventory"));
     }
 
-    private void registerSnowball(RenderManager renderManager, RenderItem renderItem,
-                             Item item, String name, Class<? extends Entity> entityClass )
-    {
-        renderItem.getItemModelMesher().register(item, 0,
-                new ModelResourceLocation(VassalMain.MODID + ":" + name, "inventory"));
-
-        RenderingRegistry.registerEntityRenderingHandler(entityClass,
-                new RenderSnowball(renderManager, item, renderItem));
-    }
-
     @Override
     public void postInit(FMLPostInitializationEvent e)
     {
 
     }
-
-
-    private static final Logger LOGGER = LogManager.getLogger();
-
 }
