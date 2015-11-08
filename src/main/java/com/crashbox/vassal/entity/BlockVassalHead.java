@@ -1,19 +1,13 @@
 package com.crashbox.vassal.entity;
 
 import com.crashbox.vassal.VassalMain;
-import com.crashbox.vassal.forester.TileEntityBeaconForester;
 import com.crashbox.vassal.util.VassalUtils;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.monster.EntitySnowman;
 import net.minecraft.init.Blocks;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  * Copyright 2015 Andrew O. Mellinger
@@ -50,14 +44,12 @@ public class BlockVassalHead extends Block
 
             EntityVassal entityVassal = new EntityVassal(worldIn);
             entityVassal.setUpCustomName();
-            entityVassal.setLocationAndAngles((double)down2.getX() + 0.5D,
-                    (double)down2.getY() + 0.05D,
-                    (double)down2.getZ() + 0.5D,
+            entityVassal.setLocationAndAngles((double) down2.getX() + 0.5D,
+                    (double) down2.getY() + 0.05D,
+                    (double) down2.getZ() + 0.5D,
                     0.0F,
                     0.0F);
             worldIn.spawnEntityInWorld(entityVassal);
         }
     }
-
-    private static final Logger LOGGER = LogManager.getLogger();
 }

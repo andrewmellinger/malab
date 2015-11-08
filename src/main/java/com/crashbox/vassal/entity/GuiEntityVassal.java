@@ -5,12 +5,8 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChatComponentTranslation;
-import net.minecraft.util.IChatComponent;
 import net.minecraft.util.ResourceLocation;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  * Copyright 2015 Andrew O. Mellinger
@@ -29,8 +25,6 @@ public class GuiEntityVassal extends GuiContainer
         _vassal = vassal;
         _inventoryPlayer = parInventoryPlayer;
         _inventory = inventory;
-
-        //LOGGER.debug("Constructed: " + this);
     }
 
     @Override
@@ -54,7 +48,6 @@ public class GuiEntityVassal extends GuiContainer
         String followMeTitle = new ChatComponentTranslation("container.vassal.title.followme").getUnformattedText();
         int start = 141 - fontRendererObj.getStringWidth(followMeTitle);
         fontRendererObj.drawString(followMeTitle, start, 20, 4210752);
-
     }
 
     /**
@@ -81,7 +74,5 @@ public class GuiEntityVassal extends GuiContainer
     }
 
     private final EntityVassal _vassal;
-
-    private static final Logger LOGGER = LogManager.getLogger();
 }
 

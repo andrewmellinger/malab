@@ -2,18 +2,13 @@ package com.crashbox.vassal.entity;
 
 import com.crashbox.vassal.common.ItemStackMatcher;
 import com.crashbox.vassal.common.SampleMatcherSlot;
-import com.crashbox.vassal.common.SampleSlot;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityFurnace;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  * Copyright 2015 Andrew O. Mellinger
@@ -21,7 +16,7 @@ import org.apache.logging.log4j.Logger;
 public class ContainerEntityVassal extends Container
 {
     public ContainerEntityVassal(InventoryPlayer inventoryPlayer,
-            EntityVassal vassal, InventoryEntityVassal inventory)
+                                 EntityVassal vassal, InventoryEntityVassal inventory)
     {
         _vassal = vassal;
         _inventory = inventory;
@@ -42,7 +37,7 @@ public class ContainerEntityVassal extends Container
         {
             for (int j = 0; j < 9; ++j)
             {
-                addSlotToContainer(new Slot(inventoryPlayer, j+i*9+9, 8+j*18, 84+i*18));
+                addSlotToContainer(new Slot(inventoryPlayer, j + i * 9 + 9, 8 + j * 18, 84 + i * 18));
             }
         }
 
@@ -99,7 +94,7 @@ public class ContainerEntityVassal extends Container
             }
 
             if (itemstack1.stackSize == 0)
-                slot.putStack((ItemStack)null);
+                slot.putStack(null);
             else
                 slot.onSlotChanged();
 
@@ -128,5 +123,4 @@ public class ContainerEntityVassal extends Container
 
     private final EntityVassal _vassal;
     private final InventoryEntityVassal _inventory;
-    private static final Logger LOGGER = LogManager.getLogger();
 }

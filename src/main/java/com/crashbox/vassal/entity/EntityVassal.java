@@ -19,10 +19,6 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeHooks;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 
 /**
  * Copyright 2015 Andrew o. Mellinger
@@ -33,7 +29,6 @@ public class EntityVassal extends EntityCreature
     {
         super(world);
         setupAI();
-        //registerExtendedProperties("vassal", new ExtendedProps());
 
         _toolStacks[0] = new ItemStack(Items.stone_pickaxe);
         _toolStacks[1] = new ItemStack(Items.stone_axe);
@@ -88,12 +83,6 @@ public class EntityVassal extends EntityCreature
         //getEntityAttribute(SharedMonsterAttributes.attackDamage).setBaseValue(4.0D);
     }
 
-//    @Override
-//    protected boolean isAIEnabled()
-//    {
-//        return true;
-//    }
-
     protected void entityInit()
     {
         super.entityInit();
@@ -132,7 +121,6 @@ public class EntityVassal extends EntityCreature
             _followMeStack.writeToNBT(followMeCompount);
             compound.setTag("followMeStack", followMeCompount);
         }
-
     }
 
     @Override
@@ -185,6 +173,7 @@ public class EntityVassal extends EntityCreature
                 {
                     sendParticleMessage(EnumParticleTypes.SPELL_MOB_AMBIENT, 12); // pretty good
 
+                    // Other particles we've looked at.
 //                    sendParticleMessage(EnumParticleTypes.PORTAL, 12);
 //                    sendParticleMessage(EnumParticleTypes.SPELL_INSTANT, 12);     // ok
 //                    sendParticleMessage(EnumParticleTypes.REDSTONE, 12);          // no
@@ -213,7 +202,7 @@ public class EntityVassal extends EntityCreature
                 this.posX + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width,
                 this.posY + 0.5D + (double)(this.rand.nextFloat() * this.height),
                 this.posZ + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width,
-                var1, var3, var5, new int[0]);
+                var1, var3, var5);
     }
 
     /**
@@ -256,7 +245,8 @@ public class EntityVassal extends EntityCreature
         // We wander slower than we normally move
         //tasks.addTask(priority++, new EntityAIWander(this, 0.2D, 10));
         _vassalAI = new EntityAIVassal(this);
-        tasks.addTask(priority++, _vassalAI);
+        tasks.addTask(priority, _vassalAI);
+        //tasks.addTask(priority++, _vassalAI);
 
         //targetTasks.addTask(0, new EntityAIHurtByTargetHerdAnimal(this, true));
     }
@@ -301,10 +291,8 @@ public class EntityVassal extends EntityCreature
     public boolean isHeldInventoryFull()
     {
         ItemStack held = getHeldItem();
-        if (held == null)
-            return false;
+        return held != null && held.stackSize >= _carryCapacity;
 
-        return held.stackSize >= _carryCapacity;
     }
 
     public int getHeldSize()
@@ -353,16 +341,14 @@ public class EntityVassal extends EntityCreature
         return null;
     }
 
-    // Copy paste from ForgeHooks
+    // Copy paste from ForgeHooks!
     public static boolean canToolHarvestBlock(IBlockAccess world, BlockPos pos, ItemStack stack)
     {
         IBlockState state = world.getBlockState(pos);
         state = state.getBlock().getActualState(state, world, pos);
         String tool = state.getBlock().getHarvestTool(state);
-        if (stack == null || tool == null) return false;
-        boolean canHarvest = stack.getItem().getHarvestLevel(stack, tool) >= state.getBlock().getHarvestLevel(state);
-//       LOGGER.debug("CanHarvest=" + canHarvest + ", stack=" + stack + ", tool=" + tool + ", block=" + state);
-        return canHarvest;
+        return !(stack == null || tool == null) &&
+                stack.getItem().getHarvestLevel(stack, tool) >= state.getBlock().getHarvestLevel(state);
     }
 
 
@@ -485,7 +471,7 @@ public class EntityVassal extends EntityCreature
         if (getEntityWorld().isRemote)
             return getDataWatcher().getWatchableObjectInt(20);
         else
-            return (int) _fuelTicks/20;
+            return _fuelTicks/20;
     }
 
     private int getFuelTicks()
@@ -581,9 +567,6 @@ public class EntityVassal extends EntityCreature
         return id;
     }
 
-    // This is NOT shared across restarts.
-    private static int NAME_INDEX = 0;
-
     private static String makeName(World world)
     {
         int id = getNextID(world);
@@ -632,6 +615,4 @@ public class EntityVassal extends EntityCreature
 
     // We use this alot
     private EntityAIVassal _vassalAI;
-
-    private static final Logger LOGGER = LogManager.getLogger();
 }
