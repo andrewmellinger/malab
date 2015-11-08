@@ -22,7 +22,6 @@ public class ItemStackMatcher
         //  TODO:  Load from config?
         ItemStackMatcher matcher = new ItemStackMatcher();
         matcher.add(new ItemStack(Item.getItemFromBlock(Blocks.cobblestone)));
-        //matcher.add(new ItemStack(Item.getItemFromBlock(Blocks.gravel)));
         matcher.add(Items.flint);
         matcher.add(Items.coal);
 
@@ -104,6 +103,7 @@ public class ItemStackMatcher
 
     /**
      * Matches IGNORING metadata
+     *
      * @param item The plain item
      * @return True if the item is in one of the stacks ignoring metadata
      */
@@ -132,8 +132,6 @@ public class ItemStackMatcher
 
     private final List<ItemStack> _samples = new ArrayList<ItemStack>();
 
-
     // ===========
     private static ItemStackMatcher QUARRY_MATCHER;
-
 }

@@ -2,7 +2,6 @@ package com.crashbox.vassal.common;
 
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntityFurnace;
 
 /**
  * Copyright 2015 Andrew O. Mellinger
