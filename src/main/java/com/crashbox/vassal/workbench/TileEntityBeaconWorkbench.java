@@ -679,20 +679,8 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory impleme
         if (candidates.isEmpty())
             return stack;
 
-        // Now, figure out the final size and add the right amount to each.
-        size += stack.stackSize;
-        size /= candidates.size();
-        if (size > stack.getMaxStackSize())
-            size = stack.getMaxStackSize();
-
-        for (ItemStack tmp : candidates)
-        {
-            int xfer = size - tmp.stackSize;
-            if (xfer > tmp.stackSize)
-                xfer = tmp.stackSize;
-            tmp.stackSize += xfer;
-            stack.stackSize -= xfer;
-        }
+        stack.stackSize = balanceStacks(candidates, size, stack.getMaxStackSize() * candidates.size(),
+                stack.stackSize);
 
         // If we didn't get rid of everything then see if we can dump into the first.
         if (stack.stackSize > 0)
@@ -703,6 +691,48 @@ public class TileEntityBeaconWorkbench extends TileEntityBeaconInventory impleme
 
         return stack;
     }
+
+    // Rebalance the recipes stacks as best we can.
+    public static int balanceStacks(List<ItemStack> stacks, int existing, int allowable, int available)
+    {
+        int added = allowable - existing;
+        if (added > available)
+            added = available;
+
+        existing += added;
+
+        // Split
+        int share = existing / stacks.size();
+        int remainder = existing - (share * stacks.size());
+        for (ItemStack stack : stacks)
+        {
+            if (share < existing)
+            {
+                if (remainder > 0)
+                {
+                    stack.stackSize = share + 1;
+                    existing -= share + 1;
+                    remainder --;
+                }
+                else
+                {
+                    stack.stackSize = share;
+                    existing -= share;
+                }
+            }
+            else
+            {
+                // This should be last one
+                stack.stackSize = existing;
+                existing = 0;
+            }
+        }
+
+        return existing;
+    }
+
+
+
 
     //---------------------------------------------------------------------------------------------
 

@@ -12,6 +12,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Copyright 2015 Andrew O. Mellinger
  */
@@ -29,17 +32,18 @@ public class ContainerBeaconWorkbench extends Container
         _craftOutput = _craftingCore.getCraftOutput();
         _controls = _craftingCore.getControls();
 
-        // Crafting result slot
+        // Crafting result slot - 0
         this.addSlotToContainer(new SlotCrafting(playerInventory.player, _craftMatrix, _craftResult,
                 0, 93, 43));
 
-        // Output slot
+        // Output slot - 1
         addSlotToContainer(new SlotOutput(playerInventory.player, _craftOutput, 0, 147, 43 ));
 
-        // Control Slot
+        // Control Slot - 2
         addSlotToContainer(new SampleSlot(_controls, 0, 121, 19 ));
 
         // ===========================
+        // Crafting 3 - 11
         int i;
         int j;
 
@@ -53,7 +57,7 @@ public class ContainerBeaconWorkbench extends Container
         }
 
         // ===========================
-        // Player inventory
+        // Player inventory: 12 - 38
         for (i = 0; i < 3; ++i)
         {
             for (j = 0; j < 9; ++j)
@@ -62,6 +66,7 @@ public class ContainerBeaconWorkbench extends Container
             }
         }
 
+        // Hotbar: 39 - 47
         for (i = 0; i < 9; ++i)
         {
             this.addSlotToContainer(new Slot(playerInventory, i, 8 + i * 18, 142));
@@ -86,18 +91,6 @@ public class ContainerBeaconWorkbench extends Container
     public void onContainerClosed(EntityPlayer playerIn)
     {
         super.onContainerClosed(playerIn);
-//        if (!this._world.isRemote)
-//        {
-//            for (int i = 0; i < 9; ++i)
-//            {
-//                ItemStack itemstack = this._craftMatrix.getStackInSlotOnClosing(i);
-//
-//                if (itemstack != null)
-//                {
-//                    playerIn.dropPlayerItemWithRandomChoice(itemstack, false);
-//                }
-//            }
-//        }
     }
 
     @Override
@@ -160,38 +153,49 @@ public class ContainerBeaconWorkbench extends Container
         ItemStack itemstack = null;
         Slot slot = (Slot)this.inventorySlots.get(index);
 
+        // DESIGN:
+        // Out of output sample out is great.
+        // Out of real output is good to.
+        // Into matrix is ONLY based on what we have, and it will AUTOMATICALLY BALANCE
+
+        // Remember:
+        // Crafting result slot - 0
+        // Output slot - 1
+        // Control Slot - 2
+        // Crafting matrix: 3 - 11
+        // Player inventory: 12 - 38
+        // Player hot bar: 39 - 47
+
         if (slot != null && slot.getHasStack())
         {
             ItemStack itemstack1 = slot.getStack();
             itemstack = itemstack1.copy();
 
-            // Result and output
             if (index == 0 || index == 1)
             {
-                if (!this.mergeItemStack(itemstack1, 11, 47, true))
+                // Result and output
+                if (!this.mergeItemStack(itemstack1, 12, 47, true))
                 {
                     return null;
                 }
 
                 slot.onSlotChange(itemstack1, itemstack);
             }
-            else if (index >= 10 && index < 37)
+            else if (index >= 12 && index <= 47)
             {
-                if (!this.mergeItemStack(itemstack1, 38, 47, false))
+                // If player inventory try to move to matrix.
+                if (!addToMatrix(itemstack1))
                 {
                     return null;
                 }
             }
-            else if (index >= 37 && index < 46)
+            else
             {
-                if (!this.mergeItemStack(itemstack1, 11, 38, false))
+                // Move to player inventory
+                if (!this.mergeItemStack(itemstack1, 12, 47, true))
                 {
                     return null;
                 }
-            }
-            else if (!this.mergeItemStack(itemstack1, 11, 47, false))
-            {
-                return null;
             }
 
             if (itemstack1.stackSize == 0)
@@ -212,6 +216,43 @@ public class ContainerBeaconWorkbench extends Container
         }
 
         return itemstack;
+    }
+
+    private boolean addToMatrix(ItemStack stack)
+    {
+        // Look at all, and see if we can apply all of them.
+
+        List<ItemStack> matches = new ArrayList<ItemStack>();
+        List<Slot> slots = new ArrayList<Slot>();
+
+        int quantityFound = 0;
+        for (int i = 0; i < 9; ++i)
+        {
+            Slot slot = getSlot(i + 3);
+            ItemStack slotStack = slot.getStack();
+            if (slotStack != null && slotStack.isItemEqual(stack))
+            {
+                matches.add(slotStack);
+                slots.add(slot);
+                quantityFound += slotStack.stackSize;
+            }
+        }
+
+        // Now that we have all the stacks compute total allowed.
+        int quantityAllowed = stack.getMaxStackSize() * matches.size();
+        if (quantityAllowed > quantityFound)
+        {
+            // Evenly distribute
+            stack.stackSize = TileEntityBeaconWorkbench.balanceStacks(matches, quantityFound, quantityAllowed, stack.stackSize);
+            for (Slot slot : slots)
+            {
+                slot.onSlotChanged();
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     /**

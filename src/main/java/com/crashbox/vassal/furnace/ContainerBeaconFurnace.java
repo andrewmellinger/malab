@@ -6,6 +6,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.*;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.FurnaceRecipes;
+import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
@@ -19,6 +21,7 @@ public class ContainerBeaconFurnace extends Container
     private final TileEntityBeaconFurnace _tileBeacon;
     private final int _sizeInventory;
     private int[] _trackedFields = { 0,0,0,0};
+
 
     public ContainerBeaconFurnace(InventoryPlayer inventoryPlayer, TileEntityBeaconFurnace tileEntity)
     {
@@ -116,57 +119,106 @@ public class ContainerBeaconFurnace extends Container
     @Override
     public ItemStack transferStackInSlot(EntityPlayer playerIn, int slotIndex)
     {
-        ItemStack itemStack1 = null;
+        // NOTE: Merge returns true if it can merge any of it.  It returns false if it can't.
+        // If it didn't use it all, we return ENTIRE THING WE TRIED TO MOVE!?!?
+
+        ItemStack itemStack = null;
         Slot slot = (Slot)inventorySlots.get(slotIndex);
+
+        int inIndex = TileEntityBeaconFurnace.slotEnum.INPUT_SLOT.ordinal();     // 0
+        int fuelIndex =  TileEntityBeaconFurnace.slotEnum.FUEL_SLOT.ordinal();   // 1
+        int outIndex = TileEntityBeaconFurnace.slotEnum.OUTPUT_SLOT.ordinal();   // 2
 
         if (slot != null && slot.getHasStack())
         {
-            ItemStack itemStack2 = slot.getStack();
-            itemStack1 = itemStack2.copy();
+            ItemStack itemStack1 = slot.getStack();
+            itemStack = itemStack1.copy();
 
-            if (slotIndex == TileEntityBeaconFurnace.slotEnum.OUTPUT_SLOT.ordinal())
+            if (slotIndex == outIndex)
             {
-                if (!mergeItemStack(itemStack2, _sizeInventory, _sizeInventory +36, true))
+                // FROM Output
+                if (!mergeItemStack(itemStack1, _sizeInventory, _sizeInventory + 36, true))
                 {
                     return null;
                 }
 
-                // Basically this says, try to make me more.  One will be MORE than 2
-                slot.onSlotChange(itemStack2, itemStack1);
+                // Basically this says, try to make me more.
+                slot.onSlotChange(itemStack1, itemStack);
             }
-            else if (slotIndex != TileEntityBeaconFurnace.slotEnum.INPUT_SLOT.ordinal())
+            else if (slotIndex < _sizeInventory)
             {
-                if (slotIndex >= _sizeInventory && slotIndex < _sizeInventory +27) // player inventory slots
-                {
-                    if (!mergeItemStack(itemStack2, _sizeInventory +27, _sizeInventory +36, false))
-                    {
-                        return null;
-                    }
-                }
-                else if (slotIndex >= _sizeInventory +27
-                            && slotIndex < _sizeInventory +36
-                            && !mergeItemStack(itemStack2, _sizeInventory +1, _sizeInventory +27, false)) // hotbar slots
+                // FROM samples, input, fuel
+                if (!mergeItemStack(itemStack1, _sizeInventory, _sizeInventory + 36, true))
                 {
                     return null;
                 }
             }
-            else if (!mergeItemStack(itemStack2, _sizeInventory, _sizeInventory + 36, false))
+            else if (FurnaceRecipes.instance().getSmeltingResult(itemStack1) != null)
             {
-                return null;
+                // To INPUT
+                if (!mergeIfMatches(itemStack1, slotIndex, inIndex))
+                    return null;
+            }
+            else if (TileEntityFurnace.isItemFuel(itemStack1))
+            {
+                // To FUEL
+                if (!mergeIfMatches(itemStack1, slotIndex, fuelIndex))
+                    return null;
+            }
+            else
+            {
+                // Player inventory movement
+                if (!mergeToOtherPlayerInventoryPart(itemStack1, slotIndex))
+                    return null;
             }
 
-            if (itemStack2.stackSize == 0)
+            // If all was used up, clear out the slot.
+            if (itemStack1.stackSize == 0)
                 slot.putStack((ItemStack)null);
             else
                 slot.onSlotChanged();
 
-            if (itemStack2.stackSize == itemStack1.stackSize)
+            // We didn't change anything
+            if (itemStack1.stackSize == itemStack.stackSize)
                 return null;
 
-            slot.onPickupFromSlot(playerIn, itemStack2);
+            slot.onPickupFromSlot(playerIn, itemStack1);
         }
 
-        return itemStack1;
+        return itemStack;
+    }
+
+    private boolean mergeIfMatches(ItemStack itemStack1, int slotIndex, int targetIndex)
+    {
+        // TO fuel
+        ItemStack targetStack =  ((Slot)inventorySlots.get(targetIndex)).getStack();
+        // If fuel already has stuff, just put into normal inventory
+        if ( targetStack == null || targetStack.isItemEqual(itemStack1))
+        {
+            return this.mergeItemStack(itemStack1, targetIndex, targetIndex + 1, false);
+        }
+        else
+        {
+            // Fallback to player inventory swapping
+            return mergeToOtherPlayerInventoryPart(itemStack1, slotIndex);
+        }
+
+    }
+
+    private boolean mergeToOtherPlayerInventoryPart(ItemStack itemstack, int slotIndex)
+    {
+        if (slotIndex >= _sizeInventory && slotIndex < _sizeInventory + 27)
+        {
+            // Inventory goes to hotbar
+            return mergeItemStack(itemstack, _sizeInventory + 27, _sizeInventory + 36, false);
+        }
+        else if (slotIndex >= _sizeInventory + 27 && slotIndex < _sizeInventory + 36)
+        {
+            // Things to inventory
+            return mergeItemStack(itemstack, _sizeInventory, _sizeInventory + 27, false);
+        }
+
+        return false;
     }
 
     private static final Logger LOGGER = LogManager.getLogger();

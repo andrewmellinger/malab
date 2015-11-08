@@ -100,6 +100,7 @@ public class TileEntityBeaconChest extends TileEntityBeaconInventory implements 
                     _itemStacks[index] = null;
                 }
 
+                this.markDirty();
                 return itemstack;
             }
         }
