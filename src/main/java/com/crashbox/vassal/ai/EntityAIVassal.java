@@ -536,7 +536,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
                     // Nothing special.
                     return State.PERFORMING;
                 case RETARGET:
-                    //debugLog(" Retargeting");
+                    debugLog(" Retargeting");
                     requestWorkAreas();
                     return State.TARGETING;
                 case DONE:
@@ -597,7 +597,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
 
     public boolean canGetTo(BlockPos pos)
     {
-        //debugLog("Checking path to: " + pos);
+        debugLog("Checking path to: " + pos);
         PathEntity path = _entity.getNavigator().getPathToXYZ(pos.getX(), pos.getY(), pos.getZ());
         return (path != null);
     }
@@ -607,15 +607,15 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
     public boolean tryMoveTo(BlockPos pos)
     {
         // If we are 2 blocks away, we are good enough
-        if (VassalUtils.isWithinSqDist(getEntity().getPosition(), pos, 4))
+        if (VassalUtils.isWithinXZSqDist(getEntity().getPosition(), pos, 4))
         {
-//            debugLog("Close enough!  Not moving.");
+            debugLog("Close enough!  Not moving.");
             return true;
         }
 
         // Compute position towards us but not on the block, so we aren't actually standing on the thing.
         BlockPos target = VassalUtils.getBlockBeside(getBlockPos(), pos);
-//        debugLog("Targeting  Nearby: " + pos + " to: " + target);
+        debugLog("Targeting  Nearby: " + pos + " to: " + target);
 
         boolean canMove = getEntity().getNavigator().tryMoveToXYZ(target.getX(), target.getY(), target.getZ(),
                 getEntity().getSpeedFactor());
@@ -632,7 +632,7 @@ public class EntityAIVassal extends EntityAIBase implements IMessager
 
     public boolean inProximity(BlockPos pos)
     {
-        return VassalUtils.isWithinSqDist(getEntity().getPosition(), pos, PROXIMITY_SQ);
+        return VassalUtils.isWithinXZSqDist(getEntity().getPosition(), pos, PROXIMITY_SQ);
     }
 
     //=============================================================================================

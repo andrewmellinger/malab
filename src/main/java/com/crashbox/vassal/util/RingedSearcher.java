@@ -24,16 +24,17 @@ public class RingedSearcher  implements Iterable<BlockPos>
                     bounds.inBounds(pos) &&
                     !VassalUtils.pointInAreas(pos, exclusions, 1))
             {
+                // Travel all the way down to the bottom finding the wood
                 Queue<BlockPos> result = new LinkedList<BlockPos>();
-
-                // Move down to bottom
-                for (int y = pos.getY(); y >= start.getY(); --y)
+                BlockPos woodPos = pos;
+                result.add(woodPos);
+                while (true)
                 {
-                    BlockPos tmp = new BlockPos(pos.getX(), y, pos.getZ());
-                    if (VassalUtils.willDrop(world, tmp, matcher))
-                    {
-                        result.add(tmp);
-                    }
+                    woodPos = woodPos.down();
+                    if (VassalUtils.willDrop(world, woodPos, matcher))
+                        result.add(woodPos);
+                    else
+                        break;
                 }
                 return result;
             }
@@ -42,7 +43,7 @@ public class RingedSearcher  implements Iterable<BlockPos>
         return null;
     }
 
-
+    @Deprecated
     public static Queue<BlockPos> findTree(World world, BlockPos center, int radius, int height,
             ItemStackMatcher matcher, List<BlockPos> exclusions)
     {
@@ -197,7 +198,7 @@ public class RingedSearcher  implements Iterable<BlockPos>
             _maxX = _center.getX() + _currentRadius;
             _maxZ = _center.getZ() + _currentRadius;
             _y = _center.getY() + _height;
-            _minY = _center.getY();
+            _minY = _center.getY() - 5;
 
             // Don't check the center block
             if (_currentRadius == 0)

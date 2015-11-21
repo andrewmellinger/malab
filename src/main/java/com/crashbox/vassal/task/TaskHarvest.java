@@ -114,7 +114,7 @@ public abstract class TaskHarvest extends TaskAcquireBase
 
     // Describes the search area
     protected final int _radius;
-    protected final int _height = 10;
+    protected final int _height = 20;
     protected final int _quantity;
 
     // Blocks we are breaking

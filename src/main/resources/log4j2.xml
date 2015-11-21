@@ -1,22 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration>
-<Appenders>
-    <Console name="Console">
-        <PatternLayout pattern="%level{WARN=W, DEBUG=D, ERROR=E, TRACE=T, INFO=I} %d{HH:mm:ss.SSS} [%t] %logger{1} - %msg%n"/>
-    </Console>
-</Appenders>
-<Loggers>
-    <Logger name="com.crashbox" level="trace" additivity="true"/>
-    <Logger name="com.crashbox.vassal.util.StairBuilder" level="info" additivity="true"/>
-    <Logger name="com.crashbox.vassal.chest.TileEntityBeaconChest" level="info" additivity="true"/>
-    <Logger name="com.crashbox.vassal.forester.TileEntityBeaconForester" level="info" additivity="true"/>
-    <Logger name="com.crashbox.vassal.furnace.TileEntityBeaconFurnace" level="info" additivity="true"/>
-    <Logger name="com.crashbox.vassal.quarry.TileEntityBeaconQuarry" level="info" additivity="true"/>
-    <Logger name="com.crashbox.vassal.workbench.TileEntityBeaconWorkbench" level="info" additivity="true"/>
-    <Logger name="com.crashbox.vassal.task.TaskPair" level="info" additivity="true"/>
-    <Logger name="com.crashbox.vassal.task.TaskMakeBigStair" level="info" additivity="true"/>
-    <Root level="warn">
-        <AppenderRef ref="Console"/>
-    </Root>
-</Loggers>
+    <Appenders>
+        <Console name="Console">
+            <PatternLayout
+                    pattern="%level{WARN=W, DEBUG=D, ERROR=E, TRACE=T, INFO=I} %d{HH:mm:ss.SSS} [%t] %logger{1} - %msg%n"/>
+        </Console>
+    </Appenders>
+    <Loggers>
+        <Logger level="trace" additivity="true" name="com.crashbox"/>
+        <Logger level="info" additivity="true" name="com.crashbox.vassal.ai.EntityAIVassal"/>
+        <Logger level="info"  additivity="true" name="com.crashbox.vassal.chest.TileEntityBeaconChest"/>
+        <Logger level="info" additivity="true" name="com.crashbox.vassal.forester.TileEntityBeaconForester"/>
+        <Logger level="info"  additivity="true" name="com.crashbox.vassal.furnace.TileEntityBeaconFurnace"/>
+        <Logger level="info"  additivity="true" name="com.crashbox.vassal.quarry.TileEntityBeaconQuarry"/>
+        <Logger level="info" additivity="true" name="com.crashbox.vassal.task.TaskPair"/>
+        <Logger level="info"  additivity="true" name="com.crashbox.vassal.task.TaskMakeBigStair"/>
+        <Logger level="info"  additivity="true" name="com.crashbox.vassal.util.StairBuilder"/>
+        <Logger level="info"  additivity="true" name="com.crashbox.vassal.workbench.TileEntityBeaconWorkbench"/>
+        <Root level="warn">
+            <AppenderRef ref="Console"/>
+        </Root>
+    </Loggers>
 </Configuration>

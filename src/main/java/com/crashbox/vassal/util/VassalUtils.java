@@ -264,7 +264,7 @@ public class VassalUtils
         int y = startPos.getY();
         int z = startPos.getZ();
 
-        AxisAlignedBB scanBlock = new AxisAlignedBB(x - range, y - 1, z - range, x + range, y + 1, z + range);
+        AxisAlignedBB scanBlock = new AxisAlignedBB(x - range, y - range, z - range, x + range, y + range, z + range);
         List entities = world.getEntitiesWithinAABB(EntityItem.class, scanBlock);
         for (Object obj :entities)
         {
@@ -294,7 +294,8 @@ public class VassalUtils
         int y = startPos.getY();
         int z = startPos.getZ();
 
-        AxisAlignedBB scanBlock = new AxisAlignedBB(x - range, y - 1, z - range, x + range, y + 1, z + range);
+        // Look pretty far down in case we are on an uneven surface.
+        AxisAlignedBB scanBlock = new AxisAlignedBB(x - range, y - range, z - range, x + range, y + range, z + range);
         List entities = world.getEntitiesWithinAABB(EntityItem.class, scanBlock);
         for (Object obj :entities)
         {
@@ -303,6 +304,7 @@ public class VassalUtils
                 EntityItem entityItem = (EntityItem) obj;
                 if (entityItem.getEntityItem().getItem() == itemType)
                 {
+                    // Make sure it is on ground.
                     return entityItem;
                 }
             }
@@ -350,43 +352,11 @@ public class VassalUtils
      */
     public static BlockPos findEmptyOrchardSquare(World world, BlockPos center, int radius)
     {
-        Queue<BlockPos> everyOther = new LinkedList<BlockPos>();
-        boolean even = false;
-
-        radius = radius - (radius % 2);
-        for (int z = center.getZ() - radius; z <= center.getZ() + radius; z += 2)
-        {
-            for (int x = center.getX() - radius; x <= center.getX() + radius; x += 2)
-            {
-                BlockPos pos = new BlockPos(x, center.getY(), z);
-                if (even)
-                {
-                    everyOther.add(pos);
-                }
-                else
-                {
-                    if (world.isAirBlock(pos))
-                    {
-                        BlockPos down = pos.down();
-                        IBlockState downState = world.getBlockState(down);
-                        if (downState.getBlock() == Blocks.grass || downState.getBlock() == Blocks.dirt)
-                            return pos;
-                    }
-                }
-                even = !even;
-            }
-        }
-
-        // If we are here, let's try every other
-        for (BlockPos pos : everyOther)
-        {
-            if (world.isAirBlock(pos))
-                return pos;
-        }
-
-        return null;
+        OrchardTraverser traverser = new OrchardTraverser(world, center, radius, 10, 5, null);
+        return traverser.iterator().next();
     }
 
+    @Deprecated
     public static enum COMPASS { EAST, SOUTH, WEST, NORTH }
 
     public static void showStack(Logger logger)
@@ -537,7 +507,7 @@ public class VassalUtils
         return true;
     }
 
-    public static boolean isWithinSqDist(BlockPos pos1, BlockPos pos2, int diff)
+    public static boolean isWithinXZSqDist(BlockPos pos1, BlockPos pos2, int diff)
     {
         // We only use XZ.
         int xOffset = pos1.getX() - pos2.getX();

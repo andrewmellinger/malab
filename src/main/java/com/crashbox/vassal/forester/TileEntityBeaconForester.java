@@ -146,8 +146,6 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
         debugLog("handleItemRequest: msg=" + msg);
 
         // Look around and see if we have any of these.
-//        boolean hasMats = RingedSearcher.detectBlock(getWorld(), getPos(), _searchRadius, _searchHeight,
-//                itemReq.getMatcher());
         BlockPos foundPos = RingedSearcher.findBlock(getWorld(), getPos(), _searchRadius, _searchHeight,
                 msg.getMatcher());
         boolean hasMats = foundPos != null;
@@ -173,6 +171,7 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
         //=====================
         // Replant trees
 
+        // TODO:  Build better landscape mapper
         EntityItem pickup = VassalUtils.findFirstEntityOfTypeOnGround(getWorld(), getPos(), _searchRadius + 2,
                 Item.getItemFromBlock(Blocks.sapling));
         BlockPos target = VassalUtils.findEmptyOrchardSquare(getWorld(), getPos(), _searchRadius);
@@ -182,7 +181,7 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
         {
             TRPickup pickupRequest = new TRPickup(TileEntityBeaconForester.this,
                     msg.getSender(), msg.getTransactionID(), Priority.getForesterPickupSaplingValue(),
-                    4, Item.getItemFromBlock(Blocks.sapling));
+                    -1, Item.getItemFromBlock(Blocks.sapling));
 
             TRPlantSapling plantRequest = new TRPlantSapling(TileEntityBeaconForester.this,
                     msg.getSender(), msg.getTransactionID(), Priority.getForesterPlantSaplingValue());
@@ -198,21 +197,14 @@ public class TileEntityBeaconForester extends TileEntity implements IUpdatePlaye
         //=====================
 
         // Cleanup anything else laying around
-        if (VassalUtils.generateCleanupTask(this, getWorld(), getBlockPos(), getRadius() + 2,msg))
+        if (VassalUtils.generateCleanupTask(this, getWorld(), getBlockPos(), getRadius() + 2, msg))
             return;
 
         //=====================
 
         // We can also just provide wood
-
-//        boolean hasMats = RingedSearcher.detectBlock(getWorld(), getPos(), _searchRadius, _searchHeight,
-//                new ItemTypeMatcher(Item.getItemFromBlock(Blocks.log)));
-
-        //int vassalCount = AIUtils.countVassalsInArea(getWorld(), getPos(), getRadius());
         ItemStack sample = RingedSearcher.findFirstItemDrop(getWorld(), getPos(), _searchRadius + 2, _searchHeight,
                 new ItemTypeMatcher(Item.getItemFromBlock(Blocks.log)));
-
-        // We only want to respond if we have materials and we aren't already being heavily worked
         if (sample != null)
         {
             // Offer a task, at our area for the requested thing.
