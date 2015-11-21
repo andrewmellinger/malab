@@ -1,7 +1,7 @@
 package com.crashbox.mal.task;
 
-import com.crashbox.mal.ai.EntityAIVassal;
-import com.crashbox.mal.beacon.TileEntityBeaconInventory;
+import com.crashbox.mal.ai.EntityAIWorkDroid;
+import com.crashbox.mal.autoblock.TileEntityAutoBlockInventory;
 import com.crashbox.mal.common.ItemStackMatcher;
 import com.crashbox.mal.messaging.*;
 import com.crashbox.mal.task.ITask.UpdateResult;
@@ -25,9 +25,9 @@ public class TaskPutInInventory extends TaskDeliverBase
         ItemStack current = getEntity().getHeldItem();
 
         IMessager requester = getRequester();
-        if (requester instanceof TileEntityBeaconInventory)
+        if (requester instanceof TileEntityAutoBlockInventory)
         {
-            current = ((TileEntityBeaconInventory) requester).mergeIntoBestSlot(current);
+            current = ((TileEntityAutoBlockInventory) requester).mergeIntoBestSlot(current);
             getEntity().setCurrentItemOrArmor(0, current);
         }
         else
@@ -39,7 +39,7 @@ public class TaskPutInInventory extends TaskDeliverBase
         return UpdateResult.DONE;
     }
 
-    public TaskPutInInventory(EntityAIVassal performer, TRPutInInventory message)
+    public TaskPutInInventory(EntityAIWorkDroid performer, TRPutInInventory message)
     {
         super(performer, message.getSender(), message.getValue());
         _matcher = message.getMatcher();

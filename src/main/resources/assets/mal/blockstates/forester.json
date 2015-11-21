@@ -1,0 +1,11 @@
+{
+  "variants":
+  {
+    "normal": { "model": "mal:forester" },
+    "facing=up": { "model": "mal:forester" },
+    "facing=east": { "model": "mal:forester" },
+    "facing=south": { "model": "mal:forester", "y": 90 },
+    "facing=west": { "model": "mal:forester", "y": 180 },
+    "facing=north": { "model": "mal:forester", "y": 270 }
+  }
+}

@@ -1,6 +1,6 @@
 package com.crashbox.mal.task;
 
-import com.crashbox.mal.ai.EntityAIVassal;
+import com.crashbox.mal.ai.EntityAIWorkDroid;
 import com.crashbox.mal.messaging.TRPlaceBlock;
 import com.crashbox.mal.task.ITask.UpdateResult;
 import net.minecraft.util.BlockPos;
@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class TaskPlaceBlock extends TaskDeliverBase
 {
-    public TaskPlaceBlock(EntityAIVassal performer, TRPlaceBlock message)
+    public TaskPlaceBlock(EntityAIWorkDroid performer, TRPlaceBlock message)
     {
         super(performer, message.getSender(), message.getValue());
         _pos = message.getPos();

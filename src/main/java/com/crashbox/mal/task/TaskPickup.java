@@ -1,7 +1,7 @@
 package com.crashbox.mal.task;
 
-import com.crashbox.mal.util.VassalUtils;
-import com.crashbox.mal.ai.EntityAIVassal;
+import com.crashbox.mal.util.MALUtils;
+import com.crashbox.mal.ai.EntityAIWorkDroid;
 import com.crashbox.mal.messaging.TRPickup;
 import com.crashbox.mal.task.ITask.UpdateResult;
 import net.minecraft.entity.item.EntityItem;
@@ -18,7 +18,7 @@ import java.util.List;
  */
 public class TaskPickup extends TaskAcquireBase
 {
-    public TaskPickup(EntityAIVassal performer, TRPickup message)
+    public TaskPickup(EntityAIWorkDroid performer, TRPickup message)
     {
         super(performer, message.getSender(), message.getValue(), message.getMatcher());
         _item = message.getItem();
@@ -27,7 +27,7 @@ public class TaskPickup extends TaskAcquireBase
     @Override
     public BlockPos getWorkTarget(List<BlockPos> others)
     {
-        EntityItem eItem = VassalUtils.findFirstEntityOfTypeOnGround(getEntity().getEntityWorld(),
+        EntityItem eItem = MALUtils.findFirstEntityOfTypeOnGround(getEntity().getEntityWorld(),
                 getRequester().getBlockPos(), getRequester().getRadius() + 2, _item);
 
         if (eItem != null)
@@ -39,13 +39,13 @@ public class TaskPickup extends TaskAcquireBase
     @Override
     public UpdateResult executeAndIsDone()
     {
-        EntityItem eItem = VassalUtils.findFirstEntityOfTypeOnGround(getEntity().getEntityWorld(), getEntity()
+        EntityItem eItem = MALUtils.findFirstEntityOfTypeOnGround(getEntity().getEntityWorld(), getEntity()
                 .getPosition(), 3, _item);
 
         if (eItem == null)
             return UpdateResult.DONE;
 
-        ItemStack collected = VassalUtils.collectEntityIntoNewStack(getWorld(), eItem.getPosition(), 3, _item);
+        ItemStack collected = MALUtils.collectEntityIntoNewStack(getWorld(), eItem.getPosition(), 3, _item);
 
         // ROBUSTNESS CHECK: If we are holding something different than what we are supposed to pick
         // up, drop it instead of just ignoring it.  This is an error.

@@ -1,7 +1,7 @@
 package com.crashbox.mal.task;
 
-import com.crashbox.mal.ai.EntityAIVassal;
-import com.crashbox.mal.beacon.TileEntityBeaconInventory;
+import com.crashbox.mal.ai.EntityAIWorkDroid;
+import com.crashbox.mal.autoblock.TileEntityAutoBlockInventory;
 import com.crashbox.mal.messaging.TRGetFromInventory;
 import com.crashbox.mal.task.ITask.UpdateResult;
 import net.minecraft.item.ItemStack;
@@ -17,7 +17,7 @@ import java.util.List;
  */
 public class TaskGetFromInventory extends TaskAcquireBase
 {
-    public TaskGetFromInventory(EntityAIVassal performer, TRGetFromInventory message)
+    public TaskGetFromInventory(EntityAIWorkDroid performer, TRGetFromInventory message)
     {
         super(performer, message.getSender(), message.getValue(), message.getMatcher());
 
@@ -44,10 +44,10 @@ public class TaskGetFromInventory extends TaskAcquireBase
         // Get the tile entity and extract it
         //debugLog(LOGGER, "Going to extract items. ");
         TileEntity entity = getWorld().getTileEntity(getRequester().getBlockPos());
-        if (entity instanceof TileEntityBeaconInventory)
+        if (entity instanceof TileEntityAutoBlockInventory)
         {
             //debugLog(LOGGER, "Extracting: entity=" + entity.getClass().getSimpleName() + ", matcher=" + getMatcher() + ", qty=" + _quantity);
-            ItemStack extracted = ((TileEntityBeaconInventory) entity).extractItems(getMatcher(), _quantity);
+            ItemStack extracted = ((TileEntityAutoBlockInventory) entity).extractItems(getMatcher(), _quantity);
             getEntity().setCurrentItemOrArmor(0, extracted);
             //debugLog(LOGGER, "Extracted: " + extracted);
         }

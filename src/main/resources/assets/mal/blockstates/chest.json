@@ -1,0 +1,11 @@
+{
+  "variants":
+  {
+    "normal": { "model": "mal:chest" },
+    "facing=up": { "model": "mal:chest" },
+    "facing=east": { "model": "mal:chest" },
+    "facing=south": { "model": "mal:chest", "y": 90 },
+    "facing=west": { "model": "mal:chest", "y": 180 },
+    "facing=north": { "model": "mal:chest", "y": 270 }
+  }
+}

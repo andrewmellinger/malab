@@ -8,7 +8,7 @@ In Vassal there are two types of robots, mobile ( moving ) and fixed ( still ). 
 
 - A Vassal sends a signal that it is available for work
 - All the beacons respond with possible work ( e.g cutting trees)
-- The vassal matches up tasks that could connect ( cut tree with furnace )
+- The workDroid matches up tasks that could connect ( cut tree with furnace )
 - The Vassal chooses the "most valuable" work ( based on a cost ) and does it
 - Repeat
 
@@ -20,11 +20,11 @@ The vassals are charcoal or coal powered. They require a source of fuel such as 
 
 Vassals may be interacted with by right clicking on them. From the inventory you may remove what is in their hands, adjust their fuel, or see how much run time they have left before consuming another piece of fuel. Activating the Vassal interface will cause the Vassal to stop the current task. This can also be used to "reset" a Vassal should it get stuck or have problems it cannot fix by itself. There is also a "follow me" slot.  If redstone is placed in this slot, the robot will follow the player that placed redstone in the slot. 
 
-If a Vassal takes damage it will self-heal between tasks, emitting a enchanting table particle effect.  The vassal will consume a significant amount of fuel while healing, roughly six times what they do when working or moving.
+If a Vassal takes damage it will self-heal between tasks, emitting a enchanting table particle effect.  The workDroid will consume a significant amount of fuel while healing, roughly six times what they do when working or moving.
 
-Constructing a Vassal is similar to constructing a snowman.  Place a piston on the ground, a furnace on top of that, then a vassal head in top of that.  The recipe for a Vassal head is:
+Constructing a Vassal is similar to constructing a snowman.  Place a piston on the ground, a furnace on top of that, then a workDroid head in top of that.  The recipe for a Vassal head is:
 
-- vassal head recipe -
+- workDroid head recipe -
 
 # Chips #
 
@@ -72,11 +72,11 @@ The workbench works with hoppers, so you can move excess outputs to chests or co
 
 The Vassal's work selection is based on a variety of factors about the provided work. Distance to work, current capacity, current need and other environmental factors. Some of the priorities have been exposed as game rules to allow experimentation.  Note, these factors apply to all Vassals and all Beacons regardless of the player or dimension.
 
-- **vassal.distance** - ( default: 64 ) - This is the maximum distance in blocks that a vassal will travel to collect a material, or from collection area to drop off.  For example, this number is the maximum distance between harvesting a tree and the chest the Vassal should put the wood in.  This helps to keep the Vassals in a more limited area.
-- **vassal.forester.harvest.value** - ( default: 0 ) - This is a weighting factor given to the Vassal when computing the priority of harvesting wood over other things when wood is in demand by something like a furnace.  The higher the number the more it will do to collect wood.  Note, chests do not demand wood.
-- **vassal.forester.idle.harvest.value** - ( default: -5 ) - This is a weighting factor given to the Vassal when computing the priority of harvesting wood over other things when nothing demands wood but the bot is idle.  The higher the number the more it will do to collect wood when not in demand.
-- **vassal.quarry.harvest.value** - ( default: 5 ) - See the harvest value for foresters for a explanation  of what this value means.  However, this value applies to quarries instead of foresters.
-- **vassal.quarry.idle.harvest.value** - ( default: 0 ) - See the idle harvest value for foresters for a explanation of what this value means.  However, this value applies to quarries instead of forresters.
-- **vassal.quarry.depth.value.tenths.per.block** - ( default: 2) - This value allows deeper quarries to be prioritized over other activities.  This number is based on the closeness to the bottom ( depth of 11.)  The closer to 11 the higher the value.  The higher this value, the higher the priority of this quarry.
+- **workDroid.distance** - ( default: 64 ) - This is the maximum distance in blocks that a workDroid will travel to collect a material, or from collection area to drop off.  For example, this number is the maximum distance between harvesting a tree and the chest the Vassal should put the wood in.  This helps to keep the Vassals in a more limited area.
+- **workDroid.forester.harvest.value** - ( default: 0 ) - This is a weighting factor given to the Vassal when computing the priority of harvesting wood over other things when wood is in demand by something like a furnace.  The higher the number the more it will do to collect wood.  Note, chests do not demand wood.
+- **workDroid.forester.idle.harvest.value** - ( default: -5 ) - This is a weighting factor given to the Vassal when computing the priority of harvesting wood over other things when nothing demands wood but the bot is idle.  The higher the number the more it will do to collect wood when not in demand.
+- **workDroid.quarry.harvest.value** - ( default: 5 ) - See the harvest value for foresters for a explanation  of what this value means.  However, this value applies to quarries instead of foresters.
+- **workDroid.quarry.idle.harvest.value** - ( default: 0 ) - See the idle harvest value for foresters for a explanation of what this value means.  However, this value applies to quarries instead of forresters.
+- **workDroid.quarry.depth.value.tenths.per.block** - ( default: 2) - This value allows deeper quarries to be prioritized over other activities.  This number is based on the closeness to the bottom ( depth of 11.)  The closer to 11 the higher the value.  The higher this value, the higher the priority of this quarry.
 
 

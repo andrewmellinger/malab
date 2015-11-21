@@ -1,6 +1,6 @@
 package com.crashbox.mal.task;
 
-import com.crashbox.mal.ai.EntityAIVassal;
+import com.crashbox.mal.ai.EntityAIWorkDroid;
 import com.crashbox.mal.messaging.TRHarvest;
 import com.crashbox.mal.util.StairBuilder;
 import net.minecraft.util.BlockPos;
@@ -16,7 +16,7 @@ import java.util.Queue;
  */
 public class TaskQuarry extends TaskHarvest
 {
-    public TaskQuarry(EntityAIVassal performer, TRHarvest message)
+    public TaskQuarry(EntityAIWorkDroid performer, TRHarvest message)
     {
         super(performer, message);
         _builder = new StairBuilder(getWorld(), getRequester().getBlockPos(), getRequester().getRadius());

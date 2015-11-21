@@ -1,6 +1,6 @@
 package com.crashbox.mal.task;
 
-import com.crashbox.mal.ai.EntityAIVassal;
+import com.crashbox.mal.ai.EntityAIWorkDroid;
 import com.crashbox.mal.common.ItemStackMatcher;
 import com.crashbox.mal.messaging.IMessager;
 
@@ -9,7 +9,7 @@ import com.crashbox.mal.messaging.IMessager;
  */
 public abstract class TaskDeliverBase extends TaskBase
 {
-    public TaskDeliverBase(EntityAIVassal performer, IMessager requester, int priority)
+    public TaskDeliverBase(EntityAIWorkDroid performer, IMessager requester, int priority)
     {
         super(performer, requester, priority);
     }

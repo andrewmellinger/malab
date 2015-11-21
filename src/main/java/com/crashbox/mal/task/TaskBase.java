@@ -1,8 +1,8 @@
 package com.crashbox.mal.task;
 
-import com.crashbox.mal.util.VassalUtils;
-import com.crashbox.mal.entity.EntityVassal;
-import com.crashbox.mal.ai.EntityAIVassal;
+import com.crashbox.mal.util.MALUtils;
+import com.crashbox.mal.workdroid.EntityWorkDroid;
+import com.crashbox.mal.ai.EntityAIWorkDroid;
 import com.crashbox.mal.messaging.IMessager;
 import com.crashbox.mal.messaging.MessageTaskRequest;
 import com.crashbox.mal.task.ITask.UpdateResult;
@@ -19,12 +19,12 @@ import java.util.List;
  */
 public abstract class TaskBase
 {
-    public static TaskBase createTask(EntityAIVassal performer, MessageTaskRequest message)
+    public static TaskBase createTask(EntityAIWorkDroid performer, MessageTaskRequest message)
     {
         Class<? extends TaskBase> clazz = message.getTaskClass();
         try
         {
-            Constructor<? extends TaskBase> ctor = clazz.getConstructor(EntityAIVassal.class,
+            Constructor<? extends TaskBase> ctor = clazz.getConstructor(EntityAIWorkDroid.class,
                     message.getClass());
             TaskBase task = ctor.newInstance(performer, message);
             return task;
@@ -43,7 +43,7 @@ public abstract class TaskBase
      * @param requester This is the requester of the task.
      * @param value The priority of the task.
      */
-    protected TaskBase(EntityAIVassal performer, IMessager requester, int value)
+    protected TaskBase(EntityAIWorkDroid performer, IMessager requester, int value)
     {
         _performer = performer;
         _requester = requester;
@@ -55,12 +55,12 @@ public abstract class TaskBase
         return _requester;
     }
 
-    public EntityVassal getEntity()
+    public EntityWorkDroid getEntity()
     {
         return _performer.getEntity();
     }
 
-    public EntityAIVassal getPerformer()
+    public EntityAIWorkDroid getPerformer()
     {
         return _performer;
     }
@@ -130,8 +130,8 @@ public abstract class TaskBase
 
     public void debugInfo(StringBuilder builder)
     {
-        builder.append("performer=").append(VassalUtils.objID(_requester));
-        builder.append(", requester=").append(VassalUtils.objID(_requester));
+        builder.append("performer=").append(MALUtils.objID(_requester));
+        builder.append(", requester=").append(MALUtils.objID(_requester));
         builder.append(", value=").append(_value);
     }
 
@@ -142,7 +142,7 @@ public abstract class TaskBase
     }
 
     // Who is executing the task?
-    protected final EntityAIVassal _performer;
+    protected final EntityAIWorkDroid _performer;
 
     // Who generated the task
     protected final IMessager _requester;

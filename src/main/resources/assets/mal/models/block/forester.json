@@ -1,0 +1,12 @@
+{
+  "parent": "block/cube",
+  "textures": {
+    "up": "mal:blocks/forester_top",
+    "down": "mal:blocks/forester_bottom",
+    "north": "mal:blocks/forester_side_NS",
+    "south": "mal:blocks/forester_side_NS",
+    "east": "mal:blocks/forester_side_EW",
+    "west": "mal:blocks/forester_side_EW",
+    "particle": "mal:blocks/forester_bottom"
+  }
+}

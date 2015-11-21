@@ -1,7 +1,7 @@
 package com.crashbox.mal.messaging;
 
-import com.crashbox.mal.ai.EntityAIVassal;
-import com.crashbox.mal.util.VassalUtils;
+import com.crashbox.mal.ai.EntityAIWorkDroid;
+import com.crashbox.mal.util.MALUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -60,17 +60,17 @@ public class Message
 
     public void debugInfo(StringBuilder builder)
     {
-        String sender = VassalUtils.objID(_sender);
-        if (_sender instanceof EntityAIVassal)
-            sender = ((EntityAIVassal)_sender).getEntity().getCustomNameTag();
+        String sender = MALUtils.objID(_sender);
+        if (_sender instanceof EntityAIWorkDroid)
+            sender = ((EntityAIWorkDroid)_sender).getEntity().getCustomNameTag();
 
-        String target = VassalUtils.objID(_target);
-        if (_target instanceof EntityAIVassal)
-            target = ((EntityAIVassal)_target).getEntity().getCustomNameTag();
+        String target = MALUtils.objID(_target);
+        if (_target instanceof EntityAIWorkDroid)
+            target = ((EntityAIWorkDroid)_target).getEntity().getCustomNameTag();
 
         builder.append(" sender=").append(sender);
         builder.append(", target=").append(target);
-        builder.append(", transactionID=").append(VassalUtils.objID(_transactionID));
+        builder.append(", transactionID=").append(MALUtils.objID(_transactionID));
         builder.append(", priority=").append(_value);
     }
 

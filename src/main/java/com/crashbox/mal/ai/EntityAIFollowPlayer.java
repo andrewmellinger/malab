@@ -1,6 +1,6 @@
 package com.crashbox.mal.ai;
 
-import com.crashbox.mal.entity.EntityVassal;
+import com.crashbox.mal.workdroid.EntityWorkDroid;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.pathfinding.PathNavigate;
@@ -10,28 +10,28 @@ import net.minecraft.pathfinding.PathNavigateGround;
  * Copyright 2015 Andrew O. Mellinger
  * <p>
  * This AI module is used to make the entity follow a specific player.  It is designed
- * to work with the vassal bot, which exposes the "getFollowPlayer" function.
+ * to work with the work droid bot, which exposes the "getFollowPlayer" function.
  * The bot will try to keep up, but will stop moving if gets too close as to prevent
  * "crowding."
  */
 public class EntityAIFollowPlayer extends EntityAIBase
 {
-    private final EntityVassal _vassal;
+    private final EntityWorkDroid _droid;
     private EntityPlayer _player;
     private PathNavigate _botPathfinder;
     private final double _maxDistSq;
     private final double _minDistSq;
     private int _tickCounter;
 
-    public EntityAIFollowPlayer(EntityVassal vassal, float minDist, float maxDist)
+    public EntityAIFollowPlayer(EntityWorkDroid droid, float minDist, float maxDist)
     {
-        _vassal = vassal;
-        _botPathfinder = vassal.getNavigator();
+        _droid = droid;
+        _botPathfinder = droid.getNavigator();
         _minDistSq = minDist * minDist;
         _maxDistSq = maxDist * maxDist;
         setMutexBits(3);
 
-        if (!(vassal.getNavigator() instanceof PathNavigateGround))
+        if (!(droid.getNavigator() instanceof PathNavigateGround))
         {
             throw new IllegalArgumentException("Unsupported mob type for EntityAIFollowPlayer");
         }
@@ -42,7 +42,7 @@ public class EntityAIFollowPlayer extends EntityAIBase
      */
     public boolean shouldExecute()
     {
-        _player = _vassal.getFollowPlayer();
+        _player = _droid.getFollowPlayer();
         return (_player != null);
     }
 
@@ -51,7 +51,7 @@ public class EntityAIFollowPlayer extends EntityAIBase
      */
     public boolean continueExecuting()
     {
-        return (_vassal.getFollowPlayer() == _player);
+        return (_droid.getFollowPlayer() == _player);
     }
 
     /**
@@ -60,7 +60,7 @@ public class EntityAIFollowPlayer extends EntityAIBase
     public void startExecuting()
     {
         _tickCounter = 0;
-        ((PathNavigateGround)_vassal.getNavigator()).func_179690_a(false);
+        ((PathNavigateGround) _droid.getNavigator()).func_179690_a(false);
     }
 
     /**
@@ -70,7 +70,7 @@ public class EntityAIFollowPlayer extends EntityAIBase
     {
         _player = null;
         _botPathfinder.clearPathEntity();
-        ((PathNavigateGround)_vassal.getNavigator()).func_179690_a(true);
+        ((PathNavigateGround) _droid.getNavigator()).func_179690_a(true);
     }
 
     /**
@@ -78,13 +78,13 @@ public class EntityAIFollowPlayer extends EntityAIBase
      */
     public void updateTask()
     {
-        _vassal.getLookHelper().setLookPositionWithEntity(_player, 10.0F, (float) _vassal.getVerticalFaceSpeed());
+        _droid.getLookHelper().setLookPositionWithEntity(_player, 10.0F, (float) _droid.getVerticalFaceSpeed());
 
-        if (_vassal.getFollowPlayer() != _player)
+        if (_droid.getFollowPlayer() != _player)
             return;
 
         // If we are out of range, just hold.
-        double distanceSq = _vassal.getDistanceSqToEntity(_player);
+        double distanceSq = _droid.getDistanceSqToEntity(_player);
         if (distanceSq < _minDistSq || distanceSq > _maxDistSq)
         {
             // If we are out of range, just hang out
@@ -93,20 +93,20 @@ public class EntityAIFollowPlayer extends EntityAIBase
         }
 
         // Only recompute every second
-        _vassal.burnFuel();
+        _droid.burnFuel();
         if (--_tickCounter <= 0)
         {
             _tickCounter = 20;
 
             // Just keep trying to get there
-            _botPathfinder.tryMoveToEntityLiving(_player, _vassal.getSpeedFactor());
-            //_vassal.sendParticleMessage(EnumParticleTypes.HEART, 22);
+            _botPathfinder.tryMoveToEntityLiving(_player, _droid.getSpeedFactor());
+            //_droid.sendParticleMessage(EnumParticleTypes.HEART, 22);
 
 //            if (!_botPathfinder.tryMoveToEntityLiving(_player, _speed))
 //            {
-//                if (!_vassal.getLeashed())
+//                if (!_droid.getLeashed())
 //                {
-//                    if (_vassal.getDistanceSqToEntity(_player) >= 144.0D)
+//                    if (_droid.getDistanceSqToEntity(_player) >= 144.0D)
 //                    {
 //                        int i = MathHelper.floor_double(_player.posX) - 2;
 //                        int j = MathHelper.floor_double(_player.posZ) - 2;
@@ -121,7 +121,7 @@ public class EntityAIFollowPlayer extends EntityAIBase
 //                                        !_world.getBlockState(new BlockPos(i + l, k, j + i1)).getBlock().isFullCube() &&
 //                                        !_world.getBlockState(new BlockPos(i + l, k + 1, j + i1)).getBlock().isFullCube())
 //                                {
-//                                    _vassal.setLocationAndAngles((double)((float)(i + l) + 0.5F), (double)k, (double)((float)(j + i1) + 0.5F), _vassal.rotationYaw, _vassal.rotationPitch);
+//                                    _droid.setLocationAndAngles((double)((float)(i + l) + 0.5F), (double)k, (double)((float)(j + i1) + 0.5F), _droid.rotationYaw, _droid.rotationPitch);
 //                                    _botPathfinder.clearPathEntity();
 //                                    return;
 //                                }

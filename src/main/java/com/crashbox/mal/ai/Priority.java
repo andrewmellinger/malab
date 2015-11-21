@@ -1,7 +1,7 @@
 package com.crashbox.mal.ai;
 
 import com.crashbox.mal.task.ITask;
-import com.crashbox.mal.util.VassalUtils;
+import com.crashbox.mal.util.MALUtils;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.GameRules;
@@ -14,21 +14,20 @@ import java.util.List;
  */
 public class Priority
 {
-    // Delays between responses from beacon
-    public static final int BEACON_AVAILABILITY_RESPONSE_DELAY_MS = 600;
-
+    // Delays between responses from auto blocks
+    public static final int AVAILABILITY_RESPONSE_DELAY_MS = 600;
 
     private static final int QUARRY_MOVE_QUARRY_BLOCK_VALUE = 20;
 
-    private static final String MAX_DISTANCE = "vassal.distance";
+    private static final String MAX_DISTANCE = "mal.distance";
 
-    private static final String FORESTER_HARVEST_PRIORITY = "vassal.forester.harvest.value";
-    private static final String FORESTER_IDLE_HARVEST_PRIORITY = "vassal.forester.idle.harvest.value";
+    private static final String FORESTER_HARVEST_PRIORITY = "mal.forester.harvest.value";
+    private static final String FORESTER_IDLE_HARVEST_PRIORITY = "mal.forester.idle.harvest.value";
 
-    private static final String QUARRY_HARVEST_PRIORITY = "vassal.quarry.harvest.value";
-    private static final String QUARRY_IDLE_HARVEST_PRIORITY = "vassal.quarry.idle.harvest.value";
+    private static final String QUARRY_HARVEST_PRIORITY = "mal.quarry.harvest.value";
+    private static final String QUARRY_IDLE_HARVEST_PRIORITY = "mal.quarry.idle.harvest.value";
 
-    private static final String QUARRY_DEPTH_PRIORITY_PER_BLOCK = "vassal.quarry.depth.value.tenths.per.block";
+    private static final String QUARRY_DEPTH_PRIORITY_PER_BLOCK = "mal.quarry.depth.value.tenths.per.block";
 
     public static void setupGameRules(World world)
     {
@@ -234,7 +233,7 @@ public class Priority
     public static boolean outOfRange(World world, BlockPos startPos, BlockPos endPos)
     {
         int longestDistance = getLongestDistance(world);
-        return VassalUtils.sqDistXZ(startPos, endPos) > ( longestDistance * longestDistance );
+        return MALUtils.sqDistXZ(startPos, endPos) > ( longestDistance * longestDistance );
     }
 
 }

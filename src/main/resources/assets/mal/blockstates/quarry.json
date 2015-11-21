@@ -1,0 +1,11 @@
+{
+  "variants":
+  {
+    "normal": { "model": "mal:quarry" },
+    "facing=up": { "model": "mal:quarry" },
+    "facing=east": { "model": "mal:quarry" },
+    "facing=south": { "model": "mal:quarry", "y": 90 },
+    "facing=west": { "model": "mal:quarry", "y": 180 },
+    "facing=north": { "model": "mal:quarry", "y": 270 }
+  }
+}

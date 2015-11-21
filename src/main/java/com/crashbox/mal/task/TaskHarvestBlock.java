@@ -1,7 +1,7 @@
 package com.crashbox.mal.task;
 
-import com.crashbox.mal.util.VassalUtils;
-import com.crashbox.mal.ai.EntityAIVassal;
+import com.crashbox.mal.util.MALUtils;
+import com.crashbox.mal.ai.EntityAIWorkDroid;
 import com.crashbox.mal.messaging.TRHarvestBlock;
 import net.minecraft.util.BlockPos;
 
@@ -14,7 +14,7 @@ import java.util.Queue;
  */
 public class TaskHarvestBlock extends TaskHarvest
 {
-    public TaskHarvestBlock(EntityAIVassal performer, TRHarvestBlock message)
+    public TaskHarvestBlock(EntityAIWorkDroid performer, TRHarvestBlock message)
     {
         super(performer, message);
         _pos = message.getPos();
@@ -25,7 +25,7 @@ public class TaskHarvestBlock extends TaskHarvest
     {
         Queue<BlockPos> result = new LinkedList<BlockPos>();
         if (!getWorld().isAirBlock(_pos) &&
-                VassalUtils.willDrop(getWorld(), _pos, getMatcher()))
+                MALUtils.willDrop(getWorld(), _pos, getMatcher()))
         {
             result.add(_pos);
         }

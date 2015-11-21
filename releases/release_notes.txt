@@ -3,13 +3,13 @@ Version 0.9.004 - 2015-
 Bug Fixes:
 -Shift click should work with all inventories (fixed crash and imperfect behavior)
 -Workbench will now "re-balance" blocks of added type so you don't need to swipe
--Fixed vassal.distance computation so now a hard limit but a hint
+-Fixed workDroid.distance computation so now a hard limit but a hint
 
 
 Version 0.9.003 - 2015-10-30
 
 Initial version with:
--Vassal (circuit & vassal head), healing, follow me
+-Vassal (circuit & workDroid head), healing, follow me
 -Forester - 11 x 11 area, harvest and plant trees
 -Quarry - 9x9 dual staircase mines down to 11
 -Furnace - Sample slots, auto-fueling

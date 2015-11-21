@@ -1,7 +1,7 @@
 package com.crashbox.mal.task;
 
-import com.crashbox.mal.util.VassalUtils;
-import com.crashbox.mal.ai.EntityAIVassal;
+import com.crashbox.mal.util.MALUtils;
+import com.crashbox.mal.ai.EntityAIWorkDroid;
 import com.crashbox.mal.ai.Priority;
 import com.crashbox.mal.messaging.*;
 import net.minecraft.item.ItemStack;
@@ -21,7 +21,7 @@ public class TaskPair implements ITask
 {
     public enum Stage { EMPTYING, ACQUIRING, DELIVERING, DONE}
 
-    public TaskPair(EntityAIVassal entityAI)
+    public TaskPair(EntityAIWorkDroid entityAI)
     {
         _entityAI = entityAI;
         _broadcastHelper = new Broadcaster.BroadcastHelper(_entityAI.getEntity().getEntityWorld().provider.getDimensionId());
@@ -208,7 +208,7 @@ public class TaskPair implements ITask
     }
 
     /**
-     * This gets the general work area, usually the location of a beacon.
+     * This gets the general work area, usually the location of a auto block.
      * @return The general area of work.
      */
     public BlockPos getWorkCenter()
@@ -336,7 +336,7 @@ public class TaskPair implements ITask
 
         // Now, find the best one based on what we are going to do with it
         TRDeliverBase best = findBest(pos, delivers);
-        if (VassalUtils.isNotNull(best, LOGGER))
+        if (MALUtils.isNotNull(best, LOGGER))
         {
             setDeliverTask((TaskDeliverBase)TaskBase.createTask(_entityAI, best));
             setResolving(Resolving.UNRESOLVED);
@@ -357,7 +357,7 @@ public class TaskPair implements ITask
         {
             TRAcquireBase best = findBest(pos, acquires);
             //LOGGER.debug("Best acquire: " + best);
-            if (VassalUtils.isNotNull(best, LOGGER))
+            if (MALUtils.isNotNull(best, LOGGER))
             {
                 setAcquireTask((TaskAcquireBase)TaskBase.createTask(_entityAI, best));
                 setResolving(Resolving.UNRESOLVED);
@@ -395,20 +395,18 @@ public class TaskPair implements ITask
     @Override
     public String toString()
     {
-        return VassalUtils.objID(this) + "{" +
+        return MALUtils.objID(this) + "{" +
                 "stage=" + _stage.name() +
                 ", resolving=" + _resolving.name() +
                 ", current=" + (_current != null) +
-//                ", acquireTask=" + VassalUtils.getSimpleName(_acquireTask) +
                 ", acquireTask=" + _acquireTask +
-//                ", deliverTask=" + VassalUtils.getSimpleName(_deliverTask) +
                 ", deliverTask=" + _deliverTask +
                 '}';
     }
 
 
     // Back reference to the entityAI.
-    private final EntityAIVassal    _entityAI;
+    private final EntityAIWorkDroid _entityAI;
     private final Broadcaster.BroadcastHelper _broadcastHelper;
 
     private boolean                 _repeat;

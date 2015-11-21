@@ -1,7 +1,7 @@
 package com.crashbox.mal.util;
 
 import net.minecraft.util.BlockPos;
-import com.crashbox.mal.util.VassalUtils.COMPASS;
+import com.crashbox.mal.util.MALUtils.COMPASS;
 
 /**
  * Copyright 2015 Andrew O. Mellinger

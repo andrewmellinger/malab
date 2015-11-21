@@ -1,0 +1,11 @@
+{
+  "variants":
+  {
+    "normal": { "model": "mal:furnaceLit" },
+    "facing=up": { "model": "mal:furnaceLit" },
+    "facing=east": { "model": "mal:furnaceLit" },
+    "facing=south": { "model": "mal:furnaceLit", "y": 90 },
+    "facing=west": { "model": "mal:furnaceLit", "y": 180 },
+    "facing=north": { "model": "mal:furnaceLit", "y": 270 }
+  }
+}

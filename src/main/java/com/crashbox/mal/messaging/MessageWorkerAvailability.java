@@ -1,6 +1,6 @@
 package com.crashbox.mal.messaging;
 
-import com.crashbox.mal.ai.EntityAIVassal;
+import com.crashbox.mal.ai.EntityAIWorkDroid;
 import net.minecraft.world.World;
 
 /**
@@ -13,12 +13,12 @@ public class MessageWorkerAvailability extends Message
     /**
      * Send a nmessage saying this worker is available
      * @param world The world object we are i
-     * @param vassal The AI that will perform the work.
+     * @param workDroid The AI that will perform the work.
      */
-    public MessageWorkerAvailability(World world, EntityAIVassal vassal)
+    public MessageWorkerAvailability(World world, EntityAIWorkDroid workDroid)
     {
-        super(vassal, null, MessageWorkerAvailability.class, 0);
-        _vassalAI = vassal;
+        super(workDroid, null, MessageWorkerAvailability.class, 0);
+        _workDroidAI = workDroid;
         _world = world;
     }
 
@@ -27,11 +27,11 @@ public class MessageWorkerAvailability extends Message
         return _world;
     }
 
-    public EntityAIVassal getAIVassal()
+    public EntityAIWorkDroid getAIWorkDroid()
     {
-        return _vassalAI;
+        return _workDroidAI;
     }
 
-    private final EntityAIVassal _vassalAI;
+    private final EntityAIWorkDroid _workDroidAI;
     private final World _world;
 }

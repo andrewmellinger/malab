@@ -20,9 +20,9 @@ public class RingedSearcher  implements Iterable<BlockPos>
         RingedSearcher searcher = new RingedSearcher(start, radius, height);
         for (BlockPos pos : searcher)
         {
-            if (VassalUtils.willDrop(world, pos, matcher) &&
+            if (MALUtils.willDrop(world, pos, matcher) &&
                     bounds.inBounds(pos) &&
-                    !VassalUtils.pointInAreas(pos, exclusions, 1))
+                    !MALUtils.pointInAreas(pos, exclusions, 1))
             {
                 // Travel all the way down to the bottom finding the wood
                 Queue<BlockPos> result = new LinkedList<BlockPos>();
@@ -31,7 +31,7 @@ public class RingedSearcher  implements Iterable<BlockPos>
                 while (true)
                 {
                     woodPos = woodPos.down();
-                    if (VassalUtils.willDrop(world, woodPos, matcher))
+                    if (MALUtils.willDrop(world, woodPos, matcher))
                         result.add(woodPos);
                     else
                         break;
@@ -50,7 +50,7 @@ public class RingedSearcher  implements Iterable<BlockPos>
         RingedSearcher searcher = new RingedSearcher(center, radius, height);
         for (BlockPos pos : searcher)
         {
-            if (VassalUtils.willDrop(world, pos, matcher) && !VassalUtils.pointInAreas(pos, exclusions, 1))
+            if (MALUtils.willDrop(world, pos, matcher) && !MALUtils.pointInAreas(pos, exclusions, 1))
             {
                 Queue<BlockPos> result = new LinkedList<BlockPos>();
 
@@ -59,7 +59,7 @@ public class RingedSearcher  implements Iterable<BlockPos>
                 for (int y = pos.getY(); y >= center.getY(); --y)
                 {
                     BlockPos tmp = new BlockPos(pos.getX(), y, pos.getZ());
-                    if (VassalUtils.willDrop(world, tmp, matcher))
+                    if (MALUtils.willDrop(world, tmp, matcher))
                     {
                         result.add(tmp);
                     }
@@ -81,7 +81,7 @@ public class RingedSearcher  implements Iterable<BlockPos>
         RingedSearcher searcher = new RingedSearcher(center, radius, height);
         for (BlockPos pos : searcher)
         {
-            if (VassalUtils.willDrop(world, pos, matcher))
+            if (MALUtils.willDrop(world, pos, matcher))
             {
                 return pos;
             }
@@ -96,7 +96,7 @@ public class RingedSearcher  implements Iterable<BlockPos>
         RingedSearcher searcher = new RingedSearcher(center, radius, height);
         for (BlockPos pos : searcher)
         {
-            ItemStack stack = VassalUtils.identifyWillDrop(world, pos, matcher);
+            ItemStack stack = MALUtils.identifyWillDrop(world, pos, matcher);
             if (stack != null)
                 return stack;
         }
@@ -328,7 +328,7 @@ public class RingedSearcher  implements Iterable<BlockPos>
             if (_exclusions == null)
                 return true;
 
-            return !VassalUtils.pointInAreas(new BlockPos(_x, _y, _z), _exclusions, 1);
+            return !MALUtils.pointInAreas(new BlockPos(_x, _y, _z), _exclusions, 1);
         }
 
 

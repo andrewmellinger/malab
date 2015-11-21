@@ -2,7 +2,7 @@ package com.crashbox.mal.util;
 
 import com.crashbox.mal.common.AnyItemMatcher;
 import com.crashbox.mal.common.ItemStackMatcher;
-import com.crashbox.mal.entity.EntityVassal;
+import com.crashbox.mal.workdroid.EntityWorkDroid;
 import net.minecraft.block.BlockSlab;
 import net.minecraft.block.BlockStoneSlab;
 import net.minecraft.block.state.IBlockState;
@@ -31,7 +31,7 @@ public class StairBuilder
         _center = center;
         _radius = radius;
         _landing = findLanding(world, center, radius);
-        _dir = VassalUtils.findClockwiseDir(_center, _landing);
+        _dir = MALUtils.findClockwiseDir(_center, _landing);
         _digCorner = getDigCorner();
         _slabList = makeSlabList(_dir);
     }
@@ -79,11 +79,11 @@ public class StairBuilder
     /**
      * Finds the first quarryable block that matches in the area.
      * @param matcher The matcher for the item we are looking for.
-     * @param vassal The vassal doing the work (for tool check.)
+     * @param workDroid The droid doing the work (for tool check.)
      * @param exclusions Places to skip
      * @return True for any.
      */
-    public BlockPos findFirstQuarryable(ItemStackMatcher matcher, EntityVassal vassal, List<BlockPos> exclusions)
+    public BlockPos findFirstQuarryable(ItemStackMatcher matcher, EntityWorkDroid workDroid, List<BlockPos> exclusions)
     {
         LOGGER.debug(this);
         LOGGER.debug("findFirstQuarrayble: " + matcher);
@@ -110,7 +110,7 @@ public class StairBuilder
                 boolean hadCollision = false;
                 for (BlockPos exPos : exclusions)
                 {
-                    if (VassalUtils.pointInArea(pos, exPos, 1))
+                    if (MALUtils.pointInArea(pos, exPos, 1))
                     {
                         hadCollision = true;
                         break;
@@ -121,7 +121,7 @@ public class StairBuilder
             }
 
             // Will it give us what we want?
-            if (!(matcher instanceof AnyItemMatcher) && !VassalUtils.willDrop(_world, pos, matcher))
+            if (!(matcher instanceof AnyItemMatcher) && !MALUtils.willDrop(_world, pos, matcher))
             {
                 LOGGER.debug("Skipping, doesn't match desired type. pos=" + pos);
                 continue;
@@ -129,9 +129,9 @@ public class StairBuilder
 
             //LOGGER.debug("Not in exclusion list: " + pos);
             // Can we break it?
-            if (vassal != null && vassal.findBestTool(pos) == null)
+            if (workDroid != null && workDroid.findBestTool(pos) == null)
             {
-                LOGGER.debug("Couldn't find any tool to harvest block: pos=" + pos + ", entity=" + vassal);
+                LOGGER.debug("Couldn't find any tool to harvest block: pos=" + pos + ", entity=" + workDroid);
                 continue;
             }
 
@@ -156,7 +156,7 @@ public class StairBuilder
         IBlockState top = getTopSlab();
 
         // Try down one
-        for (BlockPos pos : VassalUtils.getCorners(new BlockPos(start.getX(), start.getY() - 1,
+        for (BlockPos pos : MALUtils.getCorners(new BlockPos(start.getX(), start.getY() - 1,
                 start.getZ()), radius))
         {
             if (world.getBlockState(pos).equals(top))
@@ -167,7 +167,7 @@ public class StairBuilder
         }
 
         // The landing might be at our level,
-        for (BlockPos pos : VassalUtils.getCorners(start, radius))
+        for (BlockPos pos : MALUtils.getCorners(start, radius))
         {
             if (world.getBlockState(pos).equals(top))
             {
@@ -177,7 +177,7 @@ public class StairBuilder
         }
 
         // Try up one
-        BlockPos[] corners = VassalUtils.getCorners(BlockUtils.up(start), radius);
+        BlockPos[] corners = MALUtils.getCorners(BlockUtils.up(start), radius);
         for (int i = 0; i < 4; ++i)
         {
             if (world.getBlockState(corners[i]).equals(top))
@@ -187,7 +187,7 @@ public class StairBuilder
             }
         }
 
-        for (BlockPos pos : VassalUtils.getCorners(new BlockPos(start.getX(), start.getY() + 1,
+        for (BlockPos pos : MALUtils.getCorners(new BlockPos(start.getX(), start.getY() + 1,
                 start.getZ()), radius))
         {
             if (world.getBlockState(pos).equals(top))
@@ -208,10 +208,10 @@ public class StairBuilder
     {
         BlockPos center = _center.down();
         BlockPos corner = new BlockPos(_landing.getX(), center.getY(), _landing.getZ());
-        return VassalUtils.nextCornerClockwise(center, corner);
+        return MALUtils.nextCornerClockwise(center, corner);
     }
 
-    private List<ProtoBlock> makeSlabList(VassalUtils.COMPASS dir)
+    private List<ProtoBlock> makeSlabList(MALUtils.COMPASS dir)
     {
         LOGGER.debug("From landing stairs go: " + dir + " landing: "+ _landing);
         List<ProtoBlock> result = new ArrayList<ProtoBlock>();
@@ -303,7 +303,7 @@ public class StairBuilder
     private int _radius;
     private BlockPos _landing;
     private BlockPos _digCorner;
-    private VassalUtils.COMPASS _dir;
+    private MALUtils.COMPASS _dir;
 
     private List<ProtoBlock> _slabList = new ArrayList<ProtoBlock>();
 

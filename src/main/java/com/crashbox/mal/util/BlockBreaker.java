@@ -1,6 +1,6 @@
 package com.crashbox.mal.util;
 
-import com.crashbox.mal.entity.EntityVassal;
+import com.crashbox.mal.workdroid.EntityWorkDroid;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
@@ -13,7 +13,7 @@ import net.minecraft.world.World;
  */
 public class BlockBreaker
 {
-    public static float breakSeconds(World world, EntityVassal entity, BlockPos pos)
+    public static float breakSeconds(World world, EntityWorkDroid entity, BlockPos pos)
     {
         // A stone pickaxe takes about 1 second to break. So I can break 10 in 9 seconds
         // Stone hardness = 1.5
@@ -37,7 +37,7 @@ public class BlockBreaker
         return (BASE_BREAK_TIME * getHardness) / (digSpeed * entity.getWorkSpeedFactor()) ;
     }
 
-    public BlockBreaker(World world, EntityVassal entity, BlockPos pos)
+    public BlockBreaker(World world, EntityWorkDroid entity, BlockPos pos)
     {
         _world = world;
         _entityID = entity.getEntityId();

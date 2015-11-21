@@ -1,6 +1,6 @@
 package com.crashbox.mal.task;
 
-import com.crashbox.mal.ai.EntityAIVassal;
+import com.crashbox.mal.ai.EntityAIWorkDroid;
 import com.crashbox.mal.common.ItemStackMatcher;
 import com.crashbox.mal.messaging.IMessager;
 import net.minecraft.item.ItemStack;
@@ -10,7 +10,7 @@ import net.minecraft.item.ItemStack;
  */
 public abstract class TaskAcquireBase extends TaskBase
 {
-    public TaskAcquireBase(EntityAIVassal performer, IMessager requester, int priority, ItemStackMatcher matcher)
+    public TaskAcquireBase(EntityAIWorkDroid performer, IMessager requester, int priority, ItemStackMatcher matcher)
     {
         super(performer, requester, priority);
         _matcher = matcher;

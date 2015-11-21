@@ -1,7 +1,7 @@
 package com.crashbox.mal.task;
 
-import com.crashbox.mal.util.VassalUtils;
-import com.crashbox.mal.ai.EntityAIVassal;
+import com.crashbox.mal.util.MALUtils;
+import com.crashbox.mal.ai.EntityAIWorkDroid;
 import com.crashbox.mal.messaging.TRHarvest;
 import com.crashbox.mal.task.ITask.UpdateResult;
 import com.crashbox.mal.util.BlockBreaker;
@@ -17,7 +17,7 @@ import java.util.Queue;
  */
 public abstract class TaskHarvest extends TaskAcquireBase
 {
-    public TaskHarvest(EntityAIVassal performer, TRHarvest message)
+    public TaskHarvest(EntityAIWorkDroid performer, TRHarvest message)
     {
         super(performer, message.getSender(), message.getValue(), message.getMatcher());
         _radius = message.getSender().getRadius();
@@ -68,7 +68,7 @@ public abstract class TaskHarvest extends TaskAcquireBase
         _breaker = null;
 
         //debugLog(LOGGER, "Finished breaking, harvesting.");
-        VassalUtils.harvestBlockIntoHeld(getWorld(), getEntity(), _harvestBlock, getMatcher());
+        MALUtils.harvestBlockIntoHeld(getWorld(), getEntity(), _harvestBlock, getMatcher());
         // This is kinda a hack...
         onBlockBroken(_harvestBlock);
         _harvestBlock = null;

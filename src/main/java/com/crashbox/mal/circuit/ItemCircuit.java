@@ -1,6 +1,6 @@
 package com.crashbox.mal.circuit;
 
-import com.crashbox.mal.VassalMain;
+import com.crashbox.mal.MALMain;
 import net.minecraft.item.Item;
 
 /**
@@ -13,7 +13,7 @@ public class ItemCircuit extends Item
     public ItemCircuit()
     {
         setMaxStackSize(64);
-        setCreativeTab(VassalMain.VASSAL_TAB);
+        setCreativeTab(MALMain.MAL_TAB);
 
         setUnlocalizedName(NAME);
     }

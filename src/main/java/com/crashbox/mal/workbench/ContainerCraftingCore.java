@@ -15,7 +15,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class ContainerCraftingCore extends Container
 {
-    public ContainerCraftingCore(TileEntityBeaconWorkbench workbench)
+    public ContainerCraftingCore(TileEntityAutoWorkbench workbench)
     {
         _workbench = workbench;
         _craftMatrix = _workbench.makeInventory(this);
@@ -84,7 +84,7 @@ public class ContainerCraftingCore extends Container
     private IInventory _craftResult = new InventoryCraftResult();
     private IInventory _craftOutput = new InventoryBasic("output", false, 1);
     private IInventory _controls = new ControlInventory();
-    private TileEntityBeaconWorkbench _workbench;
+    private TileEntityAutoWorkbench _workbench;
     private World _world;
 
     private static final Logger LOGGER = LogManager.getLogger();

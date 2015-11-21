@@ -1,0 +1,12 @@
+{
+  "parent": "block/cube",
+  "textures": {
+    "up": "mal:blocks/quarry_top",
+    "down": "mal:blocks/quarry_bottom",
+    "north": "mal:blocks/quarry_side_NS",
+    "south": "mal:blocks/quarry_side_NS",
+    "east": "mal:blocks/quarry_side_EW",
+    "west": "mal:blocks/quarry_side_EW",
+    "particle": "mal:blocks/quarry_bottom"
+  }
+}

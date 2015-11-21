@@ -1,8 +1,0 @@
-{
-  "parent": "block/cube_bottom_top",
-  "textures": {
-    "top": "vassal:blocks/beaconChest_top",
-    "side": "vassal:blocks/beaconChest_side",
-    "bottom": "vassal:blocks/beaconChest_bottom"
-  }
-}

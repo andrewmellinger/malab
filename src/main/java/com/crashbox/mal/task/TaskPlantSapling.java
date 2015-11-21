@@ -1,7 +1,7 @@
 package com.crashbox.mal.task;
 
-import com.crashbox.mal.util.VassalUtils;
-import com.crashbox.mal.ai.EntityAIVassal;
+import com.crashbox.mal.util.MALUtils;
+import com.crashbox.mal.ai.EntityAIWorkDroid;
 import com.crashbox.mal.messaging.TRPlantSapling;
 import com.crashbox.mal.task.ITask.UpdateResult;
 import net.minecraft.block.state.IBlockState;
@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class TaskPlantSapling extends TaskDeliverBase
 {
-    public TaskPlantSapling(EntityAIVassal performer, TRPlantSapling message)
+    public TaskPlantSapling(EntityAIWorkDroid performer, TRPlantSapling message)
     {
         super(performer, message.getSender(), message.getValue());
         _matcher = message.getMatcher();
@@ -25,7 +25,7 @@ public class TaskPlantSapling extends TaskDeliverBase
     @Override
     public BlockPos getWorkTarget(List<BlockPos> others)
     {
-        _plantingTarget = VassalUtils.findEmptyOrchardSquare(getWorld(), getRequester().getBlockPos(),
+        _plantingTarget = MALUtils.findEmptyOrchardSquare(getWorld(), getRequester().getBlockPos(),
                 getRequester().getRadius());
         return _plantingTarget;
     }

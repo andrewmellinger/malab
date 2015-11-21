@@ -1,14 +1,14 @@
 package com.crashbox.mal;
 
-import com.crashbox.mal.chest.BlockBeaconChest;
+import com.crashbox.mal.chest.BlockAutoChest;
 import com.crashbox.mal.circuit.ItemCircuit;
-import com.crashbox.mal.entity.BlockVassalHead;
-import com.crashbox.mal.entity.EntityVassal;
-import com.crashbox.mal.entity.RenderVassal;
-import com.crashbox.mal.furnace.BlockBeaconFurnace;
-import com.crashbox.mal.forester.BlockBeaconForester;
-import com.crashbox.mal.quarry.BlockBeaconQuarry;
-import com.crashbox.mal.workbench.BlockBeaconWorkbench;
+import com.crashbox.mal.workdroid.BlockWorkDroidHead;
+import com.crashbox.mal.workdroid.EntityWorkDroid;
+import com.crashbox.mal.workdroid.RenderWorkDroid;
+import com.crashbox.mal.furnace.BlockAutoFurnace;
+import com.crashbox.mal.forester.BlockAutoForester;
+import com.crashbox.mal.quarry.BlockAutoQuarry;
+import com.crashbox.mal.workbench.BlockAutoWorkbench;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelZombie;
 import net.minecraft.client.renderer.entity.RenderItem;
@@ -37,52 +37,52 @@ public class ClientProxy extends CommonProxy
         RenderManager renderManager = Minecraft.getMinecraft().getRenderManager();
         RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
 
-        // VASSAL
-        RenderVassal renderer = new RenderVassal(renderManager, new ModelZombie(), 0.5F);
-        RenderingRegistry.registerEntityRenderingHandler(EntityVassal.class, renderer);
+        // DROID
+        RenderWorkDroid renderer = new RenderWorkDroid(renderManager, new ModelZombie(), 0.5F);
+        RenderingRegistry.registerEntityRenderingHandler(EntityWorkDroid.class, renderer);
 
         renderItem.getItemModelMesher().register(
-                Item.getItemFromBlock(VassalMain.BLOCK_VASSAL_HEAD),
+                Item.getItemFromBlock(MALMain.BLOCK_DROID_HEAD),
                 0,
-                new ModelResourceLocation(VassalMain.MODID + ":" + BlockBeaconWorkbench.NAME, "inventory"));
+                new ModelResourceLocation(MALMain.MODID + ":" + BlockAutoWorkbench.NAME, "inventory"));
 
         // BLOCKS
         renderItem.getItemModelMesher().register(
-                Item.getItemFromBlock(VassalMain.BLOCK_BEACON_CHEST),
+                Item.getItemFromBlock(MALMain.BLOCK_AUTO_CHEST),
                 0,
-                new ModelResourceLocation(VassalMain.MODID + ":" + BlockBeaconChest.NAME, "inventory"));
+                new ModelResourceLocation(MALMain.MODID + ":" + BlockAutoChest.NAME, "inventory"));
 
         renderItem.getItemModelMesher().register(
-                Item.getItemFromBlock(VassalMain.BLOCK_BEACON_FURNACE),
+                Item.getItemFromBlock(MALMain.BLOCK_AUTO_FURNACE),
                 0,
-                new ModelResourceLocation(VassalMain.MODID + ":" + BlockBeaconFurnace.NAME, "inventory"));
+                new ModelResourceLocation(MALMain.MODID + ":" + BlockAutoFurnace.NAME, "inventory"));
 
         renderItem.getItemModelMesher().register(
-                Item.getItemFromBlock(VassalMain.BLOCK_BEACON_FORESTER),
+                Item.getItemFromBlock(MALMain.BLOCK_AUTO_FORESTER),
                 0,
-                new ModelResourceLocation(VassalMain.MODID + ":" + BlockBeaconForester.NAME, "inventory"));
+                new ModelResourceLocation(MALMain.MODID + ":" + BlockAutoForester.NAME, "inventory"));
 
         renderItem.getItemModelMesher().register(
-                Item.getItemFromBlock(VassalMain.BLOCK_BEACON_QUARRY),
+                Item.getItemFromBlock(MALMain.BLOCK_AUTO_QUARRY),
                 0,
-                new ModelResourceLocation(VassalMain.MODID + ":" + BlockBeaconQuarry.NAME, "inventory"));
+                new ModelResourceLocation(MALMain.MODID + ":" + BlockAutoQuarry.NAME, "inventory"));
 
         renderItem.getItemModelMesher().register(
-                Item.getItemFromBlock(VassalMain.BLOCK_BEACON_WORKBENCH),
+                Item.getItemFromBlock(MALMain.BLOCK_AUTO_WORKBENCH),
                 0,
-                new ModelResourceLocation(VassalMain.MODID + ":" + BlockBeaconWorkbench.NAME, "inventory"));
+                new ModelResourceLocation(MALMain.MODID + ":" + BlockAutoWorkbench.NAME, "inventory"));
 
         // Special block
         renderItem.getItemModelMesher().register(
-                Item.getItemFromBlock(VassalMain.BLOCK_VASSAL_HEAD),
+                Item.getItemFromBlock(MALMain.BLOCK_DROID_HEAD),
                 0,
-                new ModelResourceLocation(VassalMain.MODID + ":" + BlockVassalHead.NAME, "inventory"));
+                new ModelResourceLocation(MALMain.MODID + ":" + BlockWorkDroidHead.NAME, "inventory"));
 
         //======================================
         // ITEMS
 
-        renderItem.getItemModelMesher().register(VassalMain.ITEM_CIRCUIT, 0,
-                new ModelResourceLocation(VassalMain.MODID + ":" + ItemCircuit.NAME, "inventory"));
+        renderItem.getItemModelMesher().register(MALMain.ITEM_CIRCUIT, 0,
+                new ModelResourceLocation(MALMain.MODID + ":" + ItemCircuit.NAME, "inventory"));
     }
 
     @Override

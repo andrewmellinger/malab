@@ -1,6 +1,6 @@
 package com.crashbox.mal.task;
 
-import com.crashbox.mal.ai.EntityAIVassal;
+import com.crashbox.mal.ai.EntityAIWorkDroid;
 import com.crashbox.mal.messaging.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -10,7 +10,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class TaskFactory
 {
-    public TaskAcquireBase makeTaskFromMessage(EntityAIVassal performer, TRAcquireBase message)
+    public TaskAcquireBase makeTaskFromMessage(EntityAIWorkDroid performer, TRAcquireBase message)
     {
         return (TaskAcquireBase) TaskBase.createTask(performer, message);
 //        Class<? extends TaskBase> taskClass = message.getTaskClass();
@@ -33,7 +33,7 @@ public class TaskFactory
 //        return null;
     }
 
-    public TaskDeliverBase makeTaskFromMessage(EntityAIVassal performer, TRDeliverBase message)
+    public TaskDeliverBase makeTaskFromMessage(EntityAIWorkDroid performer, TRDeliverBase message)
     {
         return (TaskDeliverBase) TaskBase.createTask(performer, message);
 

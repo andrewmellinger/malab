@@ -1,7 +1,7 @@
 package com.crashbox.mal.task;
 
-import com.crashbox.mal.util.VassalUtils;
-import com.crashbox.mal.ai.EntityAIVassal;
+import com.crashbox.mal.util.MALUtils;
+import com.crashbox.mal.ai.EntityAIWorkDroid;
 import com.crashbox.mal.common.ItemStackMatcher;
 import com.crashbox.mal.messaging.IMessager;
 import net.minecraft.item.ItemStack;
@@ -14,7 +14,7 @@ import java.util.List;
  */
 public class TaskRefuel extends TaskDeliverBase
 {
-    public TaskRefuel(EntityAIVassal performer, IMessager requester,
+    public TaskRefuel(EntityAIWorkDroid performer, IMessager requester,
                       ItemStackMatcher matcher, int quantity)
     {
         super(performer, requester, 1000);
@@ -46,7 +46,7 @@ public class TaskRefuel extends TaskDeliverBase
             return ITask.UpdateResult.DONE;
         }
 
-        VassalUtils.mergeStacks(fuel, held);
+        MALUtils.mergeStacks(fuel, held);
         if (held.stackSize == 0)
             getEntity().setCurrentItemOrArmor(0, null);
 

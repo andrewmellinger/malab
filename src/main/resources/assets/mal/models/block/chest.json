@@ -1,0 +1,8 @@
+{
+  "parent": "block/cube_bottom_top",
+  "textures": {
+    "top": "mal:blocks/chest_top",
+    "side": "mal:blocks/chest_side",
+    "bottom": "mal:blocks/chest_bottom"
+  }
+}

@@ -1,6 +1,6 @@
 package com.crashbox.mal.util;
 
-import com.crashbox.mal.util.VassalUtils.COMPASS;
+import com.crashbox.mal.util.MALUtils.COMPASS;
 import net.minecraft.util.BlockPos;
 
 import java.util.Iterator;
@@ -117,5 +117,5 @@ public class SlabTraverser implements Iterable<BlockPos>
     private final BlockPos _center;
     private final BlockPos _starting;
     private final int _radius;
-    private final VassalUtils.COMPASS _dir;
+    private final MALUtils.COMPASS _dir;
 }

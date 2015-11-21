@@ -1,9 +1,9 @@
 [
 {
-  "modid": "vassal",
-  "name": "Vassal",
-  "description": "A collection of useful agents.",
-  "version": "0.9.003",
+  "modid": "mal",
+  "name": "MAL",
+  "description": "Minecraft Autonomy Lab.",
+  "version": "0.9.004",
   "mcversion": "1.8.0",
   "url": "",
   "updateUrl": "",

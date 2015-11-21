@@ -1,7 +1,7 @@
 package com.crashbox.mal.network;
 
-import com.crashbox.mal.VassalMain;
-import com.crashbox.mal.workbench.TileEntityBeaconWorkbench;
+import com.crashbox.mal.MALMain;
+import com.crashbox.mal.workbench.TileEntityAutoWorkbench;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
@@ -34,7 +34,7 @@ public class MessageToggleWorkbenchEnable implements IMessage
     public void toBytes(ByteBuf buf)
     {
         // NOTE:  We have to use 5 because of being signed.  It isn't smart enough to deal with signed values.
-        VassalMain.LOGGER.debug("toBytes pos=" + _pos);
+        MALMain.LOGGER.debug("toBytes pos=" + _pos);
         ByteBufUtils.writeVarShort(buf, _worldID);
         ByteBufUtils.writeVarInt(buf, _pos.getX(), 5);
         ByteBufUtils.writeVarInt(buf, _pos.getY(), 5);
@@ -77,8 +77,8 @@ public class MessageToggleWorkbenchEnable implements IMessage
                 {
                     World world = DimensionManager.getWorld(message.getWorldID());
                     TileEntity entity = world.getTileEntity(message.getPos());
-                    if (entity instanceof TileEntityBeaconWorkbench)
-                        ((TileEntityBeaconWorkbench)entity).toggleEnabled();
+                    if (entity instanceof TileEntityAutoWorkbench)
+                        ((TileEntityAutoWorkbench)entity).toggleEnabled();
                 }
             });
             return null;

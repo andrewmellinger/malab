@@ -1,7 +1,7 @@
 package com.crashbox.mal.task;
 
-import com.crashbox.mal.util.VassalUtils;
-import com.crashbox.mal.ai.EntityAIVassal;
+import com.crashbox.mal.util.MALUtils;
+import com.crashbox.mal.ai.EntityAIWorkDroid;
 import com.crashbox.mal.common.ItemStackMatcher;
 import com.crashbox.mal.messaging.TRMakeBigStair;
 import com.crashbox.mal.task.ITask.UpdateResult;
@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class TaskMakeBigStair extends TaskDeliverBase
 {
-    public TaskMakeBigStair(EntityAIVassal performer, TRMakeBigStair message)
+    public TaskMakeBigStair(EntityAIWorkDroid performer, TRMakeBigStair message)
     {
         super(performer, message.getSender(), message.getValue());
         _matcher = message.getMatcher();
@@ -65,7 +65,7 @@ public class TaskMakeBigStair extends TaskDeliverBase
         _breaker = null;
 
         // If something is there, then break it.
-        VassalUtils.harvestBlockIntoHeld(getWorld(), getPerformer().getEntity(), _builder.getStairPos(),
+        MALUtils.harvestBlockIntoHeld(getWorld(), getPerformer().getEntity(), _builder.getStairPos(),
                 ItemStackMatcher.getQuarryMatcher());
 
         if (getWorld().isAirBlock(_builder.getStairPos()))
