@@ -8,15 +8,15 @@
     </Appenders>
     <Loggers>
         <Logger level="trace" additivity="true" name="com.crashbox"/>
-        <Logger level="info" additivity="true" name="com.crashbox.vassal.ai.EntityAIVassal"/>
-        <Logger level="info"  additivity="true" name="com.crashbox.vassal.chest.TileEntityBeaconChest"/>
-        <Logger level="info" additivity="true" name="com.crashbox.vassal.forester.TileEntityBeaconForester"/>
-        <Logger level="info"  additivity="true" name="com.crashbox.vassal.furnace.TileEntityBeaconFurnace"/>
-        <Logger level="info"  additivity="true" name="com.crashbox.vassal.quarry.TileEntityBeaconQuarry"/>
-        <Logger level="info" additivity="true" name="com.crashbox.vassal.task.TaskPair"/>
-        <Logger level="info"  additivity="true" name="com.crashbox.vassal.task.TaskMakeBigStair"/>
-        <Logger level="info"  additivity="true" name="com.crashbox.vassal.util.StairBuilder"/>
-        <Logger level="info"  additivity="true" name="com.crashbox.vassal.workbench.TileEntityBeaconWorkbench"/>
+        <Logger level="info" additivity="true" name="com.crashbox.mal.ai.EntityAIVassal"/>
+        <Logger level="info"  additivity="true" name="com.crashbox.mal.chest.TileEntityBeaconChest"/>
+        <Logger level="info" additivity="true" name="com.crashbox.mal.forester.TileEntityBeaconForester"/>
+        <Logger level="info"  additivity="true" name="com.crashbox.mal.furnace.TileEntityBeaconFurnace"/>
+        <Logger level="info"  additivity="true" name="com.crashbox.mal.quarry.TileEntityBeaconQuarry"/>
+        <Logger level="info" additivity="true" name="com.crashbox.mal.task.TaskPair"/>
+        <Logger level="info"  additivity="true" name="com.crashbox.mal.task.TaskMakeBigStair"/>
+        <Logger level="info"  additivity="true" name="com.crashbox.mal.util.StairBuilder"/>
+        <Logger level="info"  additivity="true" name="com.crashbox.mal.workbench.TileEntityBeaconWorkbench"/>
         <Root level="warn">
             <AppenderRef ref="Console"/>
         </Root>
