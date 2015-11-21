@@ -16,12 +16,6 @@ import org.apache.logging.log4j.Logger;
 @SideOnly(Side.CLIENT)
 public class GuiBeaconFurnace extends GuiContainer
 {
-    private static final ResourceLocation guiTexture =
-            new ResourceLocation(VassalMain.MODID
-                    + ":textures/gui/container/beaconFurnace.png");
-    private final InventoryPlayer _inventoryPlayer;
-    private final TileEntityBeaconFurnace _tileBeacon;
-
     public GuiBeaconFurnace(InventoryPlayer playerInventory,
                             TileEntityBeaconFurnace tileEntity)
     {
@@ -40,12 +34,8 @@ public class GuiBeaconFurnace extends GuiContainer
         fontRendererObj.drawString(_inventoryPlayer.getDisplayName().getUnformattedText(), 8, ySize - 96 + 2, 4210752);
     }
 
-    /**
-     * Args : renderPartialTicks, mouseX, mouseY
-     */
     @Override
-    protected void drawGuiContainerBackgroundLayer(float partialTicks,
-                                                   int mouseX, int mouseY)
+    protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY)
     {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         mc.getTextureManager().bindTexture(guiTexture);
@@ -95,6 +85,12 @@ public class GuiBeaconFurnace extends GuiContainer
                 ", _tileBeacon=" + _tileBeacon +
                 '}';
     }
+
+    private static final ResourceLocation guiTexture =
+            new ResourceLocation(VassalMain.MODID
+                    + ":textures/gui/container/beaconFurnace.png");
+    private final InventoryPlayer _inventoryPlayer;
+    private final TileEntityBeaconFurnace _tileBeacon;
 
     private static final Logger LOGGER = LogManager.getLogger();
 }

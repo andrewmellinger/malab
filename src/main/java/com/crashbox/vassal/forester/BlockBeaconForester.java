@@ -6,8 +6,10 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
 /**
@@ -51,6 +53,32 @@ public class BlockBeaconForester extends BlockContainer
         // This MUST be last because it removes the TileEntity.
         super.breakBlock(inWorld, inPos, inBlockState);
     }
+
+    @Override
+    public boolean onBlockActivated(
+            World parWorld,
+            BlockPos parBlockPos,
+            IBlockState parIBlockState,
+            EntityPlayer entityPlayer,
+            EnumFacing parSide,
+            float hitX,
+            float hitY,
+            float hitZ)
+    {
+        if (!parWorld.isRemote)
+        {
+            // This triggers the general GuiHandler
+            entityPlayer.openGui(VassalMain.instance,
+                    VassalMain.GUI_ENUM.FORESTER.ordinal(),
+                    parWorld,
+                    parBlockPos.getX(),
+                    parBlockPos.getY(),
+                    parBlockPos.getZ());
+        }
+
+        return true;
+    }
+
 
     @Override
     public int getRenderType()

@@ -70,7 +70,7 @@ public class VassalMain
     public static SimpleNetworkWrapper NETWORK;
 
     // This allows us to us one gui handler for many things
-    public static enum GUI_ENUM { VASSAL, FURNACE, WORKBENCH, CHEST }
+    public static enum GUI_ENUM { VASSAL, CHEST, FORESTER, FURNACE, QUARRY, WORKBENCH,  }
 
     @Instance(value = VassalMain.MODID)
     public static VassalMain instance;

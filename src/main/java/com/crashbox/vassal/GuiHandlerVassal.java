@@ -7,9 +7,13 @@ import com.crashbox.vassal.entity.ContainerEntityVassal;
 import com.crashbox.vassal.entity.EntityVassal;
 import com.crashbox.vassal.entity.GuiEntityVassal;
 import com.crashbox.vassal.entity.InventoryEntityVassal;
+import com.crashbox.vassal.forester.ContainerBeaconForester;
+import com.crashbox.vassal.forester.GuiBeaconForester;
 import com.crashbox.vassal.furnace.ContainerBeaconFurnace;
 import com.crashbox.vassal.furnace.GuiBeaconFurnace;
 import com.crashbox.vassal.furnace.TileEntityBeaconFurnace;
+import com.crashbox.vassal.quarry.ContainerBeaconQuarry;
+import com.crashbox.vassal.quarry.GuiBeaconQuarry;
 import com.crashbox.vassal.workbench.ContainerBeaconWorkbench;
 import com.crashbox.vassal.workbench.GuiBeaconWorkbench;
 import com.crashbox.vassal.workbench.TileEntityBeaconWorkbench;
@@ -47,14 +51,20 @@ public class GuiHandlerVassal implements IGuiHandler
         if (tileEntity == null)
             return null;
 
+        if (ID == VassalMain.GUI_ENUM.CHEST.ordinal())
+            return new ContainerBeaconChest(player.inventory, (TileEntityBeaconChest)tileEntity);
+
+        if (ID == VassalMain.GUI_ENUM.FORESTER.ordinal())
+            return new ContainerBeaconForester();
+
         if (ID == VassalMain.GUI_ENUM.FURNACE.ordinal())
             return new ContainerBeaconFurnace(player.inventory, (TileEntityBeaconFurnace)tileEntity);
 
+        if (ID == VassalMain.GUI_ENUM.QUARRY.ordinal())
+            return new ContainerBeaconQuarry();
+
         if (ID == VassalMain.GUI_ENUM.WORKBENCH.ordinal())
             return new ContainerBeaconWorkbench(player.inventory, (TileEntityBeaconWorkbench)tileEntity);
-
-        if (ID == VassalMain.GUI_ENUM.CHEST.ordinal())
-            return new ContainerBeaconChest(player.inventory, (TileEntityBeaconChest)tileEntity);
 
         return null;
     }
@@ -78,14 +88,21 @@ public class GuiHandlerVassal implements IGuiHandler
         if (tileEntity == null)
             return null;
 
+        if (ID == VassalMain.GUI_ENUM.CHEST.ordinal())
+            return new GuiBeaconChest( player.inventory, (TileEntityBeaconChest)tileEntity);
+
+        if (ID == VassalMain.GUI_ENUM.FORESTER.ordinal())
+            return new GuiBeaconForester( );
+
         if (ID == VassalMain.GUI_ENUM.FURNACE.ordinal())
             return new GuiBeaconFurnace( player.inventory, (TileEntityBeaconFurnace)tileEntity);
+
+        if (ID == VassalMain.GUI_ENUM.QUARRY.ordinal())
+            return new GuiBeaconQuarry( );
 
         if (ID == VassalMain.GUI_ENUM.WORKBENCH.ordinal())
             return new GuiBeaconWorkbench( player.inventory, (TileEntityBeaconWorkbench)tileEntity);
 
-        if (ID == VassalMain.GUI_ENUM.CHEST.ordinal())
-            return new GuiBeaconChest( player.inventory, (TileEntityBeaconChest)tileEntity);
 
         return null;
     }
