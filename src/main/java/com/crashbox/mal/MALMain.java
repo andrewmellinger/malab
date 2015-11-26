@@ -65,8 +65,6 @@ public class MALMain
 
     public static Item ITEM_CIRCUIT;
 
-    public static String GAME_RULE_NEXT_MAL_ID = "mal.next.name.id";
-
     public static SimpleNetworkWrapper NETWORK;
 
     // This allows us to us one gui handler for many things
@@ -123,9 +121,6 @@ public class MALMain
 
         // Add other custom game rules
         GameRules rules = world.getGameRules();
-
-        if (!rules.hasRule(GAME_RULE_NEXT_MAL_ID))
-            rules.addGameRule(GAME_RULE_NEXT_MAL_ID, "1", GameRules.ValueType.NUMERICAL_VALUE);
     }
 
     // PRIVATES

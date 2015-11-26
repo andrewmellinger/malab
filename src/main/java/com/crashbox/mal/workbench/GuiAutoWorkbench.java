@@ -31,8 +31,6 @@ public class GuiAutoWorkbench extends GuiContainer
         super(new ContainerAutoWorkbench(parInventoryPlayer, workbench));
         _inventoryPlayer = parInventoryPlayer;
         _tileWorkbench = workbench;
-
-        LOGGER.debug("Constructed: " + this);
     }
 
     @Override

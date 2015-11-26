@@ -174,11 +174,14 @@ public class TileEntityAutoQuarry extends TileEntity implements IUpdatePlayerLis
         }
 
         // If we are here we need a worker to move us down one.
-        _quarry.setNextAvailabilityResponseMS();
-        MALUtils.postHarvestPlacePair(getWorld(), this, msg,
-                Priority.getQuarryMoveQuarryBlockValue(), Priority.getQuarryMoveQuarryBlockValue(),
-                new ItemStackMatcher(MALMain.BLOCK_AUTO_QUARRY), getPos(), getPos().down(),
-                false);
+        if (getPos().getY() > 11)
+        {
+            _quarry.setNextAvailabilityResponseMS();
+            MALUtils.postHarvestPlacePair(getWorld(), this, msg,
+                    Priority.getQuarryMoveQuarryBlockValue(), Priority.getQuarryMoveQuarryBlockValue(),
+                    new ItemStackMatcher(MALMain.BLOCK_AUTO_QUARRY), getPos(), getPos().down(),
+                    false);
+        }
     }
 
 

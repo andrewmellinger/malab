@@ -636,7 +636,7 @@ public class TileEntityAutoFurnace extends TileEntityAutoBlockInventory implemen
 
             // Automatically refuel if we take the same item
             if (_itemStacks[FUEL_INDEX] != null &&
-                    _itemStacks[FUEL_INDEX].stackSize < 8 &&
+                    _itemStacks[FUEL_INDEX].stackSize < 4 &&
                     _itemStacks[FUEL_INDEX].isItemEqual(itemstack))
             {
                 // In case we have multiple outputs

@@ -70,6 +70,7 @@ public class EntityAIWorkDroid extends EntityAIBase implements IMessager
     @Override
     public void updateTask()
     {
+        long millis = System.currentTimeMillis();
         // Process messages should handle data requests
         processMessages();
 
@@ -116,6 +117,9 @@ public class EntityAIWorkDroid extends EntityAIBase implements IMessager
                 break;
         }
 
+        millis = System.currentTimeMillis() - millis;
+        if (millis > 50)
+            LOGGER.debug(id() + " elapsed > 50 millis: " + _currentTask);
     }
 
 
@@ -259,10 +263,10 @@ public class EntityAIWorkDroid extends EntityAIBase implements IMessager
 
     private boolean handleHealing()
     {
-        if (_entity.getHealth() < _entity.getMaxHealth())
+        if (_entity.getHealth() < _entity.getMaxHealth() && _entity.hasFuel(FUEL_PER_HALF_HEART_HEAL))
         {
             // If healing, show something.
-            if (System.currentTimeMillis() > _nextHealMS && _entity.hasFuel(FUEL_PER_HALF_HEART_HEAL))
+            if (System.currentTimeMillis() > _nextHealMS)
             {
                 // Send a message to all the clients.
                 _nextHealMS = System.currentTimeMillis() + HEAL_DELAY_MS;

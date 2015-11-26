@@ -22,8 +22,6 @@ public class GuiAutoFurnace extends GuiContainer
         super(new ContainerAutoFurnace(playerInventory, tileEntity));
         _inventoryPlayer = playerInventory;
         _tileFurnace = tileEntity;
-
-        LOGGER.debug("Constructed: " + this);
     }
 
     @Override

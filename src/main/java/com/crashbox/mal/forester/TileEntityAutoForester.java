@@ -143,24 +143,40 @@ public class TileEntityAutoForester extends TileEntity implements IUpdatePlayerL
 
     private void handleItemRequest(MessageItemRequest msg)
     {
-        debugLog("handleItemRequest: msg=" + msg);
-
-        // Look around and see if we have any of these.
-        BlockPos foundPos = RingedSearcher.findBlock(getWorld(), getPos(), _searchRadius, _searchHeight,
-                msg.getMatcher());
-        boolean hasMats = foundPos != null;
-        int droidCount = MALUtils.countDroidsInArea(getWorld(), getPos(), getRadius());
-
-        // We only want to respond if we have materials and we aren't already being heavily worked
-        if (hasMats && droidCount < getMaxDroidCount())
+        // We only know about logs, leaves, and saplings.
+        if (msg.getMatcher().matches(Item.getItemFromBlock(Blocks.sapling)) ||
+                msg.getMatcher().matches(Item.getItemFromBlock(Blocks.leaves)) ||
+                msg.getMatcher().matches(Item.getItemFromBlock(Blocks.leaves2)) ||
+                msg.getMatcher().matches(Item.getItemFromBlock(Blocks.log)) ||
+                msg.getMatcher().matches(Item.getItemFromBlock(Blocks.log2)) )
         {
-            // Offer a task, at our area for the requested thing.
-            TRHarvest req = new TRHarvest(TileEntityAutoForester.this, msg.getSender(),
-                    msg.getTransactionID(), Priority.getForesterHarvestValue(getWorld()),
-                    TaskHarvestTree.class, msg.getMatcher(), msg.getQuantity());
+            debugLog("handleItemRequest: msg=" + msg);
 
-            debugLog("Forest has item at=" + foundPos + ", for=" + req);
-            _broadcastHelper.postMessage(req);
+            // If they are looking for saplings and we have empty squares, don't give them out.
+            if (msg.getMatcher().matches(Item.getItemFromBlock(Blocks.sapling)))
+            {
+                if (MALUtils.findEmptyOrchardSquare(getWorld(), getPos(), _searchRadius) != null)
+                    return;
+            }
+
+            // Look around and see if we have any of these.
+            BlockPos foundPos = RingedSearcher.findBlock(getWorld(), getPos(), _searchRadius, _searchHeight,
+                    msg.getMatcher());
+            boolean hasMats = foundPos != null;
+            int droidCount = MALUtils.countDroidsInArea(getWorld(), getPos(), getRadius());
+
+            // We only want to respond if we have materials and we aren't already being heavily worked
+            if (hasMats && droidCount < getMaxDroidCount())
+            {
+                // Offer a task, at our area for the requested thing.
+                TRHarvest req = new TRHarvest(TileEntityAutoForester.this, msg.getSender(),
+                        msg.getTransactionID(), Priority.getForesterHarvestValue(getWorld()),
+                        TaskHarvestTree.class, msg.getMatcher(), msg.getQuantity());
+
+                debugLog("Forest has item at=" + foundPos + ", for=" + req);
+                _broadcastHelper.postMessage(req);
+            }
+
         }
     }
 

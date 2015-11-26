@@ -270,7 +270,13 @@ public class MALUtils
         {
             if ( obj instanceof EntityItem)
             {
-                return (((EntityItem)obj).getEntityItem().getItem());
+                EntityItem entityItem = (EntityItem)obj;
+                BlockPos pos = entityItem.getPosition();
+                IBlockState downState = world.getBlockState(pos.down());
+                if (downState.getBlock() == Blocks.grass || downState.getBlock() == Blocks.dirt )
+                {
+                    return entityItem.getEntityItem().getItem();
+                }
             }
         }
 
@@ -304,8 +310,10 @@ public class MALUtils
                 EntityItem entityItem = (EntityItem) obj;
                 if (entityItem.getEntityItem().getItem() == itemType)
                 {
-                    // Make sure it is on ground.
-                    return entityItem;
+                    BlockPos pos = entityItem.getPosition();
+                    IBlockState downState = world.getBlockState(pos.down());
+                    if (downState.getBlock() == Blocks.grass || downState.getBlock() == Blocks.dirt )
+                        return entityItem;
                 }
             }
         }

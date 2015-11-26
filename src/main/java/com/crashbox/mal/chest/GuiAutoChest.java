@@ -27,8 +27,6 @@ public class GuiAutoChest extends GuiContainer
                 parInventoryGrinder));
         _inventoryPlayer = parInventoryPlayer;
         _tileInventory = parInventoryGrinder;
-
-        LOGGER.debug( "Constructed: " + this);
     }
 
     @Override

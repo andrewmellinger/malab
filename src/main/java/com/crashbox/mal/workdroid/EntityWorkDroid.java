@@ -14,11 +14,14 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+
+import java.util.Random;
 
 /**
  * Copyright 2015 Andrew o. Mellinger
@@ -145,7 +148,7 @@ public class EntityWorkDroid extends EntityCreature
 
         // We always want a custom name.  If we don't have one by now, make one!
         if (!hasCustomName())
-            setCustomNameTag(makeName(getEntityWorld()));
+            setCustomNameTag(makeName());
     }
 
     @Override
@@ -199,17 +202,18 @@ public class EntityWorkDroid extends EntityCreature
         double var3 = this.rand.nextGaussian() * 0.02D;
         double var5 = this.rand.nextGaussian() * 0.02D;
         this.worldObj.spawnParticle(particleType,
-                this.posX + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width,
-                this.posY + 0.5D + (double)(this.rand.nextFloat() * this.height),
-                this.posZ + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width,
+                this.posX + (double) (this.rand.nextFloat() * this.width * 2.0F) - (double) this.width,
+                this.posY + 0.5D + (double) (this.rand.nextFloat() * this.height),
+                this.posZ + (double) (this.rand.nextFloat() * this.width * 2.0F) - (double) this.width,
                 var1, var3, var5);
     }
 
     /**
      * Used to set a particle effect on the bot.  This is for things like visual feedback
      * on healing, out of fuel, etc.
-     * @param particleID The particle ID.
-     * @param durationTicks  How many ticks to show it for.
+     *
+     * @param particleID    The particle ID.
+     * @param durationTicks How many ticks to show it for.
      */
     public void setParticleEffect(int particleID, int durationTicks)
     {
@@ -471,7 +475,7 @@ public class EntityWorkDroid extends EntityCreature
         if (getEntityWorld().isRemote)
             return getDataWatcher().getWatchableObjectInt(20);
         else
-            return _fuelTicks/20;
+            return _fuelTicks / 20;
     }
 
     private int getFuelTicks()
@@ -496,7 +500,7 @@ public class EntityWorkDroid extends EntityCreature
     //=============================================================================================
     public ItemStack getFollowMeStack()
     {
-        return  _followMeStack;
+        return _followMeStack;
     }
 
     public void setFollowMeStack(ItemStack stack)
@@ -549,41 +553,47 @@ public class EntityWorkDroid extends EntityCreature
                 '}';
     }
 
+    @Override
+    public boolean isPotionApplicable(PotionEffect p_70687_1_)
+    {
+        return false;
+    }
 
     //=============================================================================================
     // NAMING
 
-    private static String[] NAMES = { "takara", "akai",
-            "frodo", "sam", "merry", "pippin", "gimli", "legolas", "aragorn", "boromir",
-            "larry", "moe", "curly",
-            "sleepy", "grumpy", "dopey", "doc", "bashful",
-            "dobby", "harry", "hermione", "ron", "draco"
-    };
-
-    private static int getNextID(World world)
+    private static String makeName()
     {
-        int id = world.getGameRules().getInt(MALMain.GAME_RULE_NEXT_MAL_ID);
-        world.getGameRules().setOrCreateGameRule(MALMain.GAME_RULE_NEXT_MAL_ID, Integer.toString(id + 1));
-        return id;
+        // We have three formats that is four characters and a dash.  The dash can be anywhere inside
+        // but the other characters are [A-Z0-9] except the first which is just [A-Z].
+
+        Random rand = new Random();
+        return String.format(generateFormat(rand),
+                generateChar(rand),
+                generateCharOrDigit(rand),
+                generateCharOrDigit(rand),
+                generateCharOrDigit(rand));
     }
 
-    private static String makeName(World world)
+    private static String generateFormat(Random rand)
     {
-        int id = getNextID(world);
+        return NAME_FORMATS[rand.nextInt(3)];
+    }
 
-        int idx = id % NAMES.length;
-        int suffix = id / NAMES.length;
-        String name = NAMES[idx];
-        if (suffix > 0)
-            name = name + suffix;
+    private static char generateChar(Random rand)
+    {
+        return LETTER_CHARS.charAt(rand.nextInt(26));
+    }
 
-        return name;
+    private static char generateCharOrDigit(Random rand)
+    {
+        return LETTER_NUM_CHARS.charAt(rand.nextInt(36));
     }
 
     public void setUpCustomName()
     {
         if (!hasCustomName())
-            setCustomNameTag(makeName(getEntityWorld()));
+            setCustomNameTag(makeName());
     }
 
     //=============================================================================================
@@ -615,4 +625,10 @@ public class EntityWorkDroid extends EntityCreature
 
     // We use this alot
     private EntityAIWorkDroid _workDroid;
+
+
+    private static final String[] NAME_FORMATS = new String[]{"%c-%c%c%c", "%c%c-%c%c", "%c%c%c-%c"};
+    private static final String LETTER_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    private static final String LETTER_NUM_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
 }

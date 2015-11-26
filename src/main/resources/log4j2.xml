@@ -14,6 +14,7 @@
         <Logger level="info"  additivity="true" name="com.crashbox.mal.furnace.TileEntityAutoFurnace"/>
         <Logger level="info"  additivity="true" name="com.crashbox.mal.quarry.TileEntityAutoQuarry"/>
         <Logger level="info" additivity="true" name="com.crashbox.mal.task.TaskPair"/>
+        <Logger level="info" additivity="true" name="com.crashbox.mal.task"/>
         <Logger level="info"  additivity="true" name="com.crashbox.mal.task.TaskMakeBigStair"/>
         <Logger level="info"  additivity="true" name="com.crashbox.mal.util.StairBuilder"/>
         <Logger level="info"  additivity="true" name="com.crashbox.mal.workbench.TileEntityAutoWorkbench"/>
