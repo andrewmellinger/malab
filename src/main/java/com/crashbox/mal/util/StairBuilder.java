@@ -1,18 +1,24 @@
 package com.crashbox.mal.util;
 
+import com.crashbox.mal.MALMain;
 import com.crashbox.mal.common.AnyItemMatcher;
 import com.crashbox.mal.common.ItemStackMatcher;
+import com.crashbox.mal.common.NotItemStackMatcher;
 import com.crashbox.mal.workdroid.EntityWorkDroid;
+import com.sun.tools.internal.ws.processor.model.Block;
 import net.minecraft.block.BlockSlab;
 import net.minecraft.block.BlockStoneSlab;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 /**
  * Copyright 2015 Andrew O. Mellinger
@@ -83,7 +89,8 @@ public class StairBuilder
      * @param exclusions Places to skip
      * @return True for any.
      */
-    public BlockPos findFirstQuarryable(ItemStackMatcher matcher, EntityWorkDroid workDroid, List<BlockPos> exclusions)
+    public BlockPos findFirstQuarryable(ItemStackMatcher matcher, EntityWorkDroid workDroid,
+                                        List<BlockPos> exclusions)
     {
         LOGGER.debug(this);
         LOGGER.debug("findFirstQuarrayble: " + matcher);
@@ -139,6 +146,30 @@ public class StairBuilder
             LOGGER.debug("Found quarryable: " + pos);
             return pos;
         }
+        return null;
+    }
+
+    public BlockPos findTopQuarryable(ItemStackMatcher matcher, EntityWorkDroid workDroid,
+                                     List<BlockPos> exclusions)
+    {
+        List<BlockPos> exclusions2 = new ArrayList<BlockPos>();
+        exclusions2.add(_center);
+        if (exclusions != null)
+            exclusions2.addAll(exclusions);
+
+        RingedSearcher searcher = new RingedSearcher(_center, _radius, 2);
+        for (BlockPos pos : searcher)
+        {
+            if (MALUtils.willDrop(_world, pos, matcher))
+            {
+                if (workDroid != null && workDroid.findBestTool(pos) == null)
+                    continue;
+
+                if (!exclusions2.contains(pos))
+                    return pos;
+            }
+        }
+
         return null;
     }
 
@@ -263,7 +294,16 @@ public class StairBuilder
         return Blocks.stone_slab.getDefaultState().
                 withProperty(BlockStoneSlab.VARIANT, BlockStoneSlab.EnumType.COBBLESTONE).
                 withProperty(BlockStoneSlab.HALF, BlockSlab.EnumBlockHalf.BOTTOM);
+    }
 
+    public static ItemStackMatcher getNotStairMatcher()
+    {
+        IBlockState state = Blocks.stone_slab.getDefaultState().
+                withProperty(BlockStoneSlab.VARIANT, BlockStoneSlab.EnumType.COBBLESTONE);
+        int meta = Blocks.stone_slab.getMetaFromState(state);
+
+        return new NotItemStackMatcher(new ItemStack(Blocks.stone_slab, 0, meta),
+                new ItemStack(MALMain.BLOCK_AUTO_QUARRY));
     }
 
     private boolean isInExclusions(BlockPos pos)

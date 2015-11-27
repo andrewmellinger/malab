@@ -1,12 +1,14 @@
 package com.crashbox.mal.quarry;
 
 import com.crashbox.mal.MALMain;
+import com.crashbox.mal.task.TaskQuarryTop;
 import com.crashbox.mal.util.MALUtils;
 import com.crashbox.mal.ai.EntityAIWorkDroid;
 import com.crashbox.mal.ai.Priority;
 import com.crashbox.mal.autoblock.AutoBlockBase;
 import com.crashbox.mal.common.AnyItemMatcher;
 import com.crashbox.mal.common.ItemStackMatcher;
+import com.crashbox.mal.util.RingedSearcher;
 import com.crashbox.mal.workdroid.EntityWorkDroid;
 import com.crashbox.mal.messaging.*;
 import com.crashbox.mal.task.TaskQuarry;
@@ -17,6 +19,9 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Copyright 2015 Andrew O. Mellinger
@@ -129,7 +134,10 @@ public class TileEntityAutoQuarry extends TileEntity implements IUpdatePlayerLis
     {
         debugLog("handleWorkerAvailability=" + msg);
 
-        // first clean up any messes
+        if (getPos().getY() <= 11)
+            return;
+
+            // first clean up any messes
         if (MALUtils.generateCleanupTask(this, getWorld(), getPos(), _radius, msg))
         {
             _quarry.setNextAvailabilityResponseMS();
@@ -138,6 +146,23 @@ public class TileEntityAutoQuarry extends TileEntity implements IUpdatePlayerLis
 
         // If we need stairs, send a stairs event
         StairBuilder builder = new StairBuilder(getWorld(), getPos(), _radius);
+
+        // First, clear out area around quarry except for cobblestone stairs.
+        List<BlockPos> exclusions = new ArrayList<BlockPos>();
+        exclusions.add(getBlockPos());
+
+        BlockPos pos = builder.findTopQuarryable(StairBuilder.getNotStairMatcher(), getEntityFromMessage(msg),
+                exclusions);
+        if (pos != null)
+        {
+            TRHarvest quarry = new TRHarvest(this, msg.getSender(), msg.getTransactionID(),
+                    Priority.getQuarryCleanTopValue(), TaskQuarryTop.class, StairBuilder.getNotStairMatcher(), -1);
+
+            _quarry.setNextAvailabilityResponseMS();
+            _broadcastHelper.postMessage(quarry);
+            //LOGGER.debug("Posted: " + quarry);
+            return;
+        }
 
         // Set it up.
         builder.findNextStair();

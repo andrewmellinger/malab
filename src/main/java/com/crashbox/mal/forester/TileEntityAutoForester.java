@@ -160,7 +160,8 @@ public class TileEntityAutoForester extends TileEntity implements IUpdatePlayerL
             }
 
             // Look around and see if we have any of these.
-            BlockPos foundPos = RingedSearcher.findBlock(getWorld(), getPos(), _searchRadius, _searchHeight,
+            // TODO:  Build better landscape mapper
+            BlockPos foundPos = RingedSearcher.findBlock(getWorld(), getPos().down(3), _searchRadius, _searchHeight,
                     msg.getMatcher());
             boolean hasMats = foundPos != null;
             int droidCount = MALUtils.countDroidsInArea(getWorld(), getPos(), getRadius());
@@ -267,7 +268,6 @@ public class TileEntityAutoForester extends TileEntity implements IUpdatePlayerL
     {
         LOGGER.debug("Forester: " + msg);
     }
-
 
     @Override
     public String toString()

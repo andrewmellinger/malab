@@ -94,6 +94,11 @@ public class Priority
         return 10;
     }
 
+    public static int getQuarryCleanTopValue()
+    {
+        return 20;
+    }
+
     public static int getForesterPickupSaplingValue()
     {
         return 10;

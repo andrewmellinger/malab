@@ -25,7 +25,10 @@ public class TaskHarvestTree extends TaskHarvest
     {
         BlockBounds bounds = new BlockBounds(getRequester().getBlockPos(), _radius);
         BlockPos start = MALUtils.findIntersect(getRequester().getBlockPos(), _radius, getEntity().getPosition());
-        return RingedSearcher.findTree(getEntity().getEntityWorld(), start, _radius * 2, _height,
+
+        // We do a searcher times two because we are bounded by the bounding box
+        // We start down so that we can get the area.
+        return RingedSearcher.findTree(getEntity().getEntityWorld(), start.down(5), _radius * 2, _height + 5,
                 getMatcher(), exclusions, bounds);
     }
 }

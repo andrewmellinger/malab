@@ -401,6 +401,25 @@ public class MALUtils
         return false;
     }
 
+    public static boolean willDropOther(World world, BlockPos pos, ItemStackMatcher matcher)
+    {
+        IBlockState state = world.getBlockState(pos);
+        Block block = state.getBlock();
+
+        if (block.isAir(world, pos))
+        {
+            return false;
+        }
+
+        for (ItemStack stack : block.getDrops(world, pos, state, 0))
+        {
+            if (!matcher.matches(stack))
+                return true;
+        }
+
+        return false;
+    }
+
     public static ItemStack identifyWillDrop(World world, BlockPos pos, ItemStackMatcher matcher)
     {
         IBlockState state = world.getBlockState(pos);
@@ -477,7 +496,7 @@ public class MALUtils
          * Harvests the specific block if it matchers the  item stack and will put into the held
          * inventory if available.
          * @param world The  world object.
-         * @param entity The entiity performing  the action.
+         * @param entity The entity performing  the action.
          * @param harvestBlock The block to harvest.
          * @param matcher The matcher describing  allowable drops.
          * @param mustMatch True if must match.

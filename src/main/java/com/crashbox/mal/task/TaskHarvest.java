@@ -67,7 +67,7 @@ public abstract class TaskHarvest extends TaskAcquireBase
         // We are done breaking.
         _breaker = null;
 
-        //debugLog(LOGGER, "Finished breaking, harvesting.");
+        debugLog(LOGGER, "Finished breaking, harvesting.");
         MALUtils.harvestBlockIntoHeld(getWorld(), getEntity(), _harvestBlock, getMatcher());
         // This is kinda a hack...
         onBlockBroken(_harvestBlock);

@@ -1,6 +1,7 @@
 package com.crashbox.mal.util;
 
 import com.crashbox.mal.common.ItemStackMatcher;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
@@ -71,23 +72,32 @@ public class RingedSearcher  implements Iterable<BlockPos>
         return null;
     }
 
-    public static boolean detectBlock(World world, BlockPos center, int radius, int height, ItemStackMatcher matcher)
+    public static boolean detectBlock(World world, BlockPos center, int radius, int height,
+                                      ItemStackMatcher matcher)
     {
         return (findBlock(world, center, radius, height, matcher) != null);
     }
 
-    public static BlockPos findBlock(World world, BlockPos center, int radius, int height, ItemStackMatcher matcher)
+    public static BlockPos findBlock(World world, BlockPos center, int radius, int height,
+                                     ItemStackMatcher matcher, List<BlockPos> exclusions)
     {
         RingedSearcher searcher = new RingedSearcher(center, radius, height);
         for (BlockPos pos : searcher)
         {
             if (MALUtils.willDrop(world, pos, matcher))
             {
-                return pos;
+                if (exclusions == null || !exclusions.contains(pos))
+                    return pos;
             }
         }
 
         return null;
+    }
+
+    public static BlockPos findBlock(World world, BlockPos center, int radius, int height,
+                                     ItemStackMatcher matcher)
+    {
+        return findBlock(world, center, radius, height, matcher, null);
     }
 
     public static ItemStack findFirstItemDrop(World world, BlockPos center, int radius, int height,
@@ -108,7 +118,7 @@ public class RingedSearcher  implements Iterable<BlockPos>
     {
         _center = center;
         _radius = radius;
-        _height = height;
+        _height = height - 1;
     }
 
     @Override
@@ -198,7 +208,7 @@ public class RingedSearcher  implements Iterable<BlockPos>
             _maxX = _center.getX() + _currentRadius;
             _maxZ = _center.getZ() + _currentRadius;
             _y = _center.getY() + _height;
-            _minY = _center.getY() - 5;
+            _minY = _center.getY();
 
             // Don't check the center block
             if (_currentRadius == 0)
