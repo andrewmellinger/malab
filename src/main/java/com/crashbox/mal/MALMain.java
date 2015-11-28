@@ -4,6 +4,7 @@ import com.crashbox.mal.ai.Priority;
 import com.crashbox.mal.chest.BlockAutoChest;
 import com.crashbox.mal.chest.TileEntityAutoChest;
 import com.crashbox.mal.circuit.ItemCircuit;
+import com.crashbox.mal.util.MALEventHandler;
 import com.crashbox.mal.workdroid.BlockWorkDroidHead;
 import com.crashbox.mal.workdroid.EntityWorkDroid;
 import com.crashbox.mal.furnace.BlockAutoFurnace;
@@ -24,14 +25,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLServerStartedEvent;
+import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
@@ -67,6 +66,9 @@ public class MALMain
 
     public static SimpleNetworkWrapper NETWORK;
 
+    public static MALConfig CONFIG;
+
+
     // This allows us to us one gui handler for many things
     public static enum GUI_ENUM {
         DROID, CHEST, FORESTER, FURNACE, QUARRY, WORKBENCH,  }
@@ -78,9 +80,18 @@ public class MALMain
                 serverSide = "com.crashbox.mal.ServerProxy")
     public static CommonProxy proxy;
 
+    //----------------------------------------------------------------------------------------------
+
     @EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
+        CONFIG = new MALConfig();
+        CONFIG.loadAndInit(event.getSuggestedConfigurationFile());
+
+        _eventHandler = new MALEventHandler();
+        MinecraftForge.EVENT_BUS.register(_eventHandler);
+        //FMLCommonHandler.instance().bus().register(_eventHandler);
+
         MAL_TAB = new CreativeTabMAL();
         preInitBlockAndItems();
         MALMain.NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel("mal");
@@ -113,6 +124,12 @@ public class MALMain
     }
 
     @EventHandler
+    public void fmlLifeCycle(FMLServerStartingEvent event)
+    {
+        event.registerServerCommand(CONFIG.makeCommand());
+    }
+
+    @EventHandler
     public void fmlLifeCycle(FMLServerStartedEvent event)
     {
         World world = MinecraftServer.getServer().worldServerForDimension(0);
@@ -122,6 +139,9 @@ public class MALMain
         // Add other custom game rules
         GameRules rules = world.getGameRules();
     }
+
+    //----------------------------------------------------------------------------------------------
+
 
     // PRIVATES
     private void preInitBlockAndItems()
@@ -225,6 +245,8 @@ public class MALMain
     }
 
     private static int modEntityID;
+
+    private MALEventHandler _eventHandler;
 
     public static final Logger LOGGER = LogManager.getLogger();
 }

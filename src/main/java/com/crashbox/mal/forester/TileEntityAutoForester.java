@@ -1,5 +1,6 @@
 package com.crashbox.mal.forester;
 
+import com.crashbox.mal.MALMain;
 import com.crashbox.mal.util.MALUtils;
 import com.crashbox.mal.ai.*;
 import com.crashbox.mal.autoblock.AutoBlockBase;
@@ -171,7 +172,7 @@ public class TileEntityAutoForester extends TileEntity implements IUpdatePlayerL
             {
                 // Offer a task, at our area for the requested thing.
                 TRHarvest req = new TRHarvest(TileEntityAutoForester.this, msg.getSender(),
-                        msg.getTransactionID(), Priority.getForesterHarvestValue(getWorld()),
+                        msg.getTransactionID(), MALMain.CONFIG.getForesterHarvestValue(),
                         TaskHarvestTree.class, msg.getMatcher(), msg.getQuantity());
 
                 debugLog("Forest has item at=" + foundPos + ", for=" + req);
@@ -226,7 +227,7 @@ public class TileEntityAutoForester extends TileEntity implements IUpdatePlayerL
         {
             // Offer a task, at our area for the requested thing.
             TRHarvest req = new TRHarvest(TileEntityAutoForester.this, msg.getSender(),
-                    msg.getTransactionID(), Priority.getForesterIdleHarvestValue(getWorld()),
+                    msg.getTransactionID(), MALMain.CONFIG.getForesterIdleHarvestValue(),
                     TaskHarvestTree.class, new ItemStackMatcher(sample), -1);
 
             debugLog("-- posting request: " + req);

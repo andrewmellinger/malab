@@ -1,5 +1,6 @@
 package com.crashbox.mal.ai;
 
+import com.crashbox.mal.MALMain;
 import com.crashbox.mal.task.ITask;
 import com.crashbox.mal.util.MALUtils;
 import net.minecraft.item.ItemStack;
@@ -19,52 +20,21 @@ public class Priority
 
     private static final int QUARRY_MOVE_QUARRY_BLOCK_VALUE = 20;
 
-    private static final String MAX_DISTANCE = "mal.distance";
-
-    private static final String FORESTER_HARVEST_PRIORITY = "mal.forester.harvest.value";
-    private static final String FORESTER_IDLE_HARVEST_PRIORITY = "mal.forester.idle.harvest.value";
-
     private static final String QUARRY_HARVEST_PRIORITY = "mal.quarry.harvest.value";
     private static final String QUARRY_IDLE_HARVEST_PRIORITY = "mal.quarry.idle.harvest.value";
 
-    private static final String QUARRY_DEPTH_PRIORITY_PER_BLOCK = "mal.quarry.depth.value.tenths.per.block";
+    //----------------------------------------------------------------------------------------------
 
+    @Deprecated
     public static void setupGameRules(World world)
     {
         GameRules rules = world.getGameRules();
-
-        if (!rules.hasRule(MAX_DISTANCE))
-            rules.addGameRule(MAX_DISTANCE, "64", GameRules.ValueType.NUMERICAL_VALUE);
-
-        if (!rules.hasRule(FORESTER_HARVEST_PRIORITY))
-            rules.addGameRule(FORESTER_HARVEST_PRIORITY, "0", GameRules.ValueType.NUMERICAL_VALUE);
-
-        if (!rules.hasRule(FORESTER_IDLE_HARVEST_PRIORITY))
-            rules.addGameRule(FORESTER_IDLE_HARVEST_PRIORITY, "-5", GameRules.ValueType.NUMERICAL_VALUE);
 
         if (!rules.hasRule(QUARRY_HARVEST_PRIORITY))
             rules.addGameRule(QUARRY_HARVEST_PRIORITY, "5", GameRules.ValueType.NUMERICAL_VALUE);
 
         if (!rules.hasRule(QUARRY_IDLE_HARVEST_PRIORITY))
             rules.addGameRule(QUARRY_IDLE_HARVEST_PRIORITY, "0", GameRules.ValueType.NUMERICAL_VALUE);
-
-        if (!rules.hasRule(QUARRY_DEPTH_PRIORITY_PER_BLOCK))
-            rules.addGameRule(QUARRY_DEPTH_PRIORITY_PER_BLOCK, "2", GameRules.ValueType.NUMERICAL_VALUE);
-    }
-
-    public static int getLongestDistance(World world)
-    {
-        return world.getGameRules().getInt(MAX_DISTANCE);
-    }
-
-    public static int getForesterHarvestValue(World world)
-    {
-        return world.getGameRules().getInt(FORESTER_HARVEST_PRIORITY);
-    }
-
-    public static int getForesterIdleHarvestValue(World world)
-    {
-        return world.getGameRules().getInt(FORESTER_IDLE_HARVEST_PRIORITY);
     }
 
     public static int getQuarryItemHarvestValue(World world)
@@ -76,12 +46,6 @@ public class Priority
     {
         return world.getGameRules().getInt(QUARRY_IDLE_HARVEST_PRIORITY);
     }
-
-    public static int getQuarryDepthValueTenthsPerBlock(World world)
-    {
-        return world.getGameRules().getInt(QUARRY_DEPTH_PRIORITY_PER_BLOCK);
-    }
-
 
     /** Priority for moving the quarry block. */
     public static int getQuarryMoveQuarryBlockValue()
@@ -193,7 +157,7 @@ public class Priority
     public static int quarryDepthValue(World world, int y)
     {
         if (y < 60)
-            return ((60 - y) * getQuarryDepthValueTenthsPerBlock(world))/10;
+            return (int) ((60 - y) * MALMain.CONFIG.getQuarryDepthCoefficientValue());
 
         return 0;
     }
@@ -232,13 +196,21 @@ public class Priority
         // 54 / 1.25 -> 43.2 /4 = 10.8
 //        return (int) (( Math.sqrt(startPos.distanceSq(endPos)) / speed ) / 4D);
 
-        return (int) (( Math.sqrt(startPos.distanceSq(endPos)) / speed ) / 2D);
+        int value = (int) (( Math.sqrt(startPos.distanceSq(endPos)) / speed ) / 2D);
+
+        // Now, add in Y if the specified it
+        value += (int) (Math.abs(startPos.getY() - endPos.getY()) *
+                MALMain.CONFIG.getDistanceYCoefficient());
+
+        return value;
     }
 
     public static boolean outOfRange(World world, BlockPos startPos, BlockPos endPos)
     {
-        int longestDistance = getLongestDistance(world);
-        return MALUtils.sqDistXZ(startPos, endPos) > ( longestDistance * longestDistance );
+        int longestDistance = MALMain.CONFIG.getMaxXZDistance();
+        return MALUtils.sqDistXZ(startPos, endPos) > (longestDistance * longestDistance) ||
+                (Math.abs(startPos.getY() - endPos.getY()) > MALMain.CONFIG.getMaxYDistance());
+
     }
 
 }
