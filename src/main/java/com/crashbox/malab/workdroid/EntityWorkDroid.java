@@ -1,6 +1,6 @@
 package com.crashbox.malab.workdroid;
 
-import com.crashbox.malab.MALMain;
+import com.crashbox.malab.MALabMain;
 import com.crashbox.malab.ai.EntityAIFollowPlayer;
 import com.crashbox.malab.ai.EntityAIWorkDroid;
 import com.crashbox.malab.network.MessageWorkDroidEffects;
@@ -229,7 +229,7 @@ public class EntityWorkDroid extends EntityCreature
                 getEntityId(),
                 type.getParticleID(),
                 durationTicks);
-        MALMain.NETWORK.sendToAll(msg);
+        MALabMain.NETWORK.sendToAll(msg);
     }
 
     //=============================================================================================
@@ -533,8 +533,8 @@ public class EntityWorkDroid extends EntityCreature
     protected boolean interact(EntityPlayer player)
     {
         _workDroid.cancelAndPause();
-        player.openGui(MALMain.instance,
-                MALMain.GUI_ENUM.DROID.ordinal(),
+        player.openGui(MALabMain.instance,
+                MALabMain.GUI_ENUM.DROID.ordinal(),
                 getEntityWorld(),
                 getEntityId(),
                 0,

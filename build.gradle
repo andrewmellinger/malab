@@ -17,9 +17,9 @@ buildscript {
 
 apply plugin: 'forge'
 
-version = "0.9.004"
-group= "com.crashbox.mal" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "mal-1.8"
+version = "0.9.005"
+group= "com.crashbox.malab" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = "malab-1.8"
 
 minecraft {
     version = "1.8-11.14.3.1450"

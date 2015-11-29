@@ -1,6 +1,6 @@
 package com.crashbox.malab.quarry;
 
-import com.crashbox.malab.MALMain;
+import com.crashbox.malab.MALabMain;
 import com.crashbox.malab.task.TaskQuarryTop;
 import com.crashbox.malab.util.MALUtils;
 import com.crashbox.malab.ai.EntityAIWorkDroid;
@@ -123,7 +123,7 @@ public class TileEntityAutoQuarry extends TileEntity implements IUpdatePlayerLis
         {
             LOGGER.debug("--found item.");
             TRHarvest quarry = new TRHarvest(this, msg.getSender(), msg.getTransactionID(),
-                    MALMain.CONFIG.getQuarryHarvestValue(),
+                    MALabMain.CONFIG.getQuarryHarvestValue(),
                     TaskQuarry.class, msg.getMatcher(), 1);
             _broadcastHelper.postMessage(quarry);
         }
@@ -183,7 +183,7 @@ public class TileEntityAutoQuarry extends TileEntity implements IUpdatePlayerLis
         // If we have something to harvest, call him over
         if (builder.findFirstQuarryable(new AnyItemMatcher(), getEntityFromMessage(msg), null) != null)
         {
-            int value = MALMain.CONFIG.getQuarryIdleHarvestValue();
+            int value = MALabMain.CONFIG.getQuarryIdleHarvestValue();
 
             // Add some value the closer we get to the bottom.
             value += Priority.quarryDepthValue(getWorld(), msg.getSender().getBlockPos().getY());
@@ -203,7 +203,7 @@ public class TileEntityAutoQuarry extends TileEntity implements IUpdatePlayerLis
             _quarry.setNextAvailabilityResponseMS();
             MALUtils.postHarvestPlacePair(getWorld(), this, msg,
                     Priority.getQuarryMoveQuarryBlockValue(), Priority.getQuarryMoveQuarryBlockValue(),
-                    new ItemStackMatcher(MALMain.BLOCK_AUTO_QUARRY), getPos(), getPos().down(),
+                    new ItemStackMatcher(MALabMain.BLOCK_AUTO_QUARRY), getPos(), getPos().down(),
                     false);
         }
     }

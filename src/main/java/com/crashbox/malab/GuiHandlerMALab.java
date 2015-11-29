@@ -30,13 +30,13 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  * Copyright 2015 Andrew O. Mellinger
  */
 @SideOnly(Side.CLIENT)
-public class GuiHandlerMAL implements IGuiHandler
+public class GuiHandlerMALab implements IGuiHandler
 {
     @Override
     public Object getServerGuiElement(int ID, EntityPlayer player,
                                       World world, int x, int y, int z)
     {
-        if (ID == MALMain.GUI_ENUM.DROID.ordinal())
+        if (ID == MALabMain.GUI_ENUM.DROID.ordinal())
         {
             Entity entity = world.getEntityByID(x);
             if (entity instanceof EntityWorkDroid)
@@ -51,19 +51,19 @@ public class GuiHandlerMAL implements IGuiHandler
         if (tileEntity == null)
             return null;
 
-        if (ID == MALMain.GUI_ENUM.CHEST.ordinal())
+        if (ID == MALabMain.GUI_ENUM.CHEST.ordinal())
             return new ContainerAutoChest(player.inventory, (TileEntityAutoChest)tileEntity);
 
-        if (ID == MALMain.GUI_ENUM.FORESTER.ordinal())
+        if (ID == MALabMain.GUI_ENUM.FORESTER.ordinal())
             return new ContainerAutoForester();
 
-        if (ID == MALMain.GUI_ENUM.FURNACE.ordinal())
+        if (ID == MALabMain.GUI_ENUM.FURNACE.ordinal())
             return new ContainerAutoFurnace(player.inventory, (TileEntityAutoFurnace)tileEntity);
 
-        if (ID == MALMain.GUI_ENUM.QUARRY.ordinal())
+        if (ID == MALabMain.GUI_ENUM.QUARRY.ordinal())
             return new ContainerAutoQuarry();
 
-        if (ID == MALMain.GUI_ENUM.WORKBENCH.ordinal())
+        if (ID == MALabMain.GUI_ENUM.WORKBENCH.ordinal())
             return new ContainerAutoWorkbench(player.inventory, (TileEntityAutoWorkbench)tileEntity);
 
         return null;
@@ -73,7 +73,7 @@ public class GuiHandlerMAL implements IGuiHandler
     public Object getClientGuiElement(int ID, EntityPlayer player,
                                       World world, int x, int y, int z)
     {
-        if (ID == MALMain.GUI_ENUM.DROID.ordinal())
+        if (ID == MALabMain.GUI_ENUM.DROID.ordinal())
         {
             Entity entity = world.getEntityByID(x);
             if (entity instanceof EntityWorkDroid)
@@ -88,19 +88,19 @@ public class GuiHandlerMAL implements IGuiHandler
         if (tileEntity == null)
             return null;
 
-        if (ID == MALMain.GUI_ENUM.CHEST.ordinal())
+        if (ID == MALabMain.GUI_ENUM.CHEST.ordinal())
             return new GuiAutoChest( player.inventory, (TileEntityAutoChest)tileEntity);
 
-        if (ID == MALMain.GUI_ENUM.FORESTER.ordinal())
+        if (ID == MALabMain.GUI_ENUM.FORESTER.ordinal())
             return new GuiAutoForester( );
 
-        if (ID == MALMain.GUI_ENUM.FURNACE.ordinal())
+        if (ID == MALabMain.GUI_ENUM.FURNACE.ordinal())
             return new GuiAutoFurnace( player.inventory, (TileEntityAutoFurnace)tileEntity);
 
-        if (ID == MALMain.GUI_ENUM.QUARRY.ordinal())
+        if (ID == MALabMain.GUI_ENUM.QUARRY.ordinal())
             return new GuiAutoQuarry( );
 
-        if (ID == MALMain.GUI_ENUM.WORKBENCH.ordinal())
+        if (ID == MALabMain.GUI_ENUM.WORKBENCH.ordinal())
             return new GuiAutoWorkbench( player.inventory, (TileEntityAutoWorkbench)tileEntity);
 
 

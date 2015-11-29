@@ -1,6 +1,6 @@
 package com.crashbox.malab.util;
 
-import com.crashbox.malab.MALMain;
+import com.crashbox.malab.MALabMain;
 import com.crashbox.malab.common.AnyItemMatcher;
 import com.crashbox.malab.common.ItemStackMatcher;
 import com.crashbox.malab.common.NotItemStackMatcher;
@@ -300,7 +300,7 @@ public class StairBuilder
         int meta = Blocks.stone_slab.getMetaFromState(state);
 
         return new NotItemStackMatcher(new ItemStack(Blocks.stone_slab, 0, meta),
-                new ItemStack(MALMain.BLOCK_AUTO_QUARRY));
+                new ItemStack(MALabMain.BLOCK_AUTO_QUARRY));
     }
 
     private boolean isInExclusions(BlockPos pos)

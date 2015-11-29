@@ -1,6 +1,6 @@
 package com.crashbox.malab.util;
 
-import com.crashbox.malab.MALMain;
+import com.crashbox.malab.MALabMain;
 import com.crashbox.malab.ai.Priority;
 import com.crashbox.malab.common.ItemStackMatcher;
 import com.crashbox.malab.workdroid.EntityWorkDroid;
@@ -31,7 +31,7 @@ public class MALUtils
 {
     public static String getLabeledName(String name)
     {
-        return MALMain.MODID + "." + name;
+        return MALabMain.MODID + "." + name;
     }
 
 

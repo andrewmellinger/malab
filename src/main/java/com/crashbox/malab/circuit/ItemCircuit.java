@@ -1,6 +1,6 @@
 package com.crashbox.malab.circuit;
 
-import com.crashbox.malab.MALMain;
+import com.crashbox.malab.MALabMain;
 import net.minecraft.item.Item;
 
 /**
@@ -13,7 +13,7 @@ public class ItemCircuit extends Item
     public ItemCircuit()
     {
         setMaxStackSize(64);
-        setCreativeTab(MALMain.MAL_TAB);
+        setCreativeTab(MALabMain.MAL_TAB);
 
         setUnlocalizedName(NAME);
     }

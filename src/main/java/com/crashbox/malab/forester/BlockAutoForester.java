@@ -1,6 +1,6 @@
 package com.crashbox.malab.forester;
 
-import com.crashbox.malab.MALMain;
+import com.crashbox.malab.MALabMain;
 import com.crashbox.malab.util.MALUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
@@ -23,7 +23,7 @@ public class BlockAutoForester extends BlockContainer
     {
         super(Material.iron);
         setUnlocalizedName(MALUtils.getLabeledName(NAME));
-        setCreativeTab(MALMain.MAL_TAB);
+        setCreativeTab(MALabMain.MAL_TAB);
         setTickRandomly(false);
 
         setHardness(4.5F);
@@ -68,8 +68,8 @@ public class BlockAutoForester extends BlockContainer
         if (!parWorld.isRemote)
         {
             // This triggers the general GuiHandler
-            entityPlayer.openGui(MALMain.instance,
-                    MALMain.GUI_ENUM.FORESTER.ordinal(),
+            entityPlayer.openGui(MALabMain.instance,
+                    MALabMain.GUI_ENUM.FORESTER.ordinal(),
                     parWorld,
                     parBlockPos.getX(),
                     parBlockPos.getY(),

@@ -8,9 +8,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 /**
  * Copyright 2015 Andrew O. Mellinger
  */
-public class CreativeTabMAL extends CreativeTabs
+public class CreativeTabMALab extends CreativeTabs
 {
-    public CreativeTabMAL()
+    public CreativeTabMALab()
     {
         super(CreativeTabs.getNextID(), "mal");
     }
@@ -19,6 +19,6 @@ public class CreativeTabMAL extends CreativeTabs
     @Override
     public Item getTabIconItem()
     {
-        return Item.getItemFromBlock(MALMain.BLOCK_AUTO_QUARRY);
+        return Item.getItemFromBlock(MALabMain.BLOCK_AUTO_QUARRY);
     }
 }

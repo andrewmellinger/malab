@@ -1,6 +1,6 @@
 package com.crashbox.malab.furnace;
 
-import com.crashbox.malab.MALMain;
+import com.crashbox.malab.MALabMain;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -85,7 +85,7 @@ public class GuiAutoFurnace extends GuiContainer
     }
 
     private static final ResourceLocation guiTexture =
-            new ResourceLocation(MALMain.MODID
+            new ResourceLocation(MALabMain.MODID
                     + ":textures/gui/container/furnace.png");
     private final InventoryPlayer _inventoryPlayer;
     private final TileEntityAutoFurnace _tileFurnace;

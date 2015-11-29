@@ -17,7 +17,7 @@ import java.util.*;
 /**
  * Copyright 2015 Andrew O. Mellinger
  */
-public class MALConfig
+public class MALabConfig
 {
     public final static String AUTONOMY_CATEGORY = "autonomy";
 
@@ -79,7 +79,7 @@ public class MALConfig
 
     //----------------------------------------------------------------------------------------------
 
-    public MALConfig()
+    public MALabConfig()
     {
         // This is for the command
         _translationToSetting = new HashMap<String, Setting>();

@@ -1,6 +1,6 @@
 package com.crashbox.malab.workdroid;
 
-import com.crashbox.malab.MALMain;
+import com.crashbox.malab.MALabMain;
 import com.crashbox.malab.util.MALUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -20,7 +20,7 @@ public class BlockWorkDroidHead extends Block
     {
         super(Material.iron);
         setUnlocalizedName(MALUtils.getLabeledName(NAME));
-        setCreativeTab(MALMain.MAL_TAB);
+        setCreativeTab(MALabMain.MAL_TAB);
         setTickRandomly(false);
 
         setHardness(1.5F);

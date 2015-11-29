@@ -1,6 +1,6 @@
 package com.crashbox.malab.quarry;
 
-import com.crashbox.malab.MALMain;
+import com.crashbox.malab.MALabMain;
 import com.crashbox.malab.util.MALUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
@@ -25,7 +25,7 @@ public class BlockAutoQuarry extends BlockContainer
     {
         super(Material.iron);
         setUnlocalizedName(MALUtils.getLabeledName(NAME));
-        setCreativeTab(MALMain.MAL_TAB);
+        setCreativeTab(MALabMain.MAL_TAB);
         setTickRandomly(false);
 
         // TOOD: Switch to iron, later.
@@ -70,8 +70,8 @@ public class BlockAutoQuarry extends BlockContainer
         if (!parWorld.isRemote)
         {
             // This triggers the general GuiHandler
-            entityPlayer.openGui(MALMain.instance,
-                    MALMain.GUI_ENUM.QUARRY.ordinal(),
+            entityPlayer.openGui(MALabMain.instance,
+                    MALabMain.GUI_ENUM.QUARRY.ordinal(),
                     parWorld,
                     parBlockPos.getX(),
                     parBlockPos.getY(),

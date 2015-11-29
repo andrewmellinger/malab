@@ -1,6 +1,6 @@
 package com.crashbox.malab.workbench;
 
-import com.crashbox.malab.MALMain;
+import com.crashbox.malab.MALabMain;
 import com.crashbox.malab.network.MessageToggleWorkbenchEnable;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -20,7 +20,7 @@ import java.io.IOException;
 public class GuiAutoWorkbench extends GuiContainer
 {
     private static final ResourceLocation guiTextures =
-            new ResourceLocation(MALMain.MODID
+            new ResourceLocation(MALabMain.MODID
                 +":textures/gui/container/workbench.png");
     private final InventoryPlayer _inventoryPlayer;
     private final TileEntityAutoWorkbench _tileWorkbench;

@@ -1,6 +1,6 @@
 package com.crashbox.malab.chest;
 
-import com.crashbox.malab.MALMain;
+import com.crashbox.malab.MALabMain;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -64,7 +64,7 @@ public class GuiAutoChest extends GuiContainer
     }
 
     private static final ResourceLocation guiTexture =
-            new ResourceLocation(MALMain.MODID +":textures/gui/container/chest.png");
+            new ResourceLocation(MALabMain.MODID +":textures/gui/container/chest.png");
 
     private final InventoryPlayer _inventoryPlayer;
     private final IInventory _tileInventory;

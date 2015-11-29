@@ -1,9 +1,9 @@
 [
 {
-  "modid": "mal",
-  "name": "MAL",
+  "modid": "malab",
+  "name": "MALab",
   "description": "Minecraft Autonomy Lab.",
-  "version": "0.9.004",
+  "version": "0.9.005",
   "mcversion": "1.8.0",
   "url": "",
   "updateUrl": "",

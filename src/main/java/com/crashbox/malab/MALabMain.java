@@ -37,14 +37,14 @@ import org.apache.logging.log4j.Logger;
 /**
  * Copyright 2015 Andrew O. Mellinger
  */
-@Mod(modid= MALMain.MODID, name= MALMain.NAME, version= MALMain.VERSION)
-public class MALMain
+@Mod(modid= MALabMain.MODID, name= MALabMain.NAME, version= MALabMain.VERSION)
+public class MALabMain
 {
     // This guy talks about what each event handler does
     // http://greyminecraftcoder.blogspot.com/2013/11/how-forge-starts-up-your-code.html
-    public static final String MODID = "mal";
-    public static final String NAME = "MAL";
-    public static final String VERSION = "0.9.004";
+    public static final String MODID = "malab";
+    public static final String NAME = "MALab";
+    public static final String VERSION = "0.9.005";
 
     public static CreativeTabs MAL_TAB;
 
@@ -61,15 +61,15 @@ public class MALMain
 
     public static SimpleNetworkWrapper NETWORK;
 
-    public static MALConfig CONFIG;
+    public static MALabConfig CONFIG;
 
 
     // This allows us to us one gui handler for many things
     public static enum GUI_ENUM {
         DROID, CHEST, FORESTER, FURNACE, QUARRY, WORKBENCH,  }
 
-    @Instance(value = MALMain.MODID)
-    public static MALMain instance;
+    @Instance(value = MALabMain.MODID)
+    public static MALabMain instance;
 
     @SidedProxy(clientSide = "com.crashbox.mal.ClientProxy",
                 serverSide = "com.crashbox.mal.ServerProxy")
@@ -80,17 +80,17 @@ public class MALMain
     @EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
-        CONFIG = new MALConfig();
+        CONFIG = new MALabConfig();
         CONFIG.loadAndInit(event.getSuggestedConfigurationFile());
 
         //_eventHandler = new MALEventHandler();
         //MinecraftForge.EVENT_BUS.register(_eventHandler);
         //FMLCommonHandler.instance().bus().register(_eventHandler);
 
-        MAL_TAB = new CreativeTabMAL();
+        MAL_TAB = new CreativeTabMALab();
         preInitBlockAndItems();
-        MALMain.NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel("mal");
-        MALMain.NETWORK.registerMessage(MessageWorkDroidEffects.Handler.class,
+        MALabMain.NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel("mal");
+        MALabMain.NETWORK.registerMessage(MessageWorkDroidEffects.Handler.class,
                 MessageWorkDroidEffects.class, 0, Side.CLIENT );
 
         proxy.preInit(event);
@@ -101,10 +101,10 @@ public class MALMain
     {
         // summon with: /summon mal.workDroid
         EntityRegistry.registerModEntity(EntityWorkDroid.class, "WorkDroid", ++modEntityID,
-                MALMain.instance, 80, 3, false);
+                MALabMain.instance, 80, 3, false);
 
-        NetworkRegistry.INSTANCE.registerGuiHandler(MALMain.instance,
-                new GuiHandlerMAL());
+        NetworkRegistry.INSTANCE.registerGuiHandler(MALabMain.instance,
+                new GuiHandlerMALab());
 
         proxy.init(event);
 

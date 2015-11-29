@@ -1,6 +1,6 @@
 package com.crashbox.malab.furnace;
 
-import com.crashbox.malab.MALMain;
+import com.crashbox.malab.MALabMain;
 import com.crashbox.malab.util.MALUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
@@ -33,7 +33,7 @@ public class BlockAutoFurnace extends BlockContainer
         setUnlocalizedName(MALUtils.getLabeledName(NAME));
 
         if (!lit)
-            setCreativeTab(MALMain.MAL_TAB);
+            setCreativeTab(MALabMain.MAL_TAB);
         setTickRandomly(false);
 
         setHardness(4.5F);
@@ -48,13 +48,13 @@ public class BlockAutoFurnace extends BlockContainer
 
         if (active)
         {
-            worldIn.setBlockState(pos, MALMain.BLOCK_AUTO_FURNACE_LIT.getDefaultState());
-            worldIn.setBlockState(pos, MALMain.BLOCK_AUTO_FURNACE_LIT.getDefaultState());
+            worldIn.setBlockState(pos, MALabMain.BLOCK_AUTO_FURNACE_LIT.getDefaultState());
+            worldIn.setBlockState(pos, MALabMain.BLOCK_AUTO_FURNACE_LIT.getDefaultState());
         }
         else
         {
-            worldIn.setBlockState(pos, MALMain.BLOCK_AUTO_FURNACE.getDefaultState());
-            worldIn.setBlockState(pos, MALMain.BLOCK_AUTO_FURNACE.getDefaultState());
+            worldIn.setBlockState(pos, MALabMain.BLOCK_AUTO_FURNACE.getDefaultState());
+            worldIn.setBlockState(pos, MALabMain.BLOCK_AUTO_FURNACE.getDefaultState());
         }
 
         keepInventory = false;
@@ -98,7 +98,7 @@ public class BlockAutoFurnace extends BlockContainer
             Random rand,
             int fortune)
     {
-        return Item.getItemFromBlock(MALMain.BLOCK_AUTO_FURNACE);
+        return Item.getItemFromBlock(MALabMain.BLOCK_AUTO_FURNACE);
     }
 
     @Override
@@ -123,8 +123,8 @@ public class BlockAutoFurnace extends BlockContainer
         if (!parWorld.isRemote)
         {
             // This triggers the general GuiHandler
-            entityPlayer.openGui(MALMain.instance,
-                    MALMain.GUI_ENUM.FURNACE.ordinal(),
+            entityPlayer.openGui(MALabMain.instance,
+                    MALabMain.GUI_ENUM.FURNACE.ordinal(),
                     parWorld,
                     parBlockPos.getX(),
                     parBlockPos.getY(),
@@ -138,7 +138,7 @@ public class BlockAutoFurnace extends BlockContainer
     @SideOnly(Side.CLIENT)
     public Item getItem(World worldIn, BlockPos pos)
     {
-        return Item.getItemFromBlock(MALMain.BLOCK_AUTO_FURNACE);
+        return Item.getItemFromBlock(MALabMain.BLOCK_AUTO_FURNACE);
     }
 
     @Override

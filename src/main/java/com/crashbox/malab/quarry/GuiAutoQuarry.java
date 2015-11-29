@@ -1,6 +1,6 @@
 package com.crashbox.malab.quarry;
 
-import com.crashbox.malab.MALMain;
+import com.crashbox.malab.MALabMain;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ChatComponentTranslation;
@@ -36,6 +36,6 @@ public class GuiAutoQuarry extends GuiContainer
         drawTexturedModalRect(marginHorizontal, marginVertical, 0, 0, xSize, ySize);
     }
 
-    private static final ResourceLocation guiTexture = new ResourceLocation(MALMain.MODID
+    private static final ResourceLocation guiTexture = new ResourceLocation(MALabMain.MODID
                     + ":textures/gui/container/quarry.png");
 }

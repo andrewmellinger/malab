@@ -1,6 +1,6 @@
 package com.crashbox.malab.ai;
 
-import com.crashbox.malab.MALMain;
+import com.crashbox.malab.MALabMain;
 import com.crashbox.malab.task.ITask;
 import com.crashbox.malab.util.MALUtils;
 import net.minecraft.item.ItemStack;
@@ -131,7 +131,7 @@ public class Priority
     public static int quarryDepthValue(World world, int y)
     {
         if (y < 60)
-            return (int) ((60 - y) * MALMain.CONFIG.getQuarryDepthCoefficientValue());
+            return (int) ((60 - y) * MALabMain.CONFIG.getQuarryDepthCoefficientValue());
 
         return 0;
     }
@@ -174,16 +174,16 @@ public class Priority
 
         // Now, add in Y if the specified it
         value += (int) (Math.abs(startPos.getY() - endPos.getY()) *
-                MALMain.CONFIG.getDistanceYCoefficient());
+                MALabMain.CONFIG.getDistanceYCoefficient());
 
         return value;
     }
 
     public static boolean outOfRange(World world, BlockPos startPos, BlockPos endPos)
     {
-        int longestDistance = MALMain.CONFIG.getMaxXZDistance();
+        int longestDistance = MALabMain.CONFIG.getMaxXZDistance();
         return MALUtils.sqDistXZ(startPos, endPos) > (longestDistance * longestDistance) ||
-                (Math.abs(startPos.getY() - endPos.getY()) > MALMain.CONFIG.getMaxYDistance());
+                (Math.abs(startPos.getY() - endPos.getY()) > MALabMain.CONFIG.getMaxYDistance());
 
     }
 

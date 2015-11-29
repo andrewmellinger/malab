@@ -42,47 +42,47 @@ public class ClientProxy extends CommonProxy
         RenderingRegistry.registerEntityRenderingHandler(EntityWorkDroid.class, renderer);
 
         renderItem.getItemModelMesher().register(
-                Item.getItemFromBlock(MALMain.BLOCK_DROID_HEAD),
+                Item.getItemFromBlock(MALabMain.BLOCK_DROID_HEAD),
                 0,
-                new ModelResourceLocation(MALMain.MODID + ":" + BlockAutoWorkbench.NAME, "inventory"));
+                new ModelResourceLocation(MALabMain.MODID + ":" + BlockAutoWorkbench.NAME, "inventory"));
 
         // BLOCKS
         renderItem.getItemModelMesher().register(
-                Item.getItemFromBlock(MALMain.BLOCK_AUTO_CHEST),
+                Item.getItemFromBlock(MALabMain.BLOCK_AUTO_CHEST),
                 0,
-                new ModelResourceLocation(MALMain.MODID + ":" + BlockAutoChest.NAME, "inventory"));
+                new ModelResourceLocation(MALabMain.MODID + ":" + BlockAutoChest.NAME, "inventory"));
 
         renderItem.getItemModelMesher().register(
-                Item.getItemFromBlock(MALMain.BLOCK_AUTO_FURNACE),
+                Item.getItemFromBlock(MALabMain.BLOCK_AUTO_FURNACE),
                 0,
-                new ModelResourceLocation(MALMain.MODID + ":" + BlockAutoFurnace.NAME, "inventory"));
+                new ModelResourceLocation(MALabMain.MODID + ":" + BlockAutoFurnace.NAME, "inventory"));
 
         renderItem.getItemModelMesher().register(
-                Item.getItemFromBlock(MALMain.BLOCK_AUTO_FORESTER),
+                Item.getItemFromBlock(MALabMain.BLOCK_AUTO_FORESTER),
                 0,
-                new ModelResourceLocation(MALMain.MODID + ":" + BlockAutoForester.NAME, "inventory"));
+                new ModelResourceLocation(MALabMain.MODID + ":" + BlockAutoForester.NAME, "inventory"));
 
         renderItem.getItemModelMesher().register(
-                Item.getItemFromBlock(MALMain.BLOCK_AUTO_QUARRY),
+                Item.getItemFromBlock(MALabMain.BLOCK_AUTO_QUARRY),
                 0,
-                new ModelResourceLocation(MALMain.MODID + ":" + BlockAutoQuarry.NAME, "inventory"));
+                new ModelResourceLocation(MALabMain.MODID + ":" + BlockAutoQuarry.NAME, "inventory"));
 
         renderItem.getItemModelMesher().register(
-                Item.getItemFromBlock(MALMain.BLOCK_AUTO_WORKBENCH),
+                Item.getItemFromBlock(MALabMain.BLOCK_AUTO_WORKBENCH),
                 0,
-                new ModelResourceLocation(MALMain.MODID + ":" + BlockAutoWorkbench.NAME, "inventory"));
+                new ModelResourceLocation(MALabMain.MODID + ":" + BlockAutoWorkbench.NAME, "inventory"));
 
         // Special block
         renderItem.getItemModelMesher().register(
-                Item.getItemFromBlock(MALMain.BLOCK_DROID_HEAD),
+                Item.getItemFromBlock(MALabMain.BLOCK_DROID_HEAD),
                 0,
-                new ModelResourceLocation(MALMain.MODID + ":" + BlockWorkDroidHead.NAME, "inventory"));
+                new ModelResourceLocation(MALabMain.MODID + ":" + BlockWorkDroidHead.NAME, "inventory"));
 
         //======================================
         // ITEMS
 
-        renderItem.getItemModelMesher().register(MALMain.ITEM_CIRCUIT, 0,
-                new ModelResourceLocation(MALMain.MODID + ":" + ItemCircuit.NAME, "inventory"));
+        renderItem.getItemModelMesher().register(MALabMain.ITEM_CIRCUIT, 0,
+                new ModelResourceLocation(MALabMain.MODID + ":" + ItemCircuit.NAME, "inventory"));
     }
 
     @Override

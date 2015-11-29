@@ -1,6 +1,6 @@
 package com.crashbox.malab.chest;
 
-import com.crashbox.malab.MALMain;
+import com.crashbox.malab.MALabMain;
 import com.crashbox.malab.util.MALUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
@@ -29,7 +29,7 @@ public class BlockAutoChest extends BlockContainer
     {
         super(Material.iron);
         setUnlocalizedName(MALUtils.getLabeledName(NAME));
-        setCreativeTab(MALMain.MAL_TAB);
+        setCreativeTab(MALabMain.MAL_TAB);
         setTickRandomly(false);
 
         setHardness(4.5F);
@@ -68,7 +68,7 @@ public class BlockAutoChest extends BlockContainer
             Random rand,
             int fortune)
     {
-        return Item.getItemFromBlock(MALMain.BLOCK_AUTO_CHEST);
+        return Item.getItemFromBlock(MALabMain.BLOCK_AUTO_CHEST);
     }
 
     @Override
@@ -93,8 +93,8 @@ public class BlockAutoChest extends BlockContainer
         if (!parWorld.isRemote)
         {
             // This triggers the general GuiHandler
-            entityPlayer.openGui(MALMain.instance,
-                    MALMain.GUI_ENUM.CHEST.ordinal(),
+            entityPlayer.openGui(MALabMain.instance,
+                    MALabMain.GUI_ENUM.CHEST.ordinal(),
                     parWorld,
                     parBlockPos.getX(),
                     parBlockPos.getY(),
@@ -108,7 +108,7 @@ public class BlockAutoChest extends BlockContainer
     @SideOnly(Side.CLIENT)
     public Item getItem(World worldIn, BlockPos pos)
     {
-        return Item.getItemFromBlock(MALMain.BLOCK_AUTO_CHEST);
+        return Item.getItemFromBlock(MALabMain.BLOCK_AUTO_CHEST);
     }
 
     @Override

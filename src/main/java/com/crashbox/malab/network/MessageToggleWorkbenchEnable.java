@@ -1,6 +1,6 @@
 package com.crashbox.malab.network;
 
-import com.crashbox.malab.MALMain;
+import com.crashbox.malab.MALabMain;
 import com.crashbox.malab.workbench.TileEntityAutoWorkbench;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.tileentity.TileEntity;
@@ -34,7 +34,7 @@ public class MessageToggleWorkbenchEnable implements IMessage
     public void toBytes(ByteBuf buf)
     {
         // NOTE:  We have to use 5 because of being signed.  It isn't smart enough to deal with signed values.
-        MALMain.LOGGER.debug("toBytes pos=" + _pos);
+        MALabMain.LOGGER.debug("toBytes pos=" + _pos);
         ByteBufUtils.writeVarShort(buf, _worldID);
         ByteBufUtils.writeVarInt(buf, _pos.getX(), 5);
         ByteBufUtils.writeVarInt(buf, _pos.getY(), 5);
