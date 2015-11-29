@@ -1,5 +1,5 @@
 {
-  "parent": "mal:block/workDroidHead",
+  "parent": "malab:block/workDroidHead",
   "display": {
     "thirdperson": {
       "rotation": [ 10, -45, 170 ],

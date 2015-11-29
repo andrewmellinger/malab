@@ -1,12 +1,12 @@
 {
   "parent": "block/cube",
   "textures": {
-    "up": "mal:blocks/workbench_top",
-    "down": "mal:blocks/workbench_bottom",
-    "north": "mal:blocks/workbench_side_NS",
-    "south": "mal:blocks/workbench_side_NS",
-    "east": "mal:blocks/workbench_side_EW",
-    "west": "mal:blocks/workbench_side_EW",
-    "particle": "mal:blocks/workbench_bottom"
+    "up": "malab:blocks/workbench_top",
+    "down": "malab:blocks/workbench_bottom",
+    "north": "malab:blocks/workbench_side_NS",
+    "south": "malab:blocks/workbench_side_NS",
+    "east": "malab:blocks/workbench_side_EW",
+    "west": "malab:blocks/workbench_side_EW",
+    "particle": "malab:blocks/workbench_bottom"
   }
 }

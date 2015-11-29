@@ -1,5 +1,5 @@
 {
-  "parent": "mal:block/forester",
+  "parent": "malab:block/forester",
   "display": {
     "thirdperson": {
       "rotation": [ 10, -45, 170 ],

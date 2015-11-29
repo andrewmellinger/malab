@@ -1,12 +1,12 @@
 {
   "parent": "block/cube",
   "textures": {
-    "up": "mal:blocks/workDroidHead_top",
-    "down": "mal:blocks/workDroidHead_bottom",
-    "north": "mal:blocks/workDroidHead_side_N",
-    "south": "mal:blocks/workDroidHead_side_S",
-    "east": "mal:blocks/workDroidHead_side_E",
-    "west": "mal:blocks/workDroidHead_side_W",
-    "particle": "mal:blocks/workDroidHead_top"
+    "up": "malab:blocks/workDroidHead_top",
+    "down": "malab:blocks/workDroidHead_bottom",
+    "north": "malab:blocks/workDroidHead_side_N",
+    "south": "malab:blocks/workDroidHead_side_S",
+    "east": "malab:blocks/workDroidHead_side_E",
+    "west": "malab:blocks/workDroidHead_side_W",
+    "particle": "malab:blocks/workDroidHead_top"
   }
 }

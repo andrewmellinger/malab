@@ -1,5 +1,5 @@
 {
-  "parent": "mal:block/workbench",
+  "parent": "malab:block/workbench",
   "display": {
     "thirdperson": {
       "rotation": [ 10, -45, 170 ],

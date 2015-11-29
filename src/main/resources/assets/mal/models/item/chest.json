@@ -1,5 +1,5 @@
 {
-  "parent": "mal:block/chest",
+  "parent": "malab:block/chest",
   "display": {
     "thirdperson": {
       "rotation": [ 10, -45, 170 ],

@@ -1,11 +1,11 @@
 {
   "variants":
   {
-    "normal": { "model": "mal:workbench" },
-    "facing=up": { "model": "mal:workbench" },
-    "facing=east": { "model": "mal:workbench" },
-    "facing=south": { "model": "mal:workbench", "y": 90 },
-    "facing=west": { "model": "mal:workbench", "y": 180 },
-    "facing=north": { "model": "mal:workbench", "y": 270 }
+    "normal": { "model": "malab:workbench" },
+    "facing=up": { "model": "malab:workbench" },
+    "facing=east": { "model": "malab:workbench" },
+    "facing=south": { "model": "malab:workbench", "y": 90 },
+    "facing=west": { "model": "malab:workbench", "y": 180 },
+    "facing=north": { "model": "malab:workbench", "y": 270 }
   }
 }

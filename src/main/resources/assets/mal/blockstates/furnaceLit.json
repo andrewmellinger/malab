@@ -1,11 +1,11 @@
 {
   "variants":
   {
-    "normal": { "model": "mal:furnaceLit" },
-    "facing=up": { "model": "mal:furnaceLit" },
-    "facing=east": { "model": "mal:furnaceLit" },
-    "facing=south": { "model": "mal:furnaceLit", "y": 90 },
-    "facing=west": { "model": "mal:furnaceLit", "y": 180 },
-    "facing=north": { "model": "mal:furnaceLit", "y": 270 }
+    "normal": { "model": "malab:furnaceLit" },
+    "facing=up": { "model": "malab:furnaceLit" },
+    "facing=east": { "model": "malab:furnaceLit" },
+    "facing=south": { "model": "malab:furnaceLit", "y": 90 },
+    "facing=west": { "model": "malab:furnaceLit", "y": 180 },
+    "facing=north": { "model": "malab:furnaceLit", "y": 270 }
   }
 }

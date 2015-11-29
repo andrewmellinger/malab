@@ -1,5 +1,5 @@
 {
-  "parent": "mal:block/furnace",
+  "parent": "malab:block/furnace",
   "display": {
     "thirdperson": {
       "rotation": [ 10, -45, 170 ],

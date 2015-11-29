@@ -1,11 +1,11 @@
 {
   "variants":
   {
-    "normal": { "model": "mal:furnace" },
-    "facing=up": { "model": "mal:furnace" },
-    "facing=east": { "model": "mal:furnace" },
-    "facing=south": { "model": "mal:furnace", "y": 90 },
-    "facing=west": { "model": "mal:furnace", "y": 180 },
-    "facing=north": { "model": "mal:furnace", "y": 270 }
+    "normal": { "model": "malab:furnace" },
+    "facing=up": { "model": "malab:furnace" },
+    "facing=east": { "model": "malab:furnace" },
+    "facing=south": { "model": "malab:furnace", "y": 90 },
+    "facing=west": { "model": "malab:furnace", "y": 180 },
+    "facing=north": { "model": "malab:furnace", "y": 270 }
   }
 }

@@ -1,8 +1,8 @@
 {
   "parent": "block/cube_bottom_top",
   "textures": {
-    "top": "mal:blocks/furnace_top_off",
-    "side": "mal:blocks/furnace_side_off",
-    "bottom": "mal:blocks/furnace_bottom"
+    "top": "malab:blocks/furnace_top_off",
+    "side": "malab:blocks/furnace_side_off",
+    "bottom": "malab:blocks/furnace_bottom"
   }
 }

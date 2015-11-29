@@ -1,5 +1,5 @@
 {
-  "parent": "mal:block/quarry",
+  "parent": "malab:block/quarry",
   "display": {
     "thirdperson": {
       "rotation": [ 10, -45, 170 ],
