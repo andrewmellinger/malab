@@ -129,16 +129,16 @@ public class MALMain
         event.registerServerCommand(CONFIG.makeCommand());
     }
 
-    @EventHandler
-    public void fmlLifeCycle(FMLServerStartedEvent event)
-    {
-        World world = MinecraftServer.getServer().worldServerForDimension(0);
-
-        Priority.setupGameRules(world);
-
-        // Add other custom game rules
-        GameRules rules = world.getGameRules();
-    }
+//    @EventHandler
+//    public void fmlLifeCycle(FMLServerStartedEvent event)
+//    {
+//        World world = MinecraftServer.getServer().worldServerForDimension(0);
+//
+//        Priority.setupGameRules(world);
+//
+//        // Add other custom game rules
+//        GameRules rules = world.getGameRules();
+//    }
 
     //----------------------------------------------------------------------------------------------
 

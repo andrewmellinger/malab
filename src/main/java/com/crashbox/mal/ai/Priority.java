@@ -20,32 +20,7 @@ public class Priority
 
     private static final int QUARRY_MOVE_QUARRY_BLOCK_VALUE = 20;
 
-    private static final String QUARRY_HARVEST_PRIORITY = "mal.quarry.harvest.value";
-    private static final String QUARRY_IDLE_HARVEST_PRIORITY = "mal.quarry.idle.harvest.value";
-
     //----------------------------------------------------------------------------------------------
-
-    @Deprecated
-    public static void setupGameRules(World world)
-    {
-        GameRules rules = world.getGameRules();
-
-        if (!rules.hasRule(QUARRY_HARVEST_PRIORITY))
-            rules.addGameRule(QUARRY_HARVEST_PRIORITY, "5", GameRules.ValueType.NUMERICAL_VALUE);
-
-        if (!rules.hasRule(QUARRY_IDLE_HARVEST_PRIORITY))
-            rules.addGameRule(QUARRY_IDLE_HARVEST_PRIORITY, "0", GameRules.ValueType.NUMERICAL_VALUE);
-    }
-
-    public static int getQuarryItemHarvestValue(World world)
-    {
-        return world.getGameRules().getInt(QUARRY_HARVEST_PRIORITY);
-    }
-
-    public static int getQuarryIdleHarvestValue(World world)
-    {
-        return world.getGameRules().getInt(QUARRY_IDLE_HARVEST_PRIORITY);
-    }
 
     /** Priority for moving the quarry block. */
     public static int getQuarryMoveQuarryBlockValue()

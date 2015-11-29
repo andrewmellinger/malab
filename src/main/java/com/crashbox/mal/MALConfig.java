@@ -28,6 +28,8 @@ public class MALConfig
         DISTANCE_Y_COEFFICIENT(AUTONOMY_CATEGORY, "distance_y_coefficient"),
         FORESTER_HARVEST_VALUE(AUTONOMY_CATEGORY, "forester_harvest_value"),
         FORESTER_IDLE_HARVEST_VALUE(AUTONOMY_CATEGORY, "forester_idle_harvest_value"),
+        QUARRY_HARVEST_PRIORITY(AUTONOMY_CATEGORY, "quarry_harvest_value"),
+        QUARRY_IDLE_HARVEST_PRIORITY(AUTONOMY_CATEGORY, "quarry_idle_harvest_value"),
         QUARRY_DEPTH_COEFFICIENT_VALUE(AUTONOMY_CATEGORY, "quarry_depth_coefficient_value");
 
         private Setting(String category, String key)
@@ -101,6 +103,8 @@ public class MALConfig
         getForesterHarvestValueProperty();
         getForesterIdleHarvestValueProperty();
         getQuarryDepthCoefficientValueProperty();
+        getQuarryHarvestValueProperty();
+        getQuarryIdleHarvestValueProperty();
 
         _config.save();
     }
@@ -199,7 +203,6 @@ public class MALConfig
         return _config.get(setting.getCategory(), setting.getKey(), -5, setting.getHelp());
     }
 
-
     //----------------------------------------------------------------------------------------------
 
     public double getQuarryDepthCoefficientValue()
@@ -217,6 +220,44 @@ public class MALConfig
     {
         Setting setting = Setting.QUARRY_DEPTH_COEFFICIENT_VALUE;
         return _config.get(setting.getCategory(), setting.getKey(), 0.2D, setting.getHelp(), 0.0D, 10.0D);
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    public int getQuarryHarvestValue()
+    {
+        return getQuarryHarvestValueProperty().getInt();
+    }
+
+    public void setQuarryHarvestValue(int val)
+    {
+        getQuarryHarvestValueProperty().set(val);
+        _config.save();
+    }
+
+    private Property getQuarryHarvestValueProperty()
+    {
+        Setting setting = Setting.QUARRY_HARVEST_PRIORITY;
+        return _config.get(setting.getCategory(), setting.getKey(), 0, setting.getHelp());
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+    public int getQuarryIdleHarvestValue()
+    {
+        return getQuarryIdleHarvestValueProperty().getInt();
+    }
+
+    public void setQuarryIdleHarvestValue(int val)
+    {
+        getQuarryIdleHarvestValueProperty().set(val);
+        _config.save();
+    }
+
+    private Property getQuarryIdleHarvestValueProperty()
+    {
+        Setting setting = Setting.QUARRY_IDLE_HARVEST_PRIORITY;
+        return _config.get(setting.getCategory(), setting.getKey(), 0, setting.getHelp());
     }
 
     //----------------------------------------------------------------------------------------------
@@ -323,6 +364,10 @@ public class MALConfig
                 return "" + getForesterIdleHarvestValue();
             case QUARRY_DEPTH_COEFFICIENT_VALUE:
                 return "" + getQuarryDepthCoefficientValue();
+            case QUARRY_HARVEST_PRIORITY:
+                return "" + getQuarryHarvestValue();
+            case QUARRY_IDLE_HARVEST_PRIORITY:
+                return "" + getQuarryIdleHarvestValue();
         }
 
         return "Unknown";
@@ -353,7 +398,12 @@ public class MALConfig
                 case QUARRY_DEPTH_COEFFICIENT_VALUE:
                     setQuarryDepthCoefficientValue(Double.parseDouble(value));
                     break;
-
+                case QUARRY_HARVEST_PRIORITY:
+                    setQuarryHarvestValue(Integer.parseInt(value));
+                    break;
+                case QUARRY_IDLE_HARVEST_PRIORITY:
+                    setQuarryIdleHarvestValue(Integer.parseInt(value));
+                    break;
             }
 
             return true;

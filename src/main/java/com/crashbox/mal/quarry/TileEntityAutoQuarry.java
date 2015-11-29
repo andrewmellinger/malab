@@ -1,5 +1,6 @@
 package com.crashbox.mal.quarry;
 
+import com.crashbox.mal.MALConfig;
 import com.crashbox.mal.MALMain;
 import com.crashbox.mal.task.TaskQuarryTop;
 import com.crashbox.mal.util.MALUtils;
@@ -123,7 +124,7 @@ public class TileEntityAutoQuarry extends TileEntity implements IUpdatePlayerLis
         {
             LOGGER.debug("--found item.");
             TRHarvest quarry = new TRHarvest(this, msg.getSender(), msg.getTransactionID(),
-                    Priority.getQuarryItemHarvestValue(getWorld()),
+                    MALMain.CONFIG.getQuarryHarvestValue(),
                     TaskQuarry.class, msg.getMatcher(), 1);
             _broadcastHelper.postMessage(quarry);
         }
@@ -183,7 +184,7 @@ public class TileEntityAutoQuarry extends TileEntity implements IUpdatePlayerLis
         // If we have something to harvest, call him over
         if (builder.findFirstQuarryable(new AnyItemMatcher(), getEntityFromMessage(msg), null) != null)
         {
-            int value = Priority.getQuarryIdleHarvestValue(getWorld());
+            int value = MALMain.CONFIG.getQuarryIdleHarvestValue();
 
             // Add some value the closer we get to the bottom.
             value += Priority.quarryDepthValue(getWorld(), msg.getSender().getBlockPos().getY());
