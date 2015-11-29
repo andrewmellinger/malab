@@ -1,5 +1,6 @@
 package com.crashbox.mal.task;
 
+import com.crashbox.mal.messaging.IMessager;
 import com.crashbox.mal.messaging.MessageTaskRequest;
 import net.minecraft.util.BlockPos;
 
@@ -23,6 +24,8 @@ public interface ITask
     void sendHeartbeat(long expire);
 
     void start();
+
+    IMessager getRequester();
 
     BlockPos getWorkCenter();
 

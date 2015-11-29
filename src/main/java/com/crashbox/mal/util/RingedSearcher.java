@@ -5,6 +5,8 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 
@@ -18,6 +20,8 @@ public class RingedSearcher  implements Iterable<BlockPos>
                                            ItemStackMatcher matcher, List<BlockPos> exclusions,
                                            BlockBounds bounds)
     {
+        LOGGER.debug("findTree start=" + start + ", radius=" + radius + ", height=" + height + ", bound" + bounds + ", matcher=" + matcher);
+
         RingedSearcher searcher = new RingedSearcher(start, radius, height);
         for (BlockPos pos : searcher)
         {
@@ -44,34 +48,6 @@ public class RingedSearcher  implements Iterable<BlockPos>
         return null;
     }
 
-    @Deprecated
-    public static Queue<BlockPos> findTree(World world, BlockPos center, int radius, int height,
-            ItemStackMatcher matcher, List<BlockPos> exclusions)
-    {
-        RingedSearcher searcher = new RingedSearcher(center, radius, height);
-        for (BlockPos pos : searcher)
-        {
-            if (MALUtils.willDrop(world, pos, matcher) && !MALUtils.pointInAreas(pos, exclusions, 1))
-            {
-                Queue<BlockPos> result = new LinkedList<BlockPos>();
-
-                // Move down to bottom
-                // TODO:  Also look laterally
-                for (int y = pos.getY(); y >= center.getY(); --y)
-                {
-                    BlockPos tmp = new BlockPos(pos.getX(), y, pos.getZ());
-                    if (MALUtils.willDrop(world, tmp, matcher))
-                    {
-                        result.add(tmp);
-                    }
-                }
-                return result;
-            }
-        }
-
-        return null;
-    }
-
     public static boolean detectBlock(World world, BlockPos center, int radius, int height,
                                       ItemStackMatcher matcher)
     {
@@ -81,6 +57,8 @@ public class RingedSearcher  implements Iterable<BlockPos>
     public static BlockPos findBlock(World world, BlockPos center, int radius, int height,
                                      ItemStackMatcher matcher, List<BlockPos> exclusions)
     {
+        LOGGER.debug("findBlock center=" + center+ ", radius=" + radius + ", height=" + height + ", matcher=" + matcher + ", exclusions=" + exclusions);
+
         RingedSearcher searcher = new RingedSearcher(center, radius, height);
         for (BlockPos pos : searcher)
         {
@@ -108,7 +86,10 @@ public class RingedSearcher  implements Iterable<BlockPos>
         {
             ItemStack stack = MALUtils.identifyWillDrop(world, pos, matcher);
             if (stack != null)
+            {
+                LOGGER.debug("FindFirstItemDrop pos=" + pos + ", " + stack);
                 return stack;
+            }
         }
 
         return null;
@@ -361,6 +342,6 @@ public class RingedSearcher  implements Iterable<BlockPos>
     private final int _radius;
     private final int _height;
 
-
+    private static final Logger LOGGER = LogManager.getLogger();
 }
 

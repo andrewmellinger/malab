@@ -765,7 +765,7 @@ public class TileEntityAutoWorkbench extends TileEntityAutoBlockInventory implem
 
         private void handleWorkerAvailability(MessageWorkerAvailability msg)
         {
-            if (!haveFreeWorkerSlots())
+            if (!haveFreeWorkerSlots(msg))
                 return;
 
                 // Only ask for things if we have a valid config.

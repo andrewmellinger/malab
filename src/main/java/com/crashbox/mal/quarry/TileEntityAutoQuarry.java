@@ -8,7 +8,6 @@ import com.crashbox.mal.ai.Priority;
 import com.crashbox.mal.autoblock.AutoBlockBase;
 import com.crashbox.mal.common.AnyItemMatcher;
 import com.crashbox.mal.common.ItemStackMatcher;
-import com.crashbox.mal.util.RingedSearcher;
 import com.crashbox.mal.workdroid.EntityWorkDroid;
 import com.crashbox.mal.messaging.*;
 import com.crashbox.mal.task.TaskQuarry;
@@ -103,12 +102,12 @@ public class TileEntityAutoQuarry extends TileEntity implements IUpdatePlayerLis
         {
             if (msg instanceof MessageItemRequest)
             {
-                if (haveFreeWorkerSlots())
+                if (haveFreeWorkerSlots(msg))
                     handleItemRequest((MessageItemRequest) msg);
             }
             else if (msg instanceof MessageWorkerAvailability)
             {
-                if (haveFreeWorkerSlots() && readyForNextAvailabilityResponseMS())
+                if (haveFreeWorkerSlots(msg) && readyForNextAvailabilityResponseMS())
                     handleWorkerAvailability((MessageWorkerAvailability) msg);
             }
         }

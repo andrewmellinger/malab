@@ -32,6 +32,18 @@ public class BlockBounds
                   point.getZ() < _minZ || point.getZ() > _maxZ );
     }
 
+    @Override
+    public String toString()
+    {
+        return "BlockBounds{" +
+                "minX=" + _minX +
+                ", minZ=" + _minZ +
+                ", maxX=" + _maxX +
+                ", maxZ=" + _maxZ +
+                ", y=" + _y +
+                '}';
+    }
+
     private int _minX;
     private int _minZ;
     private int _maxX;

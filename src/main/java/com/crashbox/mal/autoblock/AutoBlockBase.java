@@ -87,11 +87,13 @@ public abstract class AutoBlockBase
         _lastHeartbeat.put(msg.getSender(), msg.getExpireMS());
     }
 
-    protected boolean haveFreeWorkerSlots()
+    protected boolean haveFreeWorkerSlots(Message msg)
     {
         // Prune the list
         ageOutWorkerList();
 
+        if (_lastHeartbeat.containsKey(msg.getSender()))
+            return true;
         return _lastHeartbeat.size() < concurrentWorkerCount();
     }
 

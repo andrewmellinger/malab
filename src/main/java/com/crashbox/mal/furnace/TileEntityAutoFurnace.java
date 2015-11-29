@@ -835,7 +835,7 @@ public class TileEntityAutoFurnace extends TileEntityAutoBlockInventory implemen
             if (msg instanceof MessageWorkerAvailability)
             {
                 // We don't want to ask everyone to collect resources for us all the time
-                if (haveFreeWorkerSlots())
+                if (haveFreeWorkerSlots(msg))
                     handleWorkerAvailability((MessageWorkerAvailability) msg);
             }
             else if (msg instanceof MessageIsStorageAvailable)

@@ -126,17 +126,17 @@ public class TileEntityAutoForester extends TileEntity implements IUpdatePlayerL
         {
             if (msg instanceof MessageItemRequest)
             {
-                if (haveFreeWorkerSlots())
+                if (haveFreeWorkerSlots(msg))
                     handleItemRequest((MessageItemRequest) msg);
             }
-            else if (msg instanceof MessageWorkerAvailability && haveFreeWorkerSlots())
+            else if (msg instanceof MessageWorkerAvailability)
             {
-                if (haveFreeWorkerSlots())
+                if (haveFreeWorkerSlots(msg) && readyForNextAvailabilityResponseMS())
                     handleWorkerAvailability((MessageWorkerAvailability)msg);
             }
             else if (msg instanceof MessageIsStorageAvailable)
             {
-                if (haveFreeWorkerSlots())
+                if (haveFreeWorkerSlots(msg))
                     handleIsStorageAvailable((MessageIsStorageAvailable) msg);
             }
         }
@@ -151,7 +151,7 @@ public class TileEntityAutoForester extends TileEntity implements IUpdatePlayerL
                 msg.getMatcher().matches(Item.getItemFromBlock(Blocks.log)) ||
                 msg.getMatcher().matches(Item.getItemFromBlock(Blocks.log2)) )
         {
-            debugLog("handleItemRequest: msg=" + msg);
+            LOGGER.debug("handleItemRequest: msg=" + msg);
 
             // If they are looking for saplings and we have empty squares, don't give them out.
             if (msg.getMatcher().matches(Item.getItemFromBlock(Blocks.sapling)))
@@ -175,7 +175,7 @@ public class TileEntityAutoForester extends TileEntity implements IUpdatePlayerL
                         msg.getTransactionID(), MALMain.CONFIG.getForesterHarvestValue(),
                         TaskHarvestTree.class, msg.getMatcher(), msg.getQuantity());
 
-                debugLog("Forest has item at=" + foundPos + ", for=" + req);
+                debugLog("Forester has item at=" + foundPos + ", for=" + req);
                 _broadcastHelper.postMessage(req);
             }
 
@@ -209,6 +209,7 @@ public class TileEntityAutoForester extends TileEntity implements IUpdatePlayerL
 
 //                    //LOGGER.debug("Posting request: " + req);
             _broadcastHelper.postMessage(pairRequest);
+            _forester.setNextAvailabilityResponseMS();
             return;
         }
 
@@ -216,22 +217,26 @@ public class TileEntityAutoForester extends TileEntity implements IUpdatePlayerL
 
         // Cleanup anything else laying around
         if (MALUtils.generateCleanupTask(this, getWorld(), getBlockPos(), getRadius() + 2, msg))
+        {
+            _forester.setNextAvailabilityResponseMS();
             return;
+        }
 
         //=====================
 
         // We can also just provide wood
-        ItemStack sample = RingedSearcher.findFirstItemDrop(getWorld(), getPos(), _searchRadius + 2, _searchHeight,
+        ItemStack sample = RingedSearcher.findFirstItemDrop(getWorld(), getPos(), _searchRadius, _searchHeight,
                 new ItemTypeMatcher(Item.getItemFromBlock(Blocks.log)));
         if (sample != null)
         {
-            // Offer a task, at our area for the requested thing.
+            // Offer a task, at our area for the thing we found.
             TRHarvest req = new TRHarvest(TileEntityAutoForester.this, msg.getSender(),
                     msg.getTransactionID(), MALMain.CONFIG.getForesterIdleHarvestValue(),
                     TaskHarvestTree.class, new ItemStackMatcher(sample), -1);
 
-            debugLog("-- posting request: " + req);
+            LOGGER.debug("-- posting request: " + req);
             _broadcastHelper.postMessage(req);
+            _forester.setNextAvailabilityResponseMS();
         }
     }
 
@@ -279,7 +284,7 @@ public class TileEntityAutoForester extends TileEntity implements IUpdatePlayerL
     private Forester _forester;
     private Broadcaster.BroadcastHelper _broadcastHelper;
     private int _searchRadius = 5;
-    private int _searchHeight = 10;
+    private int _searchHeight = 15;
     private static final Logger LOGGER = LogManager.getLogger();
 
 }

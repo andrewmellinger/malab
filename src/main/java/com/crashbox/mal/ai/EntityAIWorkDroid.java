@@ -32,7 +32,7 @@ public class EntityAIWorkDroid extends EntityAIBase implements IMessager
         _entity = entity;
         Broadcaster.getInstance().subscribe(new MyListener(), dimensionId);
         _nextElicit = System.currentTimeMillis() + ELICIT_DELAY_MS +
-                (long)(ELICIT_DELAY_MS * _entity.getRNG().nextFloat());
+                (long) (ELICIT_DELAY_MS * _entity.getRNG().nextFloat());
         _broadcastHelper = new Broadcaster.BroadcastHelper(dimensionId);
     }
 
@@ -64,6 +64,7 @@ public class EntityAIWorkDroid extends EntityAIBase implements IMessager
     public void resetTask()
     {
         // NOTE:  Reset is called every time we complete.
+        debugLog("resetTask called.");
         cancel();
     }
 
@@ -153,11 +154,15 @@ public class EntityAIWorkDroid extends EntityAIBase implements IMessager
             if (msg.getTarget() != null && msg.getTarget() != this)
                 continue;
 
+            // Skip ones we are ignoring
+            if (shouldIgnoreSender(msg.getSender()))
+                continue;
+
             // Hand data requests.  These are generally simple status things -
             // TODO: Move this to the listener so it doesn't have to wait for the AI loop.
             if (msg instanceof MessageDataRequest)
             {
-                processDataRequests((MessageDataRequest)msg);
+                processDataRequests((MessageDataRequest) msg);
                 continue;
             }
 
@@ -196,7 +201,7 @@ public class EntityAIWorkDroid extends EntityAIBase implements IMessager
             }
             else
             {
-                if (_currentTask != null && msg instanceof MessageTaskRequest )
+                if (_currentTask != null && msg instanceof MessageTaskRequest)
                     debugLog("Have task, ignoring message: " + msg);
                 else
                     debugLog("No task ignoring message: " + msg);
@@ -219,12 +224,12 @@ public class EntityAIWorkDroid extends EntityAIBase implements IMessager
         TaskPair pair = new TaskPair(this);
         if (message instanceof TRAcquireBase)
         {
-            TaskAcquireBase task = (TaskAcquireBase)TaskBase.createTask(this, message);
+            TaskAcquireBase task = (TaskAcquireBase) TaskBase.createTask(this, message);
             pair.setAcquireTask(task);
         }
         else if (message instanceof TRDeliverBase)
         {
-            TaskDeliverBase task = (TaskDeliverBase)TaskBase.createTask(this, message);
+            TaskDeliverBase task = (TaskDeliverBase) TaskBase.createTask(this, message);
             pair.setDeliverTask(task);
         }
         else
@@ -239,10 +244,10 @@ public class EntityAIWorkDroid extends EntityAIBase implements IMessager
     {
         TaskPair pair = new TaskPair(this);
 
-        TaskAcquireBase taskAcquire = (TaskAcquireBase)TaskBase.createTask(this, message.getAcquireRequest());
+        TaskAcquireBase taskAcquire = (TaskAcquireBase) TaskBase.createTask(this, message.getAcquireRequest());
         pair.setAcquireTask(taskAcquire);
 
-        TaskDeliverBase taskDeliver= (TaskDeliverBase)TaskBase.createTask(this, message.getDeliverRequest());
+        TaskDeliverBase taskDeliver = (TaskDeliverBase) TaskBase.createTask(this, message.getDeliverRequest());
         pair.setDeliverTask(taskDeliver);
 
         // Should we repeat?
@@ -296,7 +301,7 @@ public class EntityAIWorkDroid extends EntityAIBase implements IMessager
         // Why? Well, we may be able to collect trees and make fuel. So we can influence
         // our own fuel production.
         // Once in a while we want to tell people we need more
-        if (System.currentTimeMillis() > _nextFuelMS && _entity.needFuel() )
+        if (System.currentTimeMillis() > _nextFuelMS && _entity.needFuel())
         {
             //debugLog("Low on fuel, requesting!!!");
             _nextFuelMS = System.currentTimeMillis() + FUEL_REQUEST_DELAY;
@@ -305,7 +310,7 @@ public class EntityAIWorkDroid extends EntityAIBase implements IMessager
             postFuelRequest();
             return State.ELICITING;
         }
-        else if (System.currentTimeMillis() > _nextElicit )
+        else if (System.currentTimeMillis() > _nextElicit)
         {
             // Once in a while we want to tell people we need more
             //debugLog("Idle timeout over.");
@@ -353,30 +358,16 @@ public class EntityAIWorkDroid extends EntityAIBase implements IMessager
 
             if (_currentTask != null)
             {
-                //debugLog("Selected:" + _currentTask);
                 _currentTask.start();
             }
             else
             {
-//                debugLog("Don't have any valid task, but hands full. Looking for storage.");
-//                // If we are here we tried but couldn't find anything matching
-//                ItemStack held = getEntity().getHeldItem();
-//                if (held != null)
-//                {
-//                    _nextElicit = System.currentTimeMillis() + ELICIT_DELAY_MS;
-//                    _requestEndMS = System.currentTimeMillis() + REQUEST_TIMEOUT_MS;
-//                    Message msg = new MessageIsStorageAvailable(this, null, held.getItem(), 0, new ItemStackMatcher(held));
-//                    debugLog("-- " + msg);
-//                    Broadcaster.postMessage(msg);
-//                    return State.ELICITING;
-//                }
-//
                 return State.IDLING;
             }
 
             //getEntity().spawnExplosionParticle();
             BlockPos workCenter = _currentTask.getWorkCenter();
-//            debugLog("Selected task: " + _currentTask);
+            debugLog("Selected task: " + _currentTask);
 //            debugLog("   ==> moving to: " + workCenter);
             tryMoveTo(workCenter);
 
@@ -408,7 +399,7 @@ public class EntityAIWorkDroid extends EntityAIBase implements IMessager
         Iterator<MessageTaskRequest> iter = _responseTasks.iterator();
         while (iter.hasNext())
         {
-            MessageTaskRequest next =  iter.next();
+            MessageTaskRequest next = iter.next();
             if (next.getTransactionID() == id)
             {
                 result.add(next);
@@ -447,7 +438,8 @@ public class EntityAIWorkDroid extends EntityAIBase implements IMessager
         }
         else if (getEntity().getNavigator().noPath())
         {
-            LOGGER.debug(id() + " Couldn't get a path during transition, idling");
+            debugLog("Couldn't get a path during transition, idling. position=" + getBlockPos() +
+                    ", workCenter=" + _currentTask.getWorkCenter());
             // If we have no path, then we are done.
             resetTask();
             return State.IDLING;
@@ -474,7 +466,7 @@ public class EntityAIWorkDroid extends EntityAIBase implements IMessager
             _workArea = _currentTask.getWorkTarget(_workAreas);
             if (_workArea == null)
             {
-                debugLog(id() + " Failed to find work area, aborting. " + _currentTask);
+                debugLog("Failed to find work area, aborting. " + _currentTask);
                 _currentTask = null;
                 return State.IDLING;
             }
@@ -491,6 +483,7 @@ public class EntityAIWorkDroid extends EntityAIBase implements IMessager
             }
             else
             {
+                debugLog("Targeting with workArea but no path, idling. position=" + getBlockPos() + ", workArea=" + _workArea);
                 return State.IDLING;
             }
         }
@@ -511,7 +504,7 @@ public class EntityAIWorkDroid extends EntityAIBase implements IMessager
         Iterator<Message> iter = _responses.iterator();
         while (iter.hasNext())
         {
-            Message next =  iter.next();
+            Message next = iter.next();
             if (next instanceof MessageWorkArea)
             {
                 if (_workArea == null && next.getTransactionID() == _currentTask && System.currentTimeMillis() < _requestEndMS)
@@ -540,11 +533,11 @@ public class EntityAIWorkDroid extends EntityAIBase implements IMessager
                     // Nothing special.
                     return State.PERFORMING;
                 case RETARGET:
-                    debugLog(" Retargeting");
+                    debugLog("Retargeting");
                     requestWorkAreas();
                     return State.TARGETING;
                 case DONE:
-                    ///debugLog(this.toString());
+                    debugLog("completed task, switching to idle.");
                     //debugLog("  --> Switching to idle.");
                     //debugLog("  --> now=" + System.currentTimeMillis());
                     return State.IDLING;
@@ -606,30 +599,32 @@ public class EntityAIWorkDroid extends EntityAIBase implements IMessager
         return (path != null);
     }
 
-
     // Convenience method
     public boolean tryMoveTo(BlockPos pos)
     {
         // If we are 2 blocks away, we are good enough
-        if (MALUtils.isWithinXZSqDist(getEntity().getPosition(), pos, 4))
-        {
-            debugLog("Close enough!  Not moving.");
-            return true;
-        }
+//        if (MALUtils.isWithinXZSqDist(getEntity().getPosition(), pos, 4))
+//        {
+//            debugLog("Close enough!  Not moving. position=" + getEntity().getPosition() + ", target= " + pos);
+//            return true;
+//        }
 
         // Compute position towards us but not on the block, so we aren't actually standing on the thing.
         BlockPos target = MALUtils.getBlockBeside(getBlockPos(), pos);
-        debugLog("Targeting  Nearby: " + pos + " to: " + target);
+        debugLog("Targeting nearby: " + pos + " as: " + target);
 
         boolean canMove = getEntity().getNavigator().tryMoveToXYZ(target.getX(), target.getY(), target.getZ(),
                 getEntity().getSpeedFactor());
 
-        // Sometimes we can't move near, so just move to
+        // Sometimes we can't move near, so just move to it
         if (!canMove)
         {
             canMove = getEntity().getNavigator().tryMoveToXYZ(pos.getX(), pos.getY(), pos.getZ(),
                     getEntity().getSpeedFactor());
         }
+
+        if (!canMove)
+            ignoreSender(_currentTask.getRequester());
 
         return canMove;
     }
@@ -637,6 +632,28 @@ public class EntityAIWorkDroid extends EntityAIBase implements IMessager
     public boolean inProximity(BlockPos pos)
     {
         return MALUtils.isWithinXZSqDist(getEntity().getPosition(), pos, PROXIMITY_SQ);
+    }
+
+    private void ignoreSender(IMessager sender)
+    {
+        debugLog("Adding ignore: " + sender + " for " + IGNORE_TIMEOUT_MS + " milliseconds.");
+        _ignoreList.put(sender, System.currentTimeMillis()+IGNORE_TIMEOUT_MS);
+    }
+
+    public boolean shouldIgnoreSender(IMessager sender)
+    {
+        Long timeout = _ignoreList.get(sender);
+        if (timeout == null)
+            return false;
+
+        if( timeout < System.currentTimeMillis() )
+        {
+            _ignoreList.remove(sender);
+            return false;
+        }
+
+        debugLog("Ignoring " + sender);
+        return true;
     }
 
     //=============================================================================================
@@ -739,7 +756,8 @@ public class EntityAIWorkDroid extends EntityAIBase implements IMessager
 
     // How often do we send the hearbeat, and how long should they wait
     private static final long HEARTBEAT_DELAY       = 2000;
-    private static final long HEARTBEAT_VARIANCE    = 1000;
+//    private static final long HEARTBEAT_VARIANCE    = 1000;
+    private static final long HEARTBEAT_VARIANCE    = 3000;
     private long _nextHeartbeatMS                   = 0;
 
     private static final long HEAL_DELAY_MS             = 500;
@@ -765,6 +783,11 @@ public class EntityAIWorkDroid extends EntityAIBase implements IMessager
     private final List<MessageTaskRequest> _responseTasks = new LinkedList<MessageTaskRequest>();
 
     private final List<BlockPos> _workAreas = new ArrayList<BlockPos>();
+
+    // Messagers we are ignoring for a while
+    private final HashMap<IMessager, Long> _ignoreList = new HashMap<IMessager, Long>();
+    private static final int IGNORE_TIMEOUT_MS = 10000;
+
 
     // Do we have a current task we are pursuing?
     private ITask _currentTask;

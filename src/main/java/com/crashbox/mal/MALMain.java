@@ -88,8 +88,8 @@ public class MALMain
         CONFIG = new MALConfig();
         CONFIG.loadAndInit(event.getSuggestedConfigurationFile());
 
-        _eventHandler = new MALEventHandler();
-        MinecraftForge.EVENT_BUS.register(_eventHandler);
+        //_eventHandler = new MALEventHandler();
+        //MinecraftForge.EVENT_BUS.register(_eventHandler);
         //FMLCommonHandler.instance().bus().register(_eventHandler);
 
         MAL_TAB = new CreativeTabMAL();

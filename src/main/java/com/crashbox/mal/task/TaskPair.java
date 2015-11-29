@@ -141,7 +141,7 @@ public class TaskPair implements ITask
         BlockPos pos = _entityAI.getBlockPos();
         int value = 0;
 
-        String msg = "start=" + pos;
+        String msg = _entityAI.id() + " start=" + pos;
 
         if (_acquireTask != null)
         {
@@ -216,6 +216,11 @@ public class TaskPair implements ITask
         return _current.getWorkCenter();
     }
 
+    public IMessager getRequester()
+    {
+        return _current.getRequester();
+    }
+
     /**
      * Returns the next work available work target.  Note, this will/may change
      * each time it is called.  If it returns null, then no more work locations
@@ -266,22 +271,21 @@ public class TaskPair implements ITask
             case EMPTYING:
                 _current = _acquireTask;
                 _stage = Stage.ACQUIRING;
-                LOGGER.debug(_entityAI.id() + ":  finished acquiring.");
+                LOGGER.debug(_entityAI.id() + ":  finished emptying.");
                 return UpdateResult.RETARGET;
 
             case ACQUIRING:
                 // If we have enough stuff, then we are good
                 if (acquiredEnough())
                 {
-                    //LOGGER.debug(_entityAI.id() + ":  acquiredEnough inv=" + _entityAI.getEntity().getHeldSize() +
-                    //        ", req=" + _deliverTask.getQuantity());
                     _current = _deliverTask;
                     _stage = Stage.DELIVERING;
+                    debugLog("acquiredEnough inv=" + _entityAI.getEntity().getHeldSize() + ", req=" + _deliverTask.getQuantity());
+                    debugLog("switching from acquiring to delivering. acquire=" + _acquireTask + ", deliver=" + _deliverTask);
                 }
                 return UpdateResult.RETARGET;
 
             case DELIVERING:
-                LOGGER.debug(_entityAI.id() + ":  finished delivering.");
                 if (_repeat)
                 {
                     // If we are supposed to repeat then keep delivering until we run out
@@ -292,8 +296,10 @@ public class TaskPair implements ITask
                         _current = _acquireTask;
                     }
 
+                    debugLog("Repeating deliver.");
                     return UpdateResult.RETARGET;
                 }
+                debugLog("finished delivering.");
 
                 // Since we have no repeat, we are done.
                 _current = null;
@@ -402,6 +408,11 @@ public class TaskPair implements ITask
                 ", acquireTask=" + _acquireTask +
                 ", deliverTask=" + _deliverTask +
                 '}';
+    }
+
+    private void debugLog(String msg)
+    {
+        LOGGER.debug(_entityAI.id() + " " + msg);
     }
 
 
