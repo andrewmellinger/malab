@@ -1,5 +1,6 @@
 package com.crashbox.malab.furnace;
 
+import com.crashbox.malab.MALabMain;
 import com.crashbox.malab.ai.Priority;
 import com.crashbox.malab.common.ItemStackMatcher;
 import com.crashbox.malab.messaging.*;
@@ -538,7 +539,7 @@ public class TileEntityAutoFurnace extends TileEntityAutoBlockInventory implemen
     @Override
     public String getGuiID()
     {
-        return "mal:furnace";
+        return MALabMain.MODID + ":furnace";
     }
 
     @Override

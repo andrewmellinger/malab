@@ -1,5 +1,6 @@
 package com.crashbox.malab.workdroid;
 
+import com.crashbox.malab.MALabMain;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.renderer.entity.*;
 import net.minecraft.client.renderer.entity.layers.LayerBipedArmor;
@@ -23,6 +24,6 @@ public class RenderWorkDroid extends RenderBiped
     @Override
     protected ResourceLocation getEntityTexture(Entity entity)
     {
-        return new ResourceLocation("mal:textures/entity/mal.png");
+        return new ResourceLocation(MALabMain.MODID + ":textures/entity/mal.png");
     }
 }

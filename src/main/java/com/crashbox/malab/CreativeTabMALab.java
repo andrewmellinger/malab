@@ -12,7 +12,7 @@ public class CreativeTabMALab extends CreativeTabs
 {
     public CreativeTabMALab()
     {
-        super(CreativeTabs.getNextID(), "mal");
+        super(CreativeTabs.getNextID(), "malab");
     }
 
     @SideOnly(Side.CLIENT)

@@ -1,5 +1,6 @@
 package com.crashbox.malab.chest;
 
+import com.crashbox.malab.MALabMain;
 import com.crashbox.malab.ai.Priority;
 import com.crashbox.malab.autoblock.AutoBlockBase;
 import com.crashbox.malab.messaging.*;
@@ -320,7 +321,7 @@ public class TileEntityAutoChest extends TileEntityAutoBlockInventory implements
     @Override
     public String getGuiID()
     {
-        return "mal:chest";
+        return MALabMain.MODID + ":chest";
     }
 
     @Override

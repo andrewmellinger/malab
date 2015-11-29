@@ -89,7 +89,7 @@ public class MALabMain
 
         MAL_TAB = new CreativeTabMALab();
         preInitBlockAndItems();
-        MALabMain.NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel("mal");
+        MALabMain.NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel("malab");
         MALabMain.NETWORK.registerMessage(MessageWorkDroidEffects.Handler.class,
                 MessageWorkDroidEffects.class, 0, Side.CLIENT );
 

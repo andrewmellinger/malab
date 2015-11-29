@@ -1,5 +1,6 @@
 package com.crashbox.malab.workbench;
 
+import com.crashbox.malab.MALabMain;
 import com.crashbox.malab.util.MALUtils;
 import com.crashbox.malab.ai.Priority;
 import com.crashbox.malab.autoblock.AutoBlockBase;
@@ -389,7 +390,7 @@ public class TileEntityAutoWorkbench extends TileEntityAutoBlockInventory implem
     @Override
     public String getGuiID()
     {
-        return "mal:workbench";
+        return MALabMain.MODID + ":workbench";
     }
 
     @Override
