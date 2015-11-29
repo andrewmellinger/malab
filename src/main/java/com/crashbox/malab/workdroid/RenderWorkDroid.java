@@ -24,6 +24,6 @@ public class RenderWorkDroid extends RenderBiped
     @Override
     protected ResourceLocation getEntityTexture(Entity entity)
     {
-        return new ResourceLocation(MALabMain.MODID + ":textures/entity/mal.png");
+        return new ResourceLocation(MALabMain.MODID + ":textures/entity/malab.png");
     }
 }

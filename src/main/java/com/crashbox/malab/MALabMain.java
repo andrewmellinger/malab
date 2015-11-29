@@ -71,8 +71,8 @@ public class MALabMain
     @Instance(value = MALabMain.MODID)
     public static MALabMain instance;
 
-    @SidedProxy(clientSide = "com.crashbox.mal.ClientProxy",
-                serverSide = "com.crashbox.mal.ServerProxy")
+    @SidedProxy(clientSide = "com.crashbox.malab.ClientProxy",
+                serverSide = "com.crashbox.malab.ServerProxy")
     public static CommonProxy proxy;
 
     //----------------------------------------------------------------------------------------------
@@ -99,7 +99,7 @@ public class MALabMain
     @EventHandler
     public void init(FMLInitializationEvent event)
     {
-        // summon with: /summon mal.workDroid
+        // summon with: /summon malab.workDroid
         EntityRegistry.registerModEntity(EntityWorkDroid.class, "WorkDroid", ++modEntityID,
                 MALabMain.instance, 80, 3, false);
 

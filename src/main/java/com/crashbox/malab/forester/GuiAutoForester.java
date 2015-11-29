@@ -22,7 +22,7 @@ public class GuiAutoForester extends GuiContainer
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
     {
-        String s = new ChatComponentTranslation("container.mal.forester.directions").getUnformattedText();
+        String s = new ChatComponentTranslation("container.malab.forester.directions").getUnformattedText();
         fontRendererObj.drawSplitString(s, 6, 6, xSize - 12, 4210752);
     }
 

@@ -374,7 +374,7 @@ public class TileEntityAutoWorkbench extends TileEntityAutoBlockInventory implem
     @Override
     public String getName()
     {
-        return hasCustomName() ? _customName : "container.mal.workbench";
+        return hasCustomName() ? _customName : "container.malab.workbench";
     }
 
     @Override

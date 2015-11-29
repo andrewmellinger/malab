@@ -10,7 +10,7 @@ public class InventoryEntityWorkDroid extends InventoryBasic
 {
     public InventoryEntityWorkDroid(EntityWorkDroid workDroid)
     {
-        super(new ChatComponentTranslation("container.mal.workDroid.title").getUnformattedText(), false, 3);
+        super(new ChatComponentTranslation("container.malab.workDroid.title").getUnformattedText(), false, 3);
         _workDroid = workDroid;
         setInventorySlotContents(0, workDroid.getHeldItem());
         setInventorySlotContents(1, workDroid.getFuelStack());

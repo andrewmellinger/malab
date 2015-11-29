@@ -22,7 +22,7 @@ public class GuiAutoQuarry extends GuiContainer
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
     {
-        String s = new ChatComponentTranslation("container.mal.quarry.directions").getUnformattedText();
+        String s = new ChatComponentTranslation("container.malab.quarry.directions").getUnformattedText();
         fontRendererObj.drawSplitString(s, 6, 6, xSize - 12, 4210752);
     }
 

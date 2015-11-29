@@ -355,7 +355,7 @@ public class TileEntityAutoFurnace extends TileEntityAutoBlockInventory implemen
     @Override
     public String getName()
     {
-        return hasCustomName() ? _customName : "container.mal.furnace";
+        return hasCustomName() ? _customName : "container.malab.furnace";
     }
 
     @Override

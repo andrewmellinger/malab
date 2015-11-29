@@ -15,7 +15,7 @@ public class GuiEntityWorkDroid extends GuiContainer
 {
     private static final ResourceLocation grinderGuiTextures =
             new ResourceLocation(MALabMain.MODID
-                    + ":textures/gui/container/mal.png");
+                    + ":textures/gui/container/malab.png");
     private final InventoryPlayer _inventoryPlayer;
     private final IInventory _inventory;
 
@@ -36,16 +36,16 @@ public class GuiEntityWorkDroid extends GuiContainer
         fontRendererObj.drawString(_inventoryPlayer.getDisplayName().getUnformattedText(), 8, ySize - 96 + 2, 4210752);
 
         // Text for held
-        String heldTitle = new ChatComponentTranslation("container.mal.workDroid.title.held").getUnformattedText();
+        String heldTitle = new ChatComponentTranslation("container.malab.workDroid.title.held").getUnformattedText();
         fontRendererObj.drawString(heldTitle, 42, 20, 4210752);
 
         // Text for fuel
-        String fuelTitle = new ChatComponentTranslation("container.mal.workDroid.title.fuel").getUnformattedText();
+        String fuelTitle = new ChatComponentTranslation("container.malab.workDroid.title.fuel").getUnformattedText();
         fuelTitle += ": " + _workDroid.getFuelSecs();
         fontRendererObj.drawString(fuelTitle, 42, 56, 4210752);
 
         // Text for follow me
-        String followMeTitle = new ChatComponentTranslation("container.mal.workDroid.title.followme").getUnformattedText();
+        String followMeTitle = new ChatComponentTranslation("container.malab.workDroid.title.followme").getUnformattedText();
         int start = 141 - fontRendererObj.getStringWidth(followMeTitle);
         fontRendererObj.drawString(followMeTitle, start, 20, 4210752);
     }

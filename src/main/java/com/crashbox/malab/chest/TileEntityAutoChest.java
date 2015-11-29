@@ -222,7 +222,7 @@ public class TileEntityAutoChest extends TileEntityAutoBlockInventory implements
     @Override
     public String getName()
     {
-        return hasCustomName() ? _customName : "container.mal.chest";
+        return hasCustomName() ? _customName : "container.malab.chest";
     }
 
     @Override
