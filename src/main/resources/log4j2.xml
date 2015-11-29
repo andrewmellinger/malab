@@ -8,16 +8,16 @@
     </Appenders>
     <Loggers>
         <Logger level="trace" additivity="true" name="com.crashbox"/>
-        <Logger level="debug"  additivity="true" name="com.crashbox.mal.ai.EntityAIWorkDroid"/>
-        <Logger level="info"  additivity="true" name="com.crashbox.mal.chest.TileEntityAutoChest"/>
-        <Logger level="debug"  additivity="true" name="com.crashbox.mal.forester.TileEntityAutoForester"/>
-        <Logger level="info"  additivity="true" name="com.crashbox.mal.furnace.TileEntityAutoFurnace"/>
-        <Logger level="info"  additivity="true" name="com.crashbox.mal.quarry.TileEntityAutoQuarry"/>
-        <Logger level="info"  additivity="true" name="com.crashbox.mal.task"/>
-        <Logger level="debug"  additivity="true" name="com.crashbox.mal.task.TaskPair"/>
-        <Logger level="debug"  additivity="true" name="com.crashbox.mal.task.TaskMakeBigStair"/>
-        <Logger level="info"  additivity="true" name="com.crashbox.mal.util.StairBuilder"/>
-        <Logger level="info"  additivity="true" name="com.crashbox.mal.workbench.TileEntityAutoWorkbench"/>
+        <Logger level="debug"  additivity="true" name="com.crashbox.malab.ai.EntityAIWorkDroid"/>
+        <Logger level="info"  additivity="true" name="com.crashbox.malab.chest.TileEntityAutoChest"/>
+        <Logger level="debug"  additivity="true" name="com.crashbox.malab.forester.TileEntityAutoForester"/>
+        <Logger level="info"  additivity="true" name="com.crashbox.malab.furnace.TileEntityAutoFurnace"/>
+        <Logger level="info"  additivity="true" name="com.crashbox.malab.quarry.TileEntityAutoQuarry"/>
+        <Logger level="info"  additivity="true" name="com.crashbox.malab.task"/>
+        <Logger level="debug"  additivity="true" name="com.crashbox.malab.task.TaskPair"/>
+        <Logger level="debug"  additivity="true" name="com.crashbox.malab.task.TaskMakeBigStair"/>
+        <Logger level="info"  additivity="true" name="com.crashbox.malab.util.StairBuilder"/>
+        <Logger level="info"  additivity="true" name="com.crashbox.malab.workbench.TileEntityAutoWorkbench"/>
         <Root level="warn">
             <AppenderRef ref="Console"/>
         </Root>
