@@ -15,7 +15,7 @@ public class GuiEntityWorkDroid extends GuiContainer
 {
     private static final ResourceLocation grinderGuiTextures =
             new ResourceLocation(MALabMain.MODID
-                    + ":textures/gui/container/malab.png");
+                    + ":textures/gui/container/workdroid.png");
     private final InventoryPlayer _inventoryPlayer;
     private final IInventory _inventory;
 
