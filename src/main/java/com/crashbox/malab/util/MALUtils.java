@@ -258,7 +258,7 @@ public class MALUtils
         return null;
     }
 
-    public static Item findFirstItemTypeOnGround(World world, BlockPos startPos, int range)
+    public static Item findFirstItemTypeOnGround(World world, BlockPos startPos, int range, boolean onDirt)
     {
         int x = startPos.getX();
         int y = startPos.getY();
@@ -273,7 +273,7 @@ public class MALUtils
                 EntityItem entityItem = (EntityItem)obj;
                 BlockPos pos = entityItem.getPosition();
                 IBlockState downState = world.getBlockState(pos.down());
-                if (downState.getBlock() == Blocks.grass || downState.getBlock() == Blocks.dirt )
+                if (!onDirt || downState.getBlock() == Blocks.grass || downState.getBlock() == Blocks.dirt )
                 {
                     return entityItem.getEntityItem().getItem();
                 }
@@ -704,9 +704,9 @@ public class MALUtils
     //   #   #   #  ###  #   # ##### #   #  ####
 
     public static boolean generateCleanupTask(IMessager sender, World world, BlockPos pos, int radius,
-                                              MessageWorkerAvailability msg)
+                                              MessageWorkerAvailability msg, boolean onDirt)
     {
-        Item item = MALUtils.findFirstItemTypeOnGround(world, pos, radius);
+        Item item = MALUtils.findFirstItemTypeOnGround(world, pos, radius, onDirt);
         if (item != null)
         {
             Broadcaster.postMessage(new TRPickup(sender, msg.getSender(), msg.getTransactionID(),

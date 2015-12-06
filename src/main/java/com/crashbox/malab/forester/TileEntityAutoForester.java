@@ -216,7 +216,7 @@ public class TileEntityAutoForester extends TileEntity implements IUpdatePlayerL
         //=====================
 
         // Cleanup anything else laying around
-        if (MALUtils.generateCleanupTask(this, getWorld(), getBlockPos(), getRadius() + 2, msg))
+        if (MALUtils.generateCleanupTask(this, getWorld(), getBlockPos(), getRadius() + 2, msg, true))
         {
             _forester.setNextAvailabilityResponseMS();
             return;

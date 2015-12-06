@@ -8,14 +8,14 @@
     </Appenders>
     <Loggers>
         <Logger level="trace" additivity="true" name="com.crashbox"/>
-        <Logger level="debug"  additivity="true" name="com.crashbox.malab.ai.EntityAIWorkDroid"/>
+        <Logger level="info"  additivity="true" name="com.crashbox.malab.ai.EntityAIWorkDroid"/>
         <Logger level="info"  additivity="true" name="com.crashbox.malab.chest.TileEntityAutoChest"/>
-        <Logger level="debug"  additivity="true" name="com.crashbox.malab.forester.TileEntityAutoForester"/>
+        <Logger level="info"  additivity="true" name="com.crashbox.malab.forester.TileEntityAutoForester"/>
         <Logger level="info"  additivity="true" name="com.crashbox.malab.furnace.TileEntityAutoFurnace"/>
         <Logger level="info"  additivity="true" name="com.crashbox.malab.quarry.TileEntityAutoQuarry"/>
         <Logger level="info"  additivity="true" name="com.crashbox.malab.task"/>
-        <Logger level="debug"  additivity="true" name="com.crashbox.malab.task.TaskPair"/>
-        <Logger level="debug"  additivity="true" name="com.crashbox.malab.task.TaskMakeBigStair"/>
+        <Logger level="info"  additivity="true" name="com.crashbox.malab.task.TaskPair"/>
+        <Logger level="info"  additivity="true" name="com.crashbox.malab.task.TaskMakeBigStair"/>
         <Logger level="info"  additivity="true" name="com.crashbox.malab.util.StairBuilder"/>
         <Logger level="info"  additivity="true" name="com.crashbox.malab.workbench.TileEntityAutoWorkbench"/>
         <Root level="warn">

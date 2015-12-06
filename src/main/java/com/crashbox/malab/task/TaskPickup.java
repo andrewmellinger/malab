@@ -61,7 +61,14 @@ public class TaskPickup extends TaskAcquireBase
         return UpdateResult.DONE;
     }
 
-    //=============================================================================================
+    @Override
+    public void debugInfo(StringBuilder builder)
+    {
+        super.debugInfo(builder);
+        builder.append(", item=").append(_item);
+    }
+
+//=============================================================================================
 
     private final Item _item;
 

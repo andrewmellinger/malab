@@ -137,8 +137,9 @@ public class TileEntityAutoQuarry extends TileEntity implements IUpdatePlayerLis
             return;
 
             // first clean up any messes
-        if (MALUtils.generateCleanupTask(this, getWorld(), getPos(), _radius, msg))
+        if (MALUtils.generateCleanupTask(this, getWorld(), getPos(), _radius, msg, false))
         {
+            debugLog("************ Issued cleanup task.");
             _quarry.setNextAvailabilityResponseMS();
             return;
         }

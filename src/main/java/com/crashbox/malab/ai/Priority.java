@@ -49,7 +49,7 @@ public class Priority
 
     public static int getGenericCleanUpTaskValue()
     {
-        return 0;
+        return 30;
     }
 
     public static int getForesterStorageSaplingPlantValue()

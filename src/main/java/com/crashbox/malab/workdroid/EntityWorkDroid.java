@@ -92,6 +92,18 @@ public class EntityWorkDroid extends EntityCreature
         this.dataWatcher.addObject(20, 0);
     }
 
+
+    @Override
+    protected void onDeathUpdate()
+    {
+        // Place a block
+        World world = getEntityWorld();
+        IBlockState state = MALabMain.BLOCK_DROID_HEAD.getDefaultState();
+        world.setBlockState(getPosition(), state);
+
+        super.onDeathUpdate();
+    }
+
     @Override
     protected boolean canDespawn()
     {
@@ -562,7 +574,7 @@ public class EntityWorkDroid extends EntityCreature
     //=============================================================================================
     // NAMING
 
-    private static String makeName()
+    public static String makeName()
     {
         // We have three formats that is four characters and a dash.  The dash can be anywhere inside
         // but the other characters are [A-Z0-9] except the first which is just [A-Z].
