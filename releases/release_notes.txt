@@ -1,4 +1,12 @@
-Version 0.9.004 - 2015-
+Version 0.9.005 - 2015-12-06
+
+Additions:
+-Moved gamerule settings to "malab" command.
+-Quarry clears out area around the top now to facilitate deep mining.
+-Many changes to support better collaboration.
+
+
+Version 0.9.004 - 2015-11-15
 
 Bug Fixes:
 -Shift click should work with all inventories (fixed crash and imperfect behavior)
