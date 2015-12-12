@@ -1,5 +1,7 @@
 # Minecraft Autonomy Lab (MALab) Docs
 
+![Logo Image](doc_snapshots/logo.png)
+
 # Introduction #
 
 This mod was developed to help explore robots (autonomous systems). The first version is to set up the basic Minecraft connections and to get some basic concepts working.  The initial robots are not very smart and only do simple actions but this still provides an interesting addition to Minecraft.
