@@ -1,16 +1,21 @@
-[
 {
-  "modid": "malab",
-  "name": "MALab",
-  "description": "Minecraft Autonomy Lab.",
-  "version": "0.9.005",
-  "mcversion": "1.8.0",
-  "url": "",
-  "updateUrl": "",
-  "authorList": ["Andrew Mellinger"],
-  "credits": "For Virginia and Natalie",
-  "logoFile": "",
-  "screenshots": [],
-  "dependencies": []
+  "modListVersion": 2,
+  "modList": [{
+    "modid": "malab",
+    "name": "Minecraft Autonomy Lab",
+    "description": "Put robots to work down on the farm or in the mines!",
+    "version": "0.9.006",
+    "mcversion": "1.8",
+    "url": "http://github.com/andrewmellinger/malab",
+    "updateUrl": "http://github.com/andrewmellinger/malab/tree/master/releases",
+    "authorList": ["Andrew Mellinger"],
+    "logoFile": "assets/malab/textures/blocks/workDroidHead_side_N.png",
+    "credits": "For Virginia and Natalie",
+    "screenshots": [],
+    "dependants":[],
+    "dependencies": ["Forge@[11.14.1.1334,)"],
+    "requiredMods": ["Forge@[11.14.1.1334,)"],
+    "useDependencyInformation": true
+  }]
 }
-]
+

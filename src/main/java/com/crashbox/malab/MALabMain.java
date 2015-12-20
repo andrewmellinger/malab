@@ -44,7 +44,7 @@ public class MALabMain
     // http://greyminecraftcoder.blogspot.com/2013/11/how-forge-starts-up-your-code.html
     public static final String MODID = "malab";
     public static final String NAME = "MALab";
-    public static final String VERSION = "0.9.005";
+    public static final String VERSION = "0.9.006";
 
     public static CreativeTabs MAL_TAB;
 
